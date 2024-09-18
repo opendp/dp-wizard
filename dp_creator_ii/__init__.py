@@ -3,4 +3,8 @@
 __version__ = "0.0.1"
 
 def main():
-    print('hello world')
+    import shiny
+    import os
+    from pathlib import Path
+    os.chdir(Path(__file__).parent) # run_app() depends on the CWD.
+    shiny.run_app()
