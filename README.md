@@ -13,14 +13,24 @@ Building on what we've learned from [DP Creator](https://github.com/opendp/dpcre
 
 ## Development
 
-To get started, clone the repo, install dependencies, and start shiny:
+### Getting Started
+
+To get started, clone the repo and install dev dependencies:
 ```
 git clone https://github.com/opendp/dp-creator-ii.git
 cd dp-creator-ii
 python3 -m venv .venv
 pip install -r requirements-dev.txt
-shiny run dp_creator_ii/app.py
 ```
+
+Now install the application itself locally and run it:
+```
+flit install --symlink
+dp-creator-ii
+```
+You should see a webserver start, along with a prompt to connect to http://127.0.0.1:8000/.
+
+### Conventions
 
 Branch names should be of the form `NNNN-short-description`, where `NNNN` is the issue number being addressed.
 
