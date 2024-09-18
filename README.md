@@ -13,12 +13,13 @@ Building on what we've learned from [DP Creator](https://github.com/opendp/dpcre
 
 ## Development
 
-Clone the repo and set up a virtual environment:
+To get started, clone the repo, install dependencies, and start shiny:
 ```
 git clone https://github.com/opendp/dp-creator-ii.git
 cd dp-creator-ii
 python3 -m venv .venv
 pip install -r requirements-dev.txt
+shiny run dp_creator_ii/app.py
 ```
 
 Branch names should be of the form `NNNN-short-description`, where `NNNN` is the issue number being addressed.

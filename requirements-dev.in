@@ -1,3 +1,10 @@
 pip-tools
 flit
+
+# shiny requirements:
+faicons
 shiny
+shinywidgets
+plotly
+pandas
+ridgeplot
