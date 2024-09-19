@@ -13,7 +13,7 @@ __version__ = "0.0.1"
 
 def main():
     parser = ArgumentParser(
-        description='DP Creator II helps you get started with Differential Privacy.')
+        description=__doc__)
     parser.add_argument(
         '--csv',
         dest='csv_path',
