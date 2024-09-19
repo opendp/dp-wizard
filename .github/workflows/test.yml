@@ -12,7 +12,11 @@ jobs:
     strategy:
       matrix:
         python-version:
+          - '3.7'
+          - '3.8'
           - '3.9'
+          - '3.10'
+          - '3.11'
           - '3.12'
 
     steps:
@@ -30,6 +34,12 @@ jobs:
       - name: Install package
         run: flit install
 
-      - name: Run
+      - name: Check CLI
+        # TODO: This won't catch most missing dependencies.
         run: dp-creator-ii --help
 
+      - name: Install dev dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Test
+        run: pytest
