@@ -27,10 +27,11 @@ def main():
     parser.add_argument(
         '--debug',
         action='store_true',
-        help='Use during development for increased logging and auto-reload after code changes')
+        help='Use during development for increased logging '
+             'and auto-reload after code changes')
     args = parser.parse_args()
 
-    os.chdir(Path(__file__).parent) # run_app() depends on the CWD.
+    os.chdir(Path(__file__).parent)  # run_app() depends on the CWD.
 
     # Just setting variables in a plain python module doesn't work:
     # The new thread started for the server doesn't see changes.

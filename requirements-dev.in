@@ -3,6 +3,7 @@
 
 pip-tools
 flit
+autoflake
 
 # testing:
 pytest
