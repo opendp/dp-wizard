@@ -11,6 +11,24 @@ Building on what we've learned from [DP Creator](https://github.com/opendp/dpcre
 - UI development in Python with [Shiny](https://shiny.posit.co/py/)
 - Tracking of cumulative privacy consumption between sessions
 
+## Usage
+
+```
+usage: pytest [-h] [--csv CSV_PATH] [--unit UNIT_OF_PRIVACY] [--debug]
+
+DP Creator II makes it easier to get started with Differential Privacy.
+
+options:
+  -h, --help            show this help message and exit
+  --csv CSV_PATH        Path to CSV containing private data
+  --unit UNIT_OF_PRIVACY
+                        Unit of privacy: How many rows can an individual
+                        contribute?
+  --debug               Use during development for increased logging and auto-
+                        reload after code changes
+```
+
+
 ## Development
 
 ### Getting Started

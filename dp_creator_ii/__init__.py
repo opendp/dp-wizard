@@ -11,7 +11,7 @@ import shiny
 __version__ = "0.0.1"
 
 
-def main():
+def get_parser():
     parser = ArgumentParser(
         description=__doc__)
     parser.add_argument(
@@ -29,6 +29,11 @@ def main():
         action='store_true',
         help='Use during development for increased logging '
              'and auto-reload after code changes')
+    return parser
+
+
+def main():
+    parser = get_parser()
     args = parser.parse_args()
 
     os.chdir(Path(__file__).parent)  # run_app() depends on the CWD.
