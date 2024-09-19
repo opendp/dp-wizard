@@ -33,8 +33,6 @@ docutils==0.21.2
     # via flit
 executing==2.1.0
     # via stack-data
-faicons==0.2.2
-    # via -r requirements-dev.in
 flit==3.9.0
     # via -r requirements-dev.in
 flit-core==3.9.0
@@ -42,9 +40,7 @@ flit-core==3.9.0
 h11==0.14.0
     # via uvicorn
 htmltools==0.5.3
-    # via
-    #   faicons
-    #   shiny
+    # via shiny
 idna==3.10
     # via
     #   anyio
@@ -71,38 +67,19 @@ mdit-py-plugins==0.4.2
     # via shiny
 mdurl==0.1.2
     # via markdown-it-py
-numpy==2.1.1
-    # via
-    #   pandas
-    #   patsy
-    #   ridgeplot
-    #   scipy
-    #   statsmodels
 packaging==24.1
     # via
     #   build
     #   htmltools
-    #   plotly
     #   shiny
-    #   statsmodels
-pandas==2.2.2
-    # via
-    #   -r requirements-dev.in
-    #   statsmodels
 parso==0.8.4
     # via jedi
-patsy==0.5.6
-    # via statsmodels
 pexpect==4.9.0
     # via ipython
 pip-tools==7.4.1
     # via -r requirements-dev.in
 platformdirs==4.3.6
     # via jupyter-core
-plotly==5.24.1
-    # via
-    #   -r requirements-dev.in
-    #   ridgeplot
 prompt-toolkit==3.0.36
     # via
     #   ipython
@@ -119,21 +96,13 @@ pyproject-hooks==1.1.0
     #   build
     #   pip-tools
 python-dateutil==2.9.0.post0
-    # via
-    #   pandas
-    #   shinywidgets
+    # via shinywidgets
 python-multipart==0.0.9
     # via shiny
-pytz==2024.2
-    # via pandas
 questionary==2.0.1
     # via shiny
 requests==2.32.3
     # via flit
-ridgeplot==0.1.25
-    # via -r requirements-dev.in
-scipy==1.14.1
-    # via statsmodels
 shiny==1.1.0
     # via
     #   -r requirements-dev.in
@@ -143,7 +112,6 @@ shinywidgets==0.3.3
 six==1.16.0
     # via
     #   asttokens
-    #   patsy
     #   python-dateutil
 sniffio==1.3.1
     # via anyio
@@ -151,10 +119,6 @@ stack-data==0.6.3
     # via ipython
 starlette==0.38.5
     # via shiny
-statsmodels==0.14.3
-    # via ridgeplot
-tenacity==9.0.0
-    # via plotly
 tomli-w==1.0.0
     # via flit
 traitlets==5.14.3
@@ -168,8 +132,6 @@ typing-extensions==4.12.2
     # via
     #   htmltools
     #   shiny
-tzdata==2024.1
-    # via pandas
 uc-micro-py==1.0.3
     # via linkify-it-py
 urllib3==2.2.3

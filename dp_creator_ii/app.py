@@ -1,11 +1,10 @@
 import json
 from pathlib import Path
-from collections import defaultdict
 
 from shiny import App, ui, reactive, render
 
 config_path = Path(__file__).parent / 'config.json'
-config = defaultdict(str) if not config_path.is_file() else json.loads(config_path.read_text())
+config = json.loads(config_path.read_text())
 
 app_ui = ui.page_fluid(
     ui.output_text("value"),

@@ -1,10 +1,9 @@
+# After making changes here, run:
+#    pip-compile requirements-dev.in
+
 pip-tools
 flit
 
 # shiny requirements:
-faicons
 shiny
 shinywidgets
-plotly
-pandas
-ridgeplot
