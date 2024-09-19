@@ -9,6 +9,10 @@ readme = "README.md"
 license = {file = "LICENSE"}
 classifiers = ["License :: OSI Approved :: MIT License"]
 dynamic = ["version", "description"]
+dependencies = [
+    "shiny",
+    "shinywidgets",
+]
 
 [project.scripts]
 dp-creator-ii = "dp_creator_ii:main"
