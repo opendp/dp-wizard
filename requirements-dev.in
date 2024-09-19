@@ -4,6 +4,12 @@
 pip-tools
 flit
 
-# shiny requirements:
+# testing:
+pytest
+flake8
+mypy
+coverage
+
+# shiny:
 shiny
 shinywidgets

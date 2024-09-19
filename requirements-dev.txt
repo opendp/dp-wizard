@@ -27,12 +27,16 @@ click==8.1.7
     #   uvicorn
 comm==0.2.2
     # via ipywidgets
+coverage==7.6.1
+    # via -r requirements-dev.in
 decorator==5.1.1
     # via ipython
 docutils==0.21.2
     # via flit
 executing==2.1.0
     # via stack-data
+flake8==7.1.1
+    # via -r requirements-dev.in
 flit==3.9.0
     # via -r requirements-dev.in
 flit-core==3.9.0
@@ -45,6 +49,8 @@ idna==3.10
     # via
     #   anyio
     #   requests
+iniconfig==2.0.0
+    # via pytest
 ipython==8.18.0
     # via ipywidgets
 ipywidgets==8.1.5
@@ -63,14 +69,21 @@ markdown-it-py==3.0.0
     #   shiny
 matplotlib-inline==0.1.7
     # via ipython
+mccabe==0.7.0
+    # via flake8
 mdit-py-plugins==0.4.2
     # via shiny
 mdurl==0.1.2
     # via markdown-it-py
+mypy==1.11.2
+    # via -r requirements-dev.in
+mypy-extensions==1.0.0
+    # via mypy
 packaging==24.1
     # via
     #   build
     #   htmltools
+    #   pytest
     #   shiny
 parso==0.8.4
     # via jedi
@@ -80,6 +93,8 @@ pip-tools==7.4.1
     # via -r requirements-dev.in
 platformdirs==4.3.6
     # via jupyter-core
+pluggy==1.5.0
+    # via pytest
 prompt-toolkit==3.0.36
     # via
     #   ipython
@@ -89,12 +104,18 @@ ptyprocess==0.7.0
     # via pexpect
 pure-eval==0.2.3
     # via stack-data
+pycodestyle==2.12.1
+    # via flake8
+pyflakes==3.2.0
+    # via flake8
 pygments==2.18.0
     # via ipython
 pyproject-hooks==1.1.0
     # via
     #   build
     #   pip-tools
+pytest==8.3.3
+    # via -r requirements-dev.in
 python-dateutil==2.9.0.post0
     # via shinywidgets
 python-multipart==0.0.9
@@ -131,6 +152,7 @@ traitlets==5.14.3
 typing-extensions==4.12.2
     # via
     #   htmltools
+    #   mypy
     #   shiny
 uc-micro-py==1.0.3
     # via linkify-it-py
