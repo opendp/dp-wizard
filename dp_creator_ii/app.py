@@ -5,17 +5,18 @@ from shiny import App, ui, reactive, render
 
 config_path = Path(__file__).parent / 'config.json'
 config = json.loads(config_path.read_text())
+config_path.unlink()
 
 app_ui = ui.page_fluid(
     ui.output_text("value"),
     ui.navset_tab(
         ui.nav_panel(
-            "Dataset",
+            "Select Dataset",
             "TODO: Pick dataset",
             ui.output_text("csv_path_text"),
             ui.output_text("unit_of_privacy_text")),
-        ui.nav_panel("Analysis", "TODO: Define analysis"),
-        ui.nav_panel("Download", "TODO: Download results"),
+        ui.nav_panel("Perform Analysis", "TODO: Define analysis"),
+        ui.nav_panel("Download Results", "TODO: Download results"),
     )
 )
 
