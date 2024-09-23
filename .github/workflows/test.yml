@@ -38,4 +38,7 @@ jobs:
         run: pip install -r requirements-dev.txt
 
       - name: Test
-        run: pytest
+        run: coverage run -m pytest -v
+
+      - name: Check coverage
+        run: coverage report

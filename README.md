@@ -14,7 +14,7 @@ Building on what we've learned from [DP Creator](https://github.com/opendp/dpcre
 ## Usage
 
 ```
-usage: pytest [-h] [--csv CSV_PATH] [--unit UNIT_OF_PRIVACY] [--debug]
+usage: dp-creator-ii [-h] [--csv CSV_PATH] [--unit UNIT_OF_PRIVACY] [--debug]
 
 DP Creator II makes it easier to get started with Differential Privacy.
 
