@@ -5,6 +5,9 @@ pip-tools
 flit
 autoflake
 
+# opendp
+opendp[polars]
+
 # testing:
 pytest
 flake8

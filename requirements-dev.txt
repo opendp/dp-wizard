@@ -59,6 +59,8 @@ ipywidgets==8.1.5
     # via shinywidgets
 jedi==0.19.1
     # via ipython
+joblib==1.4.2
+    # via scikit-learn
 jupyter-core==5.7.2
     # via shinywidgets
 jupyterlab-widgets==3.0.13
@@ -81,6 +83,15 @@ mypy==1.11.2
     # via -r requirements-dev.in
 mypy-extensions==1.0.0
     # via mypy
+numpy==1.26.4
+    # via
+    #   opendp
+    #   pyarrow
+    #   randomgen
+    #   scikit-learn
+    #   scipy
+opendp[polars]==0.11.1
+    # via -r requirements-dev.in
 packaging==24.1
     # via
     #   build
@@ -97,6 +108,8 @@ platformdirs==4.3.6
     # via jupyter-core
 pluggy==1.5.0
     # via pytest
+polars==1.1.0
+    # via opendp
 prompt-toolkit==3.0.36
     # via
     #   ipython
@@ -106,6 +119,8 @@ ptyprocess==0.7.0
     # via pexpect
 pure-eval==0.2.3
     # via stack-data
+pyarrow==17.0.0
+    # via opendp
 pycodestyle==2.12.1
     # via flake8
 pyflakes==3.2.0
@@ -126,8 +141,14 @@ python-multipart==0.0.9
     # via shiny
 questionary==2.0.1
     # via shiny
+randomgen==2.0.1
+    # via opendp
 requests==2.32.3
     # via flit
+scikit-learn==1.5.2
+    # via opendp
+scipy==1.14.1
+    # via scikit-learn
 shiny==1.1.0
     # via
     #   -r requirements-dev.in
@@ -144,6 +165,8 @@ stack-data==0.6.3
     # via ipython
 starlette==0.38.5
     # via shiny
+threadpoolctl==3.5.0
+    # via scikit-learn
 tomli-w==1.0.0
     # via flit
 traitlets==5.14.3

@@ -12,6 +12,7 @@ dynamic = ["version", "description"]
 dependencies = [
     "shiny",
     "shinywidgets",
+    "opendp[polars]",
 ]
 
 [project.scripts]
