@@ -7,6 +7,9 @@ autoflake
 
 # opendp
 opendp[polars]
+# For Python 3.9:
+scipy<1.14
+
 
 # testing:
 pytest

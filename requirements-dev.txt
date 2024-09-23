@@ -147,8 +147,10 @@ requests==2.32.3
     # via flit
 scikit-learn==1.5.2
     # via opendp
-scipy==1.14.1
-    # via scikit-learn
+scipy==1.13.1
+    # via
+    #   -r requirements-dev.in
+    #   scikit-learn
 shiny==1.1.0
     # via
     #   -r requirements-dev.in
