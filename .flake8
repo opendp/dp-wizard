@@ -1,2 +1,6 @@
 [flake8]
 exclude = .git,.venv,__pycache__
+
+per-file-ignores =
+    # Ignore undefined names
+    */templates/*:F821
