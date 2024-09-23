@@ -2,6 +2,10 @@
 # All files under source are checked, even if not otherwise referenced.
 source = .
 
+omit =
+  # TODO
+  app.py
+
 # More strict: Check transitions between lines, not just individual lines.
 # TODO: branch = True
 

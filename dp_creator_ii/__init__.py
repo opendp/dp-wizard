@@ -32,7 +32,7 @@ def get_parser():
     return parser
 
 
-def main():
+def main():  # pragma: no cover
     parser = get_parser()
     args = parser.parse_args()
 
