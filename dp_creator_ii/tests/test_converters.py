@@ -13,6 +13,10 @@ def norm_nb(nb_str):
         r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z',
         '2024-01-01T00:00:00.000000Z',
         normed_nb_str)
+    normed_nb_str = re.sub(
+        r'"version": "[^"]+"',
+        '"version": "3.0.0"',
+        normed_nb_str)
     return normed_nb_str
 
 
