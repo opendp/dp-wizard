@@ -10,6 +10,8 @@ anyio==4.4.0
     #   watchfiles
 appdirs==1.4.4
     # via shiny
+appnope==0.1.4
+    # via ipykernel
 asgiref==3.8.1
     # via shiny
 asttokens==2.4.1
@@ -20,6 +22,10 @@ attrs==24.2.0
     #   referencing
 autoflake==2.3.1
     # via -r requirements-dev.in
+beautifulsoup4==4.12.3
+    # via nbconvert
+bleach==6.1.0
+    # via nbconvert
 build==1.2.2
     # via pip-tools
 certifi==2024.8.30
@@ -32,11 +38,17 @@ click==8.1.7
     #   shiny
     #   uvicorn
 comm==0.2.2
-    # via ipywidgets
+    # via
+    #   ipykernel
+    #   ipywidgets
 coverage==7.6.1
     # via -r requirements-dev.in
+debugpy==1.8.6
+    # via ipykernel
 decorator==5.1.1
     # via ipython
+defusedxml==0.7.1
+    # via nbconvert
 docutils==0.21.2
     # via flit
 executing==2.1.0
@@ -59,22 +71,39 @@ idna==3.10
     #   requests
 iniconfig==2.0.0
     # via pytest
+ipykernel==6.29.5
+    # via -r requirements-dev.in
 ipython==8.18.0
-    # via ipywidgets
+    # via
+    #   ipykernel
+    #   ipywidgets
 ipywidgets==8.1.5
     # via shinywidgets
 jedi==0.19.1
     # via ipython
+jinja2==3.1.4
+    # via nbconvert
 joblib==1.4.2
     # via scikit-learn
 jsonschema==4.23.0
     # via nbformat
 jsonschema-specifications==2023.12.1
     # via jsonschema
+jupyter-client==8.6.3
+    # via
+    #   -r requirements-dev.in
+    #   ipykernel
+    #   nbclient
 jupyter-core==5.7.2
     # via
+    #   ipykernel
+    #   jupyter-client
+    #   nbclient
+    #   nbconvert
     #   nbformat
     #   shinywidgets
+jupyterlab-pygments==0.3.0
+    # via nbconvert
 jupyterlab-widgets==3.0.13
     # via ipywidgets
 jupytext==1.16.4
@@ -86,8 +115,14 @@ markdown-it-py==3.0.0
     #   jupytext
     #   mdit-py-plugins
     #   shiny
+markupsafe==2.1.5
+    # via
+    #   jinja2
+    #   nbconvert
 matplotlib-inline==0.1.7
-    # via ipython
+    # via
+    #   ipykernel
+    #   ipython
 mccabe==0.7.0
     # via flake8
 mdit-py-plugins==0.4.2
@@ -96,12 +131,23 @@ mdit-py-plugins==0.4.2
     #   shiny
 mdurl==0.1.2
     # via markdown-it-py
+mistune==3.0.2
+    # via nbconvert
 mypy==1.11.2
     # via -r requirements-dev.in
 mypy-extensions==1.0.0
     # via mypy
+nbclient==0.10.0
+    # via nbconvert
+nbconvert==7.16.4
+    # via -r requirements-dev.in
 nbformat==5.10.4
-    # via jupytext
+    # via
+    #   jupytext
+    #   nbclient
+    #   nbconvert
+nest-asyncio==1.6.0
+    # via ipykernel
 numpy==1.26.4
     # via
     #   opendp
@@ -115,9 +161,13 @@ packaging==24.1
     # via
     #   build
     #   htmltools
+    #   ipykernel
     #   jupytext
+    #   nbconvert
     #   pytest
     #   shiny
+pandocfilters==1.5.1
+    # via nbconvert
 parso==0.8.4
     # via jedi
 pexpect==4.9.0
@@ -135,6 +185,8 @@ prompt-toolkit==3.0.36
     #   ipython
     #   questionary
     #   shiny
+psutil==6.0.0
+    # via ipykernel
 ptyprocess==0.7.0
     # via pexpect
 pure-eval==0.2.3
@@ -148,7 +200,9 @@ pyflakes==3.2.0
     #   autoflake
     #   flake8
 pygments==2.18.0
-    # via ipython
+    # via
+    #   ipython
+    #   nbconvert
 pyproject-hooks==1.1.0
     # via
     #   build
@@ -156,11 +210,17 @@ pyproject-hooks==1.1.0
 pytest==8.3.3
     # via -r requirements-dev.in
 python-dateutil==2.9.0.post0
-    # via shinywidgets
+    # via
+    #   jupyter-client
+    #   shinywidgets
 python-multipart==0.0.9
     # via shiny
 pyyaml==6.0.2
     # via jupytext
+pyzmq==26.2.0
+    # via
+    #   ipykernel
+    #   jupyter-client
 questionary==2.0.1
     # via shiny
 randomgen==2.0.1
@@ -190,24 +250,37 @@ shinywidgets==0.3.3
 six==1.16.0
     # via
     #   asttokens
+    #   bleach
     #   python-dateutil
 sniffio==1.3.1
     # via anyio
+soupsieve==2.6
+    # via beautifulsoup4
 stack-data==0.6.3
     # via ipython
 starlette==0.38.5
     # via shiny
 threadpoolctl==3.5.0
     # via scikit-learn
+tinycss2==1.3.0
+    # via nbconvert
 tomli-w==1.0.0
     # via flit
+tornado==6.4.1
+    # via
+    #   ipykernel
+    #   jupyter-client
 traitlets==5.14.3
     # via
     #   comm
+    #   ipykernel
     #   ipython
     #   ipywidgets
+    #   jupyter-client
     #   jupyter-core
     #   matplotlib-inline
+    #   nbclient
+    #   nbconvert
     #   nbformat
 typing-extensions==4.12.2
     # via
@@ -224,6 +297,10 @@ watchfiles==0.24.0
     # via shiny
 wcwidth==0.2.13
     # via prompt-toolkit
+webencodings==0.5.1
+    # via
+    #   bleach
+    #   tinycss2
 websockets==13.0.1
     # via shiny
 wheel==0.44.0

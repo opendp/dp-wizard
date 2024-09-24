@@ -23,6 +23,11 @@ scipy<1.14
 
 # Conversion:
 jupytext
+jupyter-client
+nbconvert
+ipykernel
+# May also require:
+# python -m ipykernel install --name kernel_name --user
 
 # Shiny:
 shiny
