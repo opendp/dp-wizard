@@ -1,65 +1,84 @@
 from pathlib import Path
+import re
 
 
 class _Template:
     def __init__(self, path):
+        self._path = path
         template_path = Path(__file__).parent / 'templates' / path
-        self.template = template_path.read_text()
+        self._template = template_path.read_text()
+
+    def fill_expressions(self, map={}):
+        for k, v in map.items():
+            self._template = self._template.replace(k, v)
+        return self
 
     def fill_values(self, map={}):
-        filled = self.template
         for k, v in map.items():
-            filled = filled.replace(k, repr(v))
-        return filled
+            self._template = self._template.replace(k, repr(v))
+        return self
 
-    def fill_code(self, map={}):
-        filled = self.template
+    def fill_blocks(self, map={}):
         for k, v in map.items():
-            # TODO: preserve indentation
-            filled = filled.replace(k, v)
-        return filled
+            k_re = re.escape(k)
+            self._template = re.sub(
+                rf'^(\s*){k_re}$',
+                lambda match: '\n'.join(
+                    match.group(1) + line for line in v.split('\n')),
+                self._template,
+                flags=re.MULTILINE)
+        return self
+
+    def __str__(self):
+        unfilled = set(re.findall(r'[A-Z][A-Z_]+', self._template))
+        if unfilled:
+            raise Exception(
+                f'Template {self._path} has unfilled slots: '
+                f'{", ".join(unfilled)}\n\n{self._template}')
+        return self._template
 
 
-def _make_context(csv_path, unit, loss, weights):
-    return _Template('context.py').fill_values({
+def _make_context_for_notebook(csv_path, unit, loss, weights):
+    return str(_Template('context.py').fill_values({
         'CSV_PATH': csv_path,
         'UNIT': unit,
         'LOSS': loss,
         'WEIGHTS': weights
-    })
+    }))
+
+
+def _make_context_for_script(unit, loss, weights):
+    return str(_Template('context.py').fill_expressions({
+        'CSV_PATH': 'csv_path'
+    }).fill_values({
+        'UNIT': unit,
+        'LOSS': loss,
+        'WEIGHTS': weights
+    }))
 
 
 def _make_imports():
-    return _Template('imports.py').fill_values()
+    return str(_Template('imports.py').fill_values())
 
 
-def _make_code(template, csv_path, unit, loss, weights):
-    return _Template(template).fill_code({
-        'IMPORTS_CODE': _make_imports(),
-        'CONTEXT_CODE': _make_context(
+def make_notebook(csv_path, unit, loss, weights):
+    return str(_Template('notebook.py').fill_blocks({
+        'IMPORTS_BLOCK': _make_imports(),
+        'CONTEXT_BLOCK': _make_context_for_notebook(
             csv_path=csv_path,
             unit=unit,
             loss=loss,
             weights=weights
         )
-    })
+    }))
 
 
-def make_script(csv_path, unit, loss, weights):  # pragma: no cover
-    return _make_code(
-        'script.py',
-        csv_path=csv_path,
-        unit=unit,
-        loss=loss,
-        weights=weights
-    )
-
-
-def make_notebook(csv_path, unit, loss, weights):
-    return _make_code(
-        'notebook.py',
-        csv_path=csv_path,
-        unit=unit,
-        loss=loss,
-        weights=weights
-    )
+def make_script(unit, loss, weights):
+    return str(_Template('script.py').fill_blocks({
+        'IMPORTS_BLOCK': _make_imports(),
+        'CONTEXT_BLOCK': _make_context_for_script(
+            unit=unit,
+            loss=loss,
+            weights=weights
+        )
+    }))
