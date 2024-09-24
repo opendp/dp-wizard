@@ -3,4 +3,4 @@ exclude = .git,.venv,__pycache__
 
 per-file-ignores =
     # Ignore undefined names
-    */templates/*:F821
+    */templates/*:F821,F401

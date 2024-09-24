@@ -1,0 +1,1 @@
+Keeping the templates in a format which can actually be parsed as python makes some things easier, but it also means we're making our own templating machinery. We may revisit this.

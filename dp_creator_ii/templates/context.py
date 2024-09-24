@@ -1,8 +1,3 @@
-import polars as pl
-import opendp.prelude as dp
-
-dp.enable_features("contrib")
-
 context = dp.Context.compositor(
     data=pl.scan_csv(CSV_PATH),
     privacy_unit=dp.unit_of(contributions=UNIT),
