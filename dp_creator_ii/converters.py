@@ -21,7 +21,21 @@ def convert_py_to_nb(python_str, execute=False):
         ] + (['--execute'] if execute else []) + [
             py_path.absolute()  # Input
         ]
-        subprocess.run(
-            argv,
-            check=True)
+        try:
+            subprocess.run(
+                argv,
+                check=True)
+        except subprocess.CalledProcessError:  # pragma: no cover
+            if not execute:
+                raise
+            # Install kernel if missing
+            # TODO: Is there a better way to do this?
+            subprocess.run(
+                'python -m ipykernel install '
+                '--name kernel_name --user'.split(' '),
+                check=True)
+            subprocess.run(
+                argv,
+                check=True)
+
         return nb_path.read_text()
