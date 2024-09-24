@@ -34,7 +34,7 @@ class _Template:
         if unfilled:
             raise Exception(
                 f'Template {self._path} has unfilled slots: '
-                f'{", ".join(unfilled)}\n\n{self._template}')
+                f'{", ".join(sorted(unfilled))}\n\n{self._template}')
         return self._template
 
 

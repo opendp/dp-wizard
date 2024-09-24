@@ -1,10 +1,12 @@
 from tempfile import NamedTemporaryFile
 import subprocess
+import re
+import pytest
 import opendp.prelude as dp
 from dp_creator_ii.template import _Template, make_notebook, make_script
 
 
-fake_csv = 'dp_creator_ii/tests/fake.csv'
+fake_csv = 'dp_creator_ii/tests/fixtures/fake.csv'
 
 
 def test_fill_template():
@@ -16,6 +18,16 @@ def test_fill_template():
         'WEIGHTS': [1]
     }))
     assert f"data=pl.scan_csv('{fake_csv}')" in context_block
+
+
+def test_fill_template_unfilled_slots():
+    context_template = _Template('context.py')
+    with pytest.raises(
+        Exception,
+        match=re.escape(
+            'context.py has unfilled slots: CSV_PATH, LOSS, UNIT, WEIGHTS')
+    ):
+        str(context_template.fill_values())
 
 
 def test_make_notebook():

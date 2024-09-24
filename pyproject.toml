@@ -13,6 +13,7 @@ dependencies = [
     "shiny",
     "shinywidgets",
     "opendp[polars]",
+    "jupytext",
 ]
 
 [project.scripts]
