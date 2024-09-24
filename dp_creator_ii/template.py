@@ -9,5 +9,5 @@ class Template:
     def fill(self, map):
         filled = self.template
         for k, v in map.items():
-            filled = filled.replace(k, v)
+            filled = filled.replace(k, repr(v))
         return filled
