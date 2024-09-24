@@ -49,7 +49,7 @@ def test_make_script():
         weights=[1]
     )
 
-    with NamedTemporaryFile(mode='w', delete_on_close=False) as fp:
+    with NamedTemporaryFile(mode='w', delete=False) as fp:
         fp.write(script)
         fp.close()
 
