@@ -1,5 +1,7 @@
-from dp_creator_ii.template import _Template, make_notebook
+from tempfile import NamedTemporaryFile
+import subprocess
 import opendp.prelude as dp
+from dp_creator_ii.template import _Template, make_notebook, make_script
 
 
 def test_fill_template():
@@ -20,7 +22,23 @@ def test_make_notebook():
         loss=1,
         weights=[1]
     )
-    print(notebook)
     globals = {}
     exec(notebook, globals)
     assert isinstance(globals['context'], dp.Context)
+
+
+def test_make_script():
+    script = make_script(
+        csv_path='dp_creator_ii/tests/fake.csv',
+        unit=1,
+        loss=1,
+        weights=[1]
+    )
+    print(script)
+
+    with NamedTemporaryFile(mode='w', delete_on_close=False) as fp:
+        fp.write(script)
+        fp.close()
+
+        result = subprocess.run(['python', fp.name])
+        assert result.returncode == 0
