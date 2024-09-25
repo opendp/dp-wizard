@@ -40,14 +40,21 @@ cd dp-creator-ii
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements-dev.txt
+pre-commit install
 ```
 
-Now install the application itself locally and run it:
+Now install the application itself and run it:
 ```
 flit install --symlink
 dp-creator-ii
 ```
 Your browser should open and connect you to the application.
+
+Tests should pass, and code coverage should be complete (except blocks we explicitly ignore):
+```
+coverage run -m pytest -v
+coverage report
+```
 
 ### Conventions
 

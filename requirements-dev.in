@@ -4,7 +4,8 @@
 # Developer tools:
 pip-tools
 flit
-autoflake
+black
+pre-commit
 
 # Testing:
 pytest
