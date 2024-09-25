@@ -18,6 +18,7 @@ asttokens==2.4.1
     # via stack-data
 attrs==24.2.0
     # via
+    #   flake8-bugbear
     #   jsonschema
     #   referencing
 beautifulsoup4==4.12.3
@@ -63,6 +64,10 @@ fastjsonschema==2.20.0
 filelock==3.16.1
     # via virtualenv
 flake8==7.1.1
+    # via
+    #   -r requirements-dev.in
+    #   flake8-bugbear
+flake8-bugbear==24.8.19
     # via -r requirements-dev.in
 flit==3.9.0
     # via -r requirements-dev.in
