@@ -7,27 +7,40 @@ config_path = Path(__file__).parent / "config.json"
 config = json.loads(config_path.read_text())
 config_path.unlink()
 
+
+def dataset_panel():
+    return ui.nav_panel(
+        "Select Dataset",
+        "TODO: Pick dataset",
+        ui.output_text("csv_path_text"),
+        ui.output_text("unit_of_privacy_text"),
+        ui.input_action_button("go_to_analysis", "Perform analysis"),
+        value="dataset_panel",
+    )
+
+
+def analysis_panel():
+    return ui.nav_panel(
+        "Perform Analysis",
+        "TODO: Define analysis",
+        ui.input_action_button("go_to_results", "Download results"),
+        value="analysis_panel",
+    )
+
+
+def results_panel():
+    return ui.nav_panel(
+        "Download Results",
+        "TODO: Download results",
+        value="results_panel",
+    )
+
+
 app_ui = ui.page_bootstrap(
     ui.navset_tab(
-        ui.nav_panel(
-            "Select Dataset",
-            "TODO: Pick dataset",
-            ui.output_text("csv_path_text"),
-            ui.output_text("unit_of_privacy_text"),
-            ui.input_action_button("go_to_analysis", "Perform analysis"),
-            value="dataset_panel",
-        ),
-        ui.nav_panel(
-            "Perform Analysis",
-            "TODO: Define analysis",
-            ui.input_action_button("go_to_results", "Download results"),
-            value="analysis_panel",
-        ),
-        ui.nav_panel(
-            "Download Results",
-            "TODO: Download results",
-            value="results_panel",
-        ),
+        dataset_panel(),
+        analysis_panel(),
+        results_panel(),
         id="top_level_nav",
     ),
     title="DP Creator II",
