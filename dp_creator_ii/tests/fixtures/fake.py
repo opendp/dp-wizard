@@ -1,5 +1,5 @@
 # Introduction
 
-print(2+2)
+print(2 + 2)
 
 # Conclusion

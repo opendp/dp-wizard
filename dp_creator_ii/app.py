@@ -3,7 +3,7 @@ from pathlib import Path
 
 from shiny import App, ui, reactive, render
 
-config_path = Path(__file__).parent / 'config.json'
+config_path = Path(__file__).parent / "config.json"
 config = json.loads(config_path.read_text())
 config_path.unlink()
 
@@ -14,16 +14,17 @@ app_ui = ui.page_fluid(
             "Select Dataset",
             "TODO: Pick dataset",
             ui.output_text("csv_path_text"),
-            ui.output_text("unit_of_privacy_text")),
+            ui.output_text("unit_of_privacy_text"),
+        ),
         ui.nav_panel("Perform Analysis", "TODO: Define analysis"),
         ui.nav_panel("Download Results", "TODO: Download results"),
-    )
+    ),
 )
 
 
 def server(input, output, session):
-    csv_path = reactive.value(config['csv_path'])
-    unit_of_privacy = reactive.value(config['unit_of_privacy'])
+    csv_path = reactive.value(config["csv_path"])
+    unit_of_privacy = reactive.value(config["unit_of_privacy"])
 
     @render.text
     def csv_path_text():

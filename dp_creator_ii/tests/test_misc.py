@@ -3,8 +3,8 @@ import pytest
 
 
 tests = {
-    'flake8 linting': 'flake8 . --count --show-source --statistics',
-    'mypy type checking': 'mypy .',
+    "flake8 linting": "flake8 . --count --show-source --statistics",
+    "mypy type checking": "mypy .",
 }
 
 

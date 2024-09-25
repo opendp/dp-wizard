@@ -6,26 +6,29 @@ import opendp.prelude as dp
 from dp_creator_ii.template import _Template, make_notebook, make_script
 
 
-fake_csv = 'dp_creator_ii/tests/fixtures/fake.csv'
+fake_csv = "dp_creator_ii/tests/fixtures/fake.csv"
 
 
 def test_fill_template():
-    context_template = _Template('context.py')
-    context_block = str(context_template.fill_values({
-        'CSV_PATH': fake_csv,
-        'UNIT': 1,
-        'LOSS': 1,
-        'WEIGHTS': [1]
-    }))
+    context_template = _Template("context.py")
+    context_block = str(
+        context_template.fill_values(
+            {
+                "CSV_PATH": fake_csv,
+                "UNIT": 1,
+                "LOSS": 1,
+                "WEIGHTS": [1],
+            }
+        )
+    )
     assert f"data=pl.scan_csv('{fake_csv}')" in context_block
 
 
 def test_fill_template_unfilled_slots():
-    context_template = _Template('context.py')
+    context_template = _Template("context.py")
     with pytest.raises(
         Exception,
-        match=re.escape(
-            'context.py has unfilled slots: CSV_PATH, LOSS, UNIT, WEIGHTS')
+        match=re.escape("context.py has unfilled slots: CSV_PATH, LOSS, UNIT, WEIGHTS"),
     ):
         str(context_template.fill_values())
 
@@ -35,24 +38,23 @@ def test_make_notebook():
         csv_path=fake_csv,
         unit=1,
         loss=1,
-        weights=[1]
+        weights=[1],
     )
     globals = {}
     exec(notebook, globals)
-    assert isinstance(globals['context'], dp.Context)
+    assert isinstance(globals["context"], dp.Context)
 
 
 def test_make_script():
     script = make_script(
         unit=1,
         loss=1,
-        weights=[1]
+        weights=[1],
     )
 
-    with NamedTemporaryFile(mode='w', delete=False) as fp:
+    with NamedTemporaryFile(mode="w", delete=False) as fp:
         fp.write(script)
         fp.close()
 
-        result = subprocess.run(
-            ['python', fp.name, '--csv', fake_csv])
+        result = subprocess.run(["python", fp.name, "--csv", fake_csv])
         assert result.returncode == 0
