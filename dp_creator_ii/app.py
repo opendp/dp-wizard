@@ -3,10 +3,6 @@ from pathlib import Path
 
 from shiny import App, ui, reactive, render
 
-config_path = Path(__file__).parent / "config.json"
-config = json.loads(config_path.read_text())
-config_path.unlink()
-
 
 def dataset_panel():
     return ui.nav_panel(
@@ -48,6 +44,10 @@ app_ui = ui.page_bootstrap(
 
 
 def server(input, output, session):
+    config_path = Path(__file__).parent / "config.json"
+    config = json.loads(config_path.read_text())
+    config_path.unlink()
+
     csv_path = reactive.value(config["csv_path"])
     unit_of_privacy = reactive.value(config["unit_of_privacy"])
 

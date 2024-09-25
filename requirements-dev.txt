@@ -73,6 +73,8 @@ flit==3.9.0
     # via -r requirements-dev.in
 flit-core==3.9.0
     # via flit
+greenlet==3.0.3
+    # via playwright
 h11==0.14.0
     # via uvicorn
 htmltools==0.5.3
@@ -200,6 +202,8 @@ platformdirs==4.3.6
     #   black
     #   jupyter-core
     #   virtualenv
+playwright==1.47.0
+    # via pytest-playwright
 pluggy==1.5.0
     # via pytest
 polars==1.1.0
@@ -221,6 +225,8 @@ pyarrow==17.0.0
     # via opendp
 pycodestyle==2.12.1
     # via flake8
+pyee==12.0.0
+    # via playwright
 pyflakes==3.2.0
     # via flake8
 pygments==2.18.0
@@ -232,6 +238,13 @@ pyproject-hooks==1.1.0
     #   build
     #   pip-tools
 pytest==8.3.3
+    # via
+    #   -r requirements-dev.in
+    #   pytest-base-url
+    #   pytest-playwright
+pytest-base-url==2.1.0
+    # via pytest-playwright
+pytest-playwright==0.5.2
     # via -r requirements-dev.in
 python-dateutil==2.9.0.post0
     # via
@@ -239,6 +252,8 @@ python-dateutil==2.9.0.post0
     #   shinywidgets
 python-multipart==0.0.9
     # via shiny
+python-slugify==8.0.4
+    # via pytest-playwright
 pyyaml==6.0.2
     # via
     #   jupytext
@@ -256,7 +271,9 @@ referencing==0.35.1
     #   jsonschema
     #   jsonschema-specifications
 requests==2.32.3
-    # via flit
+    # via
+    #   flit
+    #   pytest-base-url
 rpds-py==0.20.0
     # via
     #   jsonschema
@@ -286,6 +303,8 @@ stack-data==0.6.3
     # via ipython
 starlette==0.38.5
     # via shiny
+text-unidecode==1.3
+    # via python-slugify
 threadpoolctl==3.5.0
     # via scikit-learn
 tinycss2==1.3.0
@@ -312,6 +331,7 @@ typing-extensions==4.12.2
     # via
     #   htmltools
     #   mypy
+    #   pyee
     #   shiny
 uc-micro-py==1.0.3
     # via linkify-it-py

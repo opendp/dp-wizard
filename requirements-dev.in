@@ -11,6 +11,7 @@ pre-commit
 
 # Testing:
 pytest
+pytest-playwright
 mypy
 coverage
 

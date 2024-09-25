@@ -37,6 +37,9 @@ jobs:
       - name: Install dev dependencies
         run: pip install -r requirements-dev.txt
 
+      - name: Install browsers
+        run: playwright install
+
       - name: Test
         run: coverage run -m pytest -v
 

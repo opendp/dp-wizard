@@ -41,6 +41,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements-dev.txt
 pre-commit install
+playwright install
 ```
 
 Now install the application itself and run it:
