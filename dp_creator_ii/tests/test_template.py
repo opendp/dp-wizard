@@ -30,7 +30,7 @@ def test_fill_template_unfilled_slots():
         Exception,
         match=re.escape("context.py has unfilled slots: CSV_PATH, LOSS, UNIT, WEIGHTS"),
     ):
-        str(context_template.fill_values())
+        str(context_template.fill_values({}))
 
 
 def test_make_notebook():
