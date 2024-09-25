@@ -11,6 +11,9 @@ def norm_nb(nb_str):
         "2024-01-01T00:00:00.000000Z",
         normed_nb_str,
     )
+    # language_info added when saved by VSCode:
+    normed_nb_str = re.sub(r',\s+"language_info": \{[^}]*\}', "", normed_nb_str)
+    # version will be different between dev environment and CI:
     normed_nb_str = re.sub(r'"version": "[^"]+"', '"version": "3.0.0"', normed_nb_str)
     return normed_nb_str
 
