@@ -1,6 +1,3 @@
-import json
-from pathlib import Path
-
 from shiny import App, ui, reactive, render
 
 from dp_creator_ii.template import make_notebook_py, make_script_py
