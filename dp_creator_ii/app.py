@@ -59,8 +59,8 @@ def server(input, output, session):
     config = json.loads(config_path.read_text())
     config_path.unlink()
 
-    csv_path = reactive.value(config["csv_path"])
-    unit_of_privacy = reactive.value(config["unit_of_privacy"])
+    csv_path = reactive.value(config.get("csv_path"))
+    unit_of_privacy = reactive.value(config.get("unit_of_privacy"))
 
     @render.text
     def csv_path_text():

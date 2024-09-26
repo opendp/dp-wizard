@@ -16,7 +16,7 @@ def get_parser():
     parser.add_argument(
         "--csv",
         dest="csv_path",
-        type=Path,
+        type=str,
         help="Path to CSV containing private data",
     )
     parser.add_argument(
@@ -42,14 +42,12 @@ def main():  # pragma: no cover
 
     # Just setting variables in a plain python module doesn't work:
     # The new thread started for the server doesn't see changes.
-    Path("config.json").write_text(
-        json.dumps(
-            {
-                "csv_path": str(args.csv_path),
-                "unit_of_privacy": args.unit_of_privacy,
-            }
-        )
-    )
+    config = {}
+    if args.csv_path:
+        config["csv_path"] = args.csv_path
+    if args.unit_of_privacy:
+        config["unit_of_privacy"] = args.unit_of_privacy
+    Path("config.json").write_text(json.dumps(config))
 
     run_app_kwargs = (
         {}
