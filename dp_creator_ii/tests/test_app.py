@@ -7,6 +7,7 @@ app = create_app_fixture("../app.py")
 
 
 # TODO: Why is incomplete coverage reported here?
+# https://github.com/opendp/dp-creator-ii/issues/18
 def test_app(page: Page, app: ShinyAppProc):  # pragma: no cover
     pick_dataset_text = "TODO: Pick dataset"
     perform_analysis_text = "TODO: Perform analysis"
