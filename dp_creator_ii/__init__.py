@@ -25,12 +25,6 @@ def get_parser():
         type=int,
         help="Unit of privacy: How many rows can an individual contribute?",
     )
-    parser.add_argument(
-        "--debug",
-        action="store_true",
-        help="Use during development for increased logging "
-        "and auto-reload after code changes",
-    )
     return parser
 
 
@@ -51,12 +45,7 @@ def main():  # pragma: no cover
         )
     )
 
-    run_app_kwargs = (
-        {}
-        if not args.debug
-        else {
-            "reload": True,
-            "log_level": "debug",
-        }
-    )
+    run_app_kwargs = {
+        "reload": True,
+    }
     shiny.run_app(launch_browser=True, **run_app_kwargs)
