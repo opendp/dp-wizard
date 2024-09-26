@@ -51,10 +51,23 @@ dp-creator-ii
 ```
 Your browser should open and connect you to the application.
 
+### Testing
+
 Tests should pass, and code coverage should be complete (except blocks we explicitly ignore):
 ```
 coverage run -m pytest -v
 coverage report
+```
+
+We're using [Playwright](https://playwright.dev/python/) for end-to-end tests. You can use it to [generate test code](https://playwright.dev/python/docs/codegen-intro) just by interacting with the app in a browser:
+```
+dp-creator-ii&
+playwright codegen http://127.0.0.1:8000/
+```
+
+You can also [step through these tests](https://playwright.dev/python/docs/running-tests#debugging-tests) and see what the browser sees:
+```
+PWDEBUG=1 pytest
 ```
 
 ### Conventions
