@@ -42,7 +42,7 @@ def main():  # pragma: no cover
 
     # Just setting variables in a plain python module doesn't work:
     # The new thread started for the server doesn't see changes.
-    Path("config.json").write_text(
+    Path("app/config.json").write_text(
         json.dumps(
             {
                 "csv_path": str(args.csv_path),
