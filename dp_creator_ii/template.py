@@ -81,7 +81,7 @@ def _make_imports():
     return str(_Template("imports.py").fill_values({}))
 
 
-def make_notebook(csv_path, unit, loss, weights):
+def make_notebook_py(csv_path, unit, loss, weights):
     return str(
         _Template("notebook.py").fill_blocks(
             {
@@ -97,7 +97,7 @@ def make_notebook(csv_path, unit, loss, weights):
     )
 
 
-def make_script(unit, loss, weights):
+def make_script_py(unit, loss, weights):
     return str(
         _Template("script.py").fill_blocks(
             {

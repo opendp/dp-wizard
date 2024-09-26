@@ -3,6 +3,9 @@ from pathlib import Path
 
 from shiny import App, ui, reactive, render
 
+from dp_creator_ii.template import make_notebook_py, make_script_py
+from dp_creator_ii.converters import convert_py_to_nb
+
 
 def dataset_panel():
     return ui.nav_panel(
@@ -27,7 +30,15 @@ def analysis_panel():
 def results_panel():
     return ui.nav_panel(
         "Download Results",
-        "TODO: Download results",
+        "TODO: Download Results",
+        ui.download_button("download_script", "Download script"),
+        # TODO: Notebook code is badly formatted
+        # ui.download_button(
+        #     "download_notebook_unexecuted", "Download notebook (unexecuted)"
+        # ),
+        # ui.download_button(
+        #     "download_notebook_executed", "Download notebook (executed)"
+        # )
         value="results_panel",
     )
 
@@ -68,6 +79,46 @@ def server(input, output, session):
     @reactive.event(input.go_to_results)
     def go_to_results():
         ui.update_navs("top_level_nav", selected="results_panel")
+
+    @render.download(
+        filename="dp-creator-script.py",
+        media_type="text/x-python",
+    )
+    async def download_script():
+        script_py = make_script_py(
+            unit=1,
+            loss=1,
+            weights=[1],
+        )
+        yield script_py
+
+    @render.download(
+        filename="dp-creator-notebook.ipynb",
+        media_type="application/x-ipynb+json",
+    )
+    async def download_notebook_unexecuted():
+        notebook_py = make_notebook_py(
+            csv_path="todo.csv",
+            unit=1,
+            loss=1,
+            weights=[1],
+        )
+        notebook_nb = convert_py_to_nb(notebook_py)
+        yield notebook_nb
+
+    @render.download(
+        filename="dp-creator-notebook-executed.ipynb",
+        media_type="application/x-ipynb+json",
+    )
+    async def download_notebook_executed():
+        notebook_py = make_notebook_py(
+            csv_path="todo.csv",
+            unit=1,
+            loss=1,
+            weights=[1],
+        )
+        notebook_nb = convert_py_to_nb(notebook_py, execute=True)
+        yield notebook_nb
 
 
 app = App(app_ui, server)
