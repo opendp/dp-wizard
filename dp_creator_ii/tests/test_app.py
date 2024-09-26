@@ -12,18 +12,30 @@ def test_app(page: Page, app: ShinyAppProc):  # pragma: no cover
     perform_analysis_text = "TODO: Perform analysis"
     download_results_text = "TODO: Download results"
 
+    def expect_visible(text):
+        expect(page.get_by_text(text)).to_be_visible()
+
+    def expect_not_visible(text):
+        expect(page.get_by_text(text)).not_to_be_visible()
+
     page.goto(app.url)
     expect(page).to_have_title("DP Creator II")
-    expect(page.get_by_text(pick_dataset_text)).to_be_visible()
-    expect(page.get_by_text(perform_analysis_text)).not_to_be_visible()
-    expect(page.get_by_text(download_results_text)).not_to_be_visible()
+    expect_visible(pick_dataset_text)
+    expect_not_visible(perform_analysis_text)
+    expect_not_visible(download_results_text)
 
     page.get_by_role("button", name="Perform analysis").click()
-    expect(page.get_by_text(pick_dataset_text)).not_to_be_visible()
-    expect(page.get_by_text(perform_analysis_text)).to_be_visible()
-    expect(page.get_by_text(download_results_text)).not_to_be_visible()
+    expect_not_visible(pick_dataset_text)
+    expect_visible(perform_analysis_text)
+    expect_not_visible(download_results_text)
 
     page.get_by_role("button", name="Download results").click()
-    expect(page.get_by_text(pick_dataset_text)).not_to_be_visible()
-    expect(page.get_by_text(perform_analysis_text)).not_to_be_visible()
-    expect(page.get_by_text(download_results_text)).to_be_visible()
+    expect_not_visible(pick_dataset_text)
+    expect_not_visible(perform_analysis_text)
+    expect_visible(download_results_text)
+
+    with page.expect_download() as download_info:
+        page.get_by_text("Download script").click()
+    download = download_info.value
+    script = download.path().read_text()
+    assert "privacy_unit=dp.unit_of(contributions=1)" in script
