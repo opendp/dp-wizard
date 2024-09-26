@@ -21,7 +21,7 @@ def dataset_panel():
 def analysis_panel():
     return ui.nav_panel(
         "Perform Analysis",
-        "TODO: Define analysis",
+        "TODO: Perform analysis",
         ui.input_action_button("go_to_results", "Download results"),
         value="analysis_panel",
     )
@@ -29,8 +29,8 @@ def analysis_panel():
 
 def results_panel():
     return ui.nav_panel(
-        "Download Results",
-        "TODO: Download Results",
+        "Download results",
+        "TODO: Download results",
         ui.download_button("download_script", "Download script"),
         # TODO: Notebook code is badly formatted
         # ui.download_button(
@@ -55,12 +55,10 @@ app_ui = ui.page_bootstrap(
 
 
 def server(input, output, session):
-    config_path = Path(__file__).parent / "config.json"
-    config = json.loads(config_path.read_text())
-    config_path.unlink()
-
-    csv_path = reactive.value(config["csv_path"])
-    unit_of_privacy = reactive.value(config["unit_of_privacy"])
+    # TODO: Merge https://github.com/opendp/dp-creator-ii/pull/17 first,
+    # and resolve the merge conflict here it its favor.
+    csv_path = reactive.value("placeholder.csv")
+    unit_of_privacy = reactive.value(1)
 
     @render.text
     def csv_path_text():
