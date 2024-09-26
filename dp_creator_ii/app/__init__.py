@@ -6,48 +6,14 @@ from shiny import App, ui, reactive, render
 from dp_creator_ii.template import make_notebook_py, make_script_py
 from dp_creator_ii.converters import convert_py_to_nb
 
-
-def dataset_panel():
-    return ui.nav_panel(
-        "Select Dataset",
-        "TODO: Pick dataset",
-        ui.output_text("csv_path_text"),
-        ui.output_text("unit_of_privacy_text"),
-        ui.input_action_button("go_to_analysis", "Perform analysis"),
-        value="dataset_panel",
-    )
-
-
-def analysis_panel():
-    return ui.nav_panel(
-        "Perform Analysis",
-        "TODO: Define analysis",
-        ui.input_action_button("go_to_results", "Download results"),
-        value="analysis_panel",
-    )
-
-
-def results_panel():
-    return ui.nav_panel(
-        "Download Results",
-        "TODO: Download Results",
-        ui.download_button("download_script", "Download script"),
-        # TODO: Notebook code is badly formatted
-        # ui.download_button(
-        #     "download_notebook_unexecuted", "Download notebook (unexecuted)"
-        # ),
-        # ui.download_button(
-        #     "download_notebook_executed", "Download notebook (executed)"
-        # )
-        value="results_panel",
-    )
+from dp_creator_ii.app import analysis_panel, dataset_panel, results_panel
 
 
 app_ui = ui.page_bootstrap(
     ui.navset_tab(
-        dataset_panel(),
-        analysis_panel(),
-        results_panel(),
+        dataset_panel.dataset_ui(),
+        analysis_panel.analysis_ui(),
+        results_panel.results_ui(),
         id="top_level_nav",
     ),
     title="DP Creator II",
