@@ -14,7 +14,7 @@ Building on what we've learned from [DP Creator](https://github.com/opendp/dpcre
 ## Usage
 
 ```
-usage: dp-creator-ii [-h] [--csv CSV_PATH] [--unit UNIT_OF_PRIVACY] [--debug]
+usage: dp-creator-ii [-h] [--csv CSV_PATH] [--unit UNIT_OF_PRIVACY]
 
 DP Creator II makes it easier to get started with Differential Privacy.
 
@@ -24,8 +24,6 @@ options:
   --unit UNIT_OF_PRIVACY
                         Unit of privacy: How many rows can an individual
                         contribute?
-  --debug               Use during development for increased logging and auto-
-                        reload after code changes
 ```
 
 
