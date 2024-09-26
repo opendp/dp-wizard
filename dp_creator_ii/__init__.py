@@ -3,7 +3,6 @@
 import os
 from pathlib import Path
 from argparse import ArgumentParser
-import json
 
 import shiny
 
@@ -11,7 +10,7 @@ import shiny
 __version__ = "0.0.1"
 
 
-def get_parser():
+def get_arg_parser():
     parser = ArgumentParser(description=__doc__)
     parser.add_argument(
         "--csv",
@@ -29,21 +28,12 @@ def get_parser():
 
 
 def main():  # pragma: no cover
-    parser = get_parser()
-    args = parser.parse_args()
+    # We call parse_args() again inside the app.
+    # We only call it here so "--help" is handled.
+    get_arg_parser().parse_args()
 
-    os.chdir(Path(__file__).parent)  # run_app() depends on the CWD.
-
-    # Just setting variables in a plain python module doesn't work:
-    # The new thread started for the server doesn't see changes.
-    Path("config.json").write_text(
-        json.dumps(
-            {
-                "csv_path": str(args.csv_path),
-                "unit_of_privacy": args.unit_of_privacy,
-            }
-        )
-    )
+    # run_app() depends on the CWD.
+    os.chdir(Path(__file__).parent)
 
     run_app_kwargs = {
         "reload": True,

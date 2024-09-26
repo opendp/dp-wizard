@@ -1,8 +1,6 @@
-import json
-from pathlib import Path
-
 from shiny import App, ui, reactive, render
 
+from dp_creator_ii import get_arg_parser
 from dp_creator_ii.template import make_notebook_py, make_script_py
 from dp_creator_ii.converters import convert_py_to_nb
 
@@ -55,12 +53,10 @@ app_ui = ui.page_bootstrap(
 
 
 def server(input, output, session):
-    config_path = Path(__file__).parent / "config.json"
-    config = json.loads(config_path.read_text())
-    config_path.unlink()
+    args = get_arg_parser().parse_args()
 
-    csv_path = reactive.value(config["csv_path"])
-    unit_of_privacy = reactive.value(config["unit_of_privacy"])
+    csv_path = reactive.value(args.csv_path)
+    unit_of_privacy = reactive.value(args.unit_of_privacy)
 
     @render.text
     def csv_path_text():
