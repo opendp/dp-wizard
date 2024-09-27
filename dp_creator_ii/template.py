@@ -43,10 +43,10 @@ class _Template:
         return self
 
     def __str__(self):
-        # Slots are:
-        # - all caps and underscores
+        # Slots:
+        # - are all caps or underscores
         # - have word boundary on either side
-        # - at least three characters
+        # - are at least three characters
         slot_re = r"\b[A-Z][A-Z_]{2,}\b"
         unfilled = set(re.findall(slot_re, self._template))
         if unfilled:

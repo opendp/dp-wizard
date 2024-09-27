@@ -32,13 +32,7 @@ def results_panel():
         "Download Results",
         "TODO: Download Results",
         ui.download_button("download_script", "Download script"),
-        # TODO: Notebook code is badly formatted
-        # ui.download_button(
-        #     "download_notebook_unexecuted", "Download notebook (unexecuted)"
-        # ),
-        # ui.download_button(
-        #     "download_notebook_executed", "Download notebook (executed)"
-        # )
+        ui.download_button("download_notebook", "Download notebook (unexecuted)"),
         value="results_panel",
     )
 
@@ -96,7 +90,7 @@ def server(input, output, session):
         filename="dp-creator-notebook.ipynb",
         media_type="application/x-ipynb+json",
     )
-    async def download_notebook_unexecuted():
+    async def download_notebook():
         notebook_py = make_notebook_py(
             csv_path="todo.csv",
             unit=1,
@@ -104,20 +98,6 @@ def server(input, output, session):
             weights=[1],
         )
         notebook_nb = convert_py_to_nb(notebook_py)
-        yield notebook_nb
-
-    @render.download(
-        filename="dp-creator-notebook-executed.ipynb",
-        media_type="application/x-ipynb+json",
-    )
-    async def download_notebook_executed():
-        notebook_py = make_notebook_py(
-            csv_path="todo.csv",
-            unit=1,
-            loss=1,
-            weights=[1],
-        )
-        notebook_nb = convert_py_to_nb(notebook_py, execute=True)
         yield notebook_nb
 
 
