@@ -13,12 +13,10 @@ def test_fill_template():
     context_template = _Template("context.py")
     context_block = str(
         context_template.fill_values(
-            {
-                "CSV_PATH": fake_csv,
-                "UNIT": 1,
-                "LOSS": 1,
-                "WEIGHTS": [1],
-            }
+            CSV_PATH=fake_csv,
+            UNIT=1,
+            LOSS=1,
+            WEIGHTS=[1],
         )
     )
     assert f"data=pl.scan_csv('{fake_csv}')" in context_block
@@ -30,7 +28,7 @@ def test_fill_template_unfilled_slots():
         Exception,
         match=re.escape("context.py has unfilled slots: CSV_PATH, LOSS, UNIT, WEIGHTS"),
     ):
-        str(context_template.fill_values({}))
+        str(context_template.fill_values())
 
 
 def test_make_notebook():
