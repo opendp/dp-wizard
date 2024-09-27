@@ -1,23 +1,18 @@
 from pathlib import Path
 import re
-from functools import partial
-
-
-def match_indent_maker(v):
-    # Working around late binding closure in loop:
-    # https://docs.python-guide.org/writing/gotchas/#late-binding-closures
-    # Would like a simpler solution.
-    def match_indent(match):
-        return "\n".join(match.group(1) + line for line in v.split("\n"))
-
-    return match_indent
 
 
 class _Template:
-    def __init__(self, path):
-        self._path = path
-        template_path = Path(__file__).parent / "templates" / path
-        self._template = template_path.read_text()
+    def __init__(self, path, template=None):
+        if path is not None:
+            self._path = path
+            template_path = Path(__file__).parent / "templates" / path
+            self._template = template_path.read_text()
+        if template is not None:
+            if path is not None:  # pragma: no cover
+                raise Exception('"path" and "template" are mutually exclusive')
+            self._path = "template-instead-of-path"
+            self._template = template
 
     def fill_expressions(self, map):
         for k, v in map.items():
@@ -31,17 +26,29 @@ class _Template:
 
     def fill_blocks(self, map):
         for k, v in map.items():
+
+            def match_indent(match):
+                # This does what we want, but binding is confusing.
+                return "\n".join(
+                    match.group(1) + line for line in v.split("\n")  # noqa: B023
+                )
+
             k_re = re.escape(k)
             self._template = re.sub(
-                rf"^(\s*){k_re}$",
-                partial(match_indent_maker, v)(),
+                rf"^([ \t]*){k_re}$",
+                match_indent,
                 self._template,
                 flags=re.MULTILINE,
             )
         return self
 
     def __str__(self):
-        unfilled = set(re.findall(r"[A-Z][A-Z_]+", self._template))
+        # Slots are:
+        # - all caps and underscores
+        # - have word boundary on either side
+        # - at least three characters
+        slot_re = r"\b[A-Z][A-Z_]{2,}\b"
+        unfilled = set(re.findall(slot_re, self._template))
         if unfilled:
             raise Exception(
                 f"Template {self._path} has unfilled slots: "

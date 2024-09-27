@@ -17,13 +17,15 @@ def convert_py_to_nb(python_str, execute=False):
         argv = (
             [
                 "jupytext",
+                "--from",
+                ".py",
                 "--to",
-                "ipynb",  # Target format
+                ".ipynb",
                 "--output",
-                nb_path.absolute(),  # Output
+                str(nb_path.absolute()),  # Output
             ]
             + (["--execute"] if execute else [])
-            + [py_path.absolute()]  # Input
+            + [str(py_path.absolute())]  # Input
         )
         try:
             subprocess.run(argv, check=True)

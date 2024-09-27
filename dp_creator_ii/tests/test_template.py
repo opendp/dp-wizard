@@ -9,7 +9,7 @@ from dp_creator_ii.template import _Template, make_notebook_py, make_script_py
 fake_csv = "dp_creator_ii/tests/fixtures/fake.csv"
 
 
-def test_fill_template():
+def test_fill_values():
     context_template = _Template("context.py")
     context_block = str(
         context_template.fill_values(
@@ -22,6 +22,47 @@ def test_fill_template():
         )
     )
     assert f"data=pl.scan_csv('{fake_csv}')" in context_block
+
+
+def test_fill_blocks():
+    # "OK" is less than three characters, so it is not a slot.
+    template = _Template(
+        None,
+        template="""# MixedCase is OK
+
+FIRST
+
+with fake:
+    SECOND
+    if True:
+        THIRD
+""",
+    )
+    template.fill_blocks(
+        {
+            "FIRST": "\n".join(f"import {i}" for i in "abc"),
+            "SECOND": "\n".join(f"f({i})" for i in "123"),
+            "THIRD": "\n".join(f"{i}()" for i in "xyz"),
+        }
+    )
+    assert (
+        str(template)
+        == """# MixedCase is OK
+
+import a
+import b
+import c
+
+with fake:
+    f(1)
+    f(2)
+    f(3)
+    if True:
+        x()
+        y()
+        z()
+"""
+    )
 
 
 def test_fill_template_unfilled_slots():
