@@ -4,7 +4,7 @@ source = .
 
 omit =
   # TODO
-  app.py
+  dp_creator_ii/app/*
 
 # More strict: Check transitions between lines, not just individual lines.
 # TODO: branch = True
