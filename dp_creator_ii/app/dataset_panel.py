@@ -6,14 +6,16 @@ from htmltools.tags import details, pre, summary
 
 
 def dataset_ui():
+    args = get_arg_parser().parse_args()
     return ui.nav_panel(
         "Select Dataset",
         "TODO: Pick dataset",
         ui.output_text("csv_path_text"),
         ui.output_text("unit_of_privacy_text"),
+        ui.input_numeric("contributions", "Contributions", args.unit_of_privacy),
         details(
-            summary("Example code"),
-            pre("privacy_unit = dp.unit_of(contributions=1)"),
+            summary("Code sample"),
+            pre(ui.output_text("unit_of_privacy_python")),
         ),
         ui.input_action_button("go_to_analysis", "Perform analysis"),
         value="dataset_panel",
@@ -23,7 +25,6 @@ def dataset_ui():
 def dataset_server(input, output, session):
     args = get_arg_parser().parse_args()
     csv_path = reactive.value(args.csv_path)
-    unit_of_privacy = reactive.value(args.unit_of_privacy)
 
     @render.text
     def csv_path_text():
@@ -31,11 +32,11 @@ def dataset_server(input, output, session):
 
     @render.text
     def unit_of_privacy_text():
-        return str(unit_of_privacy.get())
+        return input.contributions()
 
     @render.text
     def unit_of_privacy_python():
-        contributions = unit_of_privacy.get()
+        contributions = input.contributions()
         return f"privacy_unit = dp.unit_of(contributions={contributions})"
 
     @reactive.effect
