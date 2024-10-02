@@ -19,18 +19,18 @@ class _Template:
         template_path = Path(__file__).parent / "templates" / path
         self._template = template_path.read_text()
 
-    def fill_expressions(self, map):
-        for k, v in map.items():
+    def fill_expressions(self, **kwargs):
+        for k, v in kwargs.items():
             self._template = self._template.replace(k, v)
         return self
 
-    def fill_values(self, map):
-        for k, v in map.items():
+    def fill_values(self, **kwargs):
+        for k, v in kwargs.items():
             self._template = self._template.replace(k, repr(v))
         return self
 
-    def fill_blocks(self, map):
-        for k, v in map.items():
+    def fill_blocks(self, **kwargs):
+        for k, v in kwargs.items():
             k_re = re.escape(k)
             self._template = re.sub(
                 rf"^(\s*){k_re}$",
@@ -53,12 +53,10 @@ class _Template:
 def _make_context_for_notebook(csv_path, unit, loss, weights):
     return str(
         _Template("context.py").fill_values(
-            {
-                "CSV_PATH": csv_path,
-                "UNIT": unit,
-                "LOSS": loss,
-                "WEIGHTS": weights,
-            }
+            CSV_PATH=csv_path,
+            UNIT=unit,
+            LOSS=loss,
+            WEIGHTS=weights,
         )
     )
 
@@ -66,33 +64,31 @@ def _make_context_for_notebook(csv_path, unit, loss, weights):
 def _make_context_for_script(unit, loss, weights):
     return str(
         _Template("context.py")
-        .fill_expressions({"CSV_PATH": "csv_path"})
+        .fill_expressions(
+            CSV_PATH="csv_path",
+        )
         .fill_values(
-            {
-                "UNIT": unit,
-                "LOSS": loss,
-                "WEIGHTS": weights,
-            }
+            UNIT=unit,
+            LOSS=loss,
+            WEIGHTS=weights,
         )
     )
 
 
 def _make_imports():
-    return str(_Template("imports.py").fill_values({}))
+    return str(_Template("imports.py").fill_values())
 
 
 def make_notebook_py(csv_path, unit, loss, weights):
     return str(
         _Template("notebook.py").fill_blocks(
-            {
-                "IMPORTS_BLOCK": _make_imports(),
-                "CONTEXT_BLOCK": _make_context_for_notebook(
-                    csv_path=csv_path,
-                    unit=unit,
-                    loss=loss,
-                    weights=weights,
-                ),
-            }
+            IMPORTS_BLOCK=_make_imports(),
+            CONTEXT_BLOCK=_make_context_for_notebook(
+                csv_path=csv_path,
+                unit=unit,
+                loss=loss,
+                weights=weights,
+            ),
         )
     )
 
@@ -100,13 +96,11 @@ def make_notebook_py(csv_path, unit, loss, weights):
 def make_script_py(unit, loss, weights):
     return str(
         _Template("script.py").fill_blocks(
-            {
-                "IMPORTS_BLOCK": _make_imports(),
-                "CONTEXT_BLOCK": _make_context_for_script(
-                    unit=unit,
-                    loss=loss,
-                    weights=weights,
-                ),
-            }
+            IMPORTS_BLOCK=_make_imports(),
+            CONTEXT_BLOCK=_make_context_for_script(
+                unit=unit,
+                loss=loss,
+                weights=weights,
+            ),
         )
     )
