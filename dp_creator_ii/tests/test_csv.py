@@ -7,6 +7,11 @@ import pytest
 
 @pytest.mark.parametrize("encoding", ["latin1", "utf8"])
 def test_csv_loading(encoding):
+    """
+    This isn't really a test of our code: rather, it demonstrates the pattern
+    we plan to follow. (Though if we do decide to require the encoding from
+    the user, or use chardet to sniff the encoding, that should be tested here.)
+    """
     with tempfile.NamedTemporaryFile(
         delete_on_close=False, mode="w", newline="", encoding=encoding
     ) as fp:

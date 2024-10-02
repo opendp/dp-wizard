@@ -21,7 +21,7 @@ def test_fill_template():
             }
         )
     )
-    assert f"data=pl.scan_csv('{fake_csv}')" in context_block
+    assert f"data=pl.scan_csv('{fake_csv}', encoding=\"utf8-lossy\")" in context_block
 
 
 def test_fill_template_unfilled_slots():
