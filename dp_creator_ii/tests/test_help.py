@@ -5,7 +5,7 @@ import dp_creator_ii
 
 def test_help():
     help = (
-        dp_creator_ii.get_parser()
+        dp_creator_ii.get_arg_parser()
         .format_help()
         # argparse doesn't actually know the name of the script
         # and inserts the name of the running program instead.

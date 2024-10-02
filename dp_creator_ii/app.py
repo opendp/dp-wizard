@@ -1,5 +1,8 @@
+from sys import argv
+
 from shiny import App, ui, reactive, render
 
+from dp_creator_ii import get_arg_parser
 from dp_creator_ii.template import make_notebook_py, make_script_py
 from dp_creator_ii.converters import convert_py_to_nb
 
@@ -52,10 +55,14 @@ app_ui = ui.page_bootstrap(
 
 
 def server(input, output, session):
-    # TODO: Merge https://github.com/opendp/dp-creator-ii/pull/17 first,
-    # and resolve the merge conflict here it its favor.
-    csv_path = reactive.value("placeholder.csv")
-    unit_of_privacy = reactive.value(1)
+    if argv[1:3] == ["run", "--port"]:
+        # Started by playwright
+        csv_path = None
+        unit_of_privacy = None
+    else:
+        args = get_arg_parser().parse_args()
+        csv_path = reactive.value(args.csv_path)
+        unit_of_privacy = reactive.value(args.unit_of_privacy)
 
     @render.text
     def csv_path_text():
