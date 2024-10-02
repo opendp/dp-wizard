@@ -12,16 +12,14 @@ def test_csv_loading(encoding):
     we plan to follow. (Though if we do decide to require the encoding from
     the user, or use chardet to sniff the encoding, that should be tested here.)
     """
-    with tempfile.NamedTemporaryFile(
-        delete_on_close=False, mode="w", newline="", encoding=encoding
-    ) as fp:
+    with tempfile.NamedTemporaryFile(mode="w", newline="", encoding=encoding) as fp:
         old_lf = pl.DataFrame({"NAME": ["André"], "AGE": [42]}).lazy()
 
         writer = csv.writer(fp)
         writer.writerow(["NAME", "AGE"])
         for row in old_lf.collect().rows():
             writer.writerow(row)
-        fp.close()
+        fp.flush()
 
         new_lf = pl.scan_csv(fp.name, encoding="utf8-lossy")
         if encoding == "utf8":
