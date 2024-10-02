@@ -12,6 +12,6 @@ def test_mock_data():
     assert df.select(pl.len()).item() == 1000
     assert 0 < df.get_column("col_0_100")[0] < 2
     assert 98 < df.get_column("col_0_100")[999] < 100
-    assert df.get_column("col_neg_pos")[0] + df.get_column("col_neg_pos")[
-        999
-    ] == approx(0)
+    assert (
+        df.get_column("col_neg_pos")[0] + df.get_column("col_neg_pos")[999]
+    ) == approx(0)
