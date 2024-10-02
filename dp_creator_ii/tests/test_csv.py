@@ -21,12 +21,22 @@ def test_csv_loading(encoding):
             writer.writerow(row)
         fp.flush()
 
-        new_lf = pl.scan_csv(fp.name, encoding="utf8-lossy")
+        # w/o "ignore_errors=True" it fails outright.
+        # We could ignore_errors:
+        new_default_lf = pl.scan_csv(fp.name, ignore_errors=True)
         if encoding == "utf8":
-            polars.testing.assert_frame_equal(old_lf, new_lf)
+            polars.testing.assert_frame_equal(old_lf, new_default_lf)
         if encoding != "utf8":
-            polars.testing.assert_frame_not_equal(old_lf, new_lf)
-            assert new_lf.collect().rows()[0] == ("Andr�", 42)
+            polars.testing.assert_frame_not_equal(old_lf, new_default_lf)
+            assert new_default_lf.collect().rows()[0] == (None, 42)
+
+        # But we retain more information with utf8-lossy:
+        new_lossy_lf = pl.scan_csv(fp.name, encoding="utf8-lossy")
+        if encoding == "utf8":
+            polars.testing.assert_frame_equal(old_lf, new_lossy_lf)
+        if encoding != "utf8":
+            polars.testing.assert_frame_not_equal(old_lf, new_lossy_lf)
+            assert new_lossy_lf.collect().rows()[0] == ("Andr�", 42)
             # If the file even has non-utf8 characters,
             # they are probably not the only thing that distinguishes
             # two strings that we want to group on.
