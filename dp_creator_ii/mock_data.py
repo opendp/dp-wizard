@@ -1,6 +1,6 @@
 from collections import namedtuple
 import polars as pl
-from scipy.stats import norm
+from scipy.stats import norm  # type: ignore
 
 ColumnDef = namedtuple("ColumnDef", ["min", "max"])
 
