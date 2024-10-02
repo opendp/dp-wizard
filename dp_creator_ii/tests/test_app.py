@@ -3,14 +3,14 @@ from playwright.sync_api import Page, expect
 from shiny.pytest import create_app_fixture
 
 
-app = create_app_fixture("../app.py")
+app = create_app_fixture("../app/__init__.py")
 
 
 # TODO: Why is incomplete coverage reported here?
 # https://github.com/opendp/dp-creator-ii/issues/18
 def test_app(page: Page, app: ShinyAppProc):  # pragma: no cover
     pick_dataset_text = "TODO: Pick dataset"
-    perform_analysis_text = "TODO: Perform analysis"
+    perform_analysis_text = "TODO: Define analysis"
     download_results_text = "TODO: Download results"
 
     def expect_visible(text):
@@ -25,7 +25,7 @@ def test_app(page: Page, app: ShinyAppProc):  # pragma: no cover
     expect_not_visible(perform_analysis_text)
     expect_not_visible(download_results_text)
 
-    page.get_by_role("button", name="Perform analysis").click()
+    page.get_by_role("button", name="Define analysis").click()
     expect_not_visible(pick_dataset_text)
     expect_visible(perform_analysis_text)
     expect_not_visible(download_results_text)
