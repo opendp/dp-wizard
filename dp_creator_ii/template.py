@@ -1,47 +1,54 @@
 from pathlib import Path
 import re
-from functools import partial
-
-
-def match_indent_maker(v):
-    # Working around late binding closure in loop:
-    # https://docs.python-guide.org/writing/gotchas/#late-binding-closures
-    # Would like a simpler solution.
-    def match_indent(match):
-        return "\n".join(match.group(1) + line for line in v.split("\n"))
-
-    return match_indent
 
 
 class _Template:
-    def __init__(self, path):
-        self._path = path
-        template_path = Path(__file__).parent / "templates" / path
-        self._template = template_path.read_text()
+    def __init__(self, path, template=None):
+        if path is not None:
+            self._path = path
+            template_path = Path(__file__).parent / "templates" / path
+            self._template = template_path.read_text()
+        if template is not None:
+            if path is not None:  # pragma: no cover
+                raise Exception('"path" and "template" are mutually exclusive')
+            self._path = "template-instead-of-path"
+            self._template = template
 
-    def fill_expressions(self, map):
-        for k, v in map.items():
+    def fill_expressions(self, **kwargs):
+        for k, v in kwargs.items():
             self._template = self._template.replace(k, v)
         return self
 
-    def fill_values(self, map):
-        for k, v in map.items():
+    def fill_values(self, **kwargs):
+        for k, v in kwargs.items():
             self._template = self._template.replace(k, repr(v))
         return self
 
-    def fill_blocks(self, map):
-        for k, v in map.items():
+    def fill_blocks(self, **kwargs):
+        for k, v in kwargs.items():
+
+            def match_indent(match):
+                # This does what we want, but binding is confusing.
+                return "\n".join(
+                    match.group(1) + line for line in v.split("\n")  # noqa: B023
+                )
+
             k_re = re.escape(k)
             self._template = re.sub(
-                rf"^(\s*){k_re}$",
-                partial(match_indent_maker, v)(),
+                rf"^([ \t]*){k_re}$",
+                match_indent,
                 self._template,
                 flags=re.MULTILINE,
             )
         return self
 
     def __str__(self):
-        unfilled = set(re.findall(r"[A-Z][A-Z_]+", self._template))
+        # Slots:
+        # - are all caps or underscores
+        # - have word boundary on either side
+        # - are at least three characters
+        slot_re = r"\b[A-Z][A-Z_]{2,}\b"
+        unfilled = set(re.findall(slot_re, self._template))
         if unfilled:
             raise Exception(
                 f"Template {self._path} has unfilled slots: "
@@ -53,12 +60,10 @@ class _Template:
 def _make_context_for_notebook(csv_path, unit, loss, weights):
     return str(
         _Template("context.py").fill_values(
-            {
-                "CSV_PATH": csv_path,
-                "UNIT": unit,
-                "LOSS": loss,
-                "WEIGHTS": weights,
-            }
+            CSV_PATH=csv_path,
+            UNIT=unit,
+            LOSS=loss,
+            WEIGHTS=weights,
         )
     )
 
@@ -66,33 +71,31 @@ def _make_context_for_notebook(csv_path, unit, loss, weights):
 def _make_context_for_script(unit, loss, weights):
     return str(
         _Template("context.py")
-        .fill_expressions({"CSV_PATH": "csv_path"})
+        .fill_expressions(
+            CSV_PATH="csv_path",
+        )
         .fill_values(
-            {
-                "UNIT": unit,
-                "LOSS": loss,
-                "WEIGHTS": weights,
-            }
+            UNIT=unit,
+            LOSS=loss,
+            WEIGHTS=weights,
         )
     )
 
 
 def _make_imports():
-    return str(_Template("imports.py").fill_values({}))
+    return str(_Template("imports.py").fill_values())
 
 
 def make_notebook_py(csv_path, unit, loss, weights):
     return str(
         _Template("notebook.py").fill_blocks(
-            {
-                "IMPORTS_BLOCK": _make_imports(),
-                "CONTEXT_BLOCK": _make_context_for_notebook(
-                    csv_path=csv_path,
-                    unit=unit,
-                    loss=loss,
-                    weights=weights,
-                ),
-            }
+            IMPORTS_BLOCK=_make_imports(),
+            CONTEXT_BLOCK=_make_context_for_notebook(
+                csv_path=csv_path,
+                unit=unit,
+                loss=loss,
+                weights=weights,
+            ),
         )
     )
 
@@ -100,13 +103,11 @@ def make_notebook_py(csv_path, unit, loss, weights):
 def make_script_py(unit, loss, weights):
     return str(
         _Template("script.py").fill_blocks(
-            {
-                "IMPORTS_BLOCK": _make_imports(),
-                "CONTEXT_BLOCK": _make_context_for_script(
-                    unit=unit,
-                    loss=loss,
-                    weights=weights,
-                ),
-            }
+            IMPORTS_BLOCK=_make_imports(),
+            CONTEXT_BLOCK=_make_context_for_script(
+                unit=unit,
+                loss=loss,
+                weights=weights,
+            ),
         )
     )

@@ -13,20 +13,21 @@ def convert_py_to_nb(python_str, execute=False):
         temp_dir_path = Path(temp_dir)
         py_path = temp_dir_path / "input.py"
         py_path.write_text(python_str)
-        nb_path = temp_dir_path / "output.ipynb"
         argv = (
             [
                 "jupytext",
+                "--from",
+                ".py",
                 "--to",
-                "ipynb",  # Target format
+                ".ipynb",
                 "--output",
-                nb_path.absolute(),  # Output
+                "-",
             ]
             + (["--execute"] if execute else [])
-            + [py_path.absolute()]  # Input
+            + [str(py_path.absolute())]  # Input
         )
         try:
-            subprocess.run(argv, check=True)
+            result = subprocess.run(argv, check=True, text=True, capture_output=True)
         except subprocess.CalledProcessError:  # pragma: no cover
             if not execute:
                 raise
@@ -36,6 +37,6 @@ def convert_py_to_nb(python_str, execute=False):
                 "python -m ipykernel install --name kernel_name --user".split(" "),
                 check=True,
             )
-            subprocess.run(argv, check=True)
+            result = subprocess.run(argv, check=True, text=True, capture_output=True)
 
-        return nb_path.read_text()
+        return result.stdout.strip()

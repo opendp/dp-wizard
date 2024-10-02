@@ -15,7 +15,7 @@ def norm_nb(nb_str):
     normed_nb_str = re.sub(r',\s+"language_info": \{[^}]*\}', "", normed_nb_str)
     # version will be different between dev environment and CI:
     normed_nb_str = re.sub(r'"version": "[^"]+"', '"version": "3.0.0"', normed_nb_str)
-    return normed_nb_str
+    return normed_nb_str.strip()
 
 
 def test_convert_py_to_nb():

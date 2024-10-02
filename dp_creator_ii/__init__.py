@@ -3,7 +3,6 @@
 import os
 from pathlib import Path
 from argparse import ArgumentParser
-import json
 
 import shiny
 
@@ -11,7 +10,7 @@ import shiny
 __version__ = "0.0.1"
 
 
-def get_parser():
+def get_arg_parser():
     parser = ArgumentParser(description=__doc__)
     parser.add_argument(
         "--csv",
@@ -25,38 +24,18 @@ def get_parser():
         type=int,
         help="Unit of privacy: How many rows can an individual contribute?",
     )
-    parser.add_argument(
-        "--debug",
-        action="store_true",
-        help="Use during development for increased logging "
-        "and auto-reload after code changes",
-    )
     return parser
 
 
 def main():  # pragma: no cover
-    parser = get_parser()
-    args = parser.parse_args()
+    # We call parse_args() again inside the app.
+    # We only call it here so "--help" is handled.
+    get_arg_parser().parse_args()
 
-    os.chdir(Path(__file__).parent)  # run_app() depends on the CWD.
+    # run_app() depends on the CWD.
+    os.chdir(Path(__file__).parent)
 
-    # Just setting variables in a plain python module doesn't work:
-    # The new thread started for the server doesn't see changes.
-    Path("config.json").write_text(
-        json.dumps(
-            {
-                "csv_path": str(args.csv_path),
-                "unit_of_privacy": args.unit_of_privacy,
-            }
-        )
-    )
-
-    run_app_kwargs = (
-        {}
-        if not args.debug
-        else {
-            "reload": True,
-            "log_level": "debug",
-        }
-    )
+    run_app_kwargs = {
+        "reload": True,
+    }
     shiny.run_app(launch_browser=True, **run_app_kwargs)
