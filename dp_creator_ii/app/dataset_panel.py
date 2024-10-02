@@ -11,7 +11,7 @@ def dataset_ui():
         "TODO: Pick dataset",
         ui.output_text("csv_path_text"),
         ui.output_text("unit_of_privacy_text"),
-        ui.input_action_button("go_to_analysis", "Perform analysis"),
+        ui.input_action_button("go_to_analysis", "Define analysis"),
         value="dataset_panel",
     )
 
