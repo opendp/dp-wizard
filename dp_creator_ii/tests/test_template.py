@@ -13,15 +13,13 @@ def test_fill_values():
     context_template = _Template("context.py")
     context_block = str(
         context_template.fill_values(
-            {
-                "CSV_PATH": fake_csv,
-                "UNIT": 1,
-                "LOSS": 1,
-                "WEIGHTS": [1],
-            }
+            CSV_PATH=fake_csv,
+            UNIT=1,
+            LOSS=1,
+            WEIGHTS=[1],
         )
     )
-    assert f"data=pl.scan_csv('{fake_csv}')" in context_block
+    assert f"data=pl.scan_csv('{fake_csv}', encoding=\"utf8-lossy\")" in context_block
 
 
 def test_fill_blocks():
@@ -39,11 +37,9 @@ with fake:
 """,
     )
     template.fill_blocks(
-        {
-            "FIRST": "\n".join(f"import {i}" for i in "abc"),
-            "SECOND": "\n".join(f"f({i})" for i in "123"),
-            "THIRD": "\n".join(f"{i}()" for i in "xyz"),
-        }
+        FIRST="\n".join(f"import {i}" for i in "abc"),
+        SECOND="\n".join(f"f({i})" for i in "123"),
+        THIRD="\n".join(f"{i}()" for i in "xyz"),
     )
     assert (
         str(template)
@@ -71,7 +67,7 @@ def test_fill_template_unfilled_slots():
         Exception,
         match=re.escape("context.py has unfilled slots: CSV_PATH, LOSS, UNIT, WEIGHTS"),
     ):
-        str(context_template.fill_values({}))
+        str(context_template.fill_values())
 
 
 def test_make_notebook():
