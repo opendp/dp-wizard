@@ -1,9 +1,9 @@
 from sys import argv
 
 from shiny import ui, reactive, render
-from htmltools.tags import details, pre, summary
 
 from dp_creator_ii import get_arg_parser
+from dp_creator_ii.app.ui_helpers import output_code_sample
 
 
 def get_args():
@@ -31,10 +31,7 @@ def dataset_ui():
         ui.output_text("csv_path_text"),
         ui.output_text("unit_of_privacy_text"),
         ui.input_numeric("contributions", "Contributions", args.unit_of_privacy),
-        details(
-            summary("Code sample"),
-            pre(ui.output_text("unit_of_privacy_python")),
-        ),
+        output_code_sample("unit_of_privacy_python"),
         ui.input_action_button("go_to_analysis", "Define analysis"),
         value="dataset_panel",
     )
