@@ -1,33 +1,49 @@
 from sys import argv
 
 from shiny import ui, reactive, render
+from htmltools.tags import details, pre, summary
 
 from dp_creator_ii import get_arg_parser
 
 
+def get_args():
+    """
+    Gets args from ARGV if available, or ignore them
+    if running in a playwrite test.
+    """
+    if argv[1:3] == ["run", "--port"]:
+
+        class NoneArgObject:
+            def __getattribute__(self, name: str):
+                return None
+
+        return NoneArgObject()
+    else:
+        return get_arg_parser().parse_args()
+
+
 def dataset_ui():
+    args = get_args()
+
     return ui.nav_panel(
         "Select Dataset",
         "TODO: Pick dataset",
         ui.output_text("csv_path_text"),
         ui.output_text("unit_of_privacy_text"),
+        ui.input_numeric("contributions", "Contributions", args.unit_of_privacy),
+        details(
+            summary("Code sample"),
+            pre(ui.output_text("unit_of_privacy_python")),
+        ),
         ui.input_action_button("go_to_analysis", "Define analysis"),
         value="dataset_panel",
     )
 
 
 def dataset_server(input, output, session):
-    if argv[1:3] == ["run", "--port"]:
-        # Started by playwright
-        arg_csv_path = None
-        arg_unit_of_privacy = None
-    else:
-        args = get_arg_parser().parse_args()
-        arg_csv_path = args.csv_path
-        arg_unit_of_privacy = args.unit_of_privacy
+    args = get_args()
 
-    csv_path = reactive.value(arg_csv_path)
-    unit_of_privacy = reactive.value(arg_unit_of_privacy)
+    csv_path = reactive.value(args.csv_path)
 
     @render.text
     def csv_path_text():
@@ -35,7 +51,12 @@ def dataset_server(input, output, session):
 
     @render.text
     def unit_of_privacy_text():
-        return str(unit_of_privacy.get())
+        return input.contributions()
+
+    @render.text
+    def unit_of_privacy_python():
+        contributions = input.contributions()
+        return f"privacy_unit = dp.unit_of(contributions={contributions})"
 
     @reactive.effect
     @reactive.event(input.go_to_analysis)
