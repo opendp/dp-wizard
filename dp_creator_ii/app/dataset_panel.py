@@ -7,19 +7,14 @@ from dp_creator_ii.app.ui_helpers import output_code_sample
 
 
 def get_args():
-    """
-    Gets args from ARGV if available, or ignore them
-    if running in a playwrite test.
-    """
+    arg_parser = get_arg_parser()
     if argv[1:3] == ["run", "--port"]:
-
-        class NoneArgObject:
-            def __getattribute__(self, name: str):
-                return None
-
-        return NoneArgObject()
+        # We are running a Playwright test,
+        # and ARGV is polluted, so override:
+        return arg_parser.parse_args([])
     else:
-        return get_arg_parser().parse_args()
+        # Normal parsing:
+        return arg_parser.parse_args()
 
 
 def dataset_ui():
@@ -29,7 +24,7 @@ def dataset_ui():
         "Select Dataset",
         "TODO: Pick dataset",
         ui.output_text("csv_path_text"),
-        ui.input_numeric("contributions", "Contributions", args.unit_of_privacy),
+        ui.input_numeric("contributions", "Contributions", args.contributions),
         output_code_sample("unit_of_privacy_python"),
         ui.input_action_button("go_to_analysis", "Define analysis"),
         value="dataset_panel",

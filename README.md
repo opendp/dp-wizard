@@ -14,16 +14,14 @@ Building on what we've learned from [DP Creator](https://github.com/opendp/dpcre
 ## Usage
 
 ```
-usage: dp-creator-ii [-h] [--csv CSV_PATH] [--unit UNIT_OF_PRIVACY]
+usage: dp-creator-ii [-h] [--csv CSV_PATH] [--contrib CONTRIB]
 
 DP Creator II makes it easier to get started with Differential Privacy.
 
 options:
-  -h, --help            show this help message and exit
-  --csv CSV_PATH        Path to CSV containing private data
-  --unit UNIT_OF_PRIVACY
-                        Unit of privacy: How many rows can an individual
-                        contribute?
+  -h, --help         show this help message and exit
+  --csv CSV_PATH     Path to CSV containing private data
+  --contrib CONTRIB  How many rows can an individual contribute?
 ```
 
 

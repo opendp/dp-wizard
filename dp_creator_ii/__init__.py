@@ -19,10 +19,12 @@ def get_arg_parser():
         help="Path to CSV containing private data",
     )
     parser.add_argument(
-        "--unit",
-        dest="unit_of_privacy",
+        "--contrib",
+        dest="contributions",
+        metavar="CONTRIB",
         type=int,
-        help="Unit of privacy: How many rows can an individual contribute?",
+        default=1,
+        help="How many rows can an individual contribute?",
     )
     return parser
 
