@@ -40,7 +40,7 @@ def dataset_server(input, output, session):
     def csv_path_text():
         return str(csv_path.get())
 
-    @render.text
+    @render.code
     def unit_of_privacy_python():
         contributions = input.contributions()
         return f"privacy_unit = dp.unit_of(contributions={contributions})"
