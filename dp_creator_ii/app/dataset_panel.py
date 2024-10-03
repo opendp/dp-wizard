@@ -29,7 +29,6 @@ def dataset_ui():
         "Select Dataset",
         "TODO: Pick dataset",
         ui.output_text("csv_path_text"),
-        ui.output_text("unit_of_privacy_text"),
         ui.input_numeric("contributions", "Contributions", args.unit_of_privacy),
         output_code_sample("unit_of_privacy_python"),
         ui.input_action_button("go_to_analysis", "Define analysis"),
@@ -45,10 +44,6 @@ def dataset_server(input, output, session):
     @render.text
     def csv_path_text():
         return str(csv_path.get())
-
-    @render.text
-    def unit_of_privacy_text():
-        return input.contributions()
 
     @render.text
     def unit_of_privacy_python():
