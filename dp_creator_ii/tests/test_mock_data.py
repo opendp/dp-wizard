@@ -1,5 +1,4 @@
 import polars as pl
-from pytest import approx
 
 from dp_creator_ii.mock_data import mock_data, ColumnDef
 
