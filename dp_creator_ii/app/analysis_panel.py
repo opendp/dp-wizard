@@ -1,8 +1,7 @@
 from shiny import ui, reactive, render
-import matplotlib.pyplot as plt
-import numpy as np
 
 from dp_creator_ii.mock_data import mock_data, ColumnDef
+from dp_creator_ii.app.plots import plot_error_bars_with_cutoff
 
 
 def analysis_ui():
@@ -16,44 +15,19 @@ def analysis_ui():
     )
 
 
-def plot(y_values, x_min_label="min", x_max_label="max", y_cutoff=0):
-    figure, axes = plt.subplots()
-    # figure.set_size_inches(4, 2)
-
-    x_values = 0.5 + np.arange(len(y_values))
-    axes.bar(
-        x_values,
-        y_values,
-        width=0.8,
-        edgecolor="skyblue",
-        linewidth=1,
-        yerr=2,
-        color="skyblue",
-    )
-    axes.bar(
-        x_values[:5],
-        y_values[:5],
-        width=0.8,
-        edgecolor="skyblue",
-        linewidth=0.5,
-        yerr=2,
-        color="white",
-    )
-    axes.hlines([y_cutoff], 0, len(y_values), colors=["black"], linestyles=["dotted"])
-
-    axes.set(xlim=(0, len(y_values)), ylim=(0, max(y_values)))
-    axes.get_xaxis().set_ticks([])
-    axes.get_yaxis().set_ticks([])
-
-    return figure
-
-
 def analysis_server(input, output, session):
     @render.plot()
     def plot_preview():
-        df = mock_data({"col_0_100": ColumnDef(0, 100)}, row_count=20)
-
-        return plot(df["col_0_100"].to_list(), y_cutoff=10)
+        min_x = 0
+        max_x = 100
+        df = mock_data({"col_0_100": ColumnDef(min_x, max_x)}, row_count=20)
+        return plot_error_bars_with_cutoff(
+            df["col_0_100"].to_list(),
+            x_min_label=min_x,
+            x_max_label=max_x,
+            y_cutoff=30,
+            y_error=5,
+        )
 
     @reactive.effect
     @reactive.event(input.go_to_results)
