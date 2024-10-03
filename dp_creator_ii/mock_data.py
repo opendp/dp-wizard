@@ -9,6 +9,9 @@ def mock_data(column_defs, row_count=1000):
     schema = {column_name: float for column_name in column_defs.keys()}
     data = {column_name: [] for column_name in column_defs.keys()}
 
+    # The details here don't really matter: Any method that
+    # deterministically gave us more values in the middle of the range
+    # and fewer at the extremes would do.
     quantile_width = 2 / 3
     for column_name, column_def in column_defs.items():
         scale = column_def.max - column_def.min

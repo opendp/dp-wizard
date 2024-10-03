@@ -12,6 +12,7 @@ dynamic = ["version", "description"]
 dependencies = [
     "shiny",
     "shinywidgets",
+    "matplotlib",
     "opendp[polars]",
     "jupytext",
     "jupyter-client",
