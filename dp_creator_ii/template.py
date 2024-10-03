@@ -111,3 +111,7 @@ def make_script_py(unit, loss, weights):
             ),
         )
     )
+
+
+def make_privacy_unit(contributions):
+    return str(_Template("privacy_unit.py").fill_values(CONTRIBUTIONS=contributions))

@@ -4,6 +4,7 @@ from shiny import ui, reactive, render
 
 from dp_creator_ii import get_arg_parser
 from dp_creator_ii.app.ui_helpers import output_code_sample
+from dp_creator_ii.template import make_privacy_unit
 
 
 def get_args():
@@ -43,7 +44,7 @@ def dataset_server(input, output, session):
     @render.code
     def unit_of_privacy_python():
         contributions = input.contributions()
-        return f"privacy_unit = dp.unit_of(contributions={contributions})"
+        return make_privacy_unit(contributions)
 
     @reactive.effect
     @reactive.event(input.go_to_analysis)
