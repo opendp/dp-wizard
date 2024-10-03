@@ -26,6 +26,9 @@ def test_navigation(page: Page, app: ShinyAppProc):  # pragma: no cover
     expect_visible(page, pick_dataset_text)
     expect_not_visible(page, perform_analysis_text)
     expect_not_visible(page, download_results_text)
+    page.get_by_label("Contributions").fill("42")
+    page.get_by_text("Code sample").click()
+    expect_visible(page, "dp.unit_of(contributions=42)")
 
     page.get_by_role("button", name="Define analysis").click()
     expect_not_visible(page, pick_dataset_text)
@@ -41,11 +44,4 @@ def test_navigation(page: Page, app: ShinyAppProc):  # pragma: no cover
         page.get_by_text("Download script").click()
     download = download_info.value
     script = download.path().read_text()
-    assert "privacy_unit = dp.unit_of(contributions=1)" in script
-
-
-def test_pick_dataset(page: Page, app: ShinyAppProc):  # pragma: no cover
-    page.goto(app.url)
-    page.get_by_label("Contributions").fill("42")
-    page.get_by_text("Code sample").click()
-    expect_visible(page, "dp.unit_of(contributions=42)")
+    assert "privacy_unit = dp.unit_of(contributions=42)" in script
