@@ -16,39 +16,44 @@ def analysis_ui():
     )
 
 
+def plot(y_values, x_min_label="min", x_max_label="max", y_cutoff=0):
+    figure, axes = plt.subplots()
+    # figure.set_size_inches(4, 2)
+
+    x_values = 0.5 + np.arange(len(y_values))
+    axes.bar(
+        x_values,
+        y_values,
+        width=0.8,
+        edgecolor="skyblue",
+        linewidth=1,
+        yerr=2,
+        color="skyblue",
+    )
+    axes.bar(
+        x_values[:5],
+        y_values[:5],
+        width=0.8,
+        edgecolor="skyblue",
+        linewidth=0.5,
+        yerr=2,
+        color="white",
+    )
+    axes.hlines([y_cutoff], 0, len(y_values), colors=["black"], linestyles=["dotted"])
+
+    axes.set(xlim=(0, len(y_values)), ylim=(0, max(y_values)))
+    axes.get_xaxis().set_ticks([])
+    axes.get_yaxis().set_ticks([])
+
+    return figure
+
+
 def analysis_server(input, output, session):
     @render.plot()
     def plot_preview():
-        col_0_100 = ColumnDef(0, 100)
-        col_neg_pos = ColumnDef(-10, 10)
-        df = mock_data({"col_0_100": col_0_100}, row_count=20)
+        df = mock_data({"col_0_100": ColumnDef(0, 100)}, row_count=20)
 
-        # plot
-        figure, axes = plt.subplots()
-        figure.set_size_inches(4, 2)
-
-        # make data:
-        y = df["col_0_100"].to_list()
-        x = 0.5 + np.arange(len(y))
-        axes.bar(
-            x, y, width=0.8, edgecolor="skyblue", linewidth=1, yerr=2, color="skyblue"
-        )
-        axes.bar(
-            x[:5],
-            y[:5],
-            width=0.8,
-            edgecolor="skyblue",
-            linewidth=0.5,
-            yerr=2,
-            color="white",
-        )
-        axes.hlines([10], 0, 20, colors=["black"], linestyles=["dotted"])
-
-        axes.set(xlim=(0, 20), ylim=(0, 100))
-        axes.get_xaxis().set_ticks([0, 20])
-        axes.get_yaxis().set_ticks([])
-
-        return figure
+        return plot(df["col_0_100"].to_list(), y_cutoff=10)
 
     @reactive.effect
     @reactive.event(input.go_to_results)
