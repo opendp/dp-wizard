@@ -65,7 +65,10 @@ def test_fill_template_unfilled_slots():
     context_template = _Template("context.py")
     with pytest.raises(
         Exception,
-        match=re.escape("context.py has unfilled slots: CSV_PATH, LOSS, UNIT, WEIGHTS"),
+        match=re.escape(
+            "context.py has unfilled slots: "
+            "CSV_PATH, LOSS, PRIVACY_UNIT_BLOCK, WEIGHTS"
+        ),
     ):
         str(context_template.fill_values())
 
