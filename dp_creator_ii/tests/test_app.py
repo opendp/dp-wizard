@@ -41,7 +41,7 @@ def test_navigation(page: Page, app: ShinyAppProc):  # pragma: no cover
         page.get_by_text("Download script").click()
     download = download_info.value
     script = download.path().read_text()
-    assert "privacy_unit=dp.unit_of(contributions=1)" in script
+    assert "privacy_unit = dp.unit_of(contributions=1)" in script
 
 
 def test_pick_dataset(page: Page, app: ShinyAppProc):  # pragma: no cover

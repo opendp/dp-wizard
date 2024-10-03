@@ -21,7 +21,7 @@ def results_server(input, output, session):
     )
     async def download_script():
         script_py = make_script_py(
-            unit=1,
+            contributions=1,
             loss=1,
             weights=[1],
         )
@@ -34,7 +34,7 @@ def results_server(input, output, session):
     async def download_notebook_unexecuted():
         notebook_py = make_notebook_py(
             csv_path="todo.csv",
-            unit=1,
+            contributions=1,
             loss=1,
             weights=[1],
         )
@@ -48,7 +48,7 @@ def results_server(input, output, session):
     async def download_notebook_executed():
         notebook_py = make_notebook_py(
             csv_path="todo.csv",
-            unit=1,
+            contributions=1,
             loss=1,
             weights=[1],
         )

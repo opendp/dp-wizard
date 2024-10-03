@@ -73,7 +73,7 @@ def test_fill_template_unfilled_slots():
 def test_make_notebook():
     notebook = make_notebook_py(
         csv_path=fake_csv,
-        unit=1,
+        contributions=1,
         loss=1,
         weights=[1],
     )
@@ -84,7 +84,7 @@ def test_make_notebook():
 
 def test_make_script():
     script = make_script_py(
-        unit=1,
+        contributions=1,
         loss=1,
         weights=[1],
     )
