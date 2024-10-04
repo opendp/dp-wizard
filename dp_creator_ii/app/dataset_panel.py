@@ -10,7 +10,8 @@ def dataset_ui():
         "Select Dataset",
         "TODO: Pick dataset",
         ui.input_file("csv_path_from_ui", "Choose CSV file", accept=[".csv"]),
-        ui.output_text("csv_path_from_cli"),
+        "CSV path from either CLI or UI:",
+        ui.output_text("csv_path"),
         ui.output_text("unit_of_privacy_text"),
         ui.input_action_button("go_to_analysis", "Define analysis"),
         value="dataset_panel",
@@ -27,12 +28,14 @@ def dataset_server(input, output, session):
         arg_csv_path = args.csv_path
         arg_unit_of_privacy = args.unit_of_privacy
 
-    csv_path = reactive.value(arg_csv_path)
+    csv_path_from_cli_value = reactive.value(arg_csv_path)
     unit_of_privacy = reactive.value(arg_unit_of_privacy)
 
     @render.text
-    def csv_path_from_cli():
-        return str(csv_path.get())
+    def csv_path():
+        if input.csv_path_from_ui() is not None:
+            return input.csv_path_from_ui()[0]["datapath"]
+        return csv_path_from_cli_value.get()
 
     @render.text
     def unit_of_privacy_text():
