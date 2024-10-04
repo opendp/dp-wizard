@@ -12,6 +12,8 @@ def dataset_ui():
         ui.input_file("csv_path_from_ui", "Choose CSV file", accept=[".csv"]),
         "CSV path from either CLI or UI:",
         ui.output_text("csv_path"),
+        # "CSV fields:",
+        # ui.output_text("csv_fields"),
         ui.output_text("unit_of_privacy_text"),
         ui.input_action_button("go_to_analysis", "Define analysis"),
         value="dataset_panel",
@@ -32,9 +34,11 @@ def dataset_server(input, output, session):
     unit_of_privacy = reactive.value(arg_unit_of_privacy)
 
     @render.text
+    @reactive.calc
     def csv_path():
-        if input.csv_path_from_ui() is not None:
-            return input.csv_path_from_ui()[0]["datapath"]
+        csv_path_from_ui = input.csv_path_from_ui()
+        if csv_path_from_ui is not None:
+            return csv_path_from_ui[0]["datapath"]
         return csv_path_from_cli_value.get()
 
     @render.text
