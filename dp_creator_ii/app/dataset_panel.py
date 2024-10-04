@@ -52,7 +52,7 @@ def dataset_server(input, output, session):
 
     @render.text
     def csv_fields():
-        return csv_path_calc()
+        return csv_fields_calc()
 
     @render.text
     def unit_of_privacy_text():
