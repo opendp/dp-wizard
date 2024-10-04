@@ -35,21 +35,24 @@ def dataset_server(input, output, session):
     csv_path_from_cli_value = reactive.value(arg_csv_path)
     unit_of_privacy = reactive.value(arg_unit_of_privacy)
 
-    @render.text
     @reactive.calc
-    def csv_path():
+    def csv_path_calc():
         csv_path_from_ui = input.csv_path_from_ui()
         if csv_path_from_ui is not None:
             return csv_path_from_ui[0]["datapath"]
         return csv_path_from_cli_value.get()
 
     @render.text
-    # @reactive.calc
-    def csv_fields():
-        from pathlib import Path
+    def csv_path():
+        return csv_path_calc()
 
-        path = Path(__file__).parent.parent / "tests" / "fixtures" / "fake.csv"
-        return read_field_names(path)
+    @reactive.calc
+    def csv_fields_calc():
+        return read_field_names(csv_path_calc())
+
+    @render.text
+    def csv_fields():
+        return csv_path_calc()
 
     @render.text
     def unit_of_privacy_text():
