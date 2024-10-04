@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from shiny.run import ShinyAppProc
 from playwright.sync_api import Page, expect
 from shiny.pytest import create_app_fixture
@@ -24,6 +26,10 @@ def test_app(page: Page, app: ShinyAppProc):  # pragma: no cover
     expect_visible(pick_dataset_text)
     expect_not_visible(perform_analysis_text)
     expect_not_visible(download_results_text)
+
+    csv_path = Path(__file__).parent / "fixtures" / "fake.csv"
+    page.get_by_label("Choose CSV file").set_input_files(csv_path.resolve())
+    expect_visible("student_id")
 
     page.get_by_role("button", name="Define analysis").click()
     expect_not_visible(pick_dataset_text)
