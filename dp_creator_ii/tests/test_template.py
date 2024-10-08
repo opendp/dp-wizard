@@ -103,9 +103,9 @@ def test_make_script():
         weights=[1],
     )
 
-    with NamedTemporaryFile(mode="w", delete=False) as fp:
+    with NamedTemporaryFile(mode="w") as fp:
         fp.write(script)
-        fp.close()
+        fp.flush()
 
         result = subprocess.run(["python", fp.name, "--csv", fake_csv])
         assert result.returncode == 0
