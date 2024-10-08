@@ -42,9 +42,7 @@ click==8.1.7
     #   shiny
     #   uvicorn
 comm==0.2.2
-    # via
-    #   ipykernel
-    #   ipywidgets
+    # via ipykernel
 coverage==7.6.1
     # via -r requirements-dev.in
 debugpy==1.8.6
@@ -90,11 +88,7 @@ iniconfig==2.0.0
 ipykernel==6.29.5
     # via -r requirements-dev.in
 ipython==8.18.0
-    # via
-    #   ipykernel
-    #   ipywidgets
-ipywidgets==8.1.5
-    # via shinywidgets
+    # via ipykernel
 jedi==0.19.1
     # via ipython
 jinja2==3.1.4
@@ -117,11 +111,8 @@ jupyter-core==5.7.2
     #   nbclient
     #   nbconvert
     #   nbformat
-    #   shinywidgets
 jupyterlab-pygments==0.3.0
     # via nbconvert
-jupyterlab-widgets==3.0.13
-    # via ipywidgets
 jupytext==1.16.4
     # via -r requirements-dev.in
 linkify-it-py==2.0.3
@@ -247,9 +238,7 @@ pytest-base-url==2.1.0
 pytest-playwright==0.5.2
     # via -r requirements-dev.in
 python-dateutil==2.9.0.post0
-    # via
-    #   jupyter-client
-    #   shinywidgets
+    # via jupyter-client
 python-multipart==0.0.9
     # via shiny
 python-slugify==8.0.4
@@ -285,10 +274,6 @@ scipy==1.13.1
     #   -r requirements-dev.in
     #   scikit-learn
 shiny==1.1.0
-    # via
-    #   -r requirements-dev.in
-    #   shinywidgets
-shinywidgets==0.3.3
     # via -r requirements-dev.in
 six==1.16.0
     # via
@@ -320,7 +305,6 @@ traitlets==5.14.3
     #   comm
     #   ipykernel
     #   ipython
-    #   ipywidgets
     #   jupyter-client
     #   jupyter-core
     #   matplotlib-inline
@@ -353,8 +337,6 @@ websockets==13.0.1
     # via shiny
 wheel==0.44.0
     # via pip-tools
-widgetsnbextension==4.0.13
-    # via ipywidgets
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip
