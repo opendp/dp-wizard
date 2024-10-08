@@ -48,7 +48,10 @@ def dataset_server(input, output, session):
 
     @reactive.calc
     def csv_fields_calc():
-        return read_field_names(csv_path_calc())
+        path = csv_path_calc()
+        if path is None:
+            return None
+        return read_field_names(path)
 
     @render.text
     def csv_fields():
