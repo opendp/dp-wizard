@@ -11,6 +11,8 @@ Building on what we've learned from [DP Creator](https://github.com/opendp/dpcre
 - UI development in Python with [Shiny](https://shiny.posit.co/py/)
 - Tracking of cumulative privacy consumption between sessions
 
+We plan to implement a [proof of concept](https://docs.google.com/document/d/1dteip598-jYj6KFuoYRyrZDPUuwDl9fHgxARiSieVGw/edit) over a couple months, and then get feedback from users before deciding on next steps.
+
 ## Usage
 
 ```
@@ -32,40 +34,40 @@ options:
 ### Getting Started
 
 To get started, clone the repo and install dev dependencies in a virtual environment:
-```
-git clone https://github.com/opendp/dp-creator-ii.git
-cd dp-creator-ii
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements-dev.txt
-pre-commit install
-playwright install
+```shell
+$ git clone https://github.com/opendp/dp-creator-ii.git
+$ cd dp-creator-ii
+$ python3 -m venv .venv
+$ source .venv/bin/activate
+$ pip install -r requirements-dev.txt
+$ pre-commit install
+$ playwright install
 ```
 
 Now install the application itself and run it:
-```
-flit install --symlink
-dp-creator-ii
+```shell
+$ flit install --symlink
+$ dp-creator-ii
 ```
 Your browser should open and connect you to the application.
 
 ### Testing
 
 Tests should pass, and code coverage should be complete (except blocks we explicitly ignore):
-```
-coverage run -m pytest -v
-coverage report
+```shell
+$ coverage run -m pytest -v
+$ coverage report
 ```
 
 We're using [Playwright](https://playwright.dev/python/) for end-to-end tests. You can use it to [generate test code](https://playwright.dev/python/docs/codegen-intro) just by interacting with the app in a browser:
-```
-dp-creator-ii&
-playwright codegen http://127.0.0.1:8000/
+```shell
+$ dp-creator-ii # The server will continue to run, so open a new terminal to continue.
+$ playwright codegen http://127.0.0.1:8000/
 ```
 
 You can also [step through these tests](https://playwright.dev/python/docs/running-tests#debugging-tests) and see what the browser sees:
-```
-PWDEBUG=1 pytest
+```shell
+$ PWDEBUG=1 pytest
 ```
 
 ### Conventions
