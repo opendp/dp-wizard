@@ -106,7 +106,7 @@ def test_make_script():
 
     def clear_empty_lines(text):
         # Cleanup whitespace after indenting blocks
-        return re.sub(r"^[ \t]+$", "", text, flags=re.MULTILINE).strip()
+        return re.sub(r"^\s+$", "", text, flags=re.MULTILINE).strip()
 
     expected_script = (
         Path(__file__).parent / "fixtures" / "expected-script.py"
