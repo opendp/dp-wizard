@@ -26,6 +26,7 @@ def test_app(page: Page, app: ShinyAppProc):  # pragma: no cover
     expect_visible(pick_dataset_text)
     expect_not_visible(perform_analysis_text)
     expect_not_visible(download_results_text)
+    expect_not_visible("expected str, bytes")
 
     csv_path = Path(__file__).parent / "fixtures" / "fake.csv"
     page.get_by_label("Choose CSV file").set_input_files(csv_path.resolve())
