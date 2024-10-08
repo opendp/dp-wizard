@@ -1,5 +1,6 @@
 from tempfile import NamedTemporaryFile
 import subprocess
+from pathlib import Path
 import re
 import pytest
 import opendp.prelude as dp
@@ -102,6 +103,15 @@ def test_make_script():
         loss=1,
         weights=[1],
     )
+
+    def clear_empty_lines(text):
+        # Cleanup whitespace after indenting blocks
+        return re.sub(r"^[ \t]+$", "", text, flags=re.MULTILINE).strip()
+
+    expected_script = (
+        Path(__file__).parent / "fixtures" / "expected-script.py"
+    ).read_text()
+    assert clear_empty_lines(script) == clear_empty_lines(expected_script)
 
     with NamedTemporaryFile(mode="w") as fp:
         fp.write(script)
