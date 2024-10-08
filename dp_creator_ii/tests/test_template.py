@@ -9,17 +9,28 @@ from dp_creator_ii.template import _Template, make_notebook_py, make_script_py
 fake_csv = "dp_creator_ii/tests/fixtures/fake.csv"
 
 
-def test_fill_values():
-    context_template = _Template("context.py")
-    context_block = str(
-        context_template.fill_values(
-            CSV_PATH=fake_csv,
-            UNIT=1,
-            LOSS=1,
-            WEIGHTS=[1],
+def test_fill_expressions():
+    template = _Template(None, template="No one VERB the ADJ NOUN!")
+    filled = str(
+        template.fill_expressions(
+            VERB="expects",
+            ADJ="Spanish",
+            NOUN="Inquisition",
         )
     )
-    assert f"data=pl.scan_csv('{fake_csv}', encoding=\"utf8-lossy\")" in context_block
+    assert filled == "No one expects the Spanish Inquisition!"
+
+
+def test_fill_values():
+    template = _Template(None, template="assert [STRING] * NUM == LIST")
+    filled = str(
+        template.fill_values(
+            STRING="🙂",
+            NUM=3,
+            LIST=["🙂", "🙂", "🙂"],
+        )
+    )
+    assert filled == "assert ['🙂'] * 3 == ['🙂', '🙂', '🙂']"
 
 
 def test_fill_blocks():
