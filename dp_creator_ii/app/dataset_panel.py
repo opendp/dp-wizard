@@ -8,8 +8,17 @@ from dp_creator_ii import get_arg_parser
 def dataset_ui():
     return ui.nav_panel(
         "Select Dataset",
-        "TODO: Pick dataset",
+        ui.markdown(
+            "[PR: CSV upload](https://github.com/opendp/dp-creator-ii/pull/45)"
+        ),
         ui.output_text("csv_path_text"),
+        ui.markdown(
+            "How many rows of the CSV can one individual contribute to? "
+            'This is the "unit of privacy" which will be protected.'
+        ),
+        ui.markdown(
+            "[PR: Unit of privacy](https://github.com/opendp/dp-creator-ii/pull/41)"
+        ),
         ui.output_text("unit_of_privacy_text"),
         ui.input_action_button("go_to_analysis", "Define analysis"),
         value="dataset_panel",
