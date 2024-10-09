@@ -1,9 +1,12 @@
+from pathlib import Path
+
 from shiny import App, ui
 
 from dp_creator_ii.app import analysis_panel, dataset_panel, results_panel
 
 
 app_ui = ui.page_bootstrap(
+    ui.head_content(ui.include_css(Path(__file__).parent / "css" / "styles.css")),
     ui.navset_tab(
         dataset_panel.dataset_ui(),
         analysis_panel.analysis_ui(),
