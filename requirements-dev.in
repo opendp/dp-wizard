@@ -34,7 +34,6 @@ ipykernel
 
 # Shiny:
 shiny
-shinywidgets
 
 # Visualization:
 matplotlib

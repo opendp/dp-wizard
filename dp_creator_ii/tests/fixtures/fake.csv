@@ -1,1 +1,7 @@
-fake-column
+student_id,class_year,assignment_type,grade
+1234,1,quiz,90
+1234,1,quiz,95
+1234,1,exam,85
+6789,2,quiz,70
+6789,2,quiz,100
+6789,2,exam,90
