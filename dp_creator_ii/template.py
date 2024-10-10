@@ -57,27 +57,34 @@ class _Template:
         return self._template
 
 
-def _make_context_for_notebook(csv_path, unit, loss, weights):
+def _make_context_for_notebook(csv_path, contributions, loss, weights):
+    privacy_unit_block = make_privacy_unit_block(contributions)
     return str(
-        _Template("context.py").fill_values(
+        _Template("context.py")
+        .fill_values(
             CSV_PATH=csv_path,
-            UNIT=unit,
             LOSS=loss,
             WEIGHTS=weights,
+        )
+        .fill_blocks(
+            PRIVACY_UNIT_BLOCK=privacy_unit_block,
         )
     )
 
 
-def _make_context_for_script(unit, loss, weights):
+def _make_context_for_script(contributions, loss, weights):
+    privacy_unit_block = make_privacy_unit_block(contributions)
     return str(
         _Template("context.py")
         .fill_expressions(
             CSV_PATH="csv_path",
         )
         .fill_values(
-            UNIT=unit,
             LOSS=loss,
             WEIGHTS=weights,
+        )
+        .fill_blocks(
+            PRIVACY_UNIT_BLOCK=privacy_unit_block,
         )
     )
 
@@ -86,13 +93,13 @@ def _make_imports():
     return str(_Template("imports.py").fill_values())
 
 
-def make_notebook_py(csv_path, unit, loss, weights):
+def make_notebook_py(csv_path, contributions, loss, weights):
     return str(
         _Template("notebook.py").fill_blocks(
             IMPORTS_BLOCK=_make_imports(),
             CONTEXT_BLOCK=_make_context_for_notebook(
                 csv_path=csv_path,
-                unit=unit,
+                contributions=contributions,
                 loss=loss,
                 weights=weights,
             ),
@@ -100,14 +107,18 @@ def make_notebook_py(csv_path, unit, loss, weights):
     )
 
 
-def make_script_py(unit, loss, weights):
+def make_script_py(contributions, loss, weights):
     return str(
         _Template("script.py").fill_blocks(
             IMPORTS_BLOCK=_make_imports(),
             CONTEXT_BLOCK=_make_context_for_script(
-                unit=unit,
+                contributions=contributions,
                 loss=loss,
                 weights=weights,
             ),
         )
     )
+
+
+def make_privacy_unit_block(contributions):
+    return str(_Template("privacy_unit.py").fill_values(CONTRIBUTIONS=contributions))

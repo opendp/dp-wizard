@@ -1,8 +1,7 @@
 """DP Creator II makes it easier to get started with Differential Privacy."""
 
-import os
 from pathlib import Path
-from argparse import ArgumentParser
+from argparse import ArgumentParser, ArgumentTypeError
 
 import shiny
 
@@ -10,32 +9,42 @@ import shiny
 __version__ = "0.0.1"
 
 
+def existing_csv(arg):
+    path = Path(arg)
+    if not path.exists():
+        raise ArgumentTypeError(f"No such file: {arg}")
+    if path.suffix != ".csv":
+        raise ArgumentTypeError(f'Must have ".csv" extension: {arg}')
+    return path
+
+
 def get_arg_parser():
     parser = ArgumentParser(description=__doc__)
     parser.add_argument(
         "--csv",
         dest="csv_path",
-        type=Path,
+        type=existing_csv,
         help="Path to CSV containing private data",
     )
     parser.add_argument(
-        "--unit",
-        dest="unit_of_privacy",
+        "--contrib",
+        dest="contributions",
+        metavar="CONTRIB",
         type=int,
-        help="Unit of privacy: How many rows can an individual contribute?",
+        default=1,
+        help="How many rows can an individual contribute?",
     )
     return parser
 
 
 def main():  # pragma: no cover
     # We call parse_args() again inside the app.
-    # We only call it here so "--help" is handled.
+    # We only call it here so "--help" is handled,
+    # and to validate inputs.
     get_arg_parser().parse_args()
 
-    # run_app() depends on the CWD.
-    os.chdir(Path(__file__).parent)
-
-    run_app_kwargs = {
-        "reload": True,
-    }
-    shiny.run_app(launch_browser=True, **run_app_kwargs)
+    shiny.run_app(
+        app="dp_creator_ii.app",
+        launch_browser=True,
+        reload=True,
+    )
