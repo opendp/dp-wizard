@@ -35,8 +35,9 @@ def results_server(input, output, session):
         media_type="text/x-python",
     )
     async def download_script():
+        contributions = input.contributions()
         script_py = make_script_py(
-            unit=1,
+            contributions=contributions,
             loss=1,
             weights=[1],
         )
@@ -47,9 +48,10 @@ def results_server(input, output, session):
         media_type="application/x-ipynb+json",
     )
     async def download_notebook_unexecuted():
+        contributions = input.contributions()
         notebook_py = make_notebook_py(
             csv_path="todo.csv",
-            unit=1,
+            contributions=contributions,
             loss=1,
             weights=[1],
         )
@@ -61,9 +63,10 @@ def results_server(input, output, session):
         media_type="application/x-ipynb+json",
     )
     async def download_notebook_executed():
+        contributions = input.contributions()
         notebook_py = make_notebook_py(
             csv_path="todo.csv",
-            unit=1,
+            contributions=contributions,
             loss=1,
             weights=[1],
         )

@@ -1,5 +1,6 @@
 from tempfile import NamedTemporaryFile
 import subprocess
+from pathlib import Path
 import re
 import pytest
 import opendp.prelude as dp
@@ -9,17 +10,28 @@ from dp_creator_ii.template import _Template, make_notebook_py, make_script_py
 fake_csv = "dp_creator_ii/tests/fixtures/fake.csv"
 
 
-def test_fill_values():
-    context_template = _Template("context.py")
-    context_block = str(
-        context_template.fill_values(
-            CSV_PATH=fake_csv,
-            UNIT=1,
-            LOSS=1,
-            WEIGHTS=[1],
+def test_fill_expressions():
+    template = _Template(None, template="No one VERB the ADJ NOUN!")
+    filled = str(
+        template.fill_expressions(
+            VERB="expects",
+            ADJ="Spanish",
+            NOUN="Inquisition",
         )
     )
-    assert f"data=pl.scan_csv('{fake_csv}', encoding=\"utf8-lossy\")" in context_block
+    assert filled == "No one expects the Spanish Inquisition!"
+
+
+def test_fill_values():
+    template = _Template(None, template="assert [STRING] * NUM == LIST")
+    filled = str(
+        template.fill_values(
+            STRING="🙂",
+            NUM=3,
+            LIST=["🙂", "🙂", "🙂"],
+        )
+    )
+    assert filled == "assert ['🙂'] * 3 == ['🙂', '🙂', '🙂']"
 
 
 def test_fill_blocks():
@@ -65,7 +77,10 @@ def test_fill_template_unfilled_slots():
     context_template = _Template("context.py")
     with pytest.raises(
         Exception,
-        match=re.escape("context.py has unfilled slots: CSV_PATH, LOSS, UNIT, WEIGHTS"),
+        match=re.escape(
+            "context.py has unfilled slots: "
+            "CSV_PATH, LOSS, PRIVACY_UNIT_BLOCK, WEIGHTS"
+        ),
     ):
         str(context_template.fill_values())
 
@@ -73,7 +88,7 @@ def test_fill_template_unfilled_slots():
 def test_make_notebook():
     notebook = make_notebook_py(
         csv_path=fake_csv,
-        unit=1,
+        contributions=1,
         loss=1,
         weights=[1],
     )
@@ -84,14 +99,23 @@ def test_make_notebook():
 
 def test_make_script():
     script = make_script_py(
-        unit=1,
+        contributions=1,
         loss=1,
         weights=[1],
     )
 
-    with NamedTemporaryFile(mode="w", delete=False) as fp:
+    def clear_empty_lines(text):
+        # Cleanup whitespace after indenting blocks
+        return re.sub(r"^\s+$", "", text, flags=re.MULTILINE).strip()
+
+    expected_script = (
+        Path(__file__).parent / "fixtures" / "expected-script.py"
+    ).read_text()
+    assert clear_empty_lines(script) == clear_empty_lines(expected_script)
+
+    with NamedTemporaryFile(mode="w") as fp:
         fp.write(script)
-        fp.close()
+        fp.flush()
 
         result = subprocess.run(["python", fp.name, "--csv", fake_csv])
         assert result.returncode == 0
