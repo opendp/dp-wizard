@@ -1,6 +1,8 @@
 from sys import argv
 from pathlib import Path
 from argparse import ArgumentParser, ArgumentTypeError
+import csv
+import random
 
 
 def _existing_csv_type(arg):
@@ -46,9 +48,36 @@ def _get_args():  # pragma: no cover
         return arg_parser.parse_args()
 
 
+def _clip(n, lower, upper):
+    return max(min(n, upper), lower)
+
+
 def _get_demo_csv_path():  # pragma: no cover
-    # TODO
-    pass
+    random.seed(0)  # So the mock data will be stable across runs.
+
+    csv_path = "/tmp/demo.csv"
+    contrib = 10
+
+    with open(csv_path, "w", newline="") as demo_handle:
+        fields = ["student_id", "class_year", "hw_number", "grade"]
+        writer = csv.DictWriter(demo_handle, fieldnames=fields)
+        writer.writeheader()
+        for student_id in range(1, 100):
+            class_year = int(_clip(random.gauss(2, 1), 1, 4))
+            # Older students do slightly better in the class:
+            mean_grade = random.gauss(80, 5) + class_year * 2
+            for hw_number in range(1, contrib):
+                grade = int(_clip(random.gauss(mean_grade, 5), 0, 100))
+                writer.writerow(
+                    {
+                        "student_id": student_id,
+                        "class_year": class_year,
+                        "hw_number": hw_number,
+                        "grade": grade,
+                    }
+                )
+
+    return csv_path
 
 
 def get_csv_contrib():  # pragma: no cover
