@@ -39,7 +39,7 @@ def _get_arg_parser():
 
 def _get_args():  # pragma: no cover
     arg_parser = _get_arg_parser()
-    if "--port" in argv or "-v" in argv:
+    if "--port" in argv or "-v" in argv or "-k" in argv:
         # We are running a test,
         # and ARGV is polluted, so override:
         return arg_parser.parse_args([])
@@ -66,7 +66,12 @@ def _get_demo_csv_contrib():
     >>> with open(csv_path, newline="") as csv_handle:
     ...     reader = csv.DictReader(csv_handle)
     ...     reader.fieldnames
+    ...     rows = list(reader)
+    ...     rows[0]
+    ...     rows[-1]
     ['student_id', 'class_year', 'hw_number', 'grade']
+    {'student_id': '1', 'class_year': '2', 'hw_number': '1', 'grade': '73'}
+    {'student_id': '100', 'class_year': '1', 'hw_number': '10', 'grade': '78'}
     """
     random.seed(0)  # So the mock data will be stable across runs.
 
@@ -77,11 +82,11 @@ def _get_demo_csv_contrib():
         fields = ["student_id", "class_year", "hw_number", "grade"]
         writer = csv.DictWriter(demo_handle, fieldnames=fields)
         writer.writeheader()
-        for student_id in range(1, 100):
+        for student_id in range(1, 101):
             class_year = int(_clip(random.gauss(2, 1), 1, 4))
             # Older students do slightly better in the class:
             mean_grade = random.gauss(80, 5) + class_year * 2
-            for hw_number in range(1, contributions):
+            for hw_number in range(1, contributions + 1):
                 grade = int(_clip(random.gauss(mean_grade, 5), 0, 100))
                 writer.writerow(
                     {
