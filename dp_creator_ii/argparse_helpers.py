@@ -3,7 +3,7 @@ from pathlib import Path
 from argparse import ArgumentParser, ArgumentTypeError
 
 
-def existing_csv_type(arg):
+def _existing_csv_type(arg):
     path = Path(arg)
     if not path.exists():
         raise ArgumentTypeError(f"No such file: {arg}")
@@ -12,13 +12,13 @@ def existing_csv_type(arg):
     return path
 
 
-def get_arg_parser():
+def _get_arg_parser():
     parser = ArgumentParser(description=__doc__)
     input_group = parser.add_mutually_exclusive_group()
     input_group.add_argument(
         "--csv",
         dest="csv_path",
-        type=existing_csv_type,
+        type=_existing_csv_type,
         help="Path to CSV containing private data",
     )
     input_group.add_argument(
@@ -35,8 +35,8 @@ def get_arg_parser():
     return parser
 
 
-def get_args():  # pragma: no cover
-    arg_parser = get_arg_parser()
+def _get_args():  # pragma: no cover
+    arg_parser = _get_arg_parser()
     if argv[1:3] == ["run", "--port"]:
         # We are running a Playwright test,
         # and ARGV is polluted, so override:
@@ -46,15 +46,17 @@ def get_args():  # pragma: no cover
         return arg_parser.parse_args()
 
 
-def get_demo_csv_path():  # pragma: no cover
+def _get_demo_csv_path():  # pragma: no cover
     # TODO
     pass
 
 
 def get_csv_contrib():  # pragma: no cover
-    args = get_args()
+    args = _get_args()
     if args.csv_path is not None:
         csv_path = args.csv_path
-    if args.demo:
-        csv_path = get_demo_csv_path()
+    elif args.demo:
+        csv_path = _get_demo_csv_path()
+    else:
+        csv_path = None
     return (csv_path, args.contributions)

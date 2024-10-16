@@ -1,17 +1,16 @@
 """DP Creator II makes it easier to get started with Differential Privacy."""
 
 import shiny
-from dp_creator_ii.argparse_helpers import get_args
+from dp_creator_ii.argparse_helpers import get_csv_contrib
 
 
 __version__ = "0.0.1"
 
 
 def main():  # pragma: no cover
-    # We call parse_args() again inside the app.
-    # We only call it here so "--help" is handled,
-    # and to validate inputs.
-    get_args()
+    # We only call this here so "--help" is handled,
+    # and to validate inputs before starting the server.
+    get_csv_contrib()
 
     shiny.run_app(
         app="dp_creator_ii.app",
