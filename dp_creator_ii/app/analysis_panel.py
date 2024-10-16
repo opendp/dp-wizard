@@ -2,6 +2,7 @@ from shiny import ui, reactive, render
 
 from dp_creator_ii.mock_data import mock_data, ColumnDef
 from dp_creator_ii.app.plots import plot_error_bars_with_cutoff
+from dp_creator_ii.csv_helper import read_field_names
 
 
 def analysis_ui():
@@ -13,10 +14,12 @@ def analysis_ui():
             "the number of bins for the histogram, "
             "and its relative share of the privacy budget."
         ),
+        ui.output_text("csv_name"),
         ui.markdown(
             "[TODO: Column selection]"
             "(https://github.com/opendp/dp-creator-ii/issues/33)"
         ),
+        ui.output_text("csv_fields"),
         ui.markdown(
             "What is your privacy budget for this release? "
             "Values above 1 will add less noise to the data, "
@@ -39,6 +42,27 @@ def analysis_ui():
 
 
 def analysis_server(input, output, session):
+    @reactive.calc
+    def csv_name_calc():
+        csv_path_from_ui = input.csv_path_from_ui()
+        if csv_path_from_ui is not None:
+            return csv_path_from_ui[0]["datapath"]
+
+    @render.text
+    def csv_name():
+        return csv_name_calc()
+
+    @reactive.calc
+    def csv_fields_calc():
+        csv_path_from_ui = input.csv_path_from_ui()
+        if csv_path_from_ui is None:
+            return None
+        return read_field_names(csv_path_from_ui[0]["datapath"])
+
+    @render.text
+    def csv_fields():
+        return csv_fields_calc()
+
     @render.plot()
     def plot_preview():
         min_x = 0
