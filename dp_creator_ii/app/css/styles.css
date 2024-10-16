@@ -5,3 +5,8 @@ body {
 #top_level_nav {
     margin-bottom: 1em;
 }
+
+/* Rather than engineer a new widget, hide the numbers we don't want. */
+.irs-min, .irs-max, .irs-single {
+    display: none;
+}

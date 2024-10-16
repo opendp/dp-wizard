@@ -24,8 +24,8 @@ def analysis_ui():
             "Values above 1 will add less noise to the data, "
             "but have greater risk of revealing individual data."
         ),
-        ui.input_slider("log_epsilon_slider", "Slider", -1, 1, 0, step=0.1),
-        ui.output_text_verbatim("epsilon"),
+        ui.input_slider("log_epsilon_slider", None, -1, 1, 0, step=0.1),
+        ui.output_text("epsilon"),
         ui.markdown(
             "## Preview\n"
             "These plots assume a normal distribution for the columns you've selected, "
@@ -45,7 +45,7 @@ def analysis_server(input, output, session):
 
     @render.text
     def epsilon():
-        return epsilon_calc()
+        return f"Epsilon: {epsilon_calc():0.3}"
 
     @render.plot()
     def plot_preview():
