@@ -3,7 +3,7 @@ from argparse import ArgumentTypeError
 
 import pytest
 
-from dp_creator_ii import get_arg_parser, existing_csv
+from dp_creator_ii.argparse_helpers import get_arg_parser, existing_csv_type
 
 
 def test_help():
@@ -25,14 +25,14 @@ def test_help():
 
 def test_arg_validation_no_file():
     with pytest.raises(ArgumentTypeError, match="No such file: no-such-file"):
-        existing_csv("no-such-file")
+        existing_csv_type("no-such-file")
 
 
 def test_arg_validation_not_csv():
     with pytest.raises(ArgumentTypeError, match='Must have ".csv" extension:'):
-        existing_csv(Path(__file__).parent / "fixtures" / "fake.ipynb")
+        existing_csv_type(Path(__file__).parent / "fixtures" / "fake.ipynb")
 
 
 def test_arg_validation_works():
-    path = existing_csv(Path(__file__).parent / "fixtures" / "fake.csv")
+    path = existing_csv_type(Path(__file__).parent / "fixtures" / "fake.csv")
     assert path.name == "fake.csv"

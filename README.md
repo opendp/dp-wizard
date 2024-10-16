@@ -16,13 +16,12 @@ We plan to implement a [proof of concept](https://docs.google.com/document/d/1dt
 ## Usage
 
 ```
-usage: dp-creator-ii [-h] [--csv CSV_PATH] [--contrib CONTRIB]
-
-DP Creator II makes it easier to get started with Differential Privacy.
+usage: dp-creator-ii [-h] [--csv CSV_PATH | --demo] [--contrib CONTRIB]
 
 options:
   -h, --help         show this help message and exit
   --csv CSV_PATH     Path to CSV containing private data
+  --demo             Use generated fake CSV for a quick demo
   --contrib CONTRIB  How many rows can an individual contribute?
 ```
 

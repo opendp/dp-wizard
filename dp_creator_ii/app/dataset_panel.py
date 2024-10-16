@@ -1,22 +1,9 @@
-from sys import argv
-
 from shiny import ui, reactive, render
 
-from dp_creator_ii import get_arg_parser
+from dp_creator_ii.argparse_helpers import get_args
 from dp_creator_ii.csv_helper import read_field_names
 from dp_creator_ii.app.ui_helpers import output_code_sample
 from dp_creator_ii.template import make_privacy_unit_block
-
-
-def get_args():
-    arg_parser = get_arg_parser()
-    if argv[1:3] == ["run", "--port"]:
-        # We are running a Playwright test,
-        # and ARGV is polluted, so override:
-        return arg_parser.parse_args([])
-    else:
-        # Normal parsing:
-        return arg_parser.parse_args()
 
 
 def dataset_ui():
