@@ -3,6 +3,7 @@ from pathlib import Path
 from argparse import ArgumentParser, ArgumentTypeError
 import csv
 import random
+from warnings import warn
 
 
 def _existing_csv_type(arg):
@@ -16,15 +17,11 @@ def _existing_csv_type(arg):
 
 def _get_arg_parser():
     parser = ArgumentParser(description=__doc__)
-    input_group = parser.add_mutually_exclusive_group()
-    input_group.add_argument(
+    parser.add_argument(
         "--csv",
         dest="csv_path",
         type=_existing_csv_type,
         help="Path to CSV containing private data",
-    )
-    input_group.add_argument(
-        "--demo", action="store_true", help="Use generated fake CSV for a quick demo"
     )
     parser.add_argument(
         "--contrib",
@@ -34,13 +31,16 @@ def _get_arg_parser():
         default=1,
         help="How many rows can an individual contribute?",
     )
+    parser.add_argument(
+        "--demo", action="store_true", help="Use generated fake CSV for a quick demo"
+    )
     return parser
 
 
 def _get_args():  # pragma: no cover
     arg_parser = _get_arg_parser()
-    if argv[1:3] == ["run", "--port"]:
-        # We are running a Playwright test,
+    if "--port" in argv or "-v" in argv:
+        # We are running a test,
         # and ARGV is polluted, so override:
         return arg_parser.parse_args([])
     else:
@@ -49,14 +49,29 @@ def _get_args():  # pragma: no cover
 
 
 def _clip(n, lower, upper):
+    """
+    >>> _clip(-5, 0, 10)
+    0
+    >>> _clip(5, 0, 10)
+    5
+    >>> _clip(15, 0, 10)
+    10
+    """
     return max(min(n, upper), lower)
 
 
-def _get_demo_csv_path():  # pragma: no cover
+def _get_demo_csv_contrib():
+    """
+    >>> csv_path, contributions = _get_demo_csv_contrib()
+    >>> with open(csv_path, newline="") as csv_handle:
+    ...     reader = csv.DictReader(csv_handle)
+    ...     reader.fieldnames
+    ['student_id', 'class_year', 'hw_number', 'grade']
+    """
     random.seed(0)  # So the mock data will be stable across runs.
 
     csv_path = "/tmp/demo.csv"
-    contrib = 10
+    contributions = 10
 
     with open(csv_path, "w", newline="") as demo_handle:
         fields = ["student_id", "class_year", "hw_number", "grade"]
@@ -66,7 +81,7 @@ def _get_demo_csv_path():  # pragma: no cover
             class_year = int(_clip(random.gauss(2, 1), 1, 4))
             # Older students do slightly better in the class:
             mean_grade = random.gauss(80, 5) + class_year * 2
-            for hw_number in range(1, contrib):
+            for hw_number in range(1, contributions):
                 grade = int(_clip(random.gauss(mean_grade, 5), 0, 100))
                 writer.writerow(
                     {
@@ -77,15 +92,13 @@ def _get_demo_csv_path():  # pragma: no cover
                     }
                 )
 
-    return csv_path
+    return csv_path, contributions
 
 
 def get_csv_contrib():  # pragma: no cover
     args = _get_args()
-    if args.csv_path is not None:
-        csv_path = args.csv_path
-    elif args.demo:
-        csv_path = _get_demo_csv_path()
-    else:
-        csv_path = None
-    return (csv_path, args.contributions)
+    if args.demo:
+        if args.csv_path is not None or args.contributions is not None:
+            warn('"--demo" overrides "--csv" and "--contrib"')
+        return _get_demo_csv_contrib()
+    return (args.csv_path, args.contributions)
