@@ -37,7 +37,11 @@ def _get_arg_parser():
     return parser
 
 
-def _get_args():  # pragma: no cover
+def _get_args():
+    """
+    >>> _get_args()
+    Namespace(csv_path=None, contributions=1, demo=False)
+    """
     arg_parser = _get_arg_parser()
     if "--port" in argv or "-v" in argv or "-k" in argv:
         # We are running a test,
@@ -45,7 +49,7 @@ def _get_args():  # pragma: no cover
         return arg_parser.parse_args([])
     else:
         # Normal parsing:
-        return arg_parser.parse_args()
+        return arg_parser.parse_args()  # pragma: no cover
 
 
 def _clip(n, lower, upper):
