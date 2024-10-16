@@ -9,12 +9,11 @@ def analysis_ui():
     return ui.nav_panel(
         "Define Analysis",
         ui.markdown(
-            "Select numeric columns of interest in *TODO*, "
+            "Select numeric columns of interest, "
             "and for each numeric column indicate the expected range, "
             "the number of bins for the histogram, "
             "and its relative share of the privacy budget."
         ),
-        ui.output_text("csv_name"),
         ui.markdown(
             "[TODO: Column selection]"
             "(https://github.com/opendp/dp-creator-ii/issues/33)"
@@ -42,16 +41,6 @@ def analysis_ui():
 
 
 def analysis_server(input, output, session):
-    @reactive.calc
-    def csv_name_calc():
-        csv_path_from_ui = input.csv_path_from_ui()
-        if csv_path_from_ui is not None:
-            return csv_path_from_ui[0]["datapath"]
-
-    @render.text
-    def csv_name():
-        return csv_name_calc()
-
     @reactive.calc
     def csv_fields_calc():
         csv_path_from_ui = input.csv_path_from_ui()

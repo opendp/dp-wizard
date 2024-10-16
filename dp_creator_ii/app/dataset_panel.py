@@ -36,10 +36,6 @@ def dataset_ui():
 
 
 def dataset_server(input, output, session):
-    args = get_args()
-
-    csv_path_from_cli_value = reactive.value(args.csv_path)
-
     @render.code
     def unit_of_privacy_python():
         contributions = input.contributions()
