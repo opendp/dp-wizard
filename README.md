@@ -9,7 +9,6 @@ Building on what we've learned from [DP Creator](https://github.com/opendp/dpcre
 - Streamlined workflow that doesn't assume familiarity with differential privacy
 - Interactive visualization of privacy budget choices
 - UI development in Python with [Shiny](https://shiny.posit.co/py/)
-- Tracking of cumulative privacy consumption between sessions
 
 We plan to implement a [proof of concept](https://docs.google.com/document/d/1dteip598-jYj6KFuoYRyrZDPUuwDl9fHgxARiSieVGw/edit) over a couple months, and then get feedback from users before deciding on next steps.
 
