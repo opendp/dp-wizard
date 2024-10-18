@@ -17,10 +17,15 @@ app_ui = ui.page_bootstrap(
 )
 
 
+def ctrl_c_reminder():
+    print("Session ended (Press CTRL+C to quit)")
+
+
 def server(input, output, session):
     dataset_panel.dataset_server(input, output, session)
     analysis_panel.analysis_server(input, output, session)
     results_panel.results_server(input, output, session)
+    session.on_ended(ctrl_c_reminder)
 
 
 app = App(app_ui, server)
