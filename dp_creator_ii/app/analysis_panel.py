@@ -54,8 +54,27 @@ def analysis_server(input, output, session):
 
     @render.ui
     def columns_ui():
-        columns = input.columns_checkbox_group()
-        return [ui.p(column) for column in columns]
+        # Since the names are dynamic, I'm not sure about the server part right now.
+        column_ids = input.columns_checkbox_group()
+        return [
+            [
+                ui.h3(column_id),
+                ui.input_text(f"{column_id}_min", "Min"),
+                ui.input_text(f"{column_id}_max", "Max"),
+                ui.input_text(f"{column_id}_bins", "Bins"),
+                ui.input_select(
+                    f"{column_id}_weight",
+                    "Weight",
+                    choices={
+                        1: "Least accurate",
+                        2: "Less accurate",
+                        4: "More accurate",
+                        8: "Most accurate",
+                    },
+                ),
+            ]
+            for column_id in column_ids
+        ]
 
     @reactive.calc
     def csv_path_calc():
