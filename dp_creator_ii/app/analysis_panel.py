@@ -28,7 +28,7 @@ def analysis_ui():
             "Values above 1 will add less noise to the data, "
             "but have greater risk of revealing individual data."
         ),
-        log_slider("log_epsilon_slider"),
+        log_slider("log_epsilon_slider", 0.1, 10.0),
         ui.output_text("epsilon"),
         ui.markdown(
             "## Preview\n"
