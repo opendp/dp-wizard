@@ -1,5 +1,7 @@
 import re
 from pathlib import Path
+import subprocess
+import pytest
 from dp_creator_ii.converters import convert_py_to_nb
 
 
@@ -38,3 +40,9 @@ def test_convert_py_to_nb_execute():
     normed_actual_nb_str = norm_nb(actual_nb_str)
     normed_expected_nb_str = norm_nb(expected_nb_str)
     assert normed_actual_nb_str == normed_expected_nb_str
+
+
+def test_convert_py_to_nb_error():
+    python_str = "Invalid python!"
+    with pytest.raises(subprocess.CalledProcessError):
+        convert_py_to_nb(python_str, execute=True)

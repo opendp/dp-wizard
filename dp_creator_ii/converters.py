@@ -28,9 +28,11 @@ def convert_py_to_nb(python_str, execute=False):
         )
         try:
             result = subprocess.run(argv, check=True, text=True, capture_output=True)
-        except subprocess.CalledProcessError:  # pragma: no cover
+        except subprocess.CalledProcessError:
             if not execute:
-                raise
+                # Might reach here if jupytext is just not installed.
+                # Error quickly instead of trying to recover.
+                raise  # pragma: no cover
             # Install kernel if missing
             # TODO: Is there a better way to do this?
             subprocess.run(
