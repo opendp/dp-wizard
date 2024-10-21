@@ -11,7 +11,7 @@ from dp_creator_ii.csv_helper import read_field_names
 def test_read_field_names():
     csv_path = Path(__file__).parent / "fixtures" / "fake.csv"
     field_names = read_field_names(csv_path)
-    assert field_names == ["student_id", "class_year", "assignment_type", "grade"]
+    assert field_names == ["student_id", "class_year", "hw_number", "grade"]
 
 
 @pytest.mark.parametrize("encoding", ["latin1", "utf8"])
