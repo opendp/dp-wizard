@@ -9,7 +9,7 @@ class _Template:
             template_path = Path(__file__).parent / "templates" / path
             self._template = template_path.read_text()
         if template is not None:
-            if path is not None:  # pragma: no cover
+            if path is not None:
                 raise Exception('"path" and "template" are mutually exclusive')
             self._path = "template-instead-of-path"
             self._template = template

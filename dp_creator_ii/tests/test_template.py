@@ -10,6 +10,11 @@ from dp_creator_ii.template import _Template, make_notebook_py, make_script_py
 fake_csv = "dp_creator_ii/tests/fixtures/fake.csv"
 
 
+def test_param_conflict():
+    with pytest.raises(Exception, match=r"mutually exclusive"):
+        _Template("context.py", template="Not allowed if path present")
+
+
 def test_fill_expressions():
     template = _Template(None, template="No one VERB the ADJ NOUN!")
     filled = str(
