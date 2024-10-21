@@ -43,6 +43,9 @@ def test_app(page: Page, app: ShinyAppProc):  # pragma: no cover
     expect_visible(perform_analysis_text)
     expect_not_visible(download_results_text)
     expect_visible("student_id")
+    expect_visible("class_year")
+    expect_visible("hw_number")
+    expect_visible("grade")
     expect_no_error()
 
     page.get_by_role("button", name="Download results").click()
