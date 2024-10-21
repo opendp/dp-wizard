@@ -107,7 +107,7 @@ def _get_demo_csv_contrib():
 def get_csv_contrib():  # pragma: no cover
     args = _get_args()
     if args.demo:
-        if args.csv_path is not None or args.contributions is not None:
+        if args.csv_path is not None:
             warn('"--demo" overrides "--csv" and "--contrib"')
         return _get_demo_csv_contrib()
     return (args.csv_path, args.contributions)
