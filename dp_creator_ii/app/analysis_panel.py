@@ -19,10 +19,11 @@ def analysis_ui():
             "and its relative share of the privacy budget."
         ),
         ui.input_checkbox_group("columns_checkbox_group", None, []),
+        ui.output_ui("columns_ui"),
         ui.markdown(
             "What is your privacy budget for this release? "
             "Values above 1 will add less noise to the data, "
-            "but have greater risk of revealing individual data."
+            "but have a greater risk of revealing individual data."
         ),
         log_slider("log_epsilon_slider", 0.1, 10.0),
         ui.output_text("epsilon"),
@@ -50,6 +51,11 @@ def analysis_server(input, output, session):
             label=None,
             choices=csv_fields_calc(),
         )
+
+    @render.ui
+    def columns_ui():
+        columns = input.columns_checkbox_group()
+        return [ui.p(column) for column in columns]
 
     @reactive.calc
     def csv_path_calc():
