@@ -3,8 +3,8 @@ from math import pow
 from shiny import ui, reactive, render
 
 from dp_creator_ii.mock_data import mock_data, ColumnDef
-from dp_creator_ii.app.plots import plot_error_bars_with_cutoff
-from dp_creator_ii.app.components.log_slider import log_slider
+from dp_creator_ii.app.components.plots import plot_error_bars_with_cutoff
+from dp_creator_ii.app.components.inputs import log_slider
 from dp_creator_ii.csv_helper import read_field_names
 from dp_creator_ii.argparse_helpers import get_csv_contrib
 

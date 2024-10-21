@@ -1,7 +1,7 @@
 from shiny import ui, reactive, render
 
 from dp_creator_ii.argparse_helpers import get_csv_contrib
-from dp_creator_ii.app.ui_helpers import output_code_sample
+from dp_creator_ii.app.components.outputs import output_code_sample
 from dp_creator_ii.template import make_privacy_unit_block
 
 
