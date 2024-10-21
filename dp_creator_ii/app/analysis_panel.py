@@ -18,11 +18,7 @@ def analysis_ui():
             "the number of bins for the histogram, "
             "and its relative share of the privacy budget."
         ),
-        ui.markdown(
-            "[TODO: Column selection]"
-            "(https://github.com/opendp/dp-creator-ii/issues/33)"
-        ),
-        ui.output_text("csv_fields"),
+        ui.input_checkbox_group("columns_checkbox_group", None, []),
         ui.markdown(
             "What is your privacy budget for this release? "
             "Values above 1 will add less noise to the data, "
@@ -46,6 +42,14 @@ def analysis_server(input, output, session):
     (csv_path, _contributions) = get_csv_contrib()
 
     csv_path_from_cli_value = reactive.value(csv_path)
+
+    @reactive.effect
+    def _():
+        ui.update_checkbox_group(
+            "columns_checkbox_group",
+            label=None,
+            choices=csv_fields_calc(),
+        )
 
     @reactive.calc
     def csv_path_calc():
