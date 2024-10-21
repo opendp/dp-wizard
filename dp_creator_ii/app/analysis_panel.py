@@ -1,3 +1,5 @@
+from math import pow
+
 from shiny import ui, reactive, render
 
 from dp_creator_ii.mock_data import mock_data, ColumnDef
@@ -7,7 +9,28 @@ from dp_creator_ii.app.plots import plot_error_bars_with_cutoff
 def analysis_ui():
     return ui.nav_panel(
         "Define Analysis",
-        "TODO: Define analysis",
+        ui.markdown(
+            "Select numeric columns of interest in *TODO*, "
+            "and for each numeric column indicate the expected range, "
+            "the number of bins for the histogram, "
+            "and its relative share of the privacy budget."
+        ),
+        ui.markdown(
+            "[TODO: Column selection]"
+            "(https://github.com/opendp/dp-creator-ii/issues/33)"
+        ),
+        ui.markdown(
+            "What is your privacy budget for this release? "
+            "Values above 1 will add less noise to the data, "
+            "but have greater risk of revealing individual data."
+        ),
+        ui.input_slider("log_epsilon_slider", None, -1, 1, 0, step=0.1),
+        ui.output_text("epsilon"),
+        ui.markdown(
+            "## Preview\n"
+            "These plots assume a normal distribution for the columns you've selected, "
+            "and demonstrate the effect of different parameter choices."
+        ),
         ui.output_plot("plot_preview"),
         "(This plot is only to demonstrate that plotting works.)",
         ui.input_action_button("go_to_results", "Download results"),
@@ -16,6 +39,14 @@ def analysis_ui():
 
 
 def analysis_server(input, output, session):
+    @reactive.calc
+    def epsilon_calc():
+        return pow(10, input.log_epsilon_slider())
+
+    @render.text
+    def epsilon():
+        return f"Epsilon: {epsilon_calc():0.3}"
+
     @render.plot()
     def plot_preview():
         min_x = 0

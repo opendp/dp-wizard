@@ -10,10 +10,10 @@ app = create_app_fixture("../app/__init__.py")
 
 # TODO: Why is incomplete coverage reported here?
 # https://github.com/opendp/dp-creator-ii/issues/18
-def test_navigation(page: Page, app: ShinyAppProc):  # pragma: no cover
-    pick_dataset_text = "TODO: Pick dataset"
-    perform_analysis_text = "TODO: Define analysis"
-    download_results_text = "TODO: Download results"
+def test_app(page: Page, app: ShinyAppProc):  # pragma: no cover
+    pick_dataset_text = "How many rows of the CSV"
+    perform_analysis_text = "Select numeric columns of interest"
+    download_results_text = "You can now make a differentially private release"
 
     def expect_visible(text):
         expect(page.get_by_text(text)).to_be_visible()

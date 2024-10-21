@@ -7,9 +7,24 @@ from dp_creator_ii.converters import convert_py_to_nb
 def results_ui():
     return ui.nav_panel(
         "Download results",
-        "TODO: Download results",
-        ui.download_button("download_script", "Download script"),
-        ui.download_button("download_notebook_unexecuted", "Download notebook"),
+        ui.markdown(
+            "You can now make a differentially private release of your data. "
+            "This will lock the configuration you’ve provided on the previous pages."
+        ),
+        ui.markdown("TODO: Button: “Download Report (.txt)” (implemented as yaml?)"),
+        ui.markdown("TODO: Button: “Download Report (.csv)"),
+        ui.markdown(
+            "You can also download code that can be executed to produce a DP release. "
+            "Downloaded code does not lock the configuration."
+        ),
+        ui.download_button(
+            "download_script",
+            "Download Script (.py)",
+        ),
+        ui.download_button(
+            "download_notebook_unexecuted",
+            "Download Notebook (.ipynb)",
+        ),
         value="results_panel",
     )
 
