@@ -23,32 +23,6 @@ def dataset_ui():
 
 
 def dataset_server(input, output, session):
-    # (csv_path, _contributions) = get_csv_contrib()
-
-    # csv_path_from_cli_value = reactive.value(csv_path)
-
-    # @reactive.calc
-    # def csv_path_calc():
-    #     csv_path_from_ui = input.csv_path_from_ui()
-    #     if csv_path_from_ui is not None:
-    #         return csv_path_from_ui[0]["datapath"]
-    #     return csv_path_from_cli_value.get()
-
-    # @render.text
-    # def csv_path():
-    #     return csv_path_calc()
-
-    # @reactive.calc
-    # def csv_fields_calc():
-    #     path = csv_path_calc()
-    #     if path is None:
-    #         return None
-    #     return read_field_names(path)
-
-    # @render.text
-    # def csv_fields():
-    #     return csv_fields_calc()
-
     @render.code
     def unit_of_privacy_python():
         contributions = input.contributions()
