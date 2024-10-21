@@ -24,6 +24,7 @@ def test_app(page: Page, app: ShinyAppProc):  # pragma: no cover
     def expect_no_error():
         expect(page.locator(".shiny-output-error")).not_to_be_attached()
 
+    ### Select dataset:
     page.goto(app.url)
     expect(page).to_have_title("DP Creator II")
     expect_visible(pick_dataset_text)
@@ -38,16 +39,31 @@ def test_app(page: Page, app: ShinyAppProc):  # pragma: no cover
     page.get_by_label("Choose CSV file").set_input_files(csv_path.resolve())
     expect_no_error()
 
+    ### Define analysis:
     page.get_by_role("button", name="Define analysis").click()
     expect_not_visible(pick_dataset_text)
     expect_visible(perform_analysis_text)
     expect_not_visible(download_results_text)
+    # Columns:
     expect_visible("student_id")
     expect_visible("class_year")
     expect_visible("hw_number")
     expect_visible("grade")
+    # Set column details:
+    page.get_by_label("grade").check()
+    page.get_by_label("Min").click()
+    page.get_by_label("Min").fill("0")
+    page.get_by_label("Max").click()
+    page.get_by_label("Max").fill("100")
+    page.get_by_label("Bins").click()
+    page.get_by_label("Bins").fill("20")
+    page.get_by_label("Weight").select_option("8")
+    # Epsilon slider:
+    expect_visible("0.1")
+    expect_visible("10.0")
     expect_no_error()
 
+    ### Download results:
     page.get_by_role("button", name="Download results").click()
     expect_not_visible(pick_dataset_text)
     expect_not_visible(perform_analysis_text)
