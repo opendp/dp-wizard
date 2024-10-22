@@ -5,6 +5,7 @@ from shiny import ui, reactive, render
 from dp_creator_ii.utils.mock_data import mock_data, ColumnDef
 from dp_creator_ii.app.components.plots import plot_error_bars_with_cutoff
 from dp_creator_ii.app.components.inputs import log_slider
+from dp_creator_ii.app.components.column_module import col_ui, col_server
 from dp_creator_ii.utils.csv_helper import read_field_names
 from dp_creator_ii.utils.argparse_helpers import get_csv_contrib
 
@@ -20,7 +21,6 @@ def analysis_ui():
         ),
         ui.input_checkbox_group("columns_checkbox_group", None, []),
         ui.output_ui("columns_ui"),
-        ui.output_code("columns_info"),
         ui.markdown(
             "What is your privacy budget for this release? "
             "Values above 1 will add less noise to the data, "
@@ -55,40 +55,16 @@ def analysis_server(input, output, session):  # pragma: no cover
 
     @render.ui
     def columns_ui():
-        # Since the names are dynamic, I'm not sure about the server part right now.
         column_ids = input.columns_checkbox_group()
+        for column_id in column_ids:
+            col_server(column_id)
         return [
             [
                 ui.h3(column_id),
-                ui.input_numeric(f"{column_id}_min", "Min", 0),
-                ui.input_numeric(f"{column_id}_max", "Max", 10),
-                ui.input_numeric(f"{column_id}_bins", "Bins", 10),
-                ui.input_select(
-                    f"{column_id}_weight",
-                    "Weight",
-                    choices={
-                        1: "Least accurate",
-                        2: "Less accurate",
-                        4: "More accurate",
-                        8: "Most accurate",
-                    },
-                ),
+                col_ui(column_id),
             ]
             for column_id in column_ids
         ]
-
-    @render.code
-    def columns_info():
-        data = {
-            column_id: {
-                "min": getattr(input, f"{column_id}_min")(),
-                "max": getattr(input, f"{column_id}_max")(),
-                "bins": getattr(input, f"{column_id}_bins")(),
-                "weight": int(getattr(input, f"{column_id}_weight")()),
-            }
-            for column_id in input.columns_checkbox_group()
-        }
-        return data
 
     @reactive.calc
     def csv_path_calc():
