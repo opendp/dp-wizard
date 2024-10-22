@@ -20,6 +20,7 @@ def analysis_ui():
         ),
         ui.input_checkbox_group("columns_checkbox_group", None, []),
         ui.output_ui("columns_ui"),
+        ui.output_code("columns_info"),
         ui.markdown(
             "What is your privacy budget for this release? "
             "Values above 1 will add less noise to the data, "
@@ -75,6 +76,19 @@ def analysis_server(input, output, session):  # pragma: no cover
             ]
             for column_id in column_ids
         ]
+
+    @render.code
+    def columns_info():
+        data = {
+            column_id: {
+                "min": getattr(input, f"{column_id}_min")(),
+                "max": getattr(input, f"{column_id}_max")(),
+                "bins": getattr(input, f"{column_id}_bins")(),
+                "weight": getattr(input, f"{column_id}_weight")(),
+            }
+            for column_id in input.columns_checkbox_group()
+        }
+        return data
 
     @reactive.calc
     def csv_path_calc():
