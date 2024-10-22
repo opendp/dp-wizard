@@ -5,7 +5,7 @@ import tempfile
 import pytest
 from pathlib import Path
 
-from dp_creator_ii.csv_helper import read_field_names
+from dp_creator_ii.utils.csv_helper import read_field_names
 
 
 def test_read_field_names():

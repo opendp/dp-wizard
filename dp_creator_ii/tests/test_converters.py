@@ -2,7 +2,7 @@ import re
 from pathlib import Path
 import subprocess
 import pytest
-from dp_creator_ii.converters import convert_py_to_nb
+from dp_creator_ii.utils.converters import convert_py_to_nb
 
 
 def norm_nb(nb_str):

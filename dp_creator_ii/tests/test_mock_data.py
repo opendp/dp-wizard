@@ -1,6 +1,6 @@
 import polars as pl
 
-from dp_creator_ii.mock_data import mock_data, ColumnDef
+from dp_creator_ii.utils.mock_data import mock_data, ColumnDef
 
 
 def test_mock_data():

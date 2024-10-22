@@ -4,7 +4,7 @@ from pathlib import Path
 import re
 import pytest
 import opendp.prelude as dp
-from dp_creator_ii.template import _Template, make_notebook_py, make_script_py
+from dp_creator_ii.utils.template import _Template, make_notebook_py, make_script_py
 
 
 fake_csv = "dp_creator_ii/tests/fixtures/fake.csv"

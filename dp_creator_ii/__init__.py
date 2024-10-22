@@ -1,7 +1,7 @@
 """DP Creator II makes it easier to get started with Differential Privacy."""
 
 import shiny
-from dp_creator_ii.argparse_helpers import get_csv_contrib
+from dp_creator_ii.utils.argparse_helpers import get_csv_contrib
 
 
 __version__ = "0.0.1"
