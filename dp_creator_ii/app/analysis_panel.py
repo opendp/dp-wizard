@@ -5,7 +5,7 @@ from shiny import ui, reactive, render
 from dp_creator_ii.utils.mock_data import mock_data, ColumnDef
 from dp_creator_ii.app.components.plots import plot_error_bars_with_cutoff
 from dp_creator_ii.app.components.inputs import log_slider
-from dp_creator_ii.app.components.column_module import col_ui, col_server
+from dp_creator_ii.app.components.column_module import column_ui, column_server
 from dp_creator_ii.utils.csv_helper import read_field_names
 from dp_creator_ii.utils.argparse_helpers import get_csv_contrib
 
@@ -57,11 +57,11 @@ def analysis_server(input, output, session):  # pragma: no cover
     def columns_ui():
         column_ids = input.columns_checkbox_group()
         for column_id in column_ids:
-            col_server(column_id)
+            column_server(column_id)
         return [
             [
                 ui.h3(column_id),
-                col_ui(column_id),
+                column_ui(column_id),
             ]
             for column_id in column_ids
         ]

@@ -2,13 +2,13 @@ from shiny import ui, render, module
 
 
 @module.ui
-def col_ui():
+def column_ui():
     return [
-        ui.input_numeric(f"min", "Min", 0),
-        ui.input_numeric(f"max", "Max", 10),
-        ui.input_numeric(f"bins", "Bins", 10),
+        ui.input_numeric("min", "Min", 0),
+        ui.input_numeric("max", "Max", 10),
+        ui.input_numeric("bins", "Bins", 10),
         ui.input_select(
-            f"weight",
+            "weight",
             "Weight",
             choices={
                 1: "Least accurate",
@@ -22,7 +22,7 @@ def col_ui():
 
 
 @module.server
-def col_server(input, output, session):  # pragma: no cover
+def column_server(input, output, session):  # pragma: no cover
     @output
     @render.code
     def col_config():
