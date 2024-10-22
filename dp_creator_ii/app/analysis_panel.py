@@ -60,9 +60,9 @@ def analysis_server(input, output, session):  # pragma: no cover
         return [
             [
                 ui.h3(column_id),
-                ui.input_text(f"{column_id}_min", "Min"),
-                ui.input_text(f"{column_id}_max", "Max"),
-                ui.input_text(f"{column_id}_bins", "Bins"),
+                ui.input_numeric(f"{column_id}_min", "Min", 0),
+                ui.input_numeric(f"{column_id}_max", "Max", 10),
+                ui.input_numeric(f"{column_id}_bins", "Bins", 10),
                 ui.input_select(
                     f"{column_id}_weight",
                     "Weight",
@@ -84,7 +84,7 @@ def analysis_server(input, output, session):  # pragma: no cover
                 "min": getattr(input, f"{column_id}_min")(),
                 "max": getattr(input, f"{column_id}_max")(),
                 "bins": getattr(input, f"{column_id}_bins")(),
-                "weight": getattr(input, f"{column_id}_weight")(),
+                "weight": int(getattr(input, f"{column_id}_weight")()),
             }
             for column_id in input.columns_checkbox_group()
         }
