@@ -19,7 +19,7 @@ def test_help():
     )
     print(help)
 
-    readme_md = (Path(__file__).parent.parent.parent / "README.md").read_text()
+    readme_md = (Path(__file__).parent.parent / "README.md").read_text()
     assert help in readme_md
 
 

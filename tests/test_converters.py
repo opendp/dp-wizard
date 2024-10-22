@@ -21,7 +21,7 @@ def norm_nb(nb_str):
 
 
 def test_convert_py_to_nb():
-    fixtures_path = Path("dp_creator_ii/tests/fixtures")
+    fixtures_path = Path(__file__).parent / "fixtures"
     python_str = (fixtures_path / "fake.py").read_text()
     actual_nb_str = convert_py_to_nb(python_str)
     expected_nb_str = (fixtures_path / "fake.ipynb").read_text()
@@ -32,7 +32,7 @@ def test_convert_py_to_nb():
 
 
 def test_convert_py_to_nb_execute():
-    fixtures_path = Path("dp_creator_ii/tests/fixtures")
+    fixtures_path = Path(__file__).parent / "fixtures"
     python_str = (fixtures_path / "fake.py").read_text()
     actual_nb_str = convert_py_to_nb(python_str, execute=True)
     expected_nb_str = (fixtures_path / "fake-executed.ipynb").read_text()

@@ -5,7 +5,7 @@ from playwright.sync_api import Page, expect
 from shiny.pytest import create_app_fixture
 
 
-app = create_app_fixture("../app/__init__.py")
+app = create_app_fixture("../dp_creator_ii/app/__init__.py")
 
 
 # TODO: Why is incomplete coverage reported here?
