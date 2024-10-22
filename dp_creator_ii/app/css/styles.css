@@ -5,13 +5,3 @@ body {
 #top_level_nav {
     margin-bottom: 1em;
 }
-
-/*
-    Rather than engineer a new widget, hide the numbers we don't want.
-    The rendered widget doesn't have a unique ID, but the following
-    element does, so we can use some fancy CSS to get the preceding element.
-    Long term solution is just to make our own widget.
-*/
-.irs:has(+ #log_epsilon_slider) .irs-min, .irs-max, .irs-single {
-    display: none;
-}
