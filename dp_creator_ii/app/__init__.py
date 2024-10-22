@@ -17,11 +17,11 @@ app_ui = ui.page_bootstrap(
 )
 
 
-def ctrl_c_reminder():
+def ctrl_c_reminder():  # pragma: no cover
     print("Session ended (Press CTRL+C to quit)")
 
 
-def server(input, output, session):
+def server(input, output, session):  # pragma: no cover
     dataset_panel.dataset_server(input, output, session)
     analysis_panel.analysis_server(input, output, session)
     results_panel.results_server(input, output, session)

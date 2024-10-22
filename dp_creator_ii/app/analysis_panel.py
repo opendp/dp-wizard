@@ -39,7 +39,7 @@ def analysis_ui():
     )
 
 
-def analysis_server(input, output, session):
+def analysis_server(input, output, session):  # pragma: no cover
     (csv_path, _contributions) = get_csv_contrib()
 
     csv_path_from_cli_value = reactive.value(csv_path)

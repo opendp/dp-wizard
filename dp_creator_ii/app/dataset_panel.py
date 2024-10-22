@@ -22,7 +22,7 @@ def dataset_ui():
     )
 
 
-def dataset_server(input, output, session):
+def dataset_server(input, output, session):  # pragma: no cover
     @render.code
     def unit_of_privacy_python():
         contributions = input.contributions()

@@ -4,7 +4,7 @@ import numpy as np
 
 def plot_error_bars_with_cutoff(
     y_values, x_min_label="min", x_max_label="max", y_cutoff=0, y_error=0
-):
+):  # pragma: no cover
     x_values = 0.5 + np.arange(len(y_values))
     x_values_above = []
     x_values_below = []

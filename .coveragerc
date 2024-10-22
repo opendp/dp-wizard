@@ -4,8 +4,6 @@ source = .
 
 omit =
   tests/fixtures/*
-  # TODO
-  dp_creator_ii/app/*
 
 # More strict: Check transitions between lines, not just individual lines.
 branch = True
