@@ -2,7 +2,7 @@ from shiny import ui, render, module
 
 
 @module.ui
-def column_ui():
+def column_ui():  # pragma: no cover
     return [
         ui.input_numeric("min", "Min", 0),
         ui.input_numeric("max", "Max", 10),
