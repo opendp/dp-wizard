@@ -1,4 +1,4 @@
-from shiny import ui, render, module
+from shiny import ui, render, module, reactive
 
 
 @module.ui
@@ -17,18 +17,21 @@ def column_ui():  # pragma: no cover
                 8: "Most accurate",
             },
         ),
-        ui.output_code("col_config"),
+        ui.output_code("column_code"),
     ]
 
 
 @module.server
 def column_server(input, output, session):  # pragma: no cover
-    @output
-    @render.code
-    def col_config():
+    @reactive.calc
+    def column_config():
         return {
             "min": input.min(),
             "max": input.max(),
             "bins": input.bins(),
-            "weight": input.weight(),
+            "weight": float(input.weight()),
         }
+
+    @render.code
+    def column_code():
+        return column_config()
