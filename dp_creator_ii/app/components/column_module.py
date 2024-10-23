@@ -1,5 +1,7 @@
 from shiny import ui, render, module, reactive
 
+from dp_creator_ii.utils.mock_data import mock_data, ColumnDef
+from dp_creator_ii.app.components.plots import plot_error_bars_with_cutoff
 from dp_creator_ii.utils.templates import make_column_config_block
 from dp_creator_ii.app.components.outputs import output_code_sample
 
@@ -21,6 +23,7 @@ def column_ui():  # pragma: no cover
             },
         ),
         output_code_sample("Column Definition", "column_code"),
+        ui.output_plot("column_plot"),
     ]
 
 
@@ -46,4 +49,18 @@ def column_server(input, output, session):  # pragma: no cover
             min_value=config["min"],
             max_value=config["max"],
             bin_count=config["bins"],
+        )
+
+    @render.plot()
+    def column_plot():
+        min_x = 0
+        max_x = 100
+        df = mock_data({"col_0_100": ColumnDef(min_x, max_x)}, row_count=20)
+        # TODO: we want to do DP with this data, not just return it raw.
+        return plot_error_bars_with_cutoff(
+            df["col_0_100"].to_list(),
+            x_min_label=min_x,
+            x_max_label=max_x,
+            y_cutoff=30,
+            y_error=5,
         )
