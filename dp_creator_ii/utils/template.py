@@ -13,6 +13,15 @@ class _Template:
                 raise Exception('"path" and "template" are mutually exclusive')
             self._path = "template-instead-of-path"
             self._template = template
+        self._initial_slots = self._find_slots()
+
+    def _find_slots(self):
+        # Slots:
+        # - are all caps or underscores
+        # - have word boundary on either side
+        # - are at least three characters
+        slot_re = r"\b[A-Z][A-Z_]{2,}\b"
+        return set(re.findall(slot_re, self._template))
 
     def fill_expressions(self, **kwargs):
         for k, v in kwargs.items():
@@ -43,16 +52,11 @@ class _Template:
         return self
 
     def __str__(self):
-        # Slots:
-        # - are all caps or underscores
-        # - have word boundary on either side
-        # - are at least three characters
-        slot_re = r"\b[A-Z][A-Z_]{2,}\b"
-        unfilled = set(re.findall(slot_re, self._template))
-        if unfilled:
+        unfilled_slots = self._initial_slots & self._find_slots()
+        if unfilled_slots:
             raise Exception(
                 f"Template {self._path} has unfilled slots: "
-                f'{", ".join(sorted(unfilled))}\n\n{self._template}'
+                f'{", ".join(sorted(unfilled_slots))}\n\n{self._template}'
             )
         return self._template
 
@@ -122,3 +126,53 @@ def make_script_py(contributions, loss, weights):
 
 def make_privacy_unit_block(contributions):
     return str(_Template("privacy_unit.py").fill_values(CONTRIBUTIONS=contributions))
+
+
+def make_column_config_block(name, min_value, max_value, bin_count):
+    """
+    >>> print(make_column_config_block(
+    ...     name="HW GRADE",
+    ...     min_value=0,
+    ...     max_value=100,
+    ...     bin_count=10
+    ... ))
+    # From the public information, determine the bins:
+    hw_grade_bins_list = list(range(
+        0,
+        100,
+        int((100 - 0 + 1) / 10)
+    ))
+    <BLANKLINE>
+    # Use these bins to define a Polars column:
+    hw_grade_config = (
+        pl.col('HW GRADE')
+        .cut(hw_grade_bins_list)
+        .alias('hw_grade_bin')
+        .cast(pl.String)
+    )
+    <BLANKLINE>
+    """
+    snake_name = _snake_case(name)
+    return str(
+        _Template("column_config.py")
+        .fill_expressions(
+            BINS_LIST_NAME=f"{snake_name}_bins_list",
+            POLARS_CONFIG_NAME=f"{snake_name}_config",
+        )
+        .fill_values(
+            MIN=min_value,
+            MAX=max_value,
+            BINS=bin_count,
+            BIN_COLUMN_NAME=f"{snake_name}_bin",
+            COLUMN_NAME=name,
+            # TODO: use regex when substituting so we're less sensitive to order.
+        )
+    )
+
+
+def _snake_case(name: str):
+    """
+    >>> _snake_case("HW_GRADE")
+    'hw_grade'
+    """
+    return re.sub(r"\W+", "_", name.lower())
