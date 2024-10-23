@@ -5,8 +5,8 @@ import re
 class _Template:
     def __init__(self, path, template=None):
         if path is not None:
-            self._path = path
-            template_path = Path(__file__).parent / "templates" / path
+            self._path = f"_{path}.py"
+            template_path = Path(__file__).parent / "templates" / self._path
             self._template = template_path.read_text()
         if template is not None:
             if path is not None:
@@ -66,7 +66,7 @@ class _Template:
 def _make_context_for_notebook(csv_path, contributions, loss, weights):
     privacy_unit_block = make_privacy_unit_block(contributions)
     return str(
-        _Template("_context.py")
+        _Template("context")
         .fill_values(
             CSV_PATH=csv_path,
             LOSS=loss,
@@ -81,7 +81,7 @@ def _make_context_for_notebook(csv_path, contributions, loss, weights):
 def _make_context_for_script(contributions, loss, weights):
     privacy_unit_block = make_privacy_unit_block(contributions)
     return str(
-        _Template("_context.py")
+        _Template("context")
         .fill_expressions(
             CSV_PATH="csv_path",
         )
@@ -96,12 +96,12 @@ def _make_context_for_script(contributions, loss, weights):
 
 
 def _make_imports():
-    return str(_Template("_imports.py").fill_values())
+    return str(_Template("imports").fill_values())
 
 
 def make_notebook_py(csv_path, contributions, loss, weights):
     return str(
-        _Template("_notebook.py").fill_blocks(
+        _Template("notebook").fill_blocks(
             IMPORTS_BLOCK=_make_imports(),
             CONTEXT_BLOCK=_make_context_for_notebook(
                 csv_path=csv_path,
@@ -115,7 +115,7 @@ def make_notebook_py(csv_path, contributions, loss, weights):
 
 def make_script_py(contributions, loss, weights):
     return str(
-        _Template("_script.py").fill_blocks(
+        _Template("script").fill_blocks(
             IMPORTS_BLOCK=_make_imports(),
             CONTEXT_BLOCK=_make_context_for_script(
                 contributions=contributions,
@@ -127,7 +127,7 @@ def make_script_py(contributions, loss, weights):
 
 
 def make_privacy_unit_block(contributions):
-    return str(_Template("_privacy_unit.py").fill_values(CONTRIBUTIONS=contributions))
+    return str(_Template("privacy_unit").fill_values(CONTRIBUTIONS=contributions))
 
 
 def make_column_config_block(name, min_value, max_value, bin_count):
@@ -158,7 +158,7 @@ def make_column_config_block(name, min_value, max_value, bin_count):
     """
     snake_name = _snake_case(name)
     return str(
-        _Template("_column_config.py")
+        _Template("column_config")
         .fill_expressions(
             BINS_LIST_NAME=f"{snake_name}_bins_list",
             POLARS_CONFIG_NAME=f"{snake_name}_config",

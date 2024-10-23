@@ -12,7 +12,7 @@ fake_csv = "tests/fixtures/fake.csv"
 
 def test_param_conflict():
     with pytest.raises(Exception, match=r"mutually exclusive"):
-        _Template("_context.py", template="Not allowed if path present")
+        _Template("context", template="Not allowed if path present")
 
 
 def test_fill_expressions():
@@ -79,7 +79,7 @@ with fake:
 
 
 def test_fill_template_unfilled_slots():
-    context_template = _Template("_context.py")
+    context_template = _Template("context")
     with pytest.raises(
         Exception,
         match=re.escape(
