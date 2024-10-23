@@ -25,12 +25,14 @@ class _Template:
 
     def fill_expressions(self, **kwargs):
         for k, v in kwargs.items():
-            self._template = self._template.replace(k, v)
+            k_re = re.escape(k)
+            self._template = re.sub(rf"\b{k_re}\b", str(v), self._template)
         return self
 
     def fill_values(self, **kwargs):
         for k, v in kwargs.items():
-            self._template = self._template.replace(k, repr(v))
+            k_re = re.escape(k)
+            self._template = re.sub(rf"\b{k_re}\b", repr(v), self._template)
         return self
 
     def fill_blocks(self, **kwargs):
@@ -137,17 +139,19 @@ def make_column_config_block(name, min_value, max_value, bin_count):
     ...     bin_count=10
     ... ))
     # From the public information, determine the bins:
-    hw_grade_bins_list = list(range(
-        0,
-        100,
-        int((100 - 0 + 1) / 10)
-    ))
+    hw_grade_bins_list = list(
+        range(
+            0,
+            100,
+            int((100 - 0 + 1) / 10),
+        )
+    )
     <BLANKLINE>
     # Use these bins to define a Polars column:
     hw_grade_config = (
         pl.col('HW GRADE')
         .cut(hw_grade_bins_list)
-        .alias('hw_grade_bin')
+        .alias('hw_grade_bin')  # Give the new column a name.
         .cast(pl.String)
     )
     <BLANKLINE>
@@ -163,16 +167,15 @@ def make_column_config_block(name, min_value, max_value, bin_count):
             MIN=min_value,
             MAX=max_value,
             BINS=bin_count,
-            BIN_COLUMN_NAME=f"{snake_name}_bin",
             COLUMN_NAME=name,
-            # TODO: use regex when substituting so we're less sensitive to order.
+            BIN_COLUMN_NAME=f"{snake_name}_bin",
         )
     )
 
 
 def _snake_case(name: str):
     """
-    >>> _snake_case("HW_GRADE")
+    >>> _snake_case("HW GRADE")
     'hw_grade'
     """
     return re.sub(r"\W+", "_", name.lower())
