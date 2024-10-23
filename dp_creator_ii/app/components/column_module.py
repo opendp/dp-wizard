@@ -29,6 +29,9 @@ def column_server(input, output, session):  # pragma: no cover
     @reactive.calc
     def column_config():
         return {
+            # TODO: Is input._ns ok?
+            # https://github.com/opendp/dp-creator-ii/issues/85
+            "name": input._ns,
             "min": input.min(),
             "max": input.max(),
             "bins": input.bins(),
@@ -39,7 +42,7 @@ def column_server(input, output, session):  # pragma: no cover
     def column_code():
         config = column_config()
         return make_column_config_block(
-            name="TODO",
+            name=config["name"],
             min_value=config["min"],
             max_value=config["max"],
             bin_count=config["bins"],
