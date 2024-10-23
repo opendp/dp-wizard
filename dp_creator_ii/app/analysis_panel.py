@@ -8,6 +8,8 @@ from dp_creator_ii.app.components.inputs import log_slider
 from dp_creator_ii.app.components.column_module import column_ui, column_server
 from dp_creator_ii.utils.csv_helper import read_field_names
 from dp_creator_ii.utils.argparse_helpers import get_csv_contrib
+from dp_creator_ii.app.components.outputs import output_code_sample
+from dp_creator_ii.utils.templates import make_privacy_loss_block
 
 
 def analysis_ui():
@@ -28,6 +30,7 @@ def analysis_ui():
         ),
         log_slider("log_epsilon_slider", 0.1, 10.0),
         ui.output_text("epsilon"),
+        output_code_sample("Privacy Loss", "privacy_loss_python"),
         ui.markdown(
             "## Preview\n"
             "These plots assume a normal distribution for the columns you've selected, "
@@ -94,6 +97,10 @@ def analysis_server(input, output, session):  # pragma: no cover
     @render.text
     def epsilon():
         return f"Epsilon: {epsilon_calc():0.3}"
+
+    @render.code
+    def privacy_loss_python():
+        return make_privacy_loss_block(epsilon_calc())
 
     @render.plot()
     def plot_preview():

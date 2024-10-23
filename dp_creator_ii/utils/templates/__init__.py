@@ -137,6 +137,10 @@ def make_privacy_unit_block(contributions):
     return str(_Template("privacy_unit").fill_values(CONTRIBUTIONS=contributions))
 
 
+def make_privacy_loss_block(epsilon):
+    return str(_Template("privacy_loss").fill_values(EPSILON=epsilon))
+
+
 def make_column_config_block(name, min_value, max_value, bin_count):
     """
     >>> print(make_column_config_block(

@@ -20,7 +20,7 @@ def column_ui():  # pragma: no cover
                 8: "Most accurate",
             },
         ),
-        output_code_sample("column_code"),
+        output_code_sample("Column Definition", "column_code"),
     ]
 
 

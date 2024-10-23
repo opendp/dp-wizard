@@ -16,7 +16,7 @@ def dataset_ui():
             'This is the "unit of privacy" which will be protected.'
         ),
         ui.input_numeric("contributions", "Contributions", contributions),
-        output_code_sample("unit_of_privacy_python"),
+        output_code_sample("Unit of Privacy", "unit_of_privacy_python"),
         ui.input_action_button("go_to_analysis", "Define analysis"),
         value="dataset_panel",
     )

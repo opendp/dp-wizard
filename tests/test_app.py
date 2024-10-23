@@ -31,7 +31,7 @@ def test_app(page: Page, app: ShinyAppProc):  # pragma: no cover
     expect_not_visible(perform_analysis_text)
     expect_not_visible(download_results_text)
     page.get_by_label("Contributions").fill("42")
-    page.get_by_text("Code sample").click()
+    page.get_by_text("Code sample: Unit of Privacy").click()
     expect_visible("dp.unit_of(contributions=42)")
     expect_no_error()
 
