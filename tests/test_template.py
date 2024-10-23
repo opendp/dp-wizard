@@ -84,7 +84,7 @@ def test_fill_template_unfilled_slots():
         Exception,
         match=re.escape(
             "context.py has unfilled slots: "
-            "CSV_PATH, LOSS, PRIVACY_UNIT_BLOCK, WEIGHTS"
+            "CSV_PATH, PRIVACY_LOSS_BLOCK, PRIVACY_UNIT_BLOCK, WEIGHTS"
         ),
     ):
         str(context_template.fill_values())
@@ -94,7 +94,7 @@ def test_make_notebook():
     notebook = make_notebook_py(
         csv_path=fake_csv,
         contributions=1,
-        loss=1,
+        epsilon=1,
         weights=[1],
     )
     globals = {}
@@ -105,7 +105,7 @@ def test_make_notebook():
 def test_make_script():
     script = make_script_py(
         contributions=1,
-        loss=1,
+        epsilon=1,
         weights=[1],
     )
 

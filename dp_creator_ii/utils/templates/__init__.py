@@ -70,34 +70,36 @@ class _Template:
         return self._template
 
 
-def _make_context_for_notebook(csv_path, contributions, loss, weights):
+def _make_context_for_notebook(csv_path, contributions, epsilon, weights):
     privacy_unit_block = make_privacy_unit_block(contributions)
+    privacy_loss_block = make_privacy_loss_block(epsilon)
     return str(
         _Template("context")
         .fill_values(
             CSV_PATH=csv_path,
-            LOSS=loss,
             WEIGHTS=weights,
         )
         .fill_blocks(
             PRIVACY_UNIT_BLOCK=privacy_unit_block,
+            PRIVACY_LOSS_BLOCK=privacy_loss_block,
         )
     )
 
 
-def _make_context_for_script(contributions, loss, weights):
+def _make_context_for_script(contributions, epsilon, weights):
     privacy_unit_block = make_privacy_unit_block(contributions)
+    privacy_loss_block = make_privacy_loss_block(epsilon)
     return str(
         _Template("context")
         .fill_expressions(
             CSV_PATH="csv_path",
         )
         .fill_values(
-            LOSS=loss,
             WEIGHTS=weights,
         )
         .fill_blocks(
             PRIVACY_UNIT_BLOCK=privacy_unit_block,
+            PRIVACY_LOSS_BLOCK=privacy_loss_block,
         )
     )
 
@@ -106,27 +108,27 @@ def _make_imports():
     return str(_Template("imports").fill_values())
 
 
-def make_notebook_py(csv_path, contributions, loss, weights):
+def make_notebook_py(csv_path, contributions, epsilon, weights):
     return str(
         _Template("notebook").fill_blocks(
             IMPORTS_BLOCK=_make_imports(),
             CONTEXT_BLOCK=_make_context_for_notebook(
                 csv_path=csv_path,
                 contributions=contributions,
-                loss=loss,
+                epsilon=epsilon,
                 weights=weights,
             ),
         )
     )
 
 
-def make_script_py(contributions, loss, weights):
+def make_script_py(contributions, epsilon, weights):
     return str(
         _Template("script").fill_blocks(
             IMPORTS_BLOCK=_make_imports(),
             CONTEXT_BLOCK=_make_context_for_script(
                 contributions=contributions,
-                loss=loss,
+                epsilon=epsilon,
                 weights=weights,
             ),
         )
