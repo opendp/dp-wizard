@@ -53,12 +53,14 @@ def column_server(input, output, session):  # pragma: no cover
 
     @render.plot()
     def column_plot():
-        min_x = 0
-        max_x = 100
-        df = mock_data({"col_0_100": ColumnDef(min_x, max_x)}, row_count=20)
+        config = column_config()
+        name = config["name"]
+        min_x = config["min"]
+        max_x = config["max"]
+        df = mock_data({name: ColumnDef(min_x, max_x)}, row_count=20)
         # TODO: we want to do DP with this data, not just return it raw.
         return plot_error_bars_with_cutoff(
-            df["col_0_100"].to_list(),
+            df[name].to_list(),
             x_min_label=min_x,
             x_max_label=max_x,
             y_cutoff=30,
