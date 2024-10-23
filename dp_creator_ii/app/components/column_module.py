@@ -1,5 +1,8 @@
 from shiny import ui, render, module, reactive
 
+from dp_creator_ii.utils.template import make_column_config_block
+from dp_creator_ii.app.components.outputs import output_code_sample
+
 
 @module.ui
 def column_ui():  # pragma: no cover
@@ -17,7 +20,7 @@ def column_ui():  # pragma: no cover
                 8: "Most accurate",
             },
         ),
-        ui.output_code("column_code"),
+        output_code_sample("column_code"),
     ]
 
 
@@ -34,4 +37,10 @@ def column_server(input, output, session):  # pragma: no cover
 
     @render.code
     def column_code():
-        return column_config()
+        config = column_config()
+        return make_column_config_block(
+            name="TODO",
+            min_value=config["min"],
+            max_value=config["max"],
+            bin_count=config["bins"],
+        )
