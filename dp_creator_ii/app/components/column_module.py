@@ -1,6 +1,6 @@
 from shiny import ui, render, module, reactive
 
-from dp_creator_ii.utils.template import make_column_config_block
+from dp_creator_ii.utils.templates import make_column_config_block
 from dp_creator_ii.app.components.outputs import output_code_sample
 
 

@@ -1,3 +1,10 @@
+"""
+Strings of ALL CAPS are replaced in these templates.
+Keeping them in a format which can actually be parsed as python
+makes some things easier, but it is also reinventing the wheel.
+We may revisit this.
+"""
+
 from pathlib import Path
 import re
 
@@ -6,7 +13,7 @@ class _Template:
     def __init__(self, path, template=None):
         if path is not None:
             self._path = f"_{path}.py"
-            template_path = Path(__file__).parent / "templates" / self._path
+            template_path = Path(__file__).parent / self._path
             self._template = template_path.read_text()
         if template is not None:
             if path is not None:
