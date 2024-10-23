@@ -2,9 +2,28 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
+def df_to_dict(df):
+    return {
+        # The name of the key will vary, so just get the first value.
+        list(range_len.values())[0]: range_len["len"]
+        for range_len in df.to_dicts()
+    }
+
+
+# TODO: Use this
+def plot_histogram(histogram_df, error, cutoff):
+    histogram_dict = df_to_dict(histogram_df)
+    labels, values = zip(*histogram_dict.items())
+    _figure, axes = plt.subplots()
+    bar_colors = ["blue" if v > cutoff else "lightblue" for v in values]
+    axes.bar(labels, values, color=bar_colors, yerr=error)
+    axes.axhline(cutoff, color="lightgrey", zorder=-1)
+
+
+# TODO: Remove this overly complicated function
 def plot_error_bars_with_cutoff(
     y_values, x_min_label="min", x_max_label="max", y_cutoff=0, y_error=0
-):  # pragma: no cover
+):
     x_values = 0.5 + np.arange(len(y_values))
     x_values_above = []
     x_values_below = []

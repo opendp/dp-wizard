@@ -66,3 +66,9 @@ def column_server(input, output, session):  # pragma: no cover
             y_cutoff=30,
             y_error=5,
         )
+        # TODO: Use simpler function
+        # return plot_histogram(
+        #     df,
+        #     error=5,
+        #     cutoff=30,
+        # )
