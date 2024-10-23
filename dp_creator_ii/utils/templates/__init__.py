@@ -13,7 +13,7 @@ class _Template:
     def __init__(self, path, template=None):
         if path is not None:
             self._path = f"_{path}.py"
-            template_path = Path(__file__).parent / self._path
+            template_path = Path(__file__).parent / "no-tests" / self._path
             self._template = template_path.read_text()
         if template is not None:
             if path is not None:
