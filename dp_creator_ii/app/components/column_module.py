@@ -1,9 +1,13 @@
 from shiny import ui, render, module, reactive
+import opendp.prelude as dp
+import polars as pl
 
 from dp_creator_ii.utils.mock_data import mock_data, ColumnDef
-from dp_creator_ii.app.components.plots import plot_error_bars_with_cutoff
+from dp_creator_ii.app.components.plots import plot_histogram
 from dp_creator_ii.utils.templates import make_column_config_block
 from dp_creator_ii.app.components.outputs import output_code_sample
+
+dp.enable_features("contrib")
 
 
 @module.ui
@@ -57,18 +61,48 @@ def column_server(input, output, session):  # pragma: no cover
         name = config["name"]
         min_x = config["min"]
         max_x = config["max"]
-        df = mock_data({name: ColumnDef(min_x, max_x)}, row_count=20)
-        # TODO: we want to do DP with this data, not just return it raw.
-        return plot_error_bars_with_cutoff(
-            df[name].to_list(),
-            x_min_label=min_x,
-            x_max_label=max_x,
-            y_cutoff=30,
-            y_error=5,
+        bin_count = config["bins"]
+        # TODO: Increase the number of rows unless it impinges on performance?
+        df = mock_data({name: ColumnDef(min_x, max_x)}, row_count=100)
+
+        contributions = 10  # TODO: grab from top-level
+        epsilon = 1  # TODO
+        delta = 1e-7  # TODO
+
+        # TODO: When this is stable, merge it to templates, so we can be
+        # sure that we're using the same code in the preview that we
+        # use in the generated notebook.
+        bins_list = list(
+            range(
+                min_x,
+                max_x,
+                int((max_x - min_x + 1) / bin_count),
+            )
         )
-        # TODO: Use simpler function
-        # return plot_histogram(
-        #     df,
-        #     error=5,
-        #     cutoff=30,
-        # )
+        context = dp.Context.compositor(
+            data=pl.LazyFrame(df).with_columns(
+                # The cut() method returns a Polars categorical type.
+                # Cast to string to get the human-readable label.
+                pl.col(name)
+                .cut(bins_list)
+                .alias(f"{name}_bin")
+                .cast(pl.String),
+            ),
+            privacy_unit=dp.unit_of(contributions=contributions),
+            privacy_loss=dp.loss_of(epsilon=epsilon, delta=delta),
+            split_by_weights=[1],
+            margins={
+                (f"{name}_bin",): dp.polars.Margin(
+                    max_partition_length=100,  # TODO: Use row_count above.
+                    public_info="keys",
+                ),
+            },
+        )
+        query = context.query().group_by(f"{name}_bin").agg(pl.len().dp.noise())
+        histogram = query.release().collect().sort(f"{name}_bin")
+
+        return plot_histogram(
+            histogram,
+            error=5,  # TODO
+            cutoff=30,  # TODO
+        )
