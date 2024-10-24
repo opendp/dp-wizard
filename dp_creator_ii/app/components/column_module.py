@@ -37,25 +37,22 @@ def column_ui():  # pragma: no cover
 
 def _make_cut_points(lower, upper, bin_count):
     """
-    Returns one less cut point than the bin_count.
+    Returns one more cut point than the bin_count.
+    (There are actually two more bins, extending to
+    -inf and +inf, but we'll ignore those.)
     Cut points are evenly spaced from lower to upper.
-    Handle bin_count == 2 as a special case.
 
-    >>> _make_cut_points(0, 12, 2)
-    [6.0]
-    >>> _make_cut_points(0, 12, 3)
+    >>> _make_cut_points(0, 12, 1)
     [0.0, 12.0]
-    >>> _make_cut_points(0, 12, 4)
+    >>> _make_cut_points(0, 12, 2)
     [0.0, 6.0, 12.0]
-    >>> _make_cut_points(0, 12, 5)
+    >>> _make_cut_points(0, 12, 3)
     [0.0, 4.0, 8.0, 12.0]
-    >>> _make_cut_points(0, 12, 6)
+    >>> _make_cut_points(0, 12, 4)
     [0.0, 3.0, 6.0, 9.0, 12.0]
     """
-    if bin_count == 2:
-        return [(upper - lower) / 2]
-    bin_width = (upper - lower) / (bin_count - 2)
-    return [lower + i * bin_width for i in range(bin_count - 1)]
+    bin_width = (upper - lower) / bin_count
+    return [lower + i * bin_width for i in range(bin_count + 1)]
 
 
 @module.server
