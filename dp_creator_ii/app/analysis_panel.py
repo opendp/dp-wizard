@@ -35,7 +35,7 @@ def analysis_ui():
 
 
 def analysis_server(input, output, session):  # pragma: no cover
-    (csv_path, _contributions) = get_csv_contrib()
+    (csv_path, contributions) = get_csv_contrib()
 
     csv_path_from_cli_value = reactive.value(csv_path)
 
@@ -51,7 +51,7 @@ def analysis_server(input, output, session):  # pragma: no cover
     def columns_ui():
         column_ids = input.columns_checkbox_group()
         for column_id in column_ids:
-            column_server(column_id)
+            column_server(column_id, name=column_id, contributions=contributions)
         return [
             [
                 ui.h3(column_id),
@@ -82,6 +82,7 @@ def analysis_server(input, output, session):  # pragma: no cover
     def csv_fields():
         return csv_fields_calc()
 
+    @reactive.calc
     def epsilon_calc():
         return pow(10, input.log_epsilon_slider())
 

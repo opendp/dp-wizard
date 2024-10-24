@@ -55,13 +55,12 @@ def _make_cut_points(lower, upper, bin_count):
 
 
 @module.server
-def column_server(input, output, session):  # pragma: no cover
+def column_server(
+    input, output, session, name=None, contributions=None
+):  # pragma: no cover
     @reactive.calc
     def column_config():
         return {
-            # TODO: Is input._ns ok?
-            # https://github.com/opendp/dp-creator-ii/issues/85
-            "name": input._ns,
             "min": input.min(),
             "max": input.max(),
             "bins": input.bins(),
@@ -72,7 +71,7 @@ def column_server(input, output, session):  # pragma: no cover
     def column_code():
         config = column_config()
         return make_column_config_block(
-            name=config["name"],
+            name=name,
             min_value=config["min"],
             max_value=config["max"],
             bin_count=config["bins"],
@@ -81,14 +80,14 @@ def column_server(input, output, session):  # pragma: no cover
     @render.plot()
     def column_plot():
         config = column_config()
-        name = config["name"]
         min_x = config["min"]
         max_x = config["max"]
         bin_count = config["bins"]
-        # TODO: Increase the number of rows unless it impinges on performance?
+        # Mock data only depends on min and max, so it could be cached,
+        # but I'd guess this is dominated by the DP operations,
+        # so not worth optimizing.
         df = mock_data({name: ColumnDef(min_x, max_x)}, row_count=100)
 
-        contributions = 10  # TODO: grab from top-level
         epsilon = 1  # TODO
         delta = 1e-7  # TODO
 
