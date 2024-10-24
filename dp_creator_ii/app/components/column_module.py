@@ -42,17 +42,15 @@ def _make_cut_points(lower, upper, bin_count):
     -inf and +inf, but we'll ignore those.)
     Cut points are evenly spaced from lower to upper.
 
-    >>> _make_cut_points(0, 12, 1)
-    [0.0, 12.0]
-    >>> _make_cut_points(0, 12, 2)
-    [0.0, 6.0, 12.0]
-    >>> _make_cut_points(0, 12, 3)
-    [0.0, 4.0, 8.0, 12.0]
-    >>> _make_cut_points(0, 12, 4)
-    [0.0, 3.0, 6.0, 9.0, 12.0]
+    >>> _make_cut_points(0, 10, 1)
+    [0.0, 10.0]
+    >>> _make_cut_points(0, 10, 2)
+    [0.0, 5.0, 10.0]
+    >>> _make_cut_points(0, 10, 3)
+    [0.0, 3.33, 6.67, 10.0]
     """
     bin_width = (upper - lower) / bin_count
-    return [lower + i * bin_width for i in range(bin_count + 1)]
+    return [round(lower + i * bin_width, 2) for i in range(bin_count + 1)]
 
 
 @module.server
