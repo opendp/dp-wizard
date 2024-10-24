@@ -27,8 +27,35 @@ def column_ui():  # pragma: no cover
             },
         ),
         output_code_sample("Column Definition", "column_code"),
+        ui.markdown(
+            "This simulation assumes a normal distribution between the specified min and max. "
+            "Your data file has not been read except to determine the columns."
+        ),
         ui.output_plot("column_plot"),
     ]
+
+
+def _make_cut_points(lower, upper, bin_count):
+    """
+    Returns one less cut point than the bin_count.
+    Cut points are evenly spaced from lower to upper.
+    Handle bin_count == 2 as a special case.
+
+    >>> _make_cut_points(0, 12, 2)
+    [6.0]
+    >>> _make_cut_points(0, 12, 3)
+    [0.0, 12.0]
+    >>> _make_cut_points(0, 12, 4)
+    [0.0, 6.0, 12.0]
+    >>> _make_cut_points(0, 12, 5)
+    [0.0, 4.0, 8.0, 12.0]
+    >>> _make_cut_points(0, 12, 6)
+    [0.0, 3.0, 6.0, 9.0, 12.0]
+    """
+    if bin_count == 2:
+        return [(upper - lower) / 2]
+    bin_width = (upper - lower) / (bin_count - 2)
+    return [lower + i * bin_width for i in range(bin_count - 1)]
 
 
 @module.server
@@ -72,13 +99,7 @@ def column_server(input, output, session):  # pragma: no cover
         # TODO: When this is stable, merge it to templates, so we can be
         # sure that we're using the same code in the preview that we
         # use in the generated notebook.
-        bins_list = list(
-            range(
-                min_x,
-                max_x,
-                int((max_x - min_x + 1) / bin_count),
-            )
-        )
+        bins_list = _make_cut_points(min_x, max_x, bin_count)
         context = dp.Context.compositor(
             data=pl.LazyFrame(df).with_columns(
                 # The cut() method returns a Polars categorical type.
@@ -104,5 +125,5 @@ def column_server(input, output, session):  # pragma: no cover
         return plot_histogram(
             histogram,
             error=5,  # TODO
-            cutoff=30,  # TODO
+            cutoff=0,  # TODO
         )
