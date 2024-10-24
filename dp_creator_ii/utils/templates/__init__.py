@@ -152,18 +152,12 @@ def make_column_config_block(name, min_value, max_value, bin_count):
     ...     bin_count=10
     ... ))
     # From the public information, determine the bins:
-    hw_grade_bins_list = list(
-        range(
-            0,
-            100,
-            int((100 - 0 + 1) / 10),
-        )
-    )
+    hw_grade_cut_points = make_cut_points(0, 100, 10)
     <BLANKLINE>
     # Use these bins to define a Polars column:
     hw_grade_config = (
         pl.col('HW GRADE')
-        .cut(hw_grade_bins_list)
+        .cut(hw_grade_cut_points)
         .alias('hw_grade_bin')  # Give the new column a name.
         .cast(pl.String)
     )
@@ -173,7 +167,7 @@ def make_column_config_block(name, min_value, max_value, bin_count):
     return str(
         _Template("column_config")
         .fill_expressions(
-            BINS_LIST_NAME=f"{snake_name}_bins_list",
+            CUT_LIST_NAME=f"{snake_name}_cut_points",
             POLARS_CONFIG_NAME=f"{snake_name}_config",
         )
         .fill_values(
