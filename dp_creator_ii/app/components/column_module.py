@@ -99,13 +99,13 @@ def column_server(input, output, session):  # pragma: no cover
         # TODO: When this is stable, merge it to templates, so we can be
         # sure that we're using the same code in the preview that we
         # use in the generated notebook.
-        bins_list = _make_cut_points(min_x, max_x, bin_count)
+        cut_points = _make_cut_points(min_x, max_x, bin_count)
         context = dp.Context.compositor(
             data=pl.LazyFrame(df).with_columns(
                 # The cut() method returns a Polars categorical type.
                 # Cast to string to get the human-readable label.
                 pl.col(name)
-                .cut(bins_list)
+                .cut(cut_points)
                 .alias(f"{name}_bin")
                 .cast(pl.String),
             ),

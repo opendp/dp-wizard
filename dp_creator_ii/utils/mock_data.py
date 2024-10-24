@@ -20,7 +20,13 @@ def mock_data(column_defs, row_count=1000):
         max_value = column_def.max
         slope = (max_value - min_value) / (max_ppf - min_ppf)
         intercept = min_value - slope * min_ppf
-        for i in range(row_count):
+        # Start from 1 instead of 0:
+        # The polars bin intervals are closed at the top,
+        # so if we include the zero, there is one value in the
+        # (-inf, 0] bin.
+        # TODO: Resulting dataframe will be short one row,
+        # though that probably doesn't matter for mock data.
+        for i in range(1, row_count):
             quantile = (quantile_width * i / (row_count - 1)) + (1 - quantile_width) / 2
             ppf = norm.ppf(quantile)
             value = slope * ppf + intercept
