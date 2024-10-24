@@ -26,8 +26,8 @@ def mock_data(column_defs, row_count=1000):
         # (-inf, 0] bin.
         # TODO: Resulting dataframe will be short one row,
         # though that probably doesn't matter for mock data.
-        for i in range(1, row_count):
-            quantile = (quantile_width * i / (row_count - 1)) + (1 - quantile_width) / 2
+        for i in range(1, row_count + 1):
+            quantile = (quantile_width * i / (row_count)) + (1 - quantile_width) / 2
             ppf = norm.ppf(quantile)
             value = slope * ppf + intercept
             data[column_name].append(value)

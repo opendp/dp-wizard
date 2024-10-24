@@ -28,7 +28,8 @@ def column_ui():  # pragma: no cover
         ),
         output_code_sample("Column Definition", "column_code"),
         ui.markdown(
-            "This simulation assumes a normal distribution between the specified min and max. "
+            "This simulation assumes a normal distribution "
+            "between the specified min and max. "
             "Your data file has not been read except to determine the columns."
         ),
         ui.output_plot("column_plot"),
