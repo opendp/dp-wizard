@@ -27,6 +27,28 @@ def _make_cut_points(lower, upper, bin_count):
 def make_confidence_accuracy_histogram(
     lower=None, upper=None, bin_count=None, contributions=None, weighted_epsilon=None
 ):
+    """
+    Creates fake data between lower and upper, and then creates a DP histogram from it.
+    >>> confidence, accuracy, histogram = make_confidence_accuracy_histogram(
+    ...     lower=0, upper=10, bin_count=5, contributions=1, weighted_epsilon=1)
+    >>> confidence
+    0.95
+    >>> accuracy
+    3.37...
+    >>> histogram
+    shape: (5, 2)
+    ┌─────────┬─────┐
+    │ bin     ┆ len │
+    │ ---     ┆ --- │
+    │ str     ┆ u32 │
+    ╞═════════╪═════╡
+    │ (0, 2]  ┆ ... │
+    │ (2, 4]  ┆ ... │
+    │ (4, 6]  ┆ ... │
+    │ (6, 8]  ┆ ... │
+    │ (8, 10] ┆ ... │
+    └─────────┴─────┘
+    """
     # Mock data only depends on min and max, so it could be cached,
     # but I'd guess this is dominated by the DP operations,
     # so not worth optimizing.
