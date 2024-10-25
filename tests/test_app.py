@@ -50,6 +50,9 @@ def test_app(page: Page, app: ShinyAppProc):  # pragma: no cover
     expect_visible("hw_number")
     expect_visible("grade")
     # Epsilon slider:
+    # (Note: Slider tests failed on CI when run after column details,
+    # although it worked locally. This works in either environment.
+    # Maybe a race condition?)
     expect_visible("0.1")
     expect_visible("10.0")
     expect_visible("Epsilon: 1.0")
