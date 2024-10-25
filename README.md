@@ -63,7 +63,7 @@ $ playwright codegen http://127.0.0.1:8000/
 
 You can also [step through these tests](https://playwright.dev/python/docs/running-tests#debugging-tests) and see what the browser sees:
 ```shell
-$ PWDEBUG=1 pytest
+$ PWDEBUG=1 pytest -k test_app
 ```
 
 ### Conventions
