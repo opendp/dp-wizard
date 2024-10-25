@@ -87,46 +87,60 @@ def column_server(
         max_x = config["max"]
         bin_count = config["bins"]
         weight = config["weight"]
-        # Mock data only depends on min and max, so it could be cached,
-        # but I'd guess this is dominated by the DP operations,
-        # so not worth optimizing.
-        row_count = 100
-        df = mock_data({name: ColumnDef(min_x, max_x)}, row_count=row_count)
-
-        # TODO: When this is stable, merge it to templates, so we can be
-        # sure that we're using the same code in the preview that we
-        # use in the generated notebook.
-        cut_points = _make_cut_points(min_x, max_x, bin_count)
-        context = dp.Context.compositor(
-            data=pl.LazyFrame(df).with_columns(
-                # The cut() method returns a Polars categorical type.
-                # Cast to string to get the human-readable label.
-                pl.col(name)
-                .cut(cut_points)
-                .alias("bin")
-                .cast(pl.String),
-            ),
-            privacy_unit=dp.unit_of(
-                contributions=contributions,
-            ),
-            privacy_loss=dp.loss_of(
-                epsilon=epsilon * weight,  # TODO: We need the totals of all weights.
-                delta=1e-7,  # TODO
-            ),
-            split_by_weights=[1],
-            margins={
-                ("bin",): dp.polars.Margin(
-                    max_partition_length=row_count,
-                    public_info="keys",
-                ),
-            },
+        _confidence, accuracy, histogram = _make_confidence_accuracy_histogram(
+            lower=min_x,
+            upper=max_x,
+            bin_count=bin_count,
+            contributions=contributions,
+            weighted_epsilon=epsilon * weight,  # TODO: Take into account all weights.
         )
-        query = context.query().group_by("bin").agg(pl.len().dp.noise())
-        accuracy = query.summarize(alpha=0.05)["accuracy"].item()
-        histogram = query.release().collect().sort("bin")
-
         return plot_histogram(
             histogram,
             error=accuracy,
             cutoff=0,  # TODO
         )
+
+
+def _make_confidence_accuracy_histogram(
+    lower=None, upper=None, bin_count=None, contributions=None, weighted_epsilon=None
+):
+    # Mock data only depends on min and max, so it could be cached,
+    # but I'd guess this is dominated by the DP operations,
+    # so not worth optimizing.
+    row_count = 100
+    df = mock_data({"value": ColumnDef(lower, upper)}, row_count=row_count)
+
+    # TODO: When this is stable, merge it to templates, so we can be
+    # sure that we're using the same code in the preview that we
+    # use in the generated notebook.
+    cut_points = _make_cut_points(lower, upper, bin_count)
+    context = dp.Context.compositor(
+        data=pl.LazyFrame(df).with_columns(
+            # The cut() method returns a Polars categorical type.
+            # Cast to string to get the human-readable label.
+            pl.col("value")
+            .cut(cut_points)
+            .alias("bin")
+            .cast(pl.String),
+        ),
+        privacy_unit=dp.unit_of(
+            contributions=contributions,
+        ),
+        privacy_loss=dp.loss_of(
+            epsilon=weighted_epsilon,
+            delta=1e-7,  # TODO
+        ),
+        split_by_weights=[1],
+        margins={
+            ("bin",): dp.polars.Margin(
+                max_partition_length=row_count,
+                public_info="keys",
+            ),
+        },
+    )
+    query = context.query().group_by("bin").agg(pl.len().dp.noise())
+
+    confidence = 0.95
+    accuracy = query.summarize(alpha=1 - confidence)["accuracy"].item()
+    histogram = query.release().collect().sort("bin")
+    return (confidence, accuracy, histogram)
