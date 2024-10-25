@@ -72,3 +72,43 @@ Branch names should be of the form `NNNN-short-description`, where `NNNN` is the
 
 Dependencies should be pinned for development, but not pinned when the package is installed.
 New dev dependencies can be added to `requirements-dev.in`, and then run `pip-compile requirements-dev.in` to update `requirements-dev.txt`
+
+A Github [project board](https://github.com/orgs/opendp/projects/10/views/2) provides an overview of the issues and PRs.
+
+```mermaid
+graph TD
+    subgraph Pending
+        %% We only get one auto-add workflow with the free plan.
+        %% https://docs.github.com/en/issues/planning-and-tracking-with-projects/automating-your-project/adding-items-automatically
+        Issue-New
+        PR-New-or-Changes
+    end
+    %% subgraph In Progress
+        %% How should this be used?
+        %% Can it be automated
+    %% end
+    subgraph Ready for Review
+        PR-for-Review
+    end
+    subgraph In Review
+        PR-in-Review --> PR-Approved
+    end
+    subgraph Done
+        Issue-Closed
+        PR-Merged
+        PR-Closed
+    end
+    PR-New-or-Changes -->|manual| PR-for-Review
+    PR-for-Review -->|manual| PR-in-Review
+    Issue-New -->|auto| Issue-Closed
+    PR-New-or-Changes -->|auto| PR-Closed
+    PR-for-Review -->|auto| PR-Closed
+    PR-in-Review -->|auto| PR-Closed
+    PR-for-Review -->|manual| PR-New-or-Changes
+    PR-in-Review -->|auto| PR-New-or-Changes
+    PR-Approved -->|auto| PR-Merged
+```
+- For `manual` transitions, the status of the issue or PR will need to be updated by hand, either on the issue, or by dragging between columns on the board.
+- For `auto` transitions, some other action (for example, approving a PR) should trigger a [workflow](https://github.com/orgs/opendp/projects/10/workflows).
+- These are the only the states that matter. Whether PR is a draft or has assignees does not matter.
+- If we need anything more than this, we should consider a paid plan, so that we have access to more workflows.
