@@ -1,3 +1,5 @@
+from logging import info
+
 from shiny import ui, render, module, reactive
 
 from dp_creator_ii.utils.dp_helper import make_confidence_accuracy_histogram
@@ -78,7 +80,7 @@ def column_server(
         bin_count = config["bins"]
         weight = config["weight"]
         weights_sum = get_weights_sum()
-        # print(f'{name}: {weight}/{weights_sum}')
+        info(f"Weight ratio for {name}: {weight}/{weights_sum}")
         _confidence, accuracy, histogram = make_confidence_accuracy_histogram(
             lower=min_x,
             upper=max_x,

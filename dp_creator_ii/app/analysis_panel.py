@@ -43,16 +43,29 @@ def analysis_server(input, output, session):  # pragma: no cover
     def set_column_weight(column_id, weight):
         weights.set({**weights(), column_id: weight})
 
+    def clear_column_weights(columns_ids_to_keep):
+        weights_copy = {**weights()}
+        column_ids_to_del = set(weights_copy.keys()) - set(columns_ids_to_keep)
+        for column_id in column_ids_to_del:
+            del weights_copy[column_id]
+        weights.set(weights_copy)
+
     def get_weights_sum():
         return sum(weights().values())
 
     @reactive.effect
-    def _():
+    def _update_checkbox_group():
         ui.update_checkbox_group(
             "columns_checkbox_group",
             label=None,
             choices=csv_fields_calc(),
         )
+
+    @reactive.effect
+    @reactive.event(input.columns_checkbox_group)
+    def _update_weights():
+        column_ids_to_keep = input.columns_checkbox_group()
+        clear_column_weights(column_ids_to_keep)
 
     @render.ui
     def columns_ui():

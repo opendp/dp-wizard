@@ -1,9 +1,12 @@
 from pathlib import Path
+import logging
 
 from shiny import App, ui
 
 from dp_creator_ii.app import analysis_panel, dataset_panel, results_panel
 
+
+logging.basicConfig(level=logging.INFO)
 
 app_ui = ui.page_bootstrap(
     ui.head_content(ui.include_css(Path(__file__).parent / "css" / "styles.css")),
