@@ -81,6 +81,10 @@ def column_server(
         weight = config["weight"]
         weights_sum = get_weights_sum()
         info(f"Weight ratio for {name}: {weight}/{weights_sum}")
+        if weights_sum == 0:
+            # This function is triggered when column is removed;
+            # Exit early to avoid divide-by-zero.
+            return None
         _confidence, accuracy, histogram = make_confidence_accuracy_histogram(
             lower=min_x,
             upper=max_x,
