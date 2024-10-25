@@ -57,7 +57,7 @@ def test_app(page: Page, app: ShinyAppProc):  # pragma: no cover
     page.get_by_label("Max").fill("100")
     page.get_by_label("Bins").click()
     page.get_by_label("Bins").fill("20")
-    page.get_by_label("Weight").select_option("8")
+    page.get_by_label("Weight").select_option("1")
     # Epsilon slider:
     expect_visible("0.1")
     expect_visible("10.0")
