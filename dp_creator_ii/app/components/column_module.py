@@ -16,10 +16,9 @@ def column_ui():  # pragma: no cover
             "weight",
             "Weight",
             choices={
-                1: "Least accurate",
-                2: "Less accurate",
+                1: "Less accurate",
+                2: "Default",
                 4: "More accurate",
-                8: "Most accurate",
             },
         ),
         output_code_sample("Column Definition", "column_code"),
