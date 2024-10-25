@@ -57,9 +57,6 @@ def column_server(
             "max": input.max(),
             "bins": input.bins(),
             "weight": float(input.weight()),
-            # TODO: We need to get the total of the weights across all columns,
-            # so that we can calculate what proportion this column has,
-            # and multiply that by the epsilon parameter.
         }
 
     @render.code
