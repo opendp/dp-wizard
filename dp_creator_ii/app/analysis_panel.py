@@ -51,7 +51,12 @@ def analysis_server(input, output, session):  # pragma: no cover
     def columns_ui():
         column_ids = input.columns_checkbox_group()
         for column_id in column_ids:
-            column_server(column_id, name=column_id, contributions=contributions)
+            column_server(
+                column_id,
+                name=column_id,
+                contributions=contributions,
+                epsilon=epsilon_calc(),
+            )
         return [
             [
                 ui.h3(column_id),

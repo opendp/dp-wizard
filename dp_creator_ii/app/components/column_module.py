@@ -56,7 +56,7 @@ def _make_cut_points(lower, upper, bin_count):
 
 @module.server
 def column_server(
-    input, output, session, name=None, contributions=None
+    input, output, session, name=None, contributions=None, epsilon=None
 ):  # pragma: no cover
     @reactive.calc
     def column_config():
@@ -65,6 +65,9 @@ def column_server(
             "max": input.max(),
             "bins": input.bins(),
             "weight": float(input.weight()),
+            # TODO: We need to get the total of the weights across all columns,
+            # so that we can calculate what proportion this column has,
+            # and multiply that by the epsilon parameter.
         }
 
     @render.code
@@ -83,13 +86,12 @@ def column_server(
         min_x = config["min"]
         max_x = config["max"]
         bin_count = config["bins"]
+        weight = config["weight"]
         # Mock data only depends on min and max, so it could be cached,
         # but I'd guess this is dominated by the DP operations,
         # so not worth optimizing.
-        df = mock_data({name: ColumnDef(min_x, max_x)}, row_count=100)
-
-        epsilon = 1  # TODO
-        delta = 1e-7  # TODO
+        row_count = 100
+        df = mock_data({name: ColumnDef(min_x, max_x)}, row_count=row_count)
 
         # TODO: When this is stable, merge it to templates, so we can be
         # sure that we're using the same code in the preview that we
@@ -101,24 +103,30 @@ def column_server(
                 # Cast to string to get the human-readable label.
                 pl.col(name)
                 .cut(cut_points)
-                .alias(f"{name}_bin")
+                .alias("bin")
                 .cast(pl.String),
             ),
-            privacy_unit=dp.unit_of(contributions=contributions),
-            privacy_loss=dp.loss_of(epsilon=epsilon, delta=delta),
+            privacy_unit=dp.unit_of(
+                contributions=contributions,
+            ),
+            privacy_loss=dp.loss_of(
+                epsilon=epsilon * weight,  # TODO: We need the totals of all weights.
+                delta=1e-7,  # TODO
+            ),
             split_by_weights=[1],
             margins={
-                (f"{name}_bin",): dp.polars.Margin(
-                    max_partition_length=100,  # TODO: Use row_count above.
+                ("bin",): dp.polars.Margin(
+                    max_partition_length=row_count,
                     public_info="keys",
                 ),
             },
         )
-        query = context.query().group_by(f"{name}_bin").agg(pl.len().dp.noise())
-        histogram = query.release().collect().sort(f"{name}_bin")
+        query = context.query().group_by("bin").agg(pl.len().dp.noise())
+        accuracy = query.summarize(alpha=0.05)["accuracy"].item()
+        histogram = query.release().collect().sort("bin")
 
         return plot_histogram(
             histogram,
-            error=5,  # TODO
+            error=accuracy,
             cutoff=0,  # TODO
         )
