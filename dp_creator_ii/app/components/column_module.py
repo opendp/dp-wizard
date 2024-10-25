@@ -34,8 +34,20 @@ def column_ui():  # pragma: no cover
 
 @module.server
 def column_server(
-    input, output, session, name=None, contributions=None, epsilon=None
+    input,
+    output,
+    session,
+    name,
+    contributions,
+    epsilon,
+    set_column_weight,
+    get_weights_sum,
 ):  # pragma: no cover
+    @reactive.effect
+    @reactive.event(input.weight)
+    def _():
+        set_column_weight(name, float(input.weight()))
+
     @reactive.calc
     def column_config():
         return {
@@ -70,7 +82,7 @@ def column_server(
             upper=max_x,
             bin_count=bin_count,
             contributions=contributions,
-            weighted_epsilon=epsilon * weight,  # TODO: Take into account all weights.
+            weighted_epsilon=epsilon * weight / get_weights_sum(),
         )
         return plot_histogram(
             histogram,

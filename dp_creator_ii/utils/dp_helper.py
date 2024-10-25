@@ -28,7 +28,7 @@ def make_confidence_accuracy_histogram(
     lower=None, upper=None, bin_count=None, contributions=None, weighted_epsilon=None
 ):
     """
-    Creates fake data between lower and upper, and then creates a DP histogram from it.
+    Creates fake data between lower and upper, and then returns a DP histogram from it.
     >>> confidence, accuracy, histogram = make_confidence_accuracy_histogram(
     ...     lower=0, upper=10, bin_count=5, contributions=1, weighted_epsilon=1)
     >>> confidence

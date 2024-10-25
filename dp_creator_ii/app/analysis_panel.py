@@ -38,6 +38,13 @@ def analysis_server(input, output, session):  # pragma: no cover
     (csv_path, contributions) = get_csv_contrib()
 
     csv_path_from_cli_value = reactive.value(csv_path)
+    weights = reactive.value({})
+
+    def set_column_weight(column_id, weight):
+        weights.set({**weights(), column_id: weight})
+
+    def get_weights_sum():
+        return sum(weights().values())
 
     @reactive.effect
     def _():
@@ -56,6 +63,8 @@ def analysis_server(input, output, session):  # pragma: no cover
                 name=column_id,
                 contributions=contributions,
                 epsilon=epsilon_calc(),
+                set_column_weight=set_column_weight,
+                get_weights_sum=get_weights_sum,
             )
         return [
             [
