@@ -65,6 +65,12 @@ You can also [step through these tests](https://playwright.dev/python/docs/runni
 $ PWDEBUG=1 pytest -k test_app
 ```
 
+If Playwright fails in CI, we can still see what went wrong:
+- Scroll to the end of the CI log, to `actions/upload-artifact`.
+- Download the zipped artifact locally.
+- Inside the zipped artifact will be _another_ zip: `trace.zip`.
+- Don't unzip it! Instead, open it with [trace.playwright.dev](https://trace.playwright.dev/).
+
 ### Conventions
 
 Branch names should be of the form `NNNN-short-description`, where `NNNN` is the issue number being addressed.
