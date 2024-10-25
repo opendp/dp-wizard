@@ -51,8 +51,7 @@ Your browser should open and connect you to the application.
 
 Tests should pass, and code coverage should be complete (except blocks we explicitly ignore):
 ```shell
-$ coverage run -m pytest -v
-$ coverage report
+$ ./ci.sh
 ```
 
 We're using [Playwright](https://playwright.dev/python/) for end-to-end tests. You can use it to [generate test code](https://playwright.dev/python/docs/codegen-intro) just by interacting with the app in a browser:
