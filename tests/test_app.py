@@ -49,6 +49,14 @@ def test_app(page: Page, app: ShinyAppProc):  # pragma: no cover
     expect_visible("class_year")
     expect_visible("hw_number")
     expect_visible("grade")
+    # Epsilon slider:
+    expect_visible("0.1")
+    expect_visible("10.0")
+    expect_visible("Epsilon: 1.0")
+    page.locator(".irs-bar").click()
+    expect_visible("Epsilon: 0.316")
+    page.locator(".irs-bar").click()
+    expect_visible("Epsilon: 0.158")
     # Set column details:
     page.get_by_label("grade").check()
     page.get_by_label("Min").click()
@@ -58,14 +66,6 @@ def test_app(page: Page, app: ShinyAppProc):  # pragma: no cover
     page.get_by_label("Bins").click()
     page.get_by_label("Bins").fill("20")
     page.get_by_label("Weight").select_option("1")
-    # Epsilon slider:
-    expect_visible("0.1")
-    expect_visible("10.0")
-    expect_visible("Epsilon: 1.0")
-    page.locator(".irs-bar").click()
-    expect_visible("Epsilon: 0.316")
-    page.locator(".irs-bar").click()
-    expect_visible("Epsilon: 0.158")
     expect_no_error()
 
     # -- Download results --
