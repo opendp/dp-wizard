@@ -20,6 +20,7 @@ def column_ui():  # pragma: no cover
                 2: "Default",
                 4: "More accurate",
             },
+            selected=2,
         ),
         output_code_sample("Column Definition", "column_code"),
         ui.markdown(
@@ -76,12 +77,14 @@ def column_server(
         max_x = config["max"]
         bin_count = config["bins"]
         weight = config["weight"]
+        weights_sum = get_weights_sum()
+        # print(f'{name}: {weight}/{weights_sum}')
         _confidence, accuracy, histogram = make_confidence_accuracy_histogram(
             lower=min_x,
             upper=max_x,
             bin_count=bin_count,
             contributions=contributions,
-            weighted_epsilon=epsilon * weight / get_weights_sum(),
+            weighted_epsilon=epsilon * weight / weights_sum,
         )
         return plot_histogram(
             histogram,
