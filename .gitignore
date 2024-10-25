@@ -1,6 +1,9 @@
 # MacOS
 .DS_Store
 
+# Playwright
+test-results/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
