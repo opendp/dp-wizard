@@ -1,7 +1,8 @@
 from pathlib import Path
 
-from shiny import App, ui
+from shiny import App, ui, reactive
 
+from dp_creator_ii.utils.argparse_helpers import get_csv_contrib_from_cli
 from dp_creator_ii.app import analysis_panel, dataset_panel, results_panel
 
 
@@ -22,8 +23,14 @@ def ctrl_c_reminder():  # pragma: no cover
 
 
 def server(input, output, session):  # pragma: no cover
-    dataset_panel.dataset_server(input, output, session)
-    analysis_panel.analysis_server(input, output, session)
+    (csv_path_from_cli, contributions_from_cli) = get_csv_contrib_from_cli()
+    csv_path = reactive.value(csv_path_from_cli)
+    contributions = reactive.value(contributions_from_cli)
+
+    dataset_panel.dataset_server(
+        input, output, session, csv_path=csv_path, contributions=contributions
+    )
+    analysis_panel.analysis_server(input, output, session, csv_path=csv_path)
     results_panel.results_server(input, output, session)
     session.on_ended(ctrl_c_reminder)
 

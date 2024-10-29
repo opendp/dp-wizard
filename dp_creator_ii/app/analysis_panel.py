@@ -7,7 +7,6 @@ from dp_creator_ii.app.components.plots import plot_error_bars_with_cutoff
 from dp_creator_ii.app.components.inputs import log_slider
 from dp_creator_ii.app.components.column_module import column_ui, column_server
 from dp_creator_ii.utils.csv_helper import read_field_names
-from dp_creator_ii.utils.argparse_helpers import get_csv_contrib
 
 
 def analysis_ui():
@@ -40,11 +39,7 @@ def analysis_ui():
     )
 
 
-def analysis_server(input, output, session):  # pragma: no cover
-    (csv_path, _contributions) = get_csv_contrib()
-
-    csv_path_from_cli_value = reactive.value(csv_path)
-
+def analysis_server(input, output, session, csv_path=None):  # pragma: no cover
     @reactive.effect
     def _():
         ui.update_checkbox_group(
@@ -66,20 +61,13 @@ def analysis_server(input, output, session):  # pragma: no cover
             for column_id in column_ids
         ]
 
-    @reactive.calc
-    def csv_path_calc():
-        csv_path_from_ui = input.csv_path_from_ui()
-        if csv_path_from_ui is not None:
-            return csv_path_from_ui[0]["datapath"]
-        return csv_path_from_cli_value.get()
-
     @render.text
-    def csv_path():
-        return csv_path_calc()
+    def csv_path_render():
+        return csv_path()
 
     @reactive.calc
     def csv_fields_calc():
-        path = csv_path_calc()
+        path = csv_path()
         if path is None:
             return None
         return read_field_names(path)

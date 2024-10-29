@@ -104,7 +104,7 @@ def _get_demo_csv_contrib():
     return csv_path, contributions
 
 
-def get_csv_contrib():  # pragma: no cover
+def get_csv_contrib_from_cli():  # pragma: no cover
     args = _get_args()
     if args.demo:
         if args.csv_path is not None:
