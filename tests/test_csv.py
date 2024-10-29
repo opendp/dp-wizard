@@ -27,10 +27,11 @@ def test_csv_loading(write_encoding):
     with tempfile.NamedTemporaryFile(
         mode="w", newline="", encoding=write_encoding
     ) as fp:
-        write_lf = pl.DataFrame({"NAME": ["André"], "AGE": [42]}).lazy()
+        data = {"NAME": ["André"], "AGE": [42]}
+        write_lf = pl.DataFrame(data).lazy()
 
         writer = csv.writer(fp)
-        writer.writerow(["NAME", "AGE"])
+        writer.writerow(data.keys())
         for row in write_lf.collect().rows():
             writer.writerow(row)
         fp.flush()
@@ -59,3 +60,7 @@ def test_csv_loading(write_encoding):
             assert read_lf.collect().rows()[0] == ("Andr�", 42)
         else:
             pl_testing.assert_frame_equal(write_lf, read_lf)
+
+        # Preceding lines are reading the whole DF via Polars.
+        field_names_read = read_field_names(fp.name)
+        assert field_names_read == list(data.keys())
