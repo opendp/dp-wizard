@@ -3,21 +3,8 @@ import polars as pl
 import polars.testing as pl_testing
 import tempfile
 import pytest
-from pathlib import Path
 
 from dp_creator_ii.utils.csv_helper import read_field_names
-
-
-# @pytest.mark.parametrize("encoding", ["latin1", "utf8", "utf-8-sig"])
-# def test_read_field_names(encoding):
-#     with tempfile.NamedTemporaryFile(mode="w", newline="", encoding=encoding) as fp:
-#         writer = csv.writer(fp)
-#         field_names_written = ["abc", "ijk", "xyz"]
-#         writer.writerow(field_names_written)
-#         fp.flush()
-
-#         field_names_read = read_field_names(fp.name)
-#         assert field_names_written == field_names_read
 
 
 # We will not reference the encoding when reading:
