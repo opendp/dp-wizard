@@ -8,8 +8,9 @@ from pathlib import Path
 from dp_creator_ii.utils.csv_helper import read_field_names
 
 
-def test_read_field_names():
-    with tempfile.NamedTemporaryFile(mode="w", newline="", encoding="utf8") as fp:
+@pytest.mark.parametrize("encoding", ["utf8", "utf-8-sig"])
+def test_read_field_names(encoding):
+    with tempfile.NamedTemporaryFile(mode="w", newline="", encoding=encoding) as fp:
         writer = csv.writer(fp)
         field_names_written = ["abc", "ijk", "xyz"]
         writer.writerow(field_names_written)
