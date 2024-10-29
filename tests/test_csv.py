@@ -9,9 +9,14 @@ from dp_creator_ii.utils.csv_helper import read_field_names
 
 
 def test_read_field_names():
-    csv_path = Path(__file__).parent / "fixtures" / "fake.csv"
-    field_names = read_field_names(csv_path)
-    assert field_names == ["student_id", "class_year", "hw_number", "grade"]
+    with tempfile.NamedTemporaryFile(mode="w", newline="", encoding="utf8") as fp:
+        writer = csv.writer(fp)
+        field_names_written = ["abc", "ijk", "xyz"]
+        writer.writerow(field_names_written)
+        fp.flush()
+
+        field_names_read = read_field_names(fp.name)
+        assert field_names_written == field_names_read
 
 
 @pytest.mark.parametrize("encoding", ["latin1", "utf8"])
