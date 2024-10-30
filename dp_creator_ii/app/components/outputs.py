@@ -10,7 +10,7 @@ def output_code_sample(name_of_render_function):
     )
 
 
-def demo_tooltip(is_demo, text):
+def demo_tooltip(is_demo, text):  # pragma: no cover
     if is_demo:
         return ui.tooltip(
             icon_svg("circle-question"),
