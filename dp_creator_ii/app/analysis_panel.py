@@ -63,10 +63,6 @@ def analysis_server(
             for column_id in column_ids
         ]
 
-    @render.text
-    def csv_path_render():
-        return csv_path()
-
     @reactive.calc
     def csv_fields_calc():
         path = csv_path()
