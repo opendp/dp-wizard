@@ -5,3 +5,30 @@ body {
 #top_level_nav {
     margin-bottom: 1em;
 }
+
+/*
+Improve readability of popover.
+*/
+.tooltip-inner {
+    text-align: left;
+    color: black;
+    background-color: lightgray;
+    opacity: 100%;
+}
+/*
+Arrow color should be consistent with background of tooltip-inner.
+The tooltip is positioned to avoid falling outside of the window,
+so any of these might be applied.
+*/
+.bs-tooltip-auto[data-popper-placement^="right"] .tooltip-arrow::before {
+    border-right-color: lightgrey;
+}
+.bs-tooltip-auto[data-popper-placement^="bottom"] .tooltip-arrow::before {
+    border-bottom-color: lightgray;
+}
+.bs-tooltip-auto[data-popper-placement^="left"] .tooltip-arrow::before {
+    border-left-color: lightgrey;
+}
+.bs-tooltip-auto[data-popper-placement^="top"] .tooltip-arrow::before {
+    border-top-color: lightgray;
+}
