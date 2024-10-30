@@ -4,7 +4,7 @@ from shiny import ui, reactive, render
 from faicons import icon_svg
 
 from dp_creator_ii.utils.argparse_helpers import get_csv_contrib_from_cli
-from dp_creator_ii.app.components.outputs import output_code_sample
+from dp_creator_ii.app.components.outputs import output_code_sample, demo_tooltip
 from dp_creator_ii.utils.template import make_privacy_unit_block
 
 
@@ -53,35 +53,29 @@ def dataset_server(
 
     @render.ui
     def choose_csv_demo_tooltip_ui():
-        if is_demo:
-            return ui.tooltip(
-                icon_svg("circle-question"),
-                "For the demo, we'll imagine we have the grades "
-                "on assignments for a class.",
-                placement="right",
-            )
+        return demo_tooltip(
+            is_demo,
+            "For the demo, we'll imagine we have the grades "
+            "on assignments for a class.",
+        )
 
     @render.ui
     def contributions_demo_tooltip_ui():
-        if is_demo:
-            return ui.tooltip(
-                icon_svg("circle-question"),
-                "For the demo, we assume that each student "
-                f"can occur at most {contributions()} times in the dataset. ",
-                placement="right",
-            )
+        return demo_tooltip(
+            is_demo,
+            "For the demo, we assume that each student "
+            f"can occur at most {contributions()} times in the dataset. ",
+        )
 
     @render.ui
     def python_tooltip_ui():
-        if is_demo:
-            return ui.tooltip(
-                icon_svg("circle-question"),
-                "Along the way, code samples will demonstrate "
-                "how the information you provide is used in OpenDP, "
-                "and at the end you can download a notebook "
-                "for the entire calculation.",
-                placement="right",
-            )
+        return demo_tooltip(
+            is_demo,
+            "Along the way, code samples will demonstrate "
+            "how the information you provide is used in OpenDP, "
+            "and at the end you can download a notebook "
+            "for the entire calculation.",
+        )
 
     @render.code
     def unit_of_privacy_python():
