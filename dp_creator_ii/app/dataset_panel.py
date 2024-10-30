@@ -1,7 +1,6 @@
 from pathlib import Path
 
 from shiny import ui, reactive, render
-from faicons import icon_svg
 
 from dp_creator_ii.utils.argparse_helpers import get_csv_contrib_from_cli
 from dp_creator_ii.app.components.outputs import output_code_sample, demo_tooltip
