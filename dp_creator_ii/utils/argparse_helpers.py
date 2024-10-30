@@ -66,7 +66,7 @@ def _clip(n, lower, upper):
 
 def _get_demo_csv_contrib():
     """
-    >>> csv_path, contributions = _get_demo_csv_contrib()
+    >>> csv_path, contributions, is_demo = _get_demo_csv_contrib()
     >>> with open(csv_path, newline="") as csv_handle:
     ...     reader = csv.DictReader(csv_handle)
     ...     reader.fieldnames
