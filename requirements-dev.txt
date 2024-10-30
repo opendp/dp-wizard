@@ -61,6 +61,8 @@ docutils==0.21.2
     # via flit
 executing==2.1.0
     # via stack-data
+faicons==0.2.2
+    # via -r requirements-dev.in
 fastjsonschema==2.20.0
     # via nbformat
 filelock==3.16.1
@@ -82,7 +84,9 @@ greenlet==3.0.3
 h11==0.14.0
     # via uvicorn
 htmltools==0.5.3
-    # via shiny
+    # via
+    #   faicons
+    #   shiny
 identify==2.6.1
     # via pre-commit
 idna==3.10

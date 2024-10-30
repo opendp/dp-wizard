@@ -39,7 +39,9 @@ def analysis_ui():
     )
 
 
-def analysis_server(input, output, session, csv_path=None):  # pragma: no cover
+def analysis_server(
+    input, output, session, csv_path=None, is_demo=None
+):  # pragma: no cover
     @reactive.effect
     def _():
         ui.update_checkbox_group(
