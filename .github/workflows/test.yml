@@ -43,7 +43,7 @@ jobs:
         run: playwright install firefox
 
       - name: Test
-        run: coverage run -m pytest -v
+        run: coverage run -m pytest -v --browser firefox
 
       - name: Check coverage
         run: coverage report
