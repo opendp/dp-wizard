@@ -179,6 +179,10 @@ numpy==1.26.4
     #   scikit-learn
     #   scipy
 opendp[polars]==0.11.1
+    # via
+    #   -r requirements-dev.in
+    #   opendp-logger
+opendp-logger==0.3.0
     # via -r requirements-dev.in
 packaging==24.1
     # via

@@ -13,6 +13,7 @@ dependencies = [
     "shiny",
     "matplotlib",
     "opendp[polars]",
+    "opendp-logger",
     "jupytext",
     "jupyter-client",
     "nbconvert",

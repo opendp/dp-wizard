@@ -21,6 +21,7 @@ coverage
 
 # OpenDP:
 opendp[polars]
+opendp-logger
 # For Python 3.9:
 scipy<1.14
 
