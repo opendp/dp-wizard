@@ -38,12 +38,12 @@ jobs:
         run: pip install -r requirements-dev.txt
 
       - name: Install browsers
-        # Choosing Firefox primarily because it has a smaller binary than Chromium.
+        # Install just one browser instead of the default three.
         # https://playwright.dev/python/docs/browsers#managing-browser-binaries
-        run: playwright install firefox
+        run: playwright install chromium
 
       - name: Test
-        run: coverage run -m pytest -v --browser firefox
+        run: coverage run -m pytest -v
 
       - name: Check coverage
         run: coverage report
