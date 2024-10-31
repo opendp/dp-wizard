@@ -3,9 +3,9 @@ from shiny import ui
 from faicons import icon_svg
 
 
-def output_code_sample(name_of_render_function):
+def output_code_sample(title, name_of_render_function):
     return details(
-        summary("Code sample"),
+        summary(f"Code sample: {title}"),
         ui.output_code(name_of_render_function),
     )
 

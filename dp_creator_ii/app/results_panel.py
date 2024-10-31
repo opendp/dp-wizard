@@ -1,6 +1,6 @@
 from shiny import ui, render
 
-from dp_creator_ii.utils.template import make_notebook_py, make_script_py
+from dp_creator_ii.utils.templates import make_notebook_py, make_script_py
 from dp_creator_ii.utils.converters import convert_py_to_nb
 
 
@@ -38,7 +38,7 @@ def results_server(input, output, session):  # pragma: no cover
         contributions = input.contributions()
         script_py = make_script_py(
             contributions=contributions,
-            loss=1,
+            epsilon=1,
             weights=[1],
         )
         yield script_py
@@ -52,7 +52,7 @@ def results_server(input, output, session):  # pragma: no cover
         notebook_py = make_notebook_py(
             csv_path="todo.csv",
             contributions=contributions,
-            loss=1,
+            epsilon=1,
             weights=[1],
         )
         notebook_nb = convert_py_to_nb(notebook_py)
@@ -67,7 +67,7 @@ def results_server(input, output, session):  # pragma: no cover
         notebook_py = make_notebook_py(
             csv_path="todo.csv",
             contributions=contributions,
-            loss=1,
+            epsilon=1,
             weights=[1],
         )
         notebook_nb = convert_py_to_nb(notebook_py, execute=True)

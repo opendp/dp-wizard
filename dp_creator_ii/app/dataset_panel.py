@@ -4,7 +4,7 @@ from shiny import ui, reactive, render
 
 from dp_creator_ii.utils.argparse_helpers import get_csv_contrib_from_cli
 from dp_creator_ii.app.components.outputs import output_code_sample, demo_tooltip
-from dp_creator_ii.utils.template import make_privacy_unit_block
+from dp_creator_ii.utils.templates import make_privacy_unit_block
 
 
 def dataset_ui():
@@ -31,7 +31,7 @@ def dataset_ui():
             contributions,
         ),
         ui.output_ui("python_tooltip_ui"),
-        output_code_sample("unit_of_privacy_python"),
+        output_code_sample("Unit of Privacy", "unit_of_privacy_python"),
         ui.input_action_button("go_to_analysis", "Define analysis"),
         value="dataset_panel",
     )

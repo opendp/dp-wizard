@@ -43,7 +43,8 @@ def _get_args():
     Namespace(csv_path=None, contributions=1, demo=False)
     """
     arg_parser = _get_arg_parser()
-    if "--port" in argv or "-v" in argv or "-k" in argv:
+
+    if "pytest" in argv[0] or ("shiny" in argv[0] and "run" == argv[1]):
         # We are running a test,
         # and ARGV is polluted, so override:
         return arg_parser.parse_args([])

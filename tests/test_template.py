@@ -4,7 +4,7 @@ from pathlib import Path
 import re
 import pytest
 import opendp.prelude as dp
-from dp_creator_ii.utils.template import _Template, make_notebook_py, make_script_py
+from dp_creator_ii.utils.templates import _Template, make_notebook_py, make_script_py
 
 
 fake_csv = "tests/fixtures/fake.csv"
@@ -12,7 +12,7 @@ fake_csv = "tests/fixtures/fake.csv"
 
 def test_param_conflict():
     with pytest.raises(Exception, match=r"mutually exclusive"):
-        _Template("context.py", template="Not allowed if path present")
+        _Template("context", template="Not allowed if path present")
 
 
 def test_fill_expressions():
@@ -79,12 +79,12 @@ with fake:
 
 
 def test_fill_template_unfilled_slots():
-    context_template = _Template("context.py")
+    context_template = _Template("context")
     with pytest.raises(
         Exception,
         match=re.escape(
             "context.py has unfilled slots: "
-            "CSV_PATH, LOSS, PRIVACY_UNIT_BLOCK, WEIGHTS"
+            "CSV_PATH, PRIVACY_LOSS_BLOCK, PRIVACY_UNIT_BLOCK, WEIGHTS"
         ),
     ):
         str(context_template.fill_values())
@@ -94,7 +94,7 @@ def test_make_notebook():
     notebook = make_notebook_py(
         csv_path=fake_csv,
         contributions=1,
-        loss=1,
+        epsilon=1,
         weights=[1],
     )
     globals = {}
@@ -105,7 +105,7 @@ def test_make_notebook():
 def test_make_script():
     script = make_script_py(
         contributions=1,
-        loss=1,
+        epsilon=1,
         weights=[1],
     )
 

@@ -31,7 +31,7 @@ def test_app(page: Page, app: ShinyAppProc):  # pragma: no cover
     expect_not_visible(perform_analysis_text)
     expect_not_visible(download_results_text)
     page.get_by_label("Contributions").fill("42")
-    page.get_by_text("Code sample").click()
+    page.get_by_text("Code sample: Unit of Privacy").click()
     expect_visible("dp.unit_of(contributions=42)")
     expect_no_error()
 
@@ -49,6 +49,17 @@ def test_app(page: Page, app: ShinyAppProc):  # pragma: no cover
     expect_visible("class_year")
     expect_visible("hw_number")
     expect_visible("grade")
+    # Epsilon slider:
+    # (Note: Slider tests failed on CI when run after column details,
+    # although it worked locally. This works in either environment.
+    # Maybe a race condition?)
+    expect_visible("0.1")
+    expect_visible("10.0")
+    expect_visible("Epsilon: 1.0")
+    page.locator(".irs-bar").click()
+    expect_visible("Epsilon: 0.316")
+    page.locator(".irs-bar").click()
+    expect_visible("Epsilon: 0.158")
     # Set column details:
     page.get_by_label("grade").check()
     page.get_by_label("Min").click()
@@ -57,15 +68,7 @@ def test_app(page: Page, app: ShinyAppProc):  # pragma: no cover
     page.get_by_label("Max").fill("100")
     page.get_by_label("Bins").click()
     page.get_by_label("Bins").fill("20")
-    page.get_by_label("Weight").select_option("8")
-    # Epsilon slider:
-    expect_visible("0.1")
-    expect_visible("10.0")
-    expect_visible("Epsilon: 1.0")
-    page.locator(".irs-bar").click()
-    expect_visible("Epsilon: 0.316")
-    page.locator(".irs-bar").click()
-    expect_visible("Epsilon: 0.158")
+    page.get_by_label("Weight").select_option("1")
     expect_no_error()
 
     # -- Download results --

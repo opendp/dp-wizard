@@ -1,10 +1,13 @@
 from pathlib import Path
+import logging
 
 from shiny import App, ui, reactive
 
 from dp_creator_ii.utils.argparse_helpers import get_csv_contrib_from_cli
 from dp_creator_ii.app import analysis_panel, dataset_panel, results_panel
 
+
+logging.basicConfig(level=logging.INFO)
 
 app_ui = ui.page_bootstrap(
     ui.head_content(ui.include_css(Path(__file__).parent / "css" / "styles.css")),
@@ -40,6 +43,7 @@ def server(input, output, session):  # pragma: no cover
         output,
         session,
         csv_path=csv_path,
+        contributions=contributions,
         is_demo=is_demo,
     )
     results_panel.results_server(input, output, session)

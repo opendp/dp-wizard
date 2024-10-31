@@ -51,8 +51,7 @@ Your browser should open and connect you to the application.
 
 Tests should pass, and code coverage should be complete (except blocks we explicitly ignore):
 ```shell
-$ coverage run -m pytest -v
-$ coverage report
+$ ./ci.sh
 ```
 
 We're using [Playwright](https://playwright.dev/python/) for end-to-end tests. You can use it to [generate test code](https://playwright.dev/python/docs/codegen-intro) just by interacting with the app in a browser:
@@ -63,8 +62,14 @@ $ playwright codegen http://127.0.0.1:8000/
 
 You can also [step through these tests](https://playwright.dev/python/docs/running-tests#debugging-tests) and see what the browser sees:
 ```shell
-$ PWDEBUG=1 pytest
+$ PWDEBUG=1 pytest -k test_app
 ```
+
+If Playwright fails in CI, we can still see what went wrong:
+- Scroll to the end of the CI log, to `actions/upload-artifact`.
+- Download the zipped artifact locally.
+- Inside the zipped artifact will be _another_ zip: `trace.zip`.
+- Don't unzip it! Instead, open it with [trace.playwright.dev](https://trace.playwright.dev/).
 
 ### Conventions
 
@@ -72,3 +77,43 @@ Branch names should be of the form `NNNN-short-description`, where `NNNN` is the
 
 Dependencies should be pinned for development, but not pinned when the package is installed.
 New dev dependencies can be added to `requirements-dev.in`, and then run `pip-compile requirements-dev.in` to update `requirements-dev.txt`
+
+A Github [project board](https://github.com/orgs/opendp/projects/10/views/2) provides an overview of the issues and PRs.
+
+```mermaid
+graph TD
+    subgraph Pending
+        %% We only get one auto-add workflow with the free plan.
+        %% https://docs.github.com/en/issues/planning-and-tracking-with-projects/automating-your-project/adding-items-automatically
+        Issue-New
+        PR-New-or-Changes
+    end
+    %% subgraph In Progress
+        %% How should this be used?
+        %% Can it be automated
+    %% end
+    subgraph Ready for Review
+        PR-for-Review
+    end
+    subgraph In Review
+        PR-in-Review --> PR-Approved
+    end
+    subgraph Done
+        Issue-Closed
+        PR-Merged
+        PR-Closed
+    end
+    PR-New-or-Changes -->|manual| PR-for-Review
+    PR-for-Review -->|manual| PR-in-Review
+    Issue-New -->|auto| Issue-Closed
+    PR-New-or-Changes -->|auto| PR-Closed
+    PR-for-Review -->|auto| PR-Closed
+    PR-in-Review -->|auto| PR-Closed
+    PR-for-Review -->|manual| PR-New-or-Changes
+    PR-in-Review -->|auto| PR-New-or-Changes
+    PR-Approved -->|auto| PR-Merged
+```
+- For `manual` transitions, the status of the issue or PR will need to be updated by hand, either on the issue, or by dragging between columns on the board.
+- For `auto` transitions, some other action (for example, approving a PR) should trigger a [workflow](https://github.com/orgs/opendp/projects/10/workflows).
+- These are the only the states that matter. Whether PR is a draft or has assignees does not matter.
+- If we need anything more than this, we should consider a paid plan, so that we have access to more workflows.

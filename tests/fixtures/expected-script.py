@@ -9,10 +9,12 @@ dp.enable_features("contrib")
 def get_context(csv_path):
     privacy_unit = dp.unit_of(contributions=1)
 
+    privacy_loss = dp.loss_of(epsilon=1, delta=1e-7)
+
     context = dp.Context.compositor(
         data=pl.scan_csv(csv_path, encoding="utf8-lossy"),
         privacy_unit=privacy_unit,
-        privacy_loss=dp.loss_of(epsilon=1),
+        privacy_loss=privacy_loss,
         split_by_weights=[1],
     )
 
