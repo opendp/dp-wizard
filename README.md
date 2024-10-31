@@ -43,7 +43,7 @@ $ playwright install
 Now install the application itself and run it:
 ```shell
 $ flit install --symlink
-$ dp-creator-ii
+$ .venv/bin/dp-creator-ii
 ```
 Your browser should open and connect you to the application.
 
