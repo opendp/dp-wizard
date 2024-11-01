@@ -25,29 +25,32 @@ def ctrl_c_reminder():  # pragma: no cover
     print("Session ended (Press CTRL+C to quit)")
 
 
-def server(input, output, session):  # pragma: no cover
-    (csv_path_from_cli, contributions_from_cli, is_demo) = get_csv_contrib_from_cli()
-    csv_path = reactive.value(csv_path_from_cli)
-    contributions = reactive.value(contributions_from_cli)
+def make_server_from_cli_info(cli_info):
+    def server(input, output, session):  # pragma: no cover
+        (csv_path_from_cli, contributions_from_cli, is_demo) = cli_info
+        csv_path = reactive.value(csv_path_from_cli)
+        contributions = reactive.value(contributions_from_cli)
 
-    dataset_panel.dataset_server(
-        input,
-        output,
-        session,
-        csv_path=csv_path,
-        contributions=contributions,
-        is_demo=is_demo,
-    )
-    analysis_panel.analysis_server(
-        input,
-        output,
-        session,
-        csv_path=csv_path,
-        contributions=contributions,
-        is_demo=is_demo,
-    )
-    results_panel.results_server(input, output, session)
-    session.on_ended(ctrl_c_reminder)
+        dataset_panel.dataset_server(
+            input,
+            output,
+            session,
+            csv_path=csv_path,
+            contributions=contributions,
+            is_demo=is_demo,
+        )
+        analysis_panel.analysis_server(
+            input,
+            output,
+            session,
+            csv_path=csv_path,
+            contributions=contributions,
+            is_demo=is_demo,
+        )
+        results_panel.results_server(input, output, session)
+        session.on_ended(ctrl_c_reminder)
+
+    return server
 
 
-app = App(app_ui, server)
+app = App(app_ui, make_server_from_cli_info(get_csv_contrib_from_cli()))
