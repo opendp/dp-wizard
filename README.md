@@ -71,6 +71,8 @@ If Playwright fails in CI, we can still see what went wrong:
 - Inside the zipped artifact will be _another_ zip: `trace.zip`.
 - Don't unzip it! Instead, open it with [trace.playwright.dev](https://trace.playwright.dev/).
 
+For more details, see the [TEST-PLAN](TEST-PLAN.md).
+
 ### Conventions
 
 Branch names should be of the form `NNNN-short-description`, where `NNNN` is the issue number being addressed.
