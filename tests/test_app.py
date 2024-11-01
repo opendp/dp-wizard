@@ -5,12 +5,12 @@ from playwright.sync_api import Page, expect
 from shiny.pytest import create_app_fixture
 
 
-app = create_app_fixture("../dp_creator_ii/app/__init__.py")
+default_app = create_app_fixture(Path(__file__).parent / "fixtures/default_app.py")
 
 
 # TODO: Why is incomplete coverage reported here?
 # https://github.com/opendp/dp-creator-ii/issues/18
-def test_app(page: Page, app: ShinyAppProc):  # pragma: no cover
+def test_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     pick_dataset_text = "How many rows of the CSV"
     perform_analysis_text = "Select numeric columns of interest"
     download_results_text = "You can now make a differentially private release"
@@ -25,7 +25,7 @@ def test_app(page: Page, app: ShinyAppProc):  # pragma: no cover
         expect(page.locator(".shiny-output-error")).not_to_be_attached()
 
     # -- Select dataset --
-    page.goto(app.url)
+    page.goto(default_app.url)
     expect(page).to_have_title("DP Creator II")
     expect_visible(pick_dataset_text)
     expect_not_visible(perform_analysis_text)
