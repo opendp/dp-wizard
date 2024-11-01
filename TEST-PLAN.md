@@ -5,21 +5,21 @@ Use the Test Plan document to describe the testing approach and overall framewor
 ***Template Instructions***
 *Note that the information in italics is guidelines for documenting testing efforts and activities.  To adopt this template, delete all italicized instructions and modify as appropriate*
 
-1. # **Introduction** {#introduction}
+# **Introduction** {#introduction}
 
-   1. ##   **Purpose** {#purpose}
+##   **Purpose** {#purpose}
 
 *Provide a summary of the test strategy, test approach, execution strategy and test management.*
 
 Automate the end-to-end functionality of the DP-Creator-II application to ensure it meets user requirements and maintains reliability, especially in the context of privacy-preserving data processing.
 
-2. ##   **Project Overview** {#project-overview}
+##   **Project Overview** {#project-overview}
 
 *A summary of the project, product, solution being tested.*
 
-2. #   **Scope** {#scope}
+#   **Scope** {#scope}
 
-   1. ##   **In-Scope** {#in-scope}
+##   **In-Scope** {#in-scope}
 
 *Describes what is being tested, such as all the functions/features of a specific project/product/solution.*
 
@@ -28,7 +28,7 @@ Automate the end-to-end functionality of the DP-Creator-II application to ensure
 \- UI elements related to data privacy settings
  \- Data export functionalities
 
-2. ##   **Out-of-Scope** {#out-of-scope}
+##   **Out-of-Scope** {#out-of-scope}
 
 *Identify all features and combinations of features which will not be tested and the reasons.*
 
@@ -36,9 +36,9 @@ Automate the end-to-end functionality of the DP-Creator-II application to ensure
      \- Non-functional UI aspects not directly related to functionality
      \- External API integrations that are mocked in this environment
 
-3. #   **Testing Strategy** {#testing-strategy}
+#   **Testing Strategy** {#testing-strategy}
 
-   1. ##   **Test Objectives** {#test-objectives}
+##   **Test Objectives** {#test-objectives}
 
 *Describe the objectives.  Define tasks and responsibilities.*
 
@@ -47,11 +47,11 @@ Automate the end-to-end functionality of the DP-Creator-II application to ensure
    \- Verify UI responsiveness and behavior on supported devices.
    \- Conduct regression testing to maintain code stability with new updates.
 
-2. ##   **Test Assumptions** {#test-assumptions}
+##   **Test Assumptions** {#test-assumptions}
 
 *List the key assumptions of the project and the test plan.*
 
-3. ##   **Data Approach** {#data-approach}
+##   **Data Approach** {#data-approach}
 
  *Describe the approach on the test data maintained in QA environments for functional and user acceptance testing.*
 
@@ -59,21 +59,21 @@ Automate the end-to-end functionality of the DP-Creator-II application to ensure
      \- Implement data mocks for complex scenarios.
      \- Develop data validation utilities to check outputs.
 
-4. ##   **Automation Strategy** {#automation-strategy}
+##   **Automation Strategy** {#automation-strategy}
 
      \- Smoke Testing: Quick, high-level test cases to ensure critical paths work.
      \- Regression Testing: Re-running existing tests to validate the latest changes.
      \- E2E Testing: Testing all primary workflows from start to finish.
 
-5. ##   **Test Case Prioritization** {#test-case-prioritization}
+##   **Test Case Prioritization** {#test-case-prioritization}
 
      \- High priority for critical features like data processing workflows and privacy configurations.
      \- Moderate priority for UI/UX elements like buttons, forms, and navigation.
      \- Lower priority for non-critical paths or backend validations covered in unit tests.
 
-4. # **Execution Strategy** {#execution-strategy}
+# **Execution Strategy** {#execution-strategy}
 
-   1. ##   **Entry Criteria** {#entry-criteria}
+##   **Entry Criteria** {#entry-criteria}
 
 * *The entry criteria refer to the desirable conditions in order to start test execution*
 * *Entry criteria are flexible benchmarks. If they are not met, the test team will assess the risk, identify mitigation actions and provide a recommendation.*
@@ -86,7 +86,7 @@ Automate the end-to-end functionality of the DP-Creator-II application to ensure
 | *Development has completed unit testing* |  | ![C:\\Users\\arxp\\AppData\\Local\\Microsoft\\Windows\\Temporary Internet Files\\Content.IE5\\7F9Z3IW4\\MC900441310\[1\].png][image1] |  |
 | *Test scripts are completed, reviewed and approved by the Project Team* | ![C:\\Users\\arxp\\AppData\\Local\\Microsoft\\Windows\\Temporary Internet Files\\Content.IE5\\7F9Z3IW4\\MC900441310\[1\].png][image1] | ![C:\\Users\\arxp\\AppData\\Local\\Microsoft\\Windows\\Temporary Internet Files\\Content.IE5\\7F9Z3IW4\\MC900441310\[1\].png][image1] |  |
 
-  2. ##   **Exit criteria** {#exit-criteria}
+##   **Exit criteria** {#exit-criteria}
 
 * *The exit criteria are the desirable conditions that need to be met in order proceed with the implementation.*
 * *Exit criteria are flexible benchmarks. If they are not met, the test team will assess the risk, identify mitigation actions and provide a recommendation.*
@@ -102,7 +102,7 @@ Automate the end-to-end functionality of the DP-Creator-II application to ensure
 | *All defects logged in  Defect Tracker/Spreadsheet* | ![C:\\Users\\arxp\\AppData\\Local\\Microsoft\\Windows\\Temporary Internet Files\\Content.IE5\\7F9Z3IW4\\MC900441310\[1\].png][image1] |  |  |
 | *Test environment cleanup completed and a new back up of the environment* |  | ![C:\\Users\\arxp\\AppData\\Local\\Microsoft\\Windows\\Temporary Internet Files\\Content.IE5\\7F9Z3IW4\\MC900441310\[1\].png][image1] |  |
 
-  3. ##   **Validation and Defect Management** {#validation-and-defect-management}
+##   **Validation and Defect Management** {#validation-and-defect-management}
 
 * *Specify how test cases/test scenarios should be validated*
 * *Specify how defect should be managed*
@@ -119,9 +119,9 @@ Defects found during the Testing should be categorized as below:
 | *3 (Medium)* | *Functionality issues but there is workaround for achieving the desired functionality* |
 | *4 (Low)* | *Unclear error message or cosmetic error which has minimum impact on product use.* |
 
-5. # **Github Workflow** {#github-workflow}
+# **Github Workflow** {#github-workflow}
 
-   1. ##   **Issue Submission and Prioritization**  {#issue-submission-and-prioritization}
+##   **Issue Submission and Prioritization**  {#issue-submission-and-prioritization}
 
 Bugs and feature requests are tracked in GitHub, and issues are prioritized based on their impact and urgency. Issues should be categorized into sprint goals for more efficient tracking.
 
@@ -130,7 +130,7 @@ Bugs and feature requests are tracked in GitHub, and issues are prioritized base
   \- Assign priority based on criticality, risk, and user impact.
   \- Assign issues to the current sprint or defer to future sprints if necessary.
 
-2. ##   **Pull Request Review and Testing** {#pull-request-review-and-testing}
+##   **Pull Request Review and Testing** {#pull-request-review-and-testing}
 
 QA starts with a smoke test on the PR branch. Additional functional and regression testing is done based on the feature or fix included in the PR.
 \- PR Testing:
@@ -140,7 +140,7 @@ QA starts with a smoke test on the PR branch. Additional functional and regressi
   \- Review server logs for any errors during testing.
   \- Test both the default and alternate configurations for features requiring setup.
 
-3. ##   **Continuous Integration and Deployment** {#continuous-integration-and-deployment}
+##   **Continuous Integration and Deployment** {#continuous-integration-and-deployment}
 
 Continuous integration ensures that tests run automatically with each code change. Dataverse’s Jenkins server should be used to run automated tests, while GitHub Actions provide additional automation for builds and deployments.
 
@@ -150,9 +150,9 @@ Continuous integration ensures that tests run automatically with each code chang
   \- Validate each PR’s test results through Jenkins' "Test Result" page.
   \- If tests fail, report the issue to the developer immediately for resolution
 
-6. # **Environment Requirements** {#environment-requirements}
+# **Environment Requirements** {#environment-requirements}
 
-   1. ##   **Dataverse-Internal Environment** {#dataverse-internal-environment}
+##   **Dataverse-Internal Environment** {#dataverse-internal-environment}
 
 A staging environment (\`dataverse-internal.iq.harvard.edu\`) is used to deploy and test PRs. This environment replicates production but should be limited to QA purposes. AWS instances may also be utilized for additional testing environments.
 
@@ -161,11 +161,11 @@ A staging environment (\`dataverse-internal.iq.harvard.edu\`) is used to deploy 
   \- Validate deployment success by checking the homepage for the correct build version.
   \- Run smoke tests immediately after deployment.
 
-2. ##   **AWS-Based Environments** {#aws-based-environments}
+##   **AWS-Based Environments** {#aws-based-environments}
 
 For complex testing scenarios (e.g., multiple concurrent testers or heavy load testing), spinning up EC2 instances with sample data can be useful. Persistent AWS instances may be configured for this purpose.
 
-7. # **Significantly Impacted Division/College/Department** {#significantly-impacted-division/college/department}
+# **Significantly Impacted Division/College/Department** {#significantly-impacted-division/college/department}
 
 | Business Area | Business Manager | Tester(s) |
 | ----- | ----- | ----- |
@@ -173,7 +173,7 @@ For complex testing scenarios (e.g., multiple concurrent testers or heavy load t
 |  |  |  |
 |  |  |  |
 
-8. # **Dependencies** {#dependencies}
+# **Dependencies** {#dependencies}
 
 *Identify any dependencies on testing, such as test-item availability, testing-resource availability, and deadlines.*
 
