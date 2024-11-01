@@ -5,57 +5,6 @@ Use the Test Plan document to describe the testing approach and overall framewor
 ***Template Instructions***
 *Note that the information in italics is guidelines for documenting testing efforts and activities.  To adopt this template, delete all italicized instructions and modify as appropriate*
 
-Table of Contents
-[1	Introduction	3](#introduction)
-
-[1.1	Purpose	3](#purpose)
-
-[1.2	Project Overview	3](#project-overview)
-
-[2	Scope	3](#scope)
-
-[2.1	In-Scope	3](#in-scope)
-
-[2.2	Out-of-Scope	3](#out-of-scope)
-
-[3	Testing Strategy	3](#testing-strategy)
-
-[3.1	Test Objectives	3](#test-objectives)
-
-[3.2	Test Assumptions	4](#test-assumptions)
-
-[3.3	Data Approach	4](#data-approach)
-
-[3.4	Automation Strategy	4](#automation-strategy)
-
-[3.5	Test Case Prioritization	4](#test-case-prioritization)
-
-[4	Execution Strategy	4](#execution-strategy)
-
-[4.1	Entry Criteria	4](#entry-criteria)
-
-[4.2	Exit criteria	5](#exit-criteria)
-
-[4.3	Validation and Defect Management	5](#validation-and-defect-management)
-
-[5	Github Workflow	6](#github-workflow)
-
-[5.1	Issue Submission and Prioritization	6](#issue-submission-and-prioritization)
-
-[5.2	Pull Request Review and Testing	6](#pull-request-review-and-testing)
-
-[5.3	Continuous Integration and Deployment	6](#continuous-integration-and-deployment)
-
-[6	Environment Requirements	7](#environment-requirements)
-
-[6.1	Dataverse-Internal Environment	7](#dataverse-internal-environment)
-
-[6.2	AWS-Based Environments	7](#aws-based-environments)
-
-[7	Significantly Impacted Division/College/Department	7](#significantly-impacted-division/college/department)
-
-[8	Dependencies	7](#dependencies)
-
 1. # **Introduction** {#introduction}
 
    1. ##   **Purpose** {#purpose}
