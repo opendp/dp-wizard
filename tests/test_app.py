@@ -7,6 +7,8 @@ from shiny.pytest import create_app_fixture
 
 demo_app = create_app_fixture(Path(__file__).parent / "fixtures/demo_app.py")
 default_app = create_app_fixture(Path(__file__).parent / "fixtures/default_app.py")
+tooltip = "#choose_csv_demo_tooltip_ui svg"
+for_the_demo = "For the demo, we'll imagine"
 
 
 # TODO: Why is incomplete coverage reported here?
@@ -14,6 +16,9 @@ default_app = create_app_fixture(Path(__file__).parent / "fixtures/default_app.p
 def test_demo_app(page: Page, demo_app: ShinyAppProc):  # pragma: no cover
     page.goto(demo_app.url)
     expect(page).to_have_title("DP Creator II")
+    expect(page.get_by_text(for_the_demo)).not_to_be_visible()
+    page.locator(tooltip).hover()
+    expect(page.get_by_text(for_the_demo)).to_be_visible()
 
 
 def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
@@ -33,6 +38,7 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     # -- Select dataset --
     page.goto(default_app.url)
     expect(page).to_have_title("DP Creator II")
+    expect(page.locator(tooltip)).to_have_count(0)
     expect_visible(pick_dataset_text)
     expect_not_visible(perform_analysis_text)
     expect_not_visible(download_results_text)
