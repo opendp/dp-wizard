@@ -27,6 +27,9 @@ options:
 
 ## Development
 
+This is the first project we've developed with Python Shiny,
+so let's remember [what we learned](WHAT-WE-LEARNED.md) along the way.
+
 ### Getting Started
 
 To get started, clone the repo and install dev dependencies in a virtual environment:
