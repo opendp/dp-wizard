@@ -3,7 +3,7 @@ import logging
 
 from shiny import App, ui, reactive
 
-from dp_creator_ii.utils.argparse_helpers import get_csv_contrib_from_cli
+from dp_creator_ii.utils.argparse_helpers import get_cli_info
 from dp_creator_ii.app import analysis_panel, dataset_panel, results_panel
 
 
@@ -27,9 +27,8 @@ def ctrl_c_reminder():  # pragma: no cover
 
 def make_server_from_cli_info(cli_info):
     def server(input, output, session):  # pragma: no cover
-        (csv_path_from_cli, contributions_from_cli, is_demo) = cli_info
-        csv_path = reactive.value(csv_path_from_cli)
-        contributions = reactive.value(contributions_from_cli)
+        csv_path = reactive.value(cli_info.csv_path)
+        contributions = reactive.value(cli_info.contributions)
 
         dataset_panel.dataset_server(
             input,
@@ -37,7 +36,7 @@ def make_server_from_cli_info(cli_info):
             session,
             csv_path=csv_path,
             contributions=contributions,
-            is_demo=is_demo,
+            is_demo=cli_info.is_demo,
         )
         analysis_panel.analysis_server(
             input,
@@ -45,7 +44,7 @@ def make_server_from_cli_info(cli_info):
             session,
             csv_path=csv_path,
             contributions=contributions,
-            is_demo=is_demo,
+            is_demo=cli_info.is_demo,
         )
         results_panel.results_server(input, output, session)
         session.on_ended(ctrl_c_reminder)
@@ -53,4 +52,4 @@ def make_server_from_cli_info(cli_info):
     return server
 
 
-app = App(app_ui, make_server_from_cli_info(get_csv_contrib_from_cli()))
+app = App(app_ui, make_server_from_cli_info(get_cli_info()))

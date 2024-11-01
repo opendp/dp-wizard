@@ -2,14 +2,16 @@ from pathlib import Path
 
 from shiny import ui, reactive, render
 
-from dp_creator_ii.utils.argparse_helpers import get_csv_contrib_from_cli
+from dp_creator_ii.utils.argparse_helpers import get_cli_info
 from dp_creator_ii.app.components.outputs import output_code_sample, demo_tooltip
 from dp_creator_ii.utils.templates import make_privacy_unit_block
 
 
 def dataset_ui():
-    (csv_path, contributions, is_demo) = get_csv_contrib_from_cli()
-    csv_placeholder = None if csv_path is None else Path(csv_path).name
+    cli_info = get_cli_info()
+    csv_placeholder = (
+        None if cli_info.csv_path is None else Path(cli_info.csv_path).name
+    )
 
     return ui.nav_panel(
         "Select Dataset",
@@ -28,7 +30,7 @@ def dataset_ui():
         ui.input_numeric(
             "contributions",
             ["Contributions", ui.output_ui("contributions_demo_tooltip_ui")],
-            contributions,
+            cli_info.contributions,
         ),
         ui.output_ui("python_tooltip_ui"),
         output_code_sample("Unit of Privacy", "unit_of_privacy_python"),
