@@ -2,6 +2,14 @@
 
 Even if it seems obvious in retrospect, what have we learned about Python Shiny in this project?
 
+## No warning if ID mismatch
+
+Unless I'm missing something, there doesn't seem to be any warning when there isn't a matching function name in the server for an ID in the UI. Either from typos, or fumbling some more complicated display logic, there have been times where this could have been helpful.
+
+## UI and Server functions don't really separate concerns
+
+My first impression was that the UI function would be something like a "view" and the server would be a "controller", but for any kind of conditional display I need a `render.ui`, so that distinction breaks down quickly.
+
 ## Refactoring: values vs. reactive values
 
 A couple times I've started with something as a plain value, and then realized I needed a reactive value. This gets confusing if there are merge conflicts, or if some variables are reactive, and some aren't.
