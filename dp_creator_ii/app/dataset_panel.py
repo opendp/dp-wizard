@@ -32,7 +32,11 @@ def dataset_ui():
         ),
         ui.output_ui("python_tooltip_ui"),
         output_code_sample("Unit of Privacy", "unit_of_privacy_python"),
-        ui.input_action_button("go_to_analysis", "Define analysis"),
+        # Button enabled on page load if demo;
+        # Otherwise, wait for CSV to be specified.
+        ui.input_action_button(
+            "go_to_analysis", "Define analysis", disabled=(not is_demo)
+        ),
         value="dataset_panel",
     )
 
@@ -44,6 +48,7 @@ def dataset_server(
     @reactive.event(input.csv_path)
     def _on_csv_path_change():
         csv_path.set(input.csv_path()[0]["datapath"])
+        ui.update_action_button("go_to_analysis", disabled=False)
 
     @reactive.effect
     @reactive.event(input.contributions)
