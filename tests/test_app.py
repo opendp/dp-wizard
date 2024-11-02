@@ -65,12 +65,18 @@ def test_app(page: Page, app: ShinyAppProc):  # pragma: no cover
     expect_visible("Epsilon: 0.316")
     page.locator(".irs-bar").click()
     expect_visible("Epsilon: 0.158")
+
+    # Button disabled until column selected:
+    download_results_button = page.get_by_role("button", name="Download results")
+    assert download_results_button.is_disabled()
+
     # Set column details:
     page.get_by_label("grade").check()
     page.get_by_label("Min").click()
     page.get_by_label("Min").fill("0")
     # TODO: All these recalculations cause timeouts:
     # It is still rerendering the graph after hitting "Download results".
+    # https://github.com/opendp/dp-creator-ii/issues/116
     # page.get_by_label("Max").click()
     # page.get_by_label("Max").fill("100")
     # page.get_by_label("Bins").click()
@@ -79,7 +85,7 @@ def test_app(page: Page, app: ShinyAppProc):  # pragma: no cover
     expect_no_error()
 
     # -- Download results --
-    page.get_by_role("button", name="Download results").click()
+    download_results_button.click()
     expect_not_visible(pick_dataset_text)
     expect_not_visible(perform_analysis_text)
     expect_visible(download_results_text)
