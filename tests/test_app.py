@@ -35,12 +35,17 @@ def test_app(page: Page, app: ShinyAppProc):  # pragma: no cover
     expect_visible("dp.unit_of(contributions=42)")
     expect_no_error()
 
+    # Button disabled until upload:
+    define_analysis_button = page.get_by_role("button", name="Define analysis")
+    assert define_analysis_button.is_disabled()
+
+    # Now upload:
     csv_path = Path(__file__).parent / "fixtures" / "fake.csv"
     page.get_by_label("Choose CSV file").set_input_files(csv_path.resolve())
     expect_no_error()
 
     # -- Define analysis --
-    page.get_by_role("button", name="Define analysis").click()
+    define_analysis_button.click()
     expect_not_visible(pick_dataset_text)
     expect_visible(perform_analysis_text)
     expect_not_visible(download_results_text)
