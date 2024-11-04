@@ -29,6 +29,7 @@ def dataset_ui():
             "contributions",
             ["Contributions", ui.output_ui("contributions_demo_tooltip_ui")],
             contributions,
+            min=1,
         ),
         ui.output_ui("python_tooltip_ui"),
         output_code_sample("Unit of Privacy", "unit_of_privacy_python"),
@@ -44,12 +45,19 @@ def dataset_server(
     @reactive.event(input.csv_path)
     def _on_csv_path_change():
         csv_path.set(input.csv_path()[0]["datapath"])
-        button_enabled.set(True)
 
     @reactive.effect
     @reactive.event(input.contributions)
     def _on_contributions_change():
         contributions.set(input.contributions())
+
+    @reactive.calc
+    def button_enabled():
+        contributions_is_set = input.contributions() is not None
+        csv_path_is_set = (
+            input.csv_path() is not None and len(input.csv_path()) > 0
+        ) or is_demo
+        return contributions_is_set and csv_path_is_set
 
     @render.ui
     def choose_csv_demo_tooltip_ui():
@@ -77,10 +85,6 @@ def dataset_server(
             "for the entire calculation.",
         )
 
-    # Button enabled on load if demo;
-    # Otherwise, wait for CSV to be specified.
-    button_enabled = reactive.value(is_demo)
-
     @render.ui
     def define_analysis_button_ui():
         button = ui.input_action_button(
@@ -90,7 +94,7 @@ def dataset_server(
             return button
         return [
             button,
-            "Choose CSV before proceeding.",
+            "Choose CSV and Contributions before proceeding.",
         ]
 
     @render.code
