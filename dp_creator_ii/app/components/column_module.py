@@ -11,8 +11,8 @@ from dp_creator_ii.app.components.outputs import output_code_sample
 @module.ui
 def column_ui():  # pragma: no cover
     return [
-        ui.input_numeric("min", "Min", 0),
-        ui.input_numeric("max", "Max", 10),
+        ui.input_numeric("lower", "Lower", 0),
+        ui.input_numeric("upper", "Upper", 10),
         ui.input_numeric("bins", "Bins", 10),
         ui.input_select(
             "weight",
@@ -27,7 +27,7 @@ def column_ui():  # pragma: no cover
         output_code_sample("Column Definition", "column_code"),
         ui.markdown(
             "This simulation assumes a normal distribution "
-            "between the specified min and max. "
+            "between the specified lower and upper bounds. "
             "Your data file has not been read except to determine the columns."
         ),
         ui.output_plot("column_plot"),
@@ -53,8 +53,8 @@ def column_server(
     @reactive.calc
     def column_config():
         return {
-            "min": input.min(),
-            "max": input.max(),
+            "lower": input.lower(),
+            "upper": input.upper(),
             "bins": input.bins(),
             "weight": float(input.weight()),
         }
@@ -64,16 +64,16 @@ def column_server(
         config = column_config()
         return make_column_config_block(
             name=name,
-            min_value=config["min"],
-            max_value=config["max"],
+            lower_bound=config["lower"],
+            upper_bound=config["upper"],
             bin_count=config["bins"],
         )
 
     @render.plot()
     def column_plot():
         config = column_config()
-        min_x = config["min"]
-        max_x = config["max"]
+        lower_x = config["lower"]
+        upper_x = config["upper"]
         bin_count = config["bins"]
         weight = config["weight"]
         weights_sum = get_weights_sum()
@@ -83,8 +83,8 @@ def column_server(
             # Exit early to avoid divide-by-zero.
             return None
         _confidence, accuracy, histogram = make_confidence_accuracy_histogram(
-            lower=min_x,
-            upper=max_x,
+            lower=lower_x,
+            upper=upper_x,
             bin_count=bin_count,
             contributions=contributions,
             weighted_epsilon=epsilon * weight / weights_sum,

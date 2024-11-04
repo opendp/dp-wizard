@@ -143,12 +143,12 @@ def make_privacy_loss_block(epsilon):
     return str(_Template("privacy_loss").fill_values(EPSILON=epsilon))
 
 
-def make_column_config_block(name, min_value, max_value, bin_count):
+def make_column_config_block(name, lower_bound, upper_bound, bin_count):
     """
     >>> print(make_column_config_block(
     ...     name="HW GRADE",
-    ...     min_value=0,
-    ...     max_value=100,
+    ...     lower_bound=0,
+    ...     upper_bound=100,
     ...     bin_count=10
     ... ))
     # From the public information, determine the bins:
@@ -171,8 +171,8 @@ def make_column_config_block(name, min_value, max_value, bin_count):
             POLARS_CONFIG_NAME=f"{snake_name}_config",
         )
         .fill_values(
-            MIN=min_value,
-            MAX=max_value,
+            LOWER_BOUND=lower_bound,
+            UPPER_BOUND=upper_bound,
             BINS=bin_count,
             COLUMN_NAME=name,
             BIN_COLUMN_NAME=f"{snake_name}_bin",

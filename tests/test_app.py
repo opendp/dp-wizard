@@ -74,8 +74,8 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     expect_visible("Epsilon: 0.158")
     # Set column details:
     page.get_by_label("grade").check()
-    page.get_by_label("Min").click()
-    page.get_by_label("Min").fill("0")
+    page.get_by_label("Lower").click()
+    page.get_by_label("Lower").fill("0")
     # TODO: All these recalculations cause timeouts:
     # It is still rerendering the graph after hitting "Download results".
     # page.get_by_label("Max").click()

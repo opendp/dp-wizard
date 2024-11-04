@@ -49,7 +49,7 @@ def make_confidence_accuracy_histogram(
     │ (8, 10] ┆ ... │
     └─────────┴─────┘
     """
-    # Mock data only depends on min and max, so it could be cached,
+    # Mock data only depends on lower and upper bounds, so it could be cached,
     # but I'd guess this is dominated by the DP operations,
     # so not worth optimizing.
     row_count = 100

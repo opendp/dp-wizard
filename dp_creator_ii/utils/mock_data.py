@@ -2,7 +2,7 @@ from collections import namedtuple
 import polars as pl
 from scipy.stats import norm  # type: ignore
 
-ColumnDef = namedtuple("ColumnDef", ["min", "max"])
+ColumnDef = namedtuple("ColumnDef", ["lower", "upper"])
 
 
 def mock_data(column_defs, row_count=1000):
@@ -34,12 +34,12 @@ def mock_data(column_defs, row_count=1000):
 
     quantile_width = 95 / 100
     for column_name, column_def in column_defs.items():
-        min_ppf = norm.ppf((1 - quantile_width) / 2)
-        max_ppf = norm.ppf(1 - (1 - quantile_width) / 2)
-        min_value = column_def.min
-        max_value = column_def.max
-        slope = (max_value - min_value) / (max_ppf - min_ppf)
-        intercept = min_value - slope * min_ppf
+        lower_ppf = norm.ppf((1 - quantile_width) / 2)
+        upper_ppf = norm.ppf(1 - (1 - quantile_width) / 2)
+        lower_bound = column_def.lower
+        upper_bound = column_def.upper
+        slope = (upper_bound - lower_bound) / (upper_ppf - lower_ppf)
+        intercept = lower_bound - slope * lower_ppf
         # Start from 1 instead of 0:
         # The polars bin intervals are closed at the top,
         # so if we include the zero, there is one value in the
