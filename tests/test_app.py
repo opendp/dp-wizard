@@ -5,12 +5,23 @@ from playwright.sync_api import Page, expect
 from shiny.pytest import create_app_fixture
 
 
-app = create_app_fixture("../dp_creator_ii/app/__init__.py")
+demo_app = create_app_fixture(Path(__file__).parent / "fixtures/demo_app.py")
+default_app = create_app_fixture(Path(__file__).parent / "fixtures/default_app.py")
+tooltip = "#choose_csv_demo_tooltip_ui svg"
+for_the_demo = "For the demo, we'll imagine"
 
 
 # TODO: Why is incomplete coverage reported here?
 # https://github.com/opendp/dp-creator-ii/issues/18
-def test_app(page: Page, app: ShinyAppProc):  # pragma: no cover
+def test_demo_app(page: Page, demo_app: ShinyAppProc):  # pragma: no cover
+    page.goto(demo_app.url)
+    expect(page).to_have_title("DP Creator II")
+    expect(page.get_by_text(for_the_demo)).not_to_be_visible()
+    page.locator(tooltip).hover()
+    expect(page.get_by_text(for_the_demo)).to_be_visible()
+
+
+def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     pick_dataset_text = "How many rows of the CSV"
     perform_analysis_text = "Select numeric columns of interest"
     download_results_text = "You can now make a differentially private release"
@@ -25,8 +36,9 @@ def test_app(page: Page, app: ShinyAppProc):  # pragma: no cover
         expect(page.locator(".shiny-output-error")).not_to_be_attached()
 
     # -- Select dataset --
-    page.goto(app.url)
+    page.goto(default_app.url)
     expect(page).to_have_title("DP Creator II")
+    expect(page.locator(tooltip)).to_have_count(0)
     expect_visible(pick_dataset_text)
     expect_not_visible(perform_analysis_text)
     expect_not_visible(download_results_text)
