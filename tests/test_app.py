@@ -78,8 +78,8 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     page.get_by_label("Lower").fill("0")
     # TODO: All these recalculations cause timeouts:
     # It is still rerendering the graph after hitting "Download results".
-    # page.get_by_label("Max").click()
-    # page.get_by_label("Max").fill("100")
+    # page.get_by_label("Upper").click()
+    # page.get_by_label("Upper").fill("100")
     # page.get_by_label("Bins").click()
     # page.get_by_label("Bins").fill("20")
     page.get_by_label("Weight").select_option("1")
