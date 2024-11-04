@@ -41,6 +41,10 @@ def analysis_server(
     contributions=None,
     is_demo=None,
 ):  # pragma: no cover
+    @reactive.calc
+    def button_enabled():
+        column_ids_selected = input.columns_checkbox_group()
+        return len(column_ids_selected) > 0
 
     weights = reactive.value({})
 
@@ -70,7 +74,6 @@ def analysis_server(
     def _on_column_set_change():
         column_ids_selected = input.columns_checkbox_group()
         clear_column_weights(column_ids_selected)
-        button_enabled.set(len(column_ids_selected) > 0)
 
     @render.ui
     def columns_ui():
@@ -116,10 +119,6 @@ def analysis_server(
     @reactive.event(input.go_to_results)
     def go_to_results():
         ui.update_navs("top_level_nav", selected="results_panel")
-
-    # Button disabled on load;
-    # Wait for column to be specified.
-    button_enabled = reactive.value(False)
 
     @render.ui
     def download_results_button_ui():
