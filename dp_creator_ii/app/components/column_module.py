@@ -10,11 +10,12 @@ from dp_creator_ii.app.components.outputs import output_code_sample
 
 @module.ui
 def column_ui():  # pragma: no cover
+    width = "10em"  # Just wide enough so the text isn't trucated.
     return ui.layout_columns(
         [
-            ui.input_numeric("min", "Min", 0),
-            ui.input_numeric("max", "Max", 10),
-            ui.input_numeric("bins", "Bins", 10),
+            ui.input_numeric("min", "Min", 0, width=width),
+            ui.input_numeric("max", "Max", 10, width=width),
+            ui.input_numeric("bins", "Bins", 10, width=width),
             ui.input_select(
                 "weight",
                 "Weight",
@@ -24,8 +25,8 @@ def column_ui():  # pragma: no cover
                     4: "More accurate",
                 },
                 selected=2,
+                width=width,
             ),
-            output_code_sample("Column Definition", "column_code"),
         ],
         [
             # TODO: This doesn't need to be repeated: could just go once at the top.
@@ -35,14 +36,14 @@ def column_ui():  # pragma: no cover
                 "Your data file has not been read except to determine the columns."
             ),
             ui.output_plot("column_plot"),
+            output_code_sample("Column Definition", "column_code"),
         ],
         col_widths={
             # Controls stay roughly a constant width;
             # Graph expands to fill space.
-            "sm": (6, 6),
-            "md": (5, 7),
-            "lg": (4, 8),
-            "xl": (3, 9),
+            "sm": (4, 8),
+            "md": (3, 9),
+            "lg": (2, 10),
         },
     )
 
