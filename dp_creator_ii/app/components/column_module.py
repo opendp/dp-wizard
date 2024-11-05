@@ -30,12 +30,14 @@ def column_ui():  # pragma: no cover
         ],
         [
             # TODO: This doesn't need to be repeated: could just go once at the top.
+            # https://github.com/opendp/dp-creator-ii/issues/138
             ui.markdown(
                 "This simulation assumes a normal distribution "
                 "between the specified min and max. "
                 "Your data file has not been read except to determine the columns."
             ),
-            ui.output_plot("column_plot"),
+            ui.output_plot("column_plot", height="300px"),
+            # Make plot smaller than default: about the same size as the other column.
             output_code_sample("Column Definition", "column_code"),
         ],
         col_widths={
