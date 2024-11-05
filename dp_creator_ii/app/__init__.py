@@ -30,23 +30,45 @@ def make_server_from_cli_info(cli_info):
         csv_path = reactive.value(cli_info.csv_path)
         contributions = reactive.value(cli_info.contributions)
 
+        lower_bounds = reactive.value({})
+        upper_bounds = reactive.value({})
+        bin_counts = reactive.value({})
+        weights = reactive.value({})
+        epsilon = reactive.value(1)
+
         dataset_panel.dataset_server(
             input,
             output,
             session,
+            is_demo=cli_info.is_demo,
             csv_path=csv_path,
             contributions=contributions,
-            is_demo=cli_info.is_demo,
         )
         analysis_panel.analysis_server(
             input,
             output,
             session,
+            is_demo=cli_info.is_demo,
             csv_path=csv_path,
             contributions=contributions,
-            is_demo=cli_info.is_demo,
+            lower_bounds=lower_bounds,
+            upper_bounds=upper_bounds,
+            bin_counts=bin_counts,
+            weights=weights,
+            epsilon=epsilon,
         )
-        results_panel.results_server(input, output, session)
+        results_panel.results_server(
+            input,
+            output,
+            session,
+            csv_path=csv_path,
+            contributions=contributions,
+            lower_bounds=lower_bounds,
+            upper_bounds=upper_bounds,
+            bin_counts=bin_counts,
+            weights=weights,
+            epsilon=epsilon,
+        )
         session.on_ended(ctrl_c_reminder)
 
     return server

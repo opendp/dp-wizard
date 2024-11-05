@@ -42,59 +42,47 @@ def column_server(
     name,
     contributions,
     epsilon,
-    set_column_lower,
-    set_column_upper,
-    set_column_bins,
-    set_column_weight,
-    get_weights_sum,
+    lower_bounds,
+    upper_bounds,
+    bin_counts,
+    weights,
 ):  # pragma: no cover
     @reactive.effect
     @reactive.event(input.min)
     def _set_lower():
-        set_column_lower(name, float(input.min()))
+        lower_bounds.set({**lower_bounds(), name: float(input.min())})
 
     @reactive.effect
     @reactive.event(input.max)
     def _set_upper():
-        set_column_upper(name, float(input.max()))
+        upper_bounds.set({**upper_bounds(), name: float(input.max())})
 
     @reactive.effect
     @reactive.event(input.bins)
     def _set_bins():
-        set_column_bins(name, float(input.bins()))
+        bin_counts.set({**bin_counts(), name: float(input.bins())})
 
     @reactive.effect
     @reactive.event(input.weight)
     def _set_weight():
-        set_column_weight(name, float(input.weight()))
-
-    @reactive.calc
-    def column_config():
-        return {
-            "min": input.min(),
-            "max": input.max(),
-            "bins": input.bins(),
-            "weight": float(input.weight()),
-        }
+        weights.set({**weights(), name: float(input.weight())})
 
     @render.code
     def column_code():
-        config = column_config()
         return make_column_config_block(
             name=name,
-            min_value=config["min"],
-            max_value=config["max"],
-            bin_count=config["bins"],
+            min_value=float(input.min()),
+            max_value=float(input.max()),
+            bin_count=int(input.bins()),
         )
 
     @render.plot()
     def column_plot():
-        config = column_config()
-        min_x = config["min"]
-        max_x = config["max"]
-        bin_count = config["bins"]
-        weight = config["weight"]
-        weights_sum = get_weights_sum()
+        min_x = float(input.min())
+        max_x = float(input.max())
+        bin_count = int(input.bins())
+        weight = float(input.weight())
+        weights_sum = sum(weights().values())
         info(f"Weight ratio for {name}: {weight}/{weights_sum}")
         if weights_sum == 0:
             # This function is triggered when column is removed;

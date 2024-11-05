@@ -29,7 +29,18 @@ def results_ui():
     )
 
 
-def results_server(input, output, session):  # pragma: no cover
+def results_server(
+    input,
+    output,
+    session,
+    csv_path,
+    contributions,
+    lower_bounds,
+    upper_bounds,
+    bin_counts,
+    weights,
+    epsilon,
+):  # pragma: no cover
     @render.download(
         filename="dp-creator-script.py",
         media_type="text/x-python",

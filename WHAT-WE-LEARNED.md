@@ -2,15 +2,21 @@
 
 Even if it seems obvious in retrospect, what have we learned about Python Shiny in this project?
 
-## No warning if ID mismatch
+## No warning if ID mismatch / type mismatch
 
 Unless I'm missing something, there doesn't seem to be any warning when there isn't a matching function name in the server for an ID in the UI. Either from typos, or fumbling some more complicated display logic, there have been times where this could have been helpful.
+
+Related: I had
+```
+ui.output_text("epsilon")
+```
+but then changed `epsilon` from `render.text` to `reactive.value` and forgot to update the UI. No warning in the logs: Spinner in the browser window.
 
 ## UI and Server functions don't really separate concerns
 
 My first impression was that the UI function would be something like a "view" and the server would be a "controller", but for any kind of conditional display I need a `render.ui`, so that distinction breaks down quickly.
 
-## Refactoring: values vs. reactive values
+## Values vs. reactive values
 
 A couple times I've started with something as a plain value, and then realized I needed a reactive value. This gets confusing if there are merge conflicts, or if some variables are reactive, and some aren't.
 
@@ -62,3 +68,7 @@ I've had to tweak the CSS a few times:
 
 The different flavors of "Shiny" are a bit of nuissance when trying to find examples.
 The maturity of Shiny for R means that the vast majority of the examples are for R, even with Python in the search. It would be nice if the docs site remembered that I only want to look at docs for Core.
+
+## More validation / type casting on inputs
+
+If we we imagine we have a field that is a required positive integer, it would be nice to be able to specify that in the input itself, with a default error message handled by the UI, instead of needing to set up a calc on our side.

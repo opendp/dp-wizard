@@ -26,52 +26,38 @@ def analysis_ui():
             "but have a greater risk of revealing individual data."
         ),
         log_slider("log_epsilon_slider", 0.1, 10.0),
-        ui.output_text("epsilon"),
+        ui.output_text("epsilon_text"),
         output_code_sample("Privacy Loss", "privacy_loss_python"),
         ui.output_ui("download_results_button_ui"),
         value="analysis_panel",
     )
 
 
+def _cleanup_reactive_dict(reactive_dict, keys_to_keep):
+    reactive_dict_copy = {**reactive_dict()}
+    keys_to_del = set(reactive_dict_copy.keys()) - set(keys_to_keep)
+    for key in keys_to_del:
+        del reactive_dict_copy[key]
+    reactive_dict.set(reactive_dict_copy)
+
+
 def analysis_server(
     input,
     output,
     session,
-    csv_path=None,
-    contributions=None,
-    is_demo=None,
+    csv_path,
+    contributions,
+    is_demo,
+    lower_bounds,
+    upper_bounds,
+    bin_counts,
+    weights,
+    epsilon,
 ):  # pragma: no cover
     @reactive.calc
     def button_enabled():
         column_ids_selected = input.columns_checkbox_group()
         return len(column_ids_selected) > 0
-
-    lower_bounds = reactive.value({})
-    upper_bounds = reactive.value({})
-    bin_counts = reactive.value({})
-    weights = reactive.value({})
-
-    def set_column_lower(column_id, lower):
-        lower_bounds.set({**lower_bounds(), column_id: lower})
-
-    def set_column_upper(column_id, upper):
-        upper_bounds.set({**upper_bounds(), column_id: upper})
-
-    def set_column_bins(column_id, bins):
-        bin_counts.set({**bin_counts(), column_id: bins})
-
-    def set_column_weight(column_id, weight):
-        weights.set({**weights(), column_id: weight})
-
-    def clear_column_weights(columns_ids_to_keep):
-        weights_copy = {**weights()}
-        column_ids_to_del = set(weights_copy.keys()) - set(columns_ids_to_keep)
-        for column_id in column_ids_to_del:
-            del weights_copy[column_id]
-        weights.set(weights_copy)
-
-    def get_weights_sum():
-        return sum(weights().values())
 
     @reactive.effect
     def _update_checkbox_group():
@@ -85,7 +71,10 @@ def analysis_server(
     @reactive.event(input.columns_checkbox_group)
     def _on_column_set_change():
         column_ids_selected = input.columns_checkbox_group()
-        clear_column_weights(column_ids_selected)
+        _cleanup_reactive_dict(lower_bounds, column_ids_selected)
+        _cleanup_reactive_dict(upper_bounds, column_ids_selected)
+        _cleanup_reactive_dict(bin_counts, column_ids_selected)
+        _cleanup_reactive_dict(weights, column_ids_selected)
 
     @render.ui
     def columns_ui():
@@ -95,12 +84,11 @@ def analysis_server(
                 column_id,
                 name=column_id,
                 contributions=contributions(),
-                epsilon=epsilon_calc(),
-                set_column_lower=set_column_lower,
-                set_column_upper=set_column_upper,
-                set_column_bins=set_column_bins,
-                set_column_weight=set_column_weight,
-                get_weights_sum=get_weights_sum,
+                epsilon=epsilon(),
+                lower_bounds=lower_bounds,
+                upper_bounds=upper_bounds,
+                bin_counts=bin_counts,
+                weights=weights,
             )
         return [
             [
@@ -118,17 +106,18 @@ def analysis_server(
     def csv_fields():
         return csv_fields_calc()
 
-    @reactive.calc
-    def epsilon_calc():
-        return pow(10, input.log_epsilon_slider())
+    @reactive.effect
+    @reactive.event(input.log_epsilon_slider)
+    def _set_epsilon():
+        epsilon.set(pow(10, input.log_epsilon_slider()))
 
     @render.text
-    def epsilon():
-        return f"Epsilon: {epsilon_calc():0.3}"
+    def epsilon_text():
+        return f"Epsilon: {epsilon():0.3}"
 
     @render.code
     def privacy_loss_python():
-        return make_privacy_loss_block(epsilon_calc())
+        return make_privacy_loss_block(epsilon())
 
     @reactive.effect
     @reactive.event(input.go_to_results)
