@@ -1,3 +1,5 @@
+from json import dumps
+
 from shiny import ui, render
 
 from dp_creator_ii.utils.templates import make_notebook_py, make_script_py
@@ -7,6 +9,8 @@ from dp_creator_ii.utils.converters import convert_py_to_nb
 def results_ui():
     return ui.nav_panel(
         "Download results",
+        ui.p("TODO: Use this information to fill in a template!"),
+        ui.output_code("data_dump"),
         ui.markdown(
             "You can now make a differentially private release of your data. "
             "This will lock the configuration you’ve provided on the previous pages."
@@ -41,6 +45,22 @@ def results_server(
     weights,
     epsilon,
 ):  # pragma: no cover
+    @render.code
+    def data_dump():
+        # TODO: Use this information in a template!
+        return dumps(
+            {
+                "csv_path": csv_path(),
+                "contributions": contributions(),
+                "lower_bounds": lower_bounds(),
+                "upper_bounds": upper_bounds(),
+                "bin_counts": bin_counts(),
+                "weights": weights(),
+                "epsilon": epsilon(),
+            },
+            indent=2,
+        )
+
     @render.download(
         filename="dp-creator-script.py",
         media_type="text/x-python",
