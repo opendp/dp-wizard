@@ -42,12 +42,30 @@ def column_server(
     name,
     contributions,
     epsilon,
+    set_column_lower,
+    set_column_upper,
+    set_column_bins,
     set_column_weight,
     get_weights_sum,
 ):  # pragma: no cover
     @reactive.effect
+    @reactive.event(input.min)
+    def _set_lower():
+        set_column_lower(name, float(input.min()))
+
+    @reactive.effect
+    @reactive.event(input.max)
+    def _set_upper():
+        set_column_upper(name, float(input.max()))
+
+    @reactive.effect
+    @reactive.event(input.bins)
+    def _set_bins():
+        set_column_bins(name, float(input.bins()))
+
+    @reactive.effect
     @reactive.event(input.weight)
-    def _():
+    def _set_weight():
         set_column_weight(name, float(input.weight()))
 
     @reactive.calc

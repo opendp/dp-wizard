@@ -46,7 +46,19 @@ def analysis_server(
         column_ids_selected = input.columns_checkbox_group()
         return len(column_ids_selected) > 0
 
+    lower_bounds = reactive.value({})
+    upper_bounds = reactive.value({})
+    bin_counts = reactive.value({})
     weights = reactive.value({})
+
+    def set_column_lower(column_id, lower):
+        lower_bounds.set({**lower_bounds(), column_id: lower})
+
+    def set_column_upper(column_id, upper):
+        upper_bounds.set({**upper_bounds(), column_id: upper})
+
+    def set_column_bins(column_id, bins):
+        bin_counts.set({**bin_counts(), column_id: bins})
 
     def set_column_weight(column_id, weight):
         weights.set({**weights(), column_id: weight})
@@ -84,6 +96,9 @@ def analysis_server(
                 name=column_id,
                 contributions=contributions(),
                 epsilon=epsilon_calc(),
+                set_column_lower=set_column_lower,
+                set_column_upper=set_column_upper,
+                set_column_bins=set_column_bins,
                 set_column_weight=set_column_weight,
                 get_weights_sum=get_weights_sum,
             )
