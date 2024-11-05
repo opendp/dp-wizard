@@ -33,7 +33,7 @@ def analysis_ui():
     )
 
 
-def _cleanup_reactive_dict(reactive_dict, keys_to_keep):
+def _cleanup_reactive_dict(reactive_dict, keys_to_keep):  # pragma: no cover
     reactive_dict_copy = {**reactive_dict()}
     keys_to_del = set(reactive_dict_copy.keys()) - set(keys_to_keep)
     for key in keys_to_del:

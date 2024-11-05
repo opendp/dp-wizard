@@ -50,6 +50,8 @@ Renderer.__call__() missing 1 required positional argument: '_fn'
 
 It feels like a gap in the library that there is no component testing. The only advice is to pull out testable logic from the server functions, and for the rest, use end-to-end tests: There's not a recommended way to test the ui+server interaction for just one component.
 
+Short of full component testing, being able to write unit tests around reactive values would be nice.
+
 ## Normal tooling doesn't work inside of app?
 
 There are several bits of tooling that don't seem to work inside end-to-end app tests. My guess is that this isn't related to Shiny per se, but rather the ASGI framework: It's not running in the same process as pytest, so it's not surprising that the pytest process can't instrument this.
