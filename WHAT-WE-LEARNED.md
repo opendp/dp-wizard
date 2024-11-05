@@ -62,3 +62,7 @@ I've had to tweak the CSS a few times:
 
 The different flavors of "Shiny" are a bit of nuissance when trying to find examples.
 The maturity of Shiny for R means that the vast majority of the examples are for R, even with Python in the search. It would be nice if the docs site remembered that I only want to look at docs for Core.
+
+## Shiny docs could have better formatting
+
+- https://shiny.posit.co/py/api/core/ui.layout_columns.html: bullet list not rendered correctly.

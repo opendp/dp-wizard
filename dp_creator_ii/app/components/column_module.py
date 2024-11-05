@@ -10,28 +10,41 @@ from dp_creator_ii.app.components.outputs import output_code_sample
 
 @module.ui
 def column_ui():  # pragma: no cover
-    return [
-        ui.input_numeric("min", "Min", 0),
-        ui.input_numeric("max", "Max", 10),
-        ui.input_numeric("bins", "Bins", 10),
-        ui.input_select(
-            "weight",
-            "Weight",
-            choices={
-                1: "Less accurate",
-                2: "Default",
-                4: "More accurate",
-            },
-            selected=2,
-        ),
-        output_code_sample("Column Definition", "column_code"),
-        ui.markdown(
-            "This simulation assumes a normal distribution "
-            "between the specified min and max. "
-            "Your data file has not been read except to determine the columns."
-        ),
-        ui.output_plot("column_plot"),
-    ]
+    return ui.layout_columns(
+        [
+            ui.input_numeric("min", "Min", 0),
+            ui.input_numeric("max", "Max", 10),
+            ui.input_numeric("bins", "Bins", 10),
+            ui.input_select(
+                "weight",
+                "Weight",
+                choices={
+                    1: "Less accurate",
+                    2: "Default",
+                    4: "More accurate",
+                },
+                selected=2,
+            ),
+            output_code_sample("Column Definition", "column_code"),
+        ],
+        [
+            # TODO: This doesn't need to be repeated: could just go once at the top.
+            ui.markdown(
+                "This simulation assumes a normal distribution "
+                "between the specified min and max. "
+                "Your data file has not been read except to determine the columns."
+            ),
+            ui.output_plot("column_plot"),
+        ],
+        col_widths={
+            # Controls stay roughly a constant width;
+            # Graph expands to fill space.
+            "sm": (6, 6),
+            "md": (5, 7),
+            "lg": (4, 8),
+            "xl": (3, 9),
+        },
+    )
 
 
 @module.server
