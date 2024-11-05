@@ -20,4 +20,5 @@ def plot_histogram(histogram_df, error, cutoff):  # pragma: no cover
     bar_colors = ["blue" if v > cutoff else "lightblue" for v in values]
     axes.bar(labels, values, color=bar_colors, yerr=error)
     axes.axhline(cutoff, color="lightgrey", zorder=-1)
+    axes.set_ylim(bottom=0)
     # TODO: Since this seems to return None, how does the information flow?
