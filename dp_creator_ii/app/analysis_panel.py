@@ -4,7 +4,7 @@ from shiny import ui, reactive, render, req
 
 from dp_creator_ii.app.components.inputs import log_slider
 from dp_creator_ii.app.components.column_module import column_ui, column_server
-from dp_creator_ii.utils.csv_helper import read_field_names
+from dp_creator_ii.utils.csv_helper import read_csv_ids_labels
 from dp_creator_ii.app.components.outputs import output_code_sample
 from dp_creator_ii.utils.templates import make_privacy_loss_block
 
@@ -66,7 +66,7 @@ def analysis_server(
         ui.update_checkbox_group(
             "columns_checkbox_group",
             label=None,
-            choices=csv_fields_calc(),
+            choices=csv_ids_labels_calc(),
         )
 
     @reactive.effect
@@ -96,12 +96,8 @@ def analysis_server(
         ]
 
     @reactive.calc
-    def csv_fields_calc():
-        return read_field_names(req(csv_path()))
-
-    @render.text
-    def csv_fields():
-        return csv_fields_calc()
+    def csv_ids_labels_calc():
+        return read_csv_ids_labels(req(csv_path()))
 
     @reactive.calc
     def epsilon_calc():

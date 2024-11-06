@@ -21,18 +21,18 @@ Typing might help here. I've also wondered about naming conventions, but I haven
 It seems like the returned value would be the same, so I would like to compress something like this:
 ```python
 @reactive.calc
-def csv_fields_calc():
+def csv_labels_calc():
     return read_field_names(req(csv_path()))
 
 @render.text
-def csv_fields():
-    return csv_fields_calc()
+def csv_labels():
+    return csv_labels_calc()
 ```
 into:
 ```python
 @reactive.calc
 @render.text
-def csv_fields():
+def csv_labels():
     return read_field_names(req(csv_path()))
 ```
 but that returns an error:
@@ -43,6 +43,20 @@ Renderer.__call__() missing 1 required positional argument: '_fn'
 ## No component testing
 
 It feels like a gap in the library that there is no component testing. The only advice is to pull out testable logic from the server functions, and for the rest, use end-to-end tests: There's not a recommended way to test the ui+server interaction for just one component.
+
+## Unstated requirements for module IDs
+
+The [docs](https://shiny.posit.co/py/docs/modules.html#how-to-use-modules) only say:
+
+> This id has two requirements. First, it must be unique in a single scope, and can’t be duplicated in a given application or module definition. ... Second, the UI and server ids must match.
+
+But it's fussier than that:
+
+```
+ValueError: The string 'Will this work?' is not a valid id; only letters, numbers, and underscore are permitted
+```
+
+Was planning to just use the CSV column headers as IDs, but that's not going to work. Could Shiny just hash whatever we provide, so we wouldn't have to worry about this?
 
 ## Normal tooling doesn't work inside of app?
 
