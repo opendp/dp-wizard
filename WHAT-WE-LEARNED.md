@@ -22,7 +22,7 @@ It seems like the returned value would be the same, so I would like to compress 
 ```python
 @reactive.calc
 def csv_labels_calc():
-    return read_field_names(req(csv_path()))
+    return read_labels(req(csv_path()))
 
 @render.text
 def csv_labels():
@@ -33,7 +33,7 @@ into:
 @reactive.calc
 @render.text
 def csv_labels():
-    return read_field_names(req(csv_path()))
+    return read_labels(req(csv_path()))
 ```
 but that returns an error:
 ```

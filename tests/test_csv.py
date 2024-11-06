@@ -4,7 +4,7 @@ import polars.testing as pl_testing
 import tempfile
 import pytest
 
-from dp_creator_ii.utils.csv_helper import read_csv_ids_labels
+from dp_creator_ii.utils.csv_helper import read_csv_ids_labels, read_csv_ids_names
 
 
 # We will not reference the encoding when reading:
@@ -51,3 +51,6 @@ def test_csv_loading(write_encoding):
         # Preceding lines are reading the whole DF via Polars.
         ids_labels = read_csv_ids_labels(fp.name)
         assert ids_labels == {"id_AGE": "2: AGE", "id_NAME": "1: NAME"}
+
+        ids_names = read_csv_ids_names(fp.name)
+        assert ids_names == {"id_AGE": "AGE", "id_NAME": "NAME"}

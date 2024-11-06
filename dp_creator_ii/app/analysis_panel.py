@@ -4,7 +4,7 @@ from shiny import ui, reactive, render, req
 
 from dp_creator_ii.app.components.inputs import log_slider
 from dp_creator_ii.app.components.column_module import column_ui, column_server
-from dp_creator_ii.utils.csv_helper import read_csv_ids_labels
+from dp_creator_ii.utils.csv_helper import read_csv_ids_labels, read_csv_ids_names
 from dp_creator_ii.app.components.outputs import output_code_sample
 from dp_creator_ii.utils.templates import make_privacy_loss_block
 
@@ -78,10 +78,12 @@ def analysis_server(
     @render.ui
     def columns_ui():
         column_ids = input.columns_checkbox_group()
+        column_ids_to_names = csv_ids_names_calc()
+        column_ids_to_labels = csv_ids_labels_calc()
         for column_id in column_ids:
             column_server(
                 column_id,
-                name=column_id,
+                name=column_ids_to_names[column_id],
                 contributions=contributions(),
                 epsilon=epsilon_calc(),
                 set_column_weight=set_column_weight,
@@ -89,11 +91,15 @@ def analysis_server(
             )
         return [
             [
-                ui.h3(column_id),
+                ui.h3(column_ids_to_labels[column_id]),
                 column_ui(column_id),
             ]
             for column_id in column_ids
         ]
+
+    @reactive.calc
+    def csv_ids_names_calc():
+        return read_csv_ids_names(req(csv_path()))
 
     @reactive.calc
     def csv_ids_labels_calc():

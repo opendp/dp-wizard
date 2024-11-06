@@ -27,6 +27,10 @@ def read_csv_ids_labels(csv_path):
     }
 
 
+def read_csv_ids_names(csv_path):
+    return {name_to_id(name): name for name in read_csv_names(csv_path)}
+
+
 def name_to_id(name):
     # Remember to handle empty strings!
     # TODO: There is a risk of name collision if the only distinction
