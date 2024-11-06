@@ -5,7 +5,6 @@ We'll use the following terms consistently throughout the application:
 - id: This is the string we'll pass as a module ID.
 """
 
-import re
 import polars as pl
 
 
@@ -32,7 +31,6 @@ def read_csv_ids_names(csv_path):
 
 
 def name_to_id(name):
-    # Remember to handle empty strings!
-    # TODO: There is a risk of name collision if the only distinction
-    # is non-word characters. Switch to hash()?
-    return "id_" + re.sub(r"\W", "_", name)
+    # Shiny is fussy about module IDs,
+    # but we don't need them to be human readable.
+    return str(hash(name)).replace("-", "_")

@@ -48,9 +48,12 @@ def test_csv_loading(write_encoding):
         else:
             pl_testing.assert_frame_equal(write_lf, read_lf)
 
-        # Preceding lines are reading the whole DF via Polars.
+        # Preceding lines are reading the whole DF via Polars:
+        # Now test how we read just the headers.
+        # Keys are hashes, and won't be stable across platforms,
+        # so let's just look at the values.
         ids_labels = read_csv_ids_labels(fp.name)
-        assert ids_labels == {"id_AGE": "2: AGE", "id_NAME": "1: NAME"}
+        assert set(ids_labels.values()) == {"2: AGE", "1: NAME"}
 
         ids_names = read_csv_ids_names(fp.name)
-        assert ids_names == {"id_AGE": "AGE", "id_NAME": "NAME"}
+        assert set(ids_names.values()) == {"AGE", "NAME"}

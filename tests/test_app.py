@@ -65,7 +65,8 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     expect_visible("1: [blank]")
     expect_visible("2: class year")
     expect_visible("3: hw number")
-    expect_visible("4: grade")
+    expect_visible("4: hw-number")
+    expect_visible("5: grade")
     # Epsilon slider:
     # (Note: Slider tests failed on CI when run after column details,
     # although it worked locally. This works in either environment.
