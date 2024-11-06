@@ -22,7 +22,7 @@ def read_csv_names(csv_path):
 
 def read_csv_ids_labels(csv_path):
     return {
-        name_to_id(name): f"{i+1}: {name}"
+        name_to_id(name): f"{i+1}: {name or '[blank]'}"
         for i, name in enumerate(read_csv_names(csv_path))
     }
 
