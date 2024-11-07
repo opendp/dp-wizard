@@ -5,7 +5,7 @@ from shiny import ui, render, module, reactive
 from dp_creator_ii.utils.dp_helper import make_confidence_accuracy_histogram
 from dp_creator_ii.app.components.plots import plot_histogram
 from dp_creator_ii.utils.templates import make_column_config_block
-from dp_creator_ii.app.components.outputs import output_code_sample
+from dp_creator_ii.app.components.outputs import output_code_sample, demo_tooltip
 
 
 @module.ui
@@ -13,9 +13,12 @@ def column_ui():  # pragma: no cover
     width = "10em"  # Just wide enough so the text isn't trucated.
     return ui.layout_columns(
         [
+            ui.output_ui("bounds_tooltip_ui"),
             ui.input_numeric("min", "Min", 0, width=width),
             ui.input_numeric("max", "Max", 10, width=width),
+            ui.output_ui("bins_tooltip_ui"),
             ui.input_numeric("bins", "Bins", 10, width=width),
+            ui.output_ui("weight_tooltip_ui"),
             ui.input_select(
                 "weight",
                 "Weight",
@@ -60,6 +63,7 @@ def column_server(
     epsilon,
     set_column_weight,
     get_weights_sum,
+    is_demo,
 ):  # pragma: no cover
     @reactive.effect
     @reactive.event(input.weight)
@@ -74,6 +78,44 @@ def column_server(
             "bins": input.bins(),
             "weight": float(input.weight()),
         }
+
+    @render.ui
+    def bounds_tooltip_ui():
+        return demo_tooltip(
+            is_demo,
+            """
+            DP requires that we limit the sensitivity to the contributions
+            of any individual. To do this, we need an estimate of the lower
+            and upper bounds for each variable. We should not look at the
+            data when estimating the bounds! In this case, we could imagine
+            that "class year" would vary between 1 and 4, and we could limit
+            "grade" to values between 50 and 100.
+            """,
+        )
+
+    @render.ui
+    def bins_tooltip_ui():
+        return demo_tooltip(
+            is_demo,
+            """
+            Different statistics can be measured with DP.
+            This tool provides a histogram. If you increase the number of bins,
+            you'll see that each individual bin becomes noisier to provide
+            the same overall privacy guarantee. For this example, give
+            "class_year" 4 bins and "grade" 5 bins.
+            """,
+        )
+
+    @render.ui
+    def weight_tooltip_ui():
+        return demo_tooltip(
+            is_demo,
+            """
+            You have a finite privacy budget, but you can choose
+            how to allocate it. For simplicity, we limit the options here,
+            but when using the library you can fine tune this.
+            """,
+        )
 
     @render.code
     def column_code():

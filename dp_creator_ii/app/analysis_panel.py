@@ -5,7 +5,7 @@ from shiny import ui, reactive, render, req
 from dp_creator_ii.app.components.inputs import log_slider
 from dp_creator_ii.app.components.column_module import column_ui, column_server
 from dp_creator_ii.utils.csv_helper import read_csv_ids_labels, read_csv_ids_names
-from dp_creator_ii.app.components.outputs import output_code_sample
+from dp_creator_ii.app.components.outputs import output_code_sample, demo_tooltip
 from dp_creator_ii.utils.templates import make_privacy_loss_block
 
 
@@ -18,6 +18,7 @@ def analysis_ui():
             "the number of bins for the histogram, "
             "and its relative share of the privacy budget."
         ),
+        ui.output_ui("columns_checkbox_group_tooltip_ui"),
         ui.input_checkbox_group("columns_checkbox_group", None, []),
         ui.output_ui("columns_ui"),
         ui.markdown(
@@ -25,6 +26,7 @@ def analysis_ui():
             "Values above 1 will add less noise to the data, "
             "but have a greater risk of revealing individual data."
         ),
+        ui.output_ui("epsilon_tooltip_ui"),
         log_slider("log_epsilon_slider", 0.1, 10.0),
         ui.output_text("epsilon"),
         output_code_sample("Privacy Loss", "privacy_loss_python"),
@@ -76,6 +78,17 @@ def analysis_server(
         clear_column_weights(column_ids_selected)
 
     @render.ui
+    def columns_checkbox_group_tooltip_ui():
+        return demo_tooltip(
+            is_demo,
+            """
+            Not all columns need analysis. For this demo, just check
+            "class_year" and "grade". With more columns selected,
+            each column has a smaller share of the privacy budget.
+            """,
+        )
+
+    @render.ui
     def columns_ui():
         column_ids = input.columns_checkbox_group()
         column_ids_to_names = csv_ids_names_calc()
@@ -88,6 +101,7 @@ def analysis_server(
                 epsilon=epsilon_calc(),
                 set_column_weight=set_column_weight,
                 get_weights_sum=get_weights_sum,
+                is_demo=is_demo,
             )
         return [
             [
@@ -104,6 +118,17 @@ def analysis_server(
     @reactive.calc
     def csv_ids_labels_calc():
         return read_csv_ids_labels(req(csv_path()))
+
+    @render.ui
+    def epsilon_tooltip_ui():
+        return demo_tooltip(
+            is_demo,
+            """
+            If you set epsilon above one, you'll see that the distribution
+            becomes less noisy, and the confidence intervals become smaller...
+            but increased accuracy risks revealing personal information.
+            """,
+        )
 
     @reactive.calc
     def epsilon_calc():
