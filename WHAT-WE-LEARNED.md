@@ -14,7 +14,7 @@ but then changed `epsilon` from `render.text` to `reactive.value` and forgot to 
 
 ## UI and Server functions don't really separate concerns
 
-My first impression was that the UI function would be something like a "view" and the server would be a "controller", but for any kind of conditional display I need a `render.ui`, so that distinction breaks down quickly.
+My first impression was that the UI function would be something like a "view" and the server would be a "controller", but for any kind of conditional display I need a `render.ui`, so that distinction breaks down quickly. Just maintaining a naming convention for these little bits of UI in the server gets to be a chore. It would be kludgy, but what if we could suply lambdas instead of names?
 
 ## Values vs. reactive values
 
@@ -27,19 +27,19 @@ Typing might help here. I've also wondered about naming conventions, but I haven
 It seems like the returned value would be the same, so I would like to compress something like this:
 ```python
 @reactive.calc
-def csv_fields_calc():
-    return read_field_names(req(csv_path()))
+def csv_labels_calc():
+    return read_labels(req(csv_path()))
 
 @render.text
-def csv_fields():
-    return csv_fields_calc()
+def csv_labels():
+    return csv_labels_calc()
 ```
 into:
 ```python
 @reactive.calc
 @render.text
-def csv_fields():
-    return read_field_names(req(csv_path()))
+def csv_labels():
+    return read_labels(req(csv_path()))
 ```
 but that returns an error:
 ```
@@ -51,6 +51,20 @@ Renderer.__call__() missing 1 required positional argument: '_fn'
 It feels like a gap in the library that there is no component testing. The only advice is to pull out testable logic from the server functions, and for the rest, use end-to-end tests: There's not a recommended way to test the ui+server interaction for just one component.
 
 Short of full component testing, being able to write unit tests around reactive values would be nice.
+
+## Unstated requirements for module IDs
+
+The [docs](https://shiny.posit.co/py/docs/modules.html#how-to-use-modules) only say:
+
+> This id has two requirements. First, it must be unique in a single scope, and can’t be duplicated in a given application or module definition. ... Second, the UI and server ids must match.
+
+But it's fussier than that:
+
+```
+ValueError: The string 'Will this work?' is not a valid id; only letters, numbers, and underscore are permitted
+```
+
+Was planning to just use the CSV column headers as IDs, but that's not going to work. Could Shiny just hash whatever we provide, so we wouldn't have to worry about this?
 
 ## Normal tooling doesn't work inside of app?
 
@@ -74,6 +88,10 @@ The maturity of Shiny for R means that the vast majority of the examples are for
 ## More validation / type casting on inputs
 
 If we we imagine we have a field that is a required positive integer, it would be nice to be able to specify that in the input itself, with a default error message handled by the UI, instead of needing to set up a calc on our side.
+
+## It's easy to forget `return`
+
+This is simple, but I was still scratching my head for a while. While there are some cases where returning `None` is intended, is it more more likely to be an error? What if it raised a warning, and an explicit empty string could be returned if that's really what you want?
 
 ## Shiny docs could have better formatting
 

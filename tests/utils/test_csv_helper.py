@@ -4,7 +4,7 @@ import polars.testing as pl_testing
 import tempfile
 import pytest
 
-from dp_creator_ii.utils.csv_helper import read_field_names
+from dp_creator_ii.utils.csv_helper import read_csv_ids_labels, read_csv_ids_names
 
 
 # We will not reference the encoding when reading:
@@ -48,6 +48,12 @@ def test_csv_loading(write_encoding):
         else:
             pl_testing.assert_frame_equal(write_lf, read_lf)
 
-        # Preceding lines are reading the whole DF via Polars.
-        field_names_read = read_field_names(fp.name)
-        assert field_names_read == list(data.keys())
+        # Preceding lines are reading the whole DF via Polars:
+        # Now test how we read just the headers.
+        # Keys are hashes, and won't be stable across platforms,
+        # so let's just look at the values.
+        ids_labels = read_csv_ids_labels(fp.name)
+        assert set(ids_labels.values()) == {"2: AGE", "1: NAME"}
+
+        ids_names = read_csv_ids_names(fp.name)
+        assert set(ids_names.values()) == {"AGE", "NAME"}
