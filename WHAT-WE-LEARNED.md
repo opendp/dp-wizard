@@ -8,7 +8,7 @@ Unless I'm missing something, there doesn't seem to be any warning when there is
 
 ## UI and Server functions don't really separate concerns
 
-My first impression was that the UI function would be something like a "view" and the server would be a "controller", but for any kind of conditional display I need a `render.ui`, so that distinction breaks down quickly.
+My first impression was that the UI function would be something like a "view" and the server would be a "controller", but for any kind of conditional display I need a `render.ui`, so that distinction breaks down quickly. Just maintaining a naming convention for these little bits of UI in the server gets to be a chore. It would be kludgy, but what if we could suply lambdas instead of names?
 
 ## Refactoring: values vs. reactive values
 
@@ -62,3 +62,11 @@ I've had to tweak the CSS a few times:
 
 The different flavors of "Shiny" are a bit of nuissance when trying to find examples.
 The maturity of Shiny for R means that the vast majority of the examples are for R, even with Python in the search. It would be nice if the docs site remembered that I only want to look at docs for Core.
+
+## It's easy to forget `return`
+
+This is simple, but I was still scratching my head for a while. While there are some cases where returning `None` is intended, is it more more likely to be an error? What if it raised a warning, and an explicit empty string could be returned if that's really what you want?
+
+## Shiny docs could have better formatting
+
+- https://shiny.posit.co/py/api/core/ui.layout_columns.html: bullet list not rendered correctly.
