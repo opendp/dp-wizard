@@ -7,6 +7,7 @@ import opendp.prelude as dp
 from dp_creator_ii.utils.templates import _Template, make_notebook_py, make_script_py
 
 
+fixtures_path = Path(__file__).parent.parent / "fixtures"
 fake_csv = "tests/fixtures/fake.csv"
 
 
@@ -113,9 +114,7 @@ def test_make_script():
         # Cleanup whitespace after indenting blocks
         return re.sub(r"^\s+$", "", text, flags=re.MULTILINE).strip()
 
-    expected_script = (
-        Path(__file__).parent / "fixtures" / "expected-script.py"
-    ).read_text()
+    expected_script = (fixtures_path / "expected-script.py").read_text()
     assert clear_empty_lines(script) == clear_empty_lines(expected_script)
 
     with NamedTemporaryFile(mode="w") as fp:

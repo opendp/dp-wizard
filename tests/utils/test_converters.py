@@ -5,6 +5,9 @@ import pytest
 from dp_creator_ii.utils.converters import convert_py_to_nb
 
 
+fixtures_path = Path(__file__).parent.parent / "fixtures"
+
+
 def norm_nb(nb_str):
     normed_nb_str = nb_str
     normed_nb_str = re.sub(r'"id": "[^"]+"', '"id": "12345678"', normed_nb_str)
@@ -21,7 +24,6 @@ def norm_nb(nb_str):
 
 
 def test_convert_py_to_nb():
-    fixtures_path = Path(__file__).parent / "fixtures"
     python_str = (fixtures_path / "fake.py").read_text()
     actual_nb_str = convert_py_to_nb(python_str)
     expected_nb_str = (fixtures_path / "fake.ipynb").read_text()
@@ -32,7 +34,6 @@ def test_convert_py_to_nb():
 
 
 def test_convert_py_to_nb_execute():
-    fixtures_path = Path(__file__).parent / "fixtures"
     python_str = (fixtures_path / "fake.py").read_text()
     actual_nb_str = convert_py_to_nb(python_str, execute=True)
     expected_nb_str = (fixtures_path / "fake-executed.ipynb").read_text()
