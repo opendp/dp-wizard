@@ -71,9 +71,9 @@ def analysis_server(
     @reactive.event(input.columns_checkbox_group)
     def _on_column_set_change():
         column_ids_selected = input.columns_checkbox_group()
-        _cleanup_reactive_dict(lower_bounds, column_ids_selected)
-        _cleanup_reactive_dict(upper_bounds, column_ids_selected)
-        _cleanup_reactive_dict(bin_counts, column_ids_selected)
+        # We only clean up the weights, and everything else is left in place,
+        # so if you restore a column, you see the original values.
+        # (Except for weight, which goes back to the default.)
         _cleanup_reactive_dict(weights, column_ids_selected)
 
     @render.ui

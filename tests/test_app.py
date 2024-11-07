@@ -9,6 +9,7 @@ demo_app = create_app_fixture(Path(__file__).parent / "fixtures/demo_app.py")
 default_app = create_app_fixture(Path(__file__).parent / "fixtures/default_app.py")
 tooltip = "#choose_csv_demo_tooltip_ui svg"
 for_the_demo = "For the demo, we'll imagine"
+simulation = "This simulation assumes a normal distribution"
 
 
 # TODO: Why is incomplete coverage reported here?
@@ -84,16 +85,23 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
 
     # Set column details:
     page.get_by_label("grade").check()
-    page.get_by_label("Min").click()
-    page.get_by_label("Min").fill("0")
-    # TODO: All these recalculations cause timeouts:
+    expect_visible(simulation)
+    # Check that default is set correctly:
+    assert page.get_by_label("Max").input_value() == "10"
+    # Reset, and confirm:
+    new_value = "20"
+    page.get_by_label("Max").fill(new_value)
+    # Uncheck the column:
+    page.get_by_label("grade").uncheck()
+    expect_not_visible(simulation)
+    # Recheck the column:
+    page.get_by_label("grade").check()
+    expect_visible(simulation)
+    assert page.get_by_label("Max").input_value() == new_value
+    # TODO: Setting more inputs without checking for updates
+    # cause recalculations to pile up, and these cause timeouts on CI:
     # It is still rerendering the graph after hitting "Download results".
     # https://github.com/opendp/dp-creator-ii/issues/116
-    # page.get_by_label("Max").click()
-    # page.get_by_label("Max").fill("100")
-    # page.get_by_label("Bins").click()
-    # page.get_by_label("Bins").fill("20")
-    page.get_by_label("Weight").select_option("1")
     expect_no_error()
 
     # -- Download results --
