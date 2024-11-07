@@ -74,3 +74,7 @@ The maturity of Shiny for R means that the vast majority of the examples are for
 ## More validation / type casting on inputs
 
 If we we imagine we have a field that is a required positive integer, it would be nice to be able to specify that in the input itself, with a default error message handled by the UI, instead of needing to set up a calc on our side.
+
+## Shiny docs could have better formatting
+
+- https://shiny.posit.co/py/api/core/ui.layout_columns.html: bullet list not rendered correctly.

@@ -13,30 +13,46 @@ default_weight = 2
 
 @module.ui
 def column_ui():  # pragma: no cover
-    return [
-        # The default values on these inputs
-        # should be overridden by the reactive.effect.
-        ui.input_numeric("min", "Min", 0),
-        ui.input_numeric("max", "Max", 0),
-        ui.input_numeric("bins", "Bins", 0),
-        ui.input_select(
-            "weight",
-            "Weight",
-            choices={
-                1: "Less accurate",
-                default_weight: "Default",
-                4: "More accurate",
-            },
-            selected=1,
-        ),
-        output_code_sample("Column Definition", "column_code"),
-        ui.markdown(
-            "This simulation assumes a normal distribution "
-            "between the specified min and max. "
-            "Your data file has not been read except to determine the columns."
-        ),
-        ui.output_plot("column_plot"),
-    ]
+    width = "10em"  # Just wide enough so the text isn't trucated.
+    return ui.layout_columns(
+        [
+            # The default values on these inputs
+            # should be overridden by the reactive.effect.
+            ui.input_numeric("min", "Min", 0, width=width),
+            ui.input_numeric("max", "Max", 0, width=width),
+            ui.input_numeric("bins", "Bins", 0, width=width),
+            ui.input_select(
+                "weight",
+                "Weight",
+                choices={
+                    1: "Less accurate",
+                    default_weight: "Default",
+                    4: "More accurate",
+                },
+                selected=default_weight,
+                width=width,
+            ),
+        ],
+        [
+            # TODO: This doesn't need to be repeated: could just go once at the top.
+            # https://github.com/opendp/dp-creator-ii/issues/138
+            ui.markdown(
+                "This simulation assumes a normal distribution "
+                "between the specified min and max. "
+                "Your data file has not been read except to determine the columns."
+            ),
+            ui.output_plot("column_plot", height="300px"),
+            # Make plot smaller than default: about the same size as the other column.
+            output_code_sample("Column Definition", "column_code"),
+        ],
+        col_widths={
+            # Controls stay roughly a constant width;
+            # Graph expands to fill space.
+            "sm": (4, 8),
+            "md": (3, 9),
+            "lg": (2, 10),
+        },
+    )
 
 
 @module.server

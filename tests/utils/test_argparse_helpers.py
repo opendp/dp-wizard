@@ -6,6 +6,9 @@ import pytest
 from dp_creator_ii.utils.argparse_helpers import _get_arg_parser, _existing_csv_type
 
 
+fixtures_path = Path(__file__).parent.parent / "fixtures"
+
+
 def test_help():
     help = (
         _get_arg_parser()
@@ -19,7 +22,7 @@ def test_help():
     )
     print(help)
 
-    readme_md = (Path(__file__).parent.parent / "README.md").read_text()
+    readme_md = (Path(__file__).parent.parent.parent / "README.md").read_text()
     assert help in readme_md
 
 
@@ -30,9 +33,9 @@ def test_arg_validation_no_file():
 
 def test_arg_validation_not_csv():
     with pytest.raises(ArgumentTypeError, match='Must have ".csv" extension:'):
-        _existing_csv_type(Path(__file__).parent / "fixtures" / "fake.ipynb")
+        _existing_csv_type(fixtures_path / "fake.ipynb")
 
 
 def test_arg_validation_works():
-    path = _existing_csv_type(Path(__file__).parent / "fixtures" / "fake.csv")
+    path = _existing_csv_type(fixtures_path / "fake.csv")
     assert path.name == "fake.csv"
