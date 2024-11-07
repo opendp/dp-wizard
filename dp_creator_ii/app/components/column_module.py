@@ -8,21 +8,26 @@ from dp_creator_ii.utils.templates import make_column_config_block
 from dp_creator_ii.app.components.outputs import output_code_sample
 
 
+default_weight = 2
+
+
 @module.ui
 def column_ui():  # pragma: no cover
     return [
+        # The default values on these inputs
+        # should be overridden by the reactive.effect.
         ui.input_numeric("min", "Min", 0),
-        ui.input_numeric("max", "Max", 10),
-        ui.input_numeric("bins", "Bins", 10),
+        ui.input_numeric("max", "Max", 0),
+        ui.input_numeric("bins", "Bins", 0),
         ui.input_select(
             "weight",
             "Weight",
             choices={
                 1: "Less accurate",
-                2: "Default",
+                default_weight: "Default",
                 4: "More accurate",
             },
-            selected=2,
+            selected=1,
         ),
         output_code_sample("Column Definition", "column_code"),
         ui.markdown(
@@ -47,6 +52,14 @@ def column_server(
     bin_counts,
     weights,
 ):  # pragma: no cover
+    @reactive.effect
+    def _set_all_inputs():
+        with reactive.isolate():  # Without isolate, there is an infinite loop.
+            ui.update_numeric("min", value=lower_bounds().get(name, 0))
+            ui.update_numeric("max", value=upper_bounds().get(name, 10))
+            ui.update_numeric("bins", value=bin_counts().get(name, 10))
+            ui.update_numeric("weight", value=weights().get(name, default_weight))
+
     @reactive.effect
     @reactive.event(input.min)
     def _set_lower():
