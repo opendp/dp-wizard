@@ -19,8 +19,8 @@ def column_ui():  # pragma: no cover
             # The default values on these inputs
             # should be overridden by the reactive.effect.
             ui.output_ui("bounds_tooltip_ui"),
-            ui.input_numeric("min", "Min", 0, width=width),
-            ui.input_numeric("max", "Max", 0, width=width),
+            ui.input_numeric("lower", "Lower", 0, width=width),
+            ui.input_numeric("upper", "Upper", 0, width=width),
             ui.output_ui("bins_tooltip_ui"),
             ui.input_numeric("bins", "Bins", 0, width=width),
             ui.output_ui("weight_tooltip_ui"),
@@ -41,7 +41,7 @@ def column_ui():  # pragma: no cover
             # https://github.com/opendp/dp-creator-ii/issues/138
             ui.markdown(
                 "This simulation assumes a normal distribution "
-                "between the specified min and max. "
+                "between the specified lower and upper bounds. "
                 "Your data file has not been read except to determine the columns."
             ),
             ui.output_plot("column_plot", height="300px"),
@@ -75,20 +75,20 @@ def column_server(
     @reactive.effect
     def _set_all_inputs():
         with reactive.isolate():  # Without isolate, there is an infinite loop.
-            ui.update_numeric("min", value=lower_bounds().get(name, 0))
-            ui.update_numeric("max", value=upper_bounds().get(name, 10))
+            ui.update_numeric("lower", value=lower_bounds().get(name, 0))
+            ui.update_numeric("upper", value=upper_bounds().get(name, 10))
             ui.update_numeric("bins", value=bin_counts().get(name, 10))
             ui.update_numeric("weight", value=weights().get(name, default_weight))
 
     @reactive.effect
-    @reactive.event(input.min)
+    @reactive.event(input.lower)
     def _set_lower():
-        lower_bounds.set({**lower_bounds(), name: float(input.min())})
+        lower_bounds.set({**lower_bounds(), name: float(input.lower())})
 
     @reactive.effect
-    @reactive.event(input.max)
+    @reactive.event(input.upper)
     def _set_upper():
-        upper_bounds.set({**upper_bounds(), name: float(input.max())})
+        upper_bounds.set({**upper_bounds(), name: float(input.upper())})
 
     @reactive.effect
     @reactive.event(input.bins)
@@ -142,15 +142,15 @@ def column_server(
     def column_code():
         return make_column_config_block(
             name=name,
-            min_value=float(input.min()),
-            max_value=float(input.max()),
+            lower_bound=float(input.lower()),
+            upper_bound=float(input.upper()),
             bin_count=int(input.bins()),
         )
 
     @render.plot()
     def column_plot():
-        min_x = float(input.min())
-        max_x = float(input.max())
+        lower_x = float(input.lower())
+        upper_x = float(input.upper())
         bin_count = int(input.bins())
         weight = float(input.weight())
         weights_sum = sum(weights().values())
@@ -160,8 +160,8 @@ def column_server(
             # Exit early to avoid divide-by-zero.
             return None
         _confidence, accuracy, histogram = make_confidence_accuracy_histogram(
-            lower=min_x,
-            upper=max_x,
+            lower=lower_x,
+            upper=upper_x,
             bin_count=bin_count,
             contributions=contributions,
             weighted_epsilon=epsilon * weight / weights_sum,

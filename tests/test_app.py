@@ -89,17 +89,17 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     page.get_by_label("grade").check()
     expect_visible(simulation)
     # Check that default is set correctly:
-    assert page.get_by_label("Max").input_value() == "10"
+    assert page.get_by_label("Upper").input_value() == "10"
     # Reset, and confirm:
     new_value = "20"
-    page.get_by_label("Max").fill(new_value)
+    page.get_by_label("Upper").fill(new_value)
     # Uncheck the column:
     page.get_by_label("grade").uncheck()
     expect_not_visible(simulation)
     # Recheck the column:
     page.get_by_label("grade").check()
     expect_visible(simulation)
-    assert page.get_by_label("Max").input_value() == new_value
+    assert page.get_by_label("Upper").input_value() == new_value
     # TODO: Setting more inputs without checking for updates
     # cause recalculations to pile up, and these cause timeouts on CI:
     # It is still rerendering the graph after hitting "Download results".
