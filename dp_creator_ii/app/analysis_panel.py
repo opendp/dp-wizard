@@ -30,7 +30,7 @@ def analysis_ui():
         log_slider("log_epsilon_slider", 0.1, 10.0),
         ui.output_text("epsilon"),
         output_code_sample("Privacy Loss", "privacy_loss_python"),
-        ui.input_action_button("go_to_results", "Download results"),
+        ui.output_ui("download_results_button_ui"),
         value="analysis_panel",
     )
 
@@ -43,6 +43,10 @@ def analysis_server(
     contributions=None,
     is_demo=None,
 ):  # pragma: no cover
+    @reactive.calc
+    def button_enabled():
+        column_ids_selected = input.columns_checkbox_group()
+        return len(column_ids_selected) > 0
 
     weights = reactive.value({})
 
@@ -69,9 +73,9 @@ def analysis_server(
 
     @reactive.effect
     @reactive.event(input.columns_checkbox_group)
-    def _update_weights():
-        column_ids_to_keep = input.columns_checkbox_group()
-        clear_column_weights(column_ids_to_keep)
+    def _on_column_set_change():
+        column_ids_selected = input.columns_checkbox_group()
+        clear_column_weights(column_ids_selected)
 
     @render.ui
     def columns_checkbox_group_tooltip_ui():
@@ -140,3 +144,16 @@ def analysis_server(
     @reactive.event(input.go_to_results)
     def go_to_results():
         ui.update_navs("top_level_nav", selected="results_panel")
+
+    @render.ui
+    def download_results_button_ui():
+        button = ui.input_action_button(
+            "go_to_results", "Download results", disabled=not button_enabled()
+        )
+
+        if button_enabled():
+            return button
+        return [
+            button,
+            "Select one or more columns before proceeding.",
+        ]

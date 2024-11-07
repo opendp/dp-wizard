@@ -10,31 +10,47 @@ from dp_creator_ii.app.components.outputs import output_code_sample, demo_toolti
 
 @module.ui
 def column_ui():  # pragma: no cover
-    return [
-        ui.output_ui("bounds_tooltip_ui"),
-        ui.input_numeric("min", "Min", 0),
-        ui.input_numeric("max", "Max", 10),
-        ui.output_ui("bins_tooltip_ui"),
-        ui.input_numeric("bins", "Bins", 10),
-        ui.output_ui("weight_tooltip_ui"),
-        ui.input_select(
-            "weight",
-            "Weight",
-            choices={
-                1: "Less accurate",
-                2: "Default",
-                4: "More accurate",
-            },
-            selected=2,
-        ),
-        output_code_sample("Column Definition", "column_code"),
-        ui.markdown(
-            "This simulation assumes a normal distribution "
-            "between the specified min and max. "
-            "Your data file has not been read except to determine the columns."
-        ),
-        ui.output_plot("column_plot"),
-    ]
+    width = "10em"  # Just wide enough so the text isn't trucated.
+    return ui.layout_columns(
+        [
+            ui.output_ui("bounds_tooltip_ui"),
+            ui.input_numeric("min", "Min", 0, width=width),
+            ui.input_numeric("max", "Max", 10, width=width),
+            ui.output_ui("bins_tooltip_ui"),
+            ui.input_numeric("bins", "Bins", 10, width=width),
+            ui.output_ui("weight_tooltip_ui"),
+            ui.input_select(
+                "weight",
+                "Weight",
+                choices={
+                    1: "Less accurate",
+                    2: "Default",
+                    4: "More accurate",
+                },
+                selected=2,
+                width=width,
+            ),
+        ],
+        [
+            # TODO: This doesn't need to be repeated: could just go once at the top.
+            # https://github.com/opendp/dp-creator-ii/issues/138
+            ui.markdown(
+                "This simulation assumes a normal distribution "
+                "between the specified min and max. "
+                "Your data file has not been read except to determine the columns."
+            ),
+            ui.output_plot("column_plot", height="300px"),
+            # Make plot smaller than default: about the same size as the other column.
+            output_code_sample("Column Definition", "column_code"),
+        ],
+        col_widths={
+            # Controls stay roughly a constant width;
+            # Graph expands to fill space.
+            "sm": (4, 8),
+            "md": (3, 9),
+            "lg": (2, 10),
+        },
+    )
 
 
 @module.server

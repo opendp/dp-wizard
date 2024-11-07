@@ -31,10 +31,11 @@ def dataset_ui():
             "contributions",
             ["Contributions", ui.output_ui("contributions_demo_tooltip_ui")],
             cli_info.contributions,
+            min=1,
         ),
         ui.output_ui("python_tooltip_ui"),
         output_code_sample("Unit of Privacy", "unit_of_privacy_python"),
-        ui.input_action_button("go_to_analysis", "Define analysis"),
+        ui.output_ui("define_analysis_button_ui"),
         value="dataset_panel",
     )
 
@@ -51,6 +52,14 @@ def dataset_server(
     @reactive.event(input.contributions)
     def _on_contributions_change():
         contributions.set(input.contributions())
+
+    @reactive.calc
+    def button_enabled():
+        contributions_is_set = input.contributions() is not None
+        csv_path_is_set = (
+            input.csv_path() is not None and len(input.csv_path()) > 0
+        ) or is_demo
+        return contributions_is_set and csv_path_is_set
 
     @render.ui
     def choose_csv_demo_tooltip_ui():
@@ -77,6 +86,18 @@ def dataset_server(
             "and at the end you can download a notebook "
             "for the entire calculation.",
         )
+
+    @render.ui
+    def define_analysis_button_ui():
+        button = ui.input_action_button(
+            "go_to_analysis", "Define analysis", disabled=not button_enabled()
+        )
+        if button_enabled():
+            return button
+        return [
+            button,
+            "Choose CSV and Contributions before proceeding.",
+        ]
 
     @render.code
     def unit_of_privacy_python():

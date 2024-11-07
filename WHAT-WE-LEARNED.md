@@ -66,3 +66,7 @@ The maturity of Shiny for R means that the vast majority of the examples are for
 ## It's easy to forget `return`
 
 This is simple, but I was still scratching my head for a while. While there are some cases where returning `None` is intended, is it more more likely to be an error? What if it raised a warning, and an explicit empty string could be returned if that's really what you want?
+
+## Shiny docs could have better formatting
+
+- https://shiny.posit.co/py/api/core/ui.layout_columns.html: bullet list not rendered correctly.
