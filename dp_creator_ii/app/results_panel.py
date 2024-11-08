@@ -10,14 +10,13 @@ from dp_creator_ii.app.components.outputs import output_code_sample
 def results_ui():
     return ui.nav_panel(
         "Download results",
-        ui.p("TODO: Use this information to fill in a template!"),
-        output_code_sample("Analysis JSON", "analysis_json_text"),
+        ui.p("These code snippets describe how to make a DP release of your data:"),
+        output_code_sample("Analysis JSON", "analysis_json_text"),  # TODO: Drop this?
+        output_code_sample("Analysis Python", "analysis_python_text"),
         ui.markdown(
             "You can now make a differentially private release of your data. "
             "This will lock the configuration you’ve provided on the previous pages."
         ),
-        ui.markdown("TODO: Button: “Download Report (.txt)” (implemented as yaml?)"),
-        ui.markdown("TODO: Button: “Download Report (.csv)"),
         ui.markdown(
             "You can also download code that can be executed to produce a DP release. "
             "Downloaded code does not lock the configuration."
@@ -77,6 +76,14 @@ def results_server(
     @render.text
     def analysis_json_text():
         return analysis_json()
+
+    @reactive.calc
+    def analysis_python():
+        pass  # TODO
+
+    @render.text
+    def analysis_python_text():
+        return analysis_python()
 
     @render.download(
         filename="dp-creator-script.py",
