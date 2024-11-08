@@ -111,7 +111,7 @@ def results_server(
     async def download_notebook_unexecuted():
         analysis = analysis_dict()
         notebook_py = make_notebook_py(
-            csv_path="todo.csv",
+            csv_path=analysis["csv_path"],
             contributions=analysis["contributions"],
             epsilon=analysis["epsilon"],
             columns=analysis["columns"],
@@ -126,7 +126,7 @@ def results_server(
     async def download_notebook_executed():
         analysis = analysis_dict()
         notebook_py = make_notebook_py(
-            csv_path="todo.csv",
+            csv_path=analysis["csv_path"],
             contributions=analysis["contributions"],
             epsilon=analysis["epsilon"],
             columns=analysis["columns"],
