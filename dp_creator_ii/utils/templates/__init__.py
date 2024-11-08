@@ -120,6 +120,24 @@ def _make_columns(columns):
     )
 
 
+def _make_query(column_name):
+    return str(
+        _Template("query")
+        .fill_values(
+            BIN_NAME=f"{column_name}_bin",
+        )
+        .fill_expressions(
+            QUERY_NAME=f"{column_name}_query",
+            ACCURACY_NAME=f"{column_name}_accuracy",
+            HISTOGRAM_NAME=f"{column_name}_histogram",
+        )
+    )
+
+
+def _make_queries(column_names):
+    return "\n".join(_make_query(column_name) for column_name in column_names)
+
+
 def make_notebook_py(csv_path, contributions, epsilon, columns):
     return str(
         _Template("notebook").fill_blocks(
@@ -131,6 +149,7 @@ def make_notebook_py(csv_path, contributions, epsilon, columns):
                 epsilon=epsilon,
                 weights=[column["weight"] for column in columns.values()],
             ),
+            QUERIES_BLOCK=_make_queries(columns.keys()),
         )
     )
 
@@ -141,10 +160,12 @@ def make_script_py(contributions, epsilon, columns):
             IMPORTS_BLOCK=_make_imports(),
             COLUMNS_BLOCK=_make_columns(columns),
             CONTEXT_BLOCK=_make_context_for_script(
+                # csv_path is a CLI parameter in the script
                 contributions=contributions,
                 epsilon=epsilon,
                 weights=[column["weight"] for column in columns.values()],
             ),
+            QUERIES_BLOCK=_make_queries(columns.keys()),
         )
     )
 

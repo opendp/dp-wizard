@@ -54,7 +54,7 @@ def results_server(
             col: {
                 "lower_bound": lower_bounds()[col],
                 "upper_bound": upper_bounds()[col],
-                "bin_count": bin_counts()[col],
+                "bin_count": int(bin_counts()[col]),
                 "weight": weights()[col],
             }
             for col in weights().keys()
@@ -124,12 +124,12 @@ def results_server(
         media_type="application/x-ipynb+json",
     )
     async def download_notebook_executed():
-        contributions = input.contributions()
+        analysis = analysis_dict()
         notebook_py = make_notebook_py(
             csv_path="todo.csv",
-            contributions=contributions,
-            epsilon=1,
-            weights=[1],
+            contributions=analysis["contributions"],
+            epsilon=analysis["epsilon"],
+            columns=analysis["columns"],
         )
         notebook_nb = convert_py_to_nb(notebook_py, execute=True)
         yield notebook_nb
