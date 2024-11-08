@@ -46,6 +46,8 @@ but that returns an error:
 Renderer.__call__() missing 1 required positional argument: '_fn'
 ```
 
+If I just refer to a reactive calc directly in the UI there is no error in the log, just a spinner in the UI.
+
 ## No component testing
 
 It feels like a gap in the library that there is no component testing. The only advice is to pull out testable logic from the server functions, and for the rest, use end-to-end tests: There's not a recommended way to test the ui+server interaction for just one component.
