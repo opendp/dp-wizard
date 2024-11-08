@@ -25,17 +25,6 @@ def analysis_ui():
             [],
         ),
         ui.output_ui("columns_ui"),
-        ui.layout_columns(
-            [],
-            [
-                ui.markdown(
-                    "This simulation assumes a normal distribution "
-                    "between the specified lower and upper bounds. "
-                    "Your data file has not been read except to determine the columns."
-                )
-            ],
-            col_widths=col_widths,
-        ),
         ui.markdown(
             "What is your privacy budget for this release? "
             "Values above 1 will add less noise to the data, "
@@ -123,10 +112,33 @@ def analysis_server(
             )
         return [
             [
-                ui.h3(column_ids_to_labels[column_id]),
-                column_ui(column_id),
-            ]
-            for column_id in column_ids
+                [
+                    ui.h3(column_ids_to_labels[column_id]),
+                    column_ui(column_id),
+                ]
+                for column_id in column_ids
+            ],
+            [
+                (
+                    ui.layout_columns(
+                        [],
+                        [
+                            ui.markdown(
+                                """
+                            This simulation assumes a normal
+                            distribution between the specified
+                            lower and upper bounds. Your data
+                            file has not been read except to
+                            determine the columns.
+                            """
+                            )
+                        ],
+                        col_widths=col_widths,
+                    )
+                    if column_ids
+                    else []
+                )
+            ],
         ]
 
     @reactive.calc
