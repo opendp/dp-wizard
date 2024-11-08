@@ -79,7 +79,13 @@ def results_server(
 
     @reactive.calc
     def analysis_python():
-        pass  # TODO
+        analysis = analysis_dict()
+        return make_notebook_py(
+            csv_path=analysis["csv_path"],
+            contributions=analysis["contributions"],
+            epsilon=analysis["epsilon"],
+            weights=[1],
+        )
 
     @render.text
     def analysis_python_text():
