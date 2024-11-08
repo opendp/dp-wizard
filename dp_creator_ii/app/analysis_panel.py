@@ -7,6 +7,7 @@ from dp_creator_ii.app.components.column_module import column_ui, column_server
 from dp_creator_ii.utils.csv_helper import read_csv_ids_labels, read_csv_ids_names
 from dp_creator_ii.app.components.outputs import output_code_sample, demo_tooltip
 from dp_creator_ii.utils.templates import make_privacy_loss_block
+from dp_creator_ii.app.components.column_module import col_widths
 
 
 def analysis_ui():
@@ -24,6 +25,17 @@ def analysis_ui():
             [],
         ),
         ui.output_ui("columns_ui"),
+        ui.layout_columns(
+            [],
+            [
+                ui.markdown(
+                    "This simulation assumes a normal distribution "
+                    "between the specified lower and upper bounds. "
+                    "Your data file has not been read except to determine the columns."
+                )
+            ],
+            col_widths=col_widths,
+        ),
         ui.markdown(
             "What is your privacy budget for this release? "
             "Values above 1 will add less noise to the data, "

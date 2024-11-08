@@ -10,6 +10,14 @@ from dp_creator_ii.app.components.outputs import output_code_sample, demo_toolti
 
 default_weight = 2
 
+col_widths = {
+    # Controls stay roughly a constant width;
+    # Graph expands to fill space.
+    "sm": (4, 8),
+    "md": (3, 9),
+    "lg": (2, 10),
+}
+
 
 @module.ui
 def column_ui():  # pragma: no cover
@@ -38,24 +46,11 @@ def column_ui():  # pragma: no cover
             ),
         ],
         [
-            # TODO: This doesn't need to be repeated: could just go once at the top.
-            # https://github.com/opendp/dp-creator-ii/issues/138
-            ui.markdown(
-                "This simulation assumes a normal distribution "
-                "between the specified lower and upper bounds. "
-                "Your data file has not been read except to determine the columns."
-            ),
             ui.output_plot("column_plot", height="300px"),
             # Make plot smaller than default: about the same size as the other column.
             output_code_sample("Column Definition", "column_code"),
         ],
-        col_widths={
-            # Controls stay roughly a constant width;
-            # Graph expands to fill space.
-            "sm": (4, 8),
-            "md": (3, 9),
-            "lg": (2, 10),
-        },
+        col_widths=col_widths,
     )
 
 
