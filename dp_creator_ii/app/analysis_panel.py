@@ -18,8 +18,11 @@ def analysis_ui():
             "the number of bins for the histogram, "
             "and its relative share of the privacy budget."
         ),
-        ui.output_ui("columns_checkbox_group_tooltip_ui"),
-        ui.input_checkbox_group("columns_checkbox_group", None, []),
+        ui.input_checkbox_group(
+            "columns_checkbox_group",
+            ["Columns", ui.output_ui("columns_checkbox_group_tooltip_ui")],
+            [],
+        ),
         ui.output_ui("columns_ui"),
         ui.markdown(
             "What is your privacy budget for this release? "

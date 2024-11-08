@@ -16,17 +16,18 @@ def column_ui():  # pragma: no cover
     width = "10em"  # Just wide enough so the text isn't trucated.
     return ui.layout_columns(
         [
-            # The default values on these inputs
+            # The initial values on these inputs
             # should be overridden by the reactive.effect.
-            ui.output_ui("bounds_tooltip_ui"),
-            ui.input_numeric("lower", "Lower", 0, width=width),
+            ui.input_numeric(
+                "lower", ["Lower", ui.output_ui("bounds_tooltip_ui")], 0, width=width
+            ),
             ui.input_numeric("upper", "Upper", 0, width=width),
-            ui.output_ui("bins_tooltip_ui"),
-            ui.input_numeric("bins", "Bins", 0, width=width),
-            ui.output_ui("weight_tooltip_ui"),
+            ui.input_numeric(
+                "bins", ["Bins", ui.output_ui("bins_tooltip_ui")], 0, width=width
+            ),
             ui.input_select(
                 "weight",
-                "Weight",
+                ["Weight", ui.output_ui("weight_tooltip_ui")],
                 choices={
                     1: "Less accurate",
                     default_weight: "Default",
