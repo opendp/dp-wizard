@@ -1,0 +1,58 @@
+from argparse import ArgumentParser
+
+import polars as pl
+import opendp.prelude as dp
+
+# The OpenDP team is working to vet the core algorithms.
+# Until that is complete we need to opt-in to use these features.
+dp.enable_features("contrib")
+
+def make_cut_points(lower_bound, upper_bound, bin_count):
+    """
+    Returns one more cut point than the bin_count.
+    (There are actually two more bins, extending to
+    -inf and +inf, but we'll ignore those.)
+    Cut points are evenly spaced from lower_bound to upper_bound.
+    """
+    bin_width = (upper_bound - lower_bound) / bin_count
+    return [round(lower_bound + i * bin_width, 2) for i in range(bin_count + 1)]
+
+# From the public information, determine the bins:
+fake_column_cut_points = make_cut_points(
+    lower_bound=5,
+    upper_bound=15,
+    bin_count=20,
+)
+
+# Use these bins to define a Polars column:
+fake_column_config = (
+    pl.col('fake column')
+    .cut(fake_column_cut_points)
+    .alias('fake_column_bin')  # Give the new column a name.
+    .cast(pl.String)
+)
+
+
+def get_context(csv_path):
+    privacy_unit = dp.unit_of(contributions=1)
+
+    privacy_loss = dp.loss_of(epsilon=1, delta=1e-7)
+
+    context = dp.Context.compositor(
+        data=pl.scan_csv(csv_path, encoding="utf8-lossy"),
+        privacy_unit=privacy_unit,
+        privacy_loss=privacy_loss,
+        split_by_weights=[4],
+    )
+
+    return context
+
+
+if __name__ == "__main__":
+    parser = ArgumentParser(
+        description="Creates a differentially private release from a csv"
+    )
+    parser.add_argument("--csv", help="Path to csv containing private data")
+    args = parser.parse_args()
+    context = get_context(csv_path=args.csv)
+    print(context)

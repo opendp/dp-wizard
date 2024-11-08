@@ -84,7 +84,7 @@ def results_server(
             csv_path=analysis["csv_path"],
             contributions=analysis["contributions"],
             epsilon=analysis["epsilon"],
-            weights=[1],
+            columns=analysis["columns"],
         )
 
     @render.text
@@ -96,11 +96,11 @@ def results_server(
         media_type="text/x-python",
     )
     async def download_script():
-        contributions = input.contributions()
+        analysis = analysis_dict()
         script_py = make_script_py(
-            contributions=contributions,
-            epsilon=1,
-            weights=[1],
+            contributions=analysis["contributions"],
+            epsilon=analysis["epsilon"],
+            columns=analysis["columns"],
         )
         yield script_py
 
@@ -109,12 +109,12 @@ def results_server(
         media_type="application/x-ipynb+json",
     )
     async def download_notebook_unexecuted():
-        contributions = input.contributions()
+        analysis = analysis_dict()
         notebook_py = make_notebook_py(
             csv_path="todo.csv",
-            contributions=contributions,
-            epsilon=1,
-            weights=[1],
+            contributions=analysis["contributions"],
+            epsilon=analysis["epsilon"],
+            columns=analysis["columns"],
         )
         notebook_nb = convert_py_to_nb(notebook_py)
         yield notebook_nb

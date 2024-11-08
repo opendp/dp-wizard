@@ -96,7 +96,14 @@ def test_make_notebook():
         csv_path=fake_csv,
         contributions=1,
         epsilon=1,
-        weights=[1],
+        columns={
+            "fake column": {
+                "lower_bound": 5,
+                "upper_bound": 15,
+                "bin_count": 20,
+                "weight": 4,
+            }
+        },
     )
     globals = {}
     exec(notebook, globals)
@@ -107,14 +114,21 @@ def test_make_script():
     script = make_script_py(
         contributions=1,
         epsilon=1,
-        weights=[1],
+        columns={
+            "fake column": {
+                "lower_bound": 5,
+                "upper_bound": 15,
+                "bin_count": 20,
+                "weight": 4,
+            }
+        },
     )
 
     def clear_empty_lines(text):
         # Cleanup whitespace after indenting blocks
         return re.sub(r"^\s+$", "", text, flags=re.MULTILINE).strip()
 
-    expected_script = (fixtures_path / "expected-script.py").read_text()
+    expected_script = (fixtures_path / "expected-script.py.txt").read_text()
     assert clear_empty_lines(script) == clear_empty_lines(expected_script)
 
     with NamedTemporaryFile(mode="w") as fp:

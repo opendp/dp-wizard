@@ -108,28 +108,42 @@ def _make_imports():
     return str(_Template("imports").fill_values())
 
 
-def make_notebook_py(csv_path, contributions, epsilon, weights):
+def _make_columns(columns):
+    return "\n".join(
+        make_column_config_block(
+            name=name,
+            lower_bound=col["lower_bound"],
+            upper_bound=col["upper_bound"],
+            bin_count=col["bin_count"],
+        )
+        for name, col in columns.items()
+    )
+
+
+def make_notebook_py(csv_path, contributions, epsilon, columns):
     return str(
         _Template("notebook").fill_blocks(
             IMPORTS_BLOCK=_make_imports(),
+            COLUMNS_BLOCK=_make_columns(columns),
             CONTEXT_BLOCK=_make_context_for_notebook(
                 csv_path=csv_path,
                 contributions=contributions,
                 epsilon=epsilon,
-                weights=weights,
+                weights=[column["weight"] for column in columns.values()],
             ),
         )
     )
 
 
-def make_script_py(contributions, epsilon, weights):
+def make_script_py(contributions, epsilon, columns):
     return str(
         _Template("script").fill_blocks(
             IMPORTS_BLOCK=_make_imports(),
+            COLUMNS_BLOCK=_make_columns(columns),
             CONTEXT_BLOCK=_make_context_for_script(
                 contributions=contributions,
                 epsilon=epsilon,
-                weights=weights,
+                weights=[column["weight"] for column in columns.values()],
             ),
         )
     )
@@ -152,7 +166,11 @@ def make_column_config_block(name, lower_bound, upper_bound, bin_count):
     ...     bin_count=10
     ... ))
     # From the public information, determine the bins:
-    hw_grade_cut_points = make_cut_points(0, 100, 10)
+    hw_grade_cut_points = make_cut_points(
+        lower_bound=0,
+        upper_bound=100,
+        bin_count=10,
+    )
     <BLANKLINE>
     # Use these bins to define a Polars column:
     hw_grade_config = (
@@ -173,7 +191,7 @@ def make_column_config_block(name, lower_bound, upper_bound, bin_count):
         .fill_values(
             LOWER_BOUND=lower_bound,
             UPPER_BOUND=upper_bound,
-            BINS=bin_count,
+            BIN_COUNT=bin_count,
             COLUMN_NAME=name,
             BIN_COLUMN_NAME=f"{snake_name}_bin",
         )

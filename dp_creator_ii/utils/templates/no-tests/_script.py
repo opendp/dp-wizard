@@ -2,6 +2,8 @@ from argparse import ArgumentParser
 
 IMPORTS_BLOCK
 
+COLUMNS_BLOCK
+
 
 def get_context(csv_path):
     CONTEXT_BLOCK
