@@ -70,11 +70,38 @@ class _Template:
         return self._template
 
 
-def _make_context_for_notebook(csv_path, contributions, epsilon, weights):
+def _make_margins_block(bin_names):
+    margins = (
+        [
+            """
+   (): dp.polars.Margin(
+        public_info="lengths",
+    ),
+"""
+        ]
+        + [
+            f"""
+    ("{bin_name}",): dp.polars.Margin(
+        public_info="keys",
+    ),
+"""
+            for bin_name in bin_names
+        ]
+    )
+
+    margins_block = "{" + "".join(margins) + "}"
+    return margins_block
+
+
+def _make_context_for_notebook(csv_path, contributions, epsilon, weights, bin_names):
     privacy_unit_block = make_privacy_unit_block(contributions)
     privacy_loss_block = make_privacy_loss_block(epsilon)
+    margins_block = _make_margins_block(bin_names)
     return str(
         _Template("context")
+        .fill_expressions(
+            MARGINS_BLOCK=margins_block,
+        )
         .fill_values(
             CSV_PATH=csv_path,
             WEIGHTS=weights,
@@ -86,13 +113,15 @@ def _make_context_for_notebook(csv_path, contributions, epsilon, weights):
     )
 
 
-def _make_context_for_script(contributions, epsilon, weights):
+def _make_context_for_script(contributions, epsilon, weights, bin_names):
     privacy_unit_block = make_privacy_unit_block(contributions)
     privacy_loss_block = make_privacy_loss_block(epsilon)
+    margins_block = _make_margins_block(bin_names)
     return str(
         _Template("context")
         .fill_expressions(
             CSV_PATH="csv_path",
+            MARGINS_BLOCK=margins_block,
         )
         .fill_values(
             WEIGHTS=weights,
@@ -100,6 +129,7 @@ def _make_context_for_script(contributions, epsilon, weights):
         .fill_blocks(
             PRIVACY_UNIT_BLOCK=privacy_unit_block,
             PRIVACY_LOSS_BLOCK=privacy_loss_block,
+            MARGINS_BLOCK=margins_block,
         )
     )
 
@@ -148,6 +178,7 @@ def make_notebook_py(csv_path, contributions, epsilon, columns):
                 contributions=contributions,
                 epsilon=epsilon,
                 weights=[column["weight"] for column in columns.values()],
+                bin_names=[f"{name}_bin" for name in columns.keys()],
             ),
             QUERIES_BLOCK=_make_queries(columns.keys()),
         )
@@ -164,6 +195,7 @@ def make_script_py(contributions, epsilon, columns):
                 contributions=contributions,
                 epsilon=epsilon,
                 weights=[column["weight"] for column in columns.values()],
+                bin_names=[f"{name}_bin" for name in columns.keys()],
             ),
             QUERIES_BLOCK=_make_queries(columns.keys()),
         )

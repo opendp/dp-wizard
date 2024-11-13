@@ -55,7 +55,9 @@ def results_server(
                 "lower_bound": lower_bounds()[col],
                 "upper_bound": upper_bounds()[col],
                 "bin_count": int(bin_counts()[col]),
-                "weight": weights()[col],
+                # TODO: Floats should work for weight, but they don't:
+                # https://github.com/opendp/opendp/issues/2140
+                "weight": int(weights()[col]),
             }
             for col in weights().keys()
         }
