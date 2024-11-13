@@ -7,6 +7,7 @@ We may revisit this.
 
 from pathlib import Path
 import re
+from dp_creator_ii.utils.csv_helper import name_to_identifier
 
 
 class _Template:
@@ -70,37 +71,38 @@ class _Template:
         return self._template
 
 
-def _make_margins_block(bin_names):
+def _make_margins_dict(bin_names):
+    # TODO: Don't worry too much about the formatting here.
+    # Plan to run the output through black for consistency.
+    # https://github.com/opendp/dp-creator-ii/issues/50
     margins = (
         [
             """
-   (): dp.polars.Margin(
-        public_info="lengths",
-    ),
-"""
+        (): dp.polars.Margin(
+            public_info="lengths",
+        ),"""
         ]
         + [
             f"""
-    ("{bin_name}",): dp.polars.Margin(
-        public_info="keys",
-    ),
-"""
+        ("{bin_name}",): dp.polars.Margin(
+            public_info="keys",
+        ),"""
             for bin_name in bin_names
         ]
     )
 
-    margins_block = "{" + "".join(margins) + "}"
-    return margins_block
+    margins_dict = "{" + "".join(margins) + "\n        }"
+    return margins_dict
 
 
 def _make_context_for_notebook(csv_path, contributions, epsilon, weights, bin_names):
     privacy_unit_block = make_privacy_unit_block(contributions)
     privacy_loss_block = make_privacy_loss_block(epsilon)
-    margins_block = _make_margins_block(bin_names)
+    margins_dict = _make_margins_dict(bin_names)
     return str(
         _Template("context")
         .fill_expressions(
-            MARGINS_BLOCK=margins_block,
+            MARGINS_DICT=margins_dict,
         )
         .fill_values(
             CSV_PATH=csv_path,
@@ -116,12 +118,12 @@ def _make_context_for_notebook(csv_path, contributions, epsilon, weights, bin_na
 def _make_context_for_script(contributions, epsilon, weights, bin_names):
     privacy_unit_block = make_privacy_unit_block(contributions)
     privacy_loss_block = make_privacy_loss_block(epsilon)
-    margins_block = _make_margins_block(bin_names)
+    margins_dict = _make_margins_dict(bin_names)
     return str(
         _Template("context")
         .fill_expressions(
             CSV_PATH="csv_path",
-            MARGINS_BLOCK=margins_block,
+            MARGINS_DICT=margins_dict,
         )
         .fill_values(
             WEIGHTS=weights,
@@ -129,7 +131,7 @@ def _make_context_for_script(contributions, epsilon, weights, bin_names):
         .fill_blocks(
             PRIVACY_UNIT_BLOCK=privacy_unit_block,
             PRIVACY_LOSS_BLOCK=privacy_loss_block,
-            MARGINS_BLOCK=margins_block,
+            MARGINS_DICT=margins_dict,
         )
     )
 
@@ -178,7 +180,9 @@ def make_notebook_py(csv_path, contributions, epsilon, columns):
                 contributions=contributions,
                 epsilon=epsilon,
                 weights=[column["weight"] for column in columns.values()],
-                bin_names=[f"{name}_bin" for name in columns.keys()],
+                bin_names=[
+                    name_to_identifier(name) + "_bin" for name in columns.keys()
+                ],
             ),
             QUERIES_BLOCK=_make_queries(columns.keys()),
         )
@@ -195,7 +199,9 @@ def make_script_py(contributions, epsilon, columns):
                 contributions=contributions,
                 epsilon=epsilon,
                 weights=[column["weight"] for column in columns.values()],
-                bin_names=[f"{name}_bin" for name in columns.keys()],
+                bin_names=[
+                    name_to_identifier(name) + "_bin" for name in columns.keys()
+                ],
             ),
             QUERIES_BLOCK=_make_queries(columns.keys()),
         )

@@ -5,5 +5,5 @@ context = dp.Context.compositor(
     privacy_unit=privacy_unit,
     privacy_loss=privacy_loss,
     split_by_weights=WEIGHTS,
-    margins=MARGINS_BLOCK,
+    margins=MARGINS_DICT,
 )
