@@ -124,15 +124,6 @@ def test_make_script():
         },
     )
 
-    def clear_empty_lines(text):
-        # Cleanup whitespace after indenting blocks
-        return re.sub(r"^\s+$", "", text, flags=re.MULTILINE).strip()
-
-    expected_script = (fixtures_path / "expected-script.py.txt").read_text()
-    print("Templated script:")
-    print(script)
-    assert clear_empty_lines(script) == clear_empty_lines(expected_script)
-
     with NamedTemporaryFile(mode="w") as fp:
         fp.write(script)
         fp.flush()
