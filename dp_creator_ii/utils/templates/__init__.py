@@ -91,7 +91,7 @@ def _make_margins_dict(bin_names):
         ]
     )
 
-    margins_dict = "{" + "".join(margins) + "\n        }"
+    margins_dict = "{" + "".join(margins) + "\n    }"
     return margins_dict
 
 
@@ -153,15 +153,16 @@ def _make_columns(columns):
 
 
 def _make_query(column_name):
+    indentifier = name_to_identifier(column_name)
     return str(
         _Template("query")
         .fill_values(
-            BIN_NAME=f"{column_name}_bin",
+            BIN_NAME=f"{indentifier}_bin",
         )
         .fill_expressions(
-            QUERY_NAME=f"{column_name}_query",
-            ACCURACY_NAME=f"{column_name}_accuracy",
-            HISTOGRAM_NAME=f"{column_name}_histogram",
+            QUERY_NAME=f"{indentifier}_query",
+            ACCURACY_NAME=f"{indentifier}_accuracy",
+            HISTOGRAM_NAME=f"{indentifier}_histogram",
         )
     )
 
@@ -181,7 +182,7 @@ def make_notebook_py(csv_path, contributions, epsilon, columns):
                 epsilon=epsilon,
                 weights=[column["weight"] for column in columns.values()],
                 bin_names=[
-                    name_to_identifier(name) + "_bin" for name in columns.keys()
+                    f"{name_to_identifier(name)}_bin" for name in columns.keys()
                 ],
             ),
             QUERIES_BLOCK=_make_queries(columns.keys()),
