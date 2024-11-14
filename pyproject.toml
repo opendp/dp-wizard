@@ -3,7 +3,7 @@ requires = ["flit_core >=3.2,<4"]
 build-backend = "flit_core.buildapi"
 
 [project]
-name = "dp_creator_ii"
+name = "dp_wizard"
 authors = [{name = "Chuck McCallum", email = "mccallucc@gmail.com"}]
 readme = "README.md"
 license = {file = "LICENSE"}
@@ -21,7 +21,7 @@ dependencies = [
 ]
 
 [project.scripts]
-dp-creator-ii = "dp_creator_ii:main"
+dp-wizard = "dp_wizard:main"
 
 [project.urls]
-Home = "https://github.com/opendp/dp-creator-ii"
+Home = "https://github.com/opendp/dp-wizard"

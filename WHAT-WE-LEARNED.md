@@ -69,8 +69,8 @@ Was planning to just use the CSV column headers as IDs, but that's not going to 
 ## Normal tooling doesn't work inside of app?
 
 There are several bits of tooling that don't seem to work inside end-to-end app tests. My guess is that this isn't related to Shiny per se, but rather the ASGI framework: It's not running in the same process as pytest, so it's not surprising that the pytest process can't instrument this.
-- [App code skipped by test coverage](https://github.com/opendp/dp-creator-ii/issues/18)
-- [Mocks don't work inside app](https://github.com/opendp/dp-creator-ii/issues/119)
+- [App code skipped by test coverage](https://github.com/opendp/dp-wizard/issues/18)
+- [Mocks don't work inside app](https://github.com/opendp/dp-wizard/issues/119)
 - `breakpoint()` doesn't work inside end-to-end tests. (A comparison might be made to debugging a React application: With React devtools in the browser, it's pretty easy!)
 
 ## You still need some webdev skills

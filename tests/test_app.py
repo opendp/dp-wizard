@@ -13,10 +13,10 @@ simulation = "This simulation assumes a normal distribution"
 
 
 # TODO: Why is incomplete coverage reported here?
-# https://github.com/opendp/dp-creator-ii/issues/18
+# https://github.com/opendp/dp-wizard/issues/18
 def test_demo_app(page: Page, demo_app: ShinyAppProc):  # pragma: no cover
     page.goto(demo_app.url)
-    expect(page).to_have_title("DP Creator II")
+    expect(page).to_have_title("DP Wizard")
     expect(page.get_by_text(for_the_demo)).not_to_be_visible()
     page.locator(tooltip).hover()
     expect(page.get_by_text(for_the_demo)).to_be_visible()
@@ -38,7 +38,7 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
 
     # -- Select dataset --
     page.goto(default_app.url)
-    expect(page).to_have_title("DP Creator II")
+    expect(page).to_have_title("DP Wizard")
     expect(page.locator(tooltip)).to_have_count(0)
     expect_visible(pick_dataset_text)
     expect_not_visible(perform_analysis_text)
@@ -103,7 +103,7 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     # TODO: Setting more inputs without checking for updates
     # cause recalculations to pile up, and these cause timeouts on CI:
     # It is still rerendering the graph after hitting "Download results".
-    # https://github.com/opendp/dp-creator-ii/issues/116
+    # https://github.com/opendp/dp-wizard/issues/116
     expect_no_error()
 
     # -- Download results --
