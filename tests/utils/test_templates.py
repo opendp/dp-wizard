@@ -97,7 +97,9 @@ def test_make_notebook():
         contributions=1,
         epsilon=1,
         columns={
-            "fake column": {
+            # For a strong test, use a column whose name
+            # doesn't work as a python identifier.
+            "hw-number": {
                 "lower_bound": 5,
                 "upper_bound": 15,
                 "bin_count": 20,
@@ -116,7 +118,7 @@ def test_make_script():
         contributions=1,
         epsilon=1,
         columns={
-            "fake column": {
+            "hw-number": {
                 "lower_bound": 5,
                 "upper_bound": 15,
                 "bin_count": 20,

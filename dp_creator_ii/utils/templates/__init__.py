@@ -99,10 +99,12 @@ def _make_context_for_notebook(csv_path, contributions, epsilon, weights, bin_na
     privacy_unit_block = make_privacy_unit_block(contributions)
     privacy_loss_block = make_privacy_loss_block(epsilon)
     margins_dict = _make_margins_dict(bin_names)
+    columns = ",".join(f"{bin_name}_config" for bin_name in bin_names)
     return str(
         _Template("context")
         .fill_expressions(
             MARGINS_DICT=margins_dict,
+            COLUMNS=columns,
         )
         .fill_values(
             CSV_PATH=csv_path,
@@ -119,11 +121,13 @@ def _make_context_for_script(contributions, epsilon, weights, bin_names):
     privacy_unit_block = make_privacy_unit_block(contributions)
     privacy_loss_block = make_privacy_loss_block(epsilon)
     margins_dict = _make_margins_dict(bin_names)
+    columns = ",".join(f"{bin_name}_config" for bin_name in bin_names)
     return str(
         _Template("context")
         .fill_expressions(
             CSV_PATH="csv_path",
             MARGINS_DICT=margins_dict,
+            COLUMNS=columns,
         )
         .fill_values(
             WEIGHTS=weights,

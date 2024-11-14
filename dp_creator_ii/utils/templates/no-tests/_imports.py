@@ -25,7 +25,7 @@ def df_to_columns(df):
     ...     "bin": ["A", "B", "C"],
     ...     "len": [0, 10, 20],
     ... })
-    >>> _df_to_columns(df)
+    >>> df_to_columns(df)
     (['A', 'B', 'C'], [0, 10, 20])
     """
     return tuple(list(df[col]) for col in df.columns)
