@@ -8,14 +8,14 @@ from dp_wizard.utils.templates import make_column_config_block
 from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip
 
 
-default_weight = 2
+default_weight = "2"
 
 col_widths = {
     # Controls stay roughly a constant width;
     # Graph expands to fill space.
-    "sm": (4, 8),
-    "md": (3, 9),
-    "lg": (2, 10),
+    "sm": [4, 8],
+    "md": [3, 9],
+    "lg": [2, 10],
 }
 
 
@@ -37,9 +37,9 @@ def column_ui():  # pragma: no cover
                 "weight",
                 ["Weight", ui.output_ui("weight_tooltip_ui")],
                 choices={
-                    1: "Less accurate",
+                    "1": "Less accurate",
                     default_weight: "Default",
-                    4: "More accurate",
+                    "4": "More accurate",
                 },
                 selected=default_weight,
                 width=width,
@@ -50,7 +50,7 @@ def column_ui():  # pragma: no cover
             # Make plot smaller than default: about the same size as the other column.
             output_code_sample("Column Definition", "column_code"),
         ],
-        col_widths=col_widths,
+        col_widths=col_widths,  # type: ignore
     )
 
 

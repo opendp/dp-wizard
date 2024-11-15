@@ -133,7 +133,7 @@ def analysis_server(
                             """
                             )
                         ],
-                        col_widths=col_widths,
+                        col_widths=col_widths,  # type: ignore
                     )
                     if column_ids
                     else []

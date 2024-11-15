@@ -77,15 +77,15 @@ def make_confidence_accuracy_histogram(
         ),
         split_by_weights=[1],
         margins={
-            ("bin",): dp.polars.Margin(
+            ("bin",): dp.polars.Margin(  # type: ignore
                 max_partition_length=row_count,
                 public_info="keys",
             ),
         },
     )
-    query = context.query().group_by("bin").agg(pl.len().dp.noise())
+    query = context.query().group_by("bin").agg(pl.len().dp.noise())  # type: ignore
 
     confidence = 0.95
-    accuracy = query.summarize(alpha=1 - confidence)["accuracy"].item()
+    accuracy = query.summarize(alpha=1 - confidence)["accuracy"].item()  # type: ignore
     histogram = query.release().collect().sort("bin")
     return (confidence, accuracy, histogram)

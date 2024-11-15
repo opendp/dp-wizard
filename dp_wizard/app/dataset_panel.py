@@ -9,9 +9,7 @@ from dp_wizard.utils.templates import make_privacy_unit_block
 
 def dataset_ui():
     cli_info = get_cli_info()
-    csv_placeholder = (
-        None if cli_info.csv_path is None else Path(cli_info.csv_path).name
-    )
+    csv_placeholder = "" if cli_info.csv_path is None else Path(cli_info.csv_path).name
 
     return ui.nav_panel(
         "Select Dataset",
@@ -41,7 +39,7 @@ def dataset_ui():
 
 
 def dataset_server(
-    input, output, session, csv_path=None, contributions=None, is_demo=None
+    input, output, session, csv_path, contributions, is_demo
 ):  # pragma: no cover
     @reactive.effect
     @reactive.event(input.csv_path)
