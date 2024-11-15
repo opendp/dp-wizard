@@ -2,26 +2,9 @@ import polars as pl
 import opendp.prelude as dp
 
 from dp_wizard.utils.mock_data import mock_data, ColumnDef
+from dp_wizard.utils.shared import make_cut_points
 
 dp.enable_features("contrib")
-
-
-def _make_cut_points(lower, upper, bin_count):
-    """
-    Returns one more cut point than the bin_count.
-    (There are actually two more bins, extending to
-    -inf and +inf, but we'll ignore those.)
-    Cut points are evenly spaced from lower to upper.
-
-    >>> _make_cut_points(0, 10, 1)
-    [0.0, 10.0]
-    >>> _make_cut_points(0, 10, 2)
-    [0.0, 5.0, 10.0]
-    >>> _make_cut_points(0, 10, 3)
-    [0.0, 3.33, 6.67, 10.0]
-    """
-    bin_width = (upper - lower) / bin_count
-    return [round(lower + i * bin_width, 2) for i in range(bin_count + 1)]
 
 
 def make_confidence_accuracy_histogram(
@@ -58,7 +41,7 @@ def make_confidence_accuracy_histogram(
     # TODO: When this is stable, merge it to templates, so we can be
     # sure that we're using the same code in the preview that we
     # use in the generated notebook.
-    cut_points = _make_cut_points(lower, upper, bin_count)
+    cut_points = make_cut_points(lower, upper, bin_count)
     context = dp.Context.compositor(
         data=pl.LazyFrame(df).with_columns(
             # The cut() method returns a Polars categorical type.

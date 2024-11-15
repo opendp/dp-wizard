@@ -1,21 +1,40 @@
-import matplotlib.pyplot as plt
+# These functions are used both in the application and in generated notebooks.
 
 
-def _df_to_columns(df):
+def make_cut_points(lower_bound, upper_bound, bin_count):
     """
+    Returns one more cut point than the bin_count.
+    (There are actually two more bins, extending to
+    -inf and +inf, but we'll ignore those.)
+    Cut points are evenly spaced from lower_bound to upper_bound.
+    >>> make_cut_points(0, 10, 2)
+    [0.0, 5.0, 10.0]
+    """
+    bin_width = (upper_bound - lower_bound) / bin_count
+    return [round(lower_bound + i * bin_width, 2) for i in range(bin_count + 1)]
+
+
+def df_to_columns(df):
+    """
+    Transform a Dataframe into a format that is easier to plot.
     >>> import polars as pl
     >>> df = pl.DataFrame({
     ...     "bin": ["A", "B", "C"],
     ...     "len": [0, 10, 20],
     ... })
-    >>> _df_to_columns(df)
+    >>> df_to_columns(df)
     (['A', 'B', 'C'], [0, 10, 20])
     """
     return tuple(list(df[col]) for col in df.columns)
 
 
 def plot_histogram(histogram_df, error, cutoff):  # pragma: no cover
-    bins, values = _df_to_columns(histogram_df)
+    """
+    Given a Dataframe for a histogram, plot the data.
+    """
+    import matplotlib.pyplot as plt
+
+    bins, values = df_to_columns(histogram_df)
     mod = (len(bins) // 12) + 1
     majors = [label for i, label in enumerate(bins) if i % mod == 0]
     minors = [label for i, label in enumerate(bins) if i % mod != 0]
@@ -26,4 +45,3 @@ def plot_histogram(histogram_df, error, cutoff):  # pragma: no cover
     axes.set_xticks(minors, ["" for _ in minors], minor=True)
     axes.axhline(cutoff, color="lightgrey", zorder=-1)
     axes.set_ylim(bottom=0)
-    # TODO: Since this seems to return None, how does the information flow?
