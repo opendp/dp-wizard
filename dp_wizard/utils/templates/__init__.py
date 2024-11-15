@@ -172,7 +172,9 @@ def _make_query(column_name):
 
 
 def _make_queries(column_names):
-    return "\n".join(_make_query(column_name) for column_name in column_names)
+    return "confidence = 0.95\n" + "\n".join(
+        _make_query(column_name) for column_name in column_names
+    )
 
 
 def make_notebook_py(csv_path, contributions, epsilon, columns):
