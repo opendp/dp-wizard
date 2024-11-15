@@ -14,18 +14,28 @@ def make_cut_points(lower_bound, upper_bound, bin_count):
     return [round(lower_bound + i * bin_width, 2) for i in range(bin_count + 1)]
 
 
+def interval_bottom(interval):
+    """
+    >>> interval_bottom("(10, 20]")
+    10.0
+    """
+    return float(interval.split(",")[0][1:])
+
+
 def df_to_columns(df):
     """
-    Transform a Dataframe into a format that is easier to plot.
+    Transform a Dataframe into a format that is easier to plot,
+    parsing the interval strings to sort them as numbers.
     >>> import polars as pl
     >>> df = pl.DataFrame({
-    ...     "bin": ["A", "B", "C"],
-    ...     "len": [0, 10, 20],
+    ...     "bin": ["(-inf, 5]", "(10, 20]", "(5, 10]"],
+    ...     "len": [0, 20, 10],
     ... })
     >>> df_to_columns(df)
-    (['A', 'B', 'C'], [0, 10, 20])
+    (('(-inf, 5]', '(5, 10]', '(10, 20]'), (0, 10, 20))
     """
-    return tuple(list(df[col]) for col in df.columns)
+    sorted_rows = sorted(df.rows(), key=lambda pair: interval_bottom(pair[0]))
+    return tuple(zip(*sorted_rows))
 
 
 def plot_histogram(histogram_df, error, cutoff):  # pragma: no cover
