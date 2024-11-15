@@ -154,12 +154,8 @@ mdurl==0.1.2
     # via markdown-it-py
 mistune==3.0.2
     # via nbconvert
-mypy==1.12.0
-    # via -r requirements-dev.in
 mypy-extensions==1.0.0
-    # via
-    #   black
-    #   mypy
+    # via black
 nbclient==0.10.0
     # via nbconvert
 nbconvert==7.16.4
@@ -172,7 +168,9 @@ nbformat==5.10.4
 nest-asyncio==1.6.0
     # via ipykernel
 nodeenv==1.9.1
-    # via pre-commit
+    # via
+    #   pre-commit
+    #   pyright
 numpy==1.26.4
     # via
     #   contourpy
@@ -249,6 +247,8 @@ pyproject-hooks==1.2.0
     # via
     #   build
     #   pip-tools
+pyright==1.1.389
+    # via -r requirements-dev.in
 pytest==8.3.3
     # via
     #   -r requirements-dev.in
@@ -337,8 +337,8 @@ traitlets==5.14.3
 typing-extensions==4.12.2
     # via
     #   htmltools
-    #   mypy
     #   pyee
+    #   pyright
     #   shiny
 uc-micro-py==1.0.3
     # via linkify-it-py
