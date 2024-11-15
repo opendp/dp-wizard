@@ -1,6 +1,6 @@
 from json import dumps
 
-from shiny import ui, render, reactive
+from shiny import ui, render, reactive, Inputs, Outputs, Session
 
 from dp_wizard.utils.templates import make_notebook_py, make_script_py
 from dp_wizard.utils.converters import convert_py_to_nb
@@ -23,9 +23,9 @@ def results_ui():
 
 
 def results_server(
-    input,
-    output,
-    session,
+    input: Inputs,
+    output: Outputs,
+    session: Session,
     csv_path,
     contributions,
     lower_bounds,

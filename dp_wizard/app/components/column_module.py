@@ -1,6 +1,6 @@
 from logging import info
 
-from shiny import ui, render, module, reactive
+from shiny import ui, render, module, reactive, Inputs, Outputs, Session
 
 from dp_wizard.utils.dp_helper import make_confidence_accuracy_histogram
 from dp_wizard.app.components.plots import plot_histogram
@@ -56,9 +56,9 @@ def column_ui():  # pragma: no cover
 
 @module.server
 def column_server(
-    input,
-    output,
-    session,
+    input: Inputs,
+    output: Outputs,
+    session: Session,
     name,
     contributions,
     epsilon,

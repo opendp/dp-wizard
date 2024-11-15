@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from shiny import ui, reactive, render
+from shiny import ui, reactive, render, Inputs, Outputs, Session
 
 from dp_wizard.utils.argparse_helpers import get_cli_info
 from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip
@@ -39,7 +39,7 @@ def dataset_ui():
 
 
 def dataset_server(
-    input, output, session, csv_path, contributions, is_demo
+    input: Inputs, output: Outputs, session: Session, csv_path, contributions, is_demo
 ):  # pragma: no cover
     @reactive.effect
     @reactive.event(input.csv_path)

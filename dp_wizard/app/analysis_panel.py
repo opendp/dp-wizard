@@ -1,6 +1,6 @@
 from math import pow
 
-from shiny import ui, reactive, render, req
+from shiny import ui, reactive, render, req, Inputs, Outputs, Session
 
 from dp_wizard.app.components.inputs import log_slider
 from dp_wizard.app.components.column_module import column_ui, column_server
@@ -48,9 +48,9 @@ def _cleanup_reactive_dict(reactive_dict, keys_to_keep):  # pragma: no cover
 
 
 def analysis_server(
-    input,
-    output,
-    session,
+    input: Inputs,
+    output: Outputs,
+    session: Session,
     csv_path,
     contributions,
     is_demo,
