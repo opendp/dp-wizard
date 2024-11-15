@@ -1,7 +1,7 @@
 from pathlib import Path
 import logging
 
-from shiny import App, ui, reactive, Inputs, Outputs, Session
+from shiny import App, ui, reactive, Inputs, Outputs
 
 from dp_wizard.utils.argparse_helpers import get_cli_info
 from dp_wizard.app import analysis_panel, dataset_panel, results_panel
