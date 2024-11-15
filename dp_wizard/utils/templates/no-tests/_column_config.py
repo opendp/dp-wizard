@@ -1,4 +1,4 @@
-# From the public information, determine the bins:
+# From the public information, determine the bins for "COLUMN_NAME":
 CUT_LIST_NAME = make_cut_points(
     lower_bound=LOWER_BOUND,
     upper_bound=UPPER_BOUND,

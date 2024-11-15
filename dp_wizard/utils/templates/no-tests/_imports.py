@@ -20,6 +20,7 @@ def make_cut_points(lower_bound, upper_bound, bin_count):
 
 def df_to_columns(df):
     """
+    Transform a Dataframe into a format that is easier to plot.
     >>> import polars as pl
     >>> df = pl.DataFrame({
     ...     "bin": ["A", "B", "C"],
@@ -32,6 +33,9 @@ def df_to_columns(df):
 
 
 def plot_histogram(histogram_df, error, cutoff):  # pragma: no cover
+    """
+    Given a Dataframe for a histogram, plot the data.
+    """
     bins, values = df_to_columns(histogram_df)
     mod = (len(bins) // 12) + 1
     majors = [label for i, label in enumerate(bins) if i % mod == 0]
