@@ -95,11 +95,11 @@ def _make_margins_dict(bin_names):
     return margins_dict
 
 
-def _make_context_for_notebook(csv_path, contributions, epsilon, weights, bin_names):
+def _make_context_for_notebook(csv_path, contributions, epsilon, weights, column_names):
     privacy_unit_block = make_privacy_unit_block(contributions)
     privacy_loss_block = make_privacy_loss_block(epsilon)
-    margins_dict = _make_margins_dict(bin_names)
-    columns = ",".join(f"{bin_name}_config" for bin_name in bin_names)
+    margins_dict = _make_margins_dict([f"{name}_bin" for name in column_names])
+    columns = ", ".join([f"{name}_config" for name in column_names])
     return str(
         _Template("context")
         .fill_expressions(
@@ -117,11 +117,11 @@ def _make_context_for_notebook(csv_path, contributions, epsilon, weights, bin_na
     )
 
 
-def _make_context_for_script(contributions, epsilon, weights, bin_names):
+def _make_context_for_script(contributions, epsilon, weights, column_names):
     privacy_unit_block = make_privacy_unit_block(contributions)
     privacy_loss_block = make_privacy_loss_block(epsilon)
-    margins_dict = _make_margins_dict(bin_names)
-    columns = ",".join(f"{bin_name}_config" for bin_name in bin_names)
+    margins_dict = _make_margins_dict([f"{name}_bin" for name in column_names])
+    columns = ",".join([f"{name}_config" for name in column_names])
     return str(
         _Template("context")
         .fill_expressions(
@@ -185,9 +185,7 @@ def make_notebook_py(csv_path, contributions, epsilon, columns):
                 contributions=contributions,
                 epsilon=epsilon,
                 weights=[column["weight"] for column in columns.values()],
-                bin_names=[
-                    f"{name_to_identifier(name)}_bin" for name in columns.keys()
-                ],
+                column_names=[name_to_identifier(name) for name in columns.keys()],
             ),
             QUERIES_BLOCK=_make_queries(columns.keys()),
         )
@@ -204,9 +202,7 @@ def make_script_py(contributions, epsilon, columns):
                 contributions=contributions,
                 epsilon=epsilon,
                 weights=[column["weight"] for column in columns.values()],
-                bin_names=[
-                    name_to_identifier(name) + "_bin" for name in columns.keys()
-                ],
+                column_names=[name_to_identifier(name) for name in columns.keys()],
             ),
             QUERIES_BLOCK=_make_queries(columns.keys()),
         )
