@@ -172,7 +172,7 @@ def _make_query(column_name):
 
 
 def _make_queries(column_names):
-    return "confidence = 0.95\n" + "\n".join(
+    return "confidence = 0.95\n\n" + "\n".join(
         _make_query(column_name) for column_name in column_names
     )
 

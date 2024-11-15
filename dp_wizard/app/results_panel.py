@@ -10,23 +10,13 @@ from dp_wizard.app.components.outputs import output_code_sample
 def results_ui():
     return ui.nav_panel(
         "Download results",
-        ui.p("These code snippets describe how to make a DP release of your data:"),
-        output_code_sample("Analysis JSON", "analysis_json_text"),  # TODO: Drop this?
-        output_code_sample("Analysis Python", "analysis_python_text"),
-        ui.markdown(
-            "You can now make a differentially private release of your data. "
-            "This will lock the configuration you’ve provided on the previous pages."
-        ),
-        ui.markdown(
-            "You can also download code that can be executed to produce a DP release. "
-            "Downloaded code does not lock the configuration."
-        ),
+        ui.markdown("You can now make a differentially private release of your data."),
         ui.download_button(
             "download_script",
             "Download Script (.py)",
         ),
         ui.download_button(
-            "download_notebook_unexecuted",
+            "download_notebook",
             "Download Notebook (.ipynb)",
         ),
         value="results_panel",
@@ -110,22 +100,7 @@ def results_server(
         filename="dp-wizard-notebook.ipynb",
         media_type="application/x-ipynb+json",
     )
-    async def download_notebook_unexecuted():
-        analysis = analysis_dict()
-        notebook_py = make_notebook_py(
-            csv_path=analysis["csv_path"],
-            contributions=analysis["contributions"],
-            epsilon=analysis["epsilon"],
-            columns=analysis["columns"],
-        )
-        notebook_nb = convert_py_to_nb(notebook_py)
-        yield notebook_nb
-
-    @render.download(
-        filename="dp-wizard-notebook-executed.ipynb",
-        media_type="application/x-ipynb+json",
-    )
-    async def download_notebook_executed():
+    async def download_notebook():
         analysis = analysis_dict()
         notebook_py = make_notebook_py(
             csv_path=analysis["csv_path"],
