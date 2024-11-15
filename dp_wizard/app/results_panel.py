@@ -2,9 +2,9 @@ from json import dumps
 
 from shiny import ui, render, reactive
 
-from dp_creator_ii.utils.templates import make_notebook_py, make_script_py
-from dp_creator_ii.utils.converters import convert_py_to_nb
-from dp_creator_ii.app.components.outputs import output_code_sample
+from dp_wizard.utils.templates import make_notebook_py, make_script_py
+from dp_wizard.utils.converters import convert_py_to_nb
+from dp_wizard.app.components.outputs import output_code_sample
 
 
 def results_ui():
@@ -94,7 +94,7 @@ def results_server(
         return analysis_python()
 
     @render.download(
-        filename="dp-creator-script.py",
+        filename="dp-wizard-script.py",
         media_type="text/x-python",
     )
     async def download_script():
@@ -107,7 +107,7 @@ def results_server(
         yield script_py
 
     @render.download(
-        filename="dp-creator-notebook.ipynb",
+        filename="dp-wizard-notebook.ipynb",
         media_type="application/x-ipynb+json",
     )
     async def download_notebook_unexecuted():
@@ -122,7 +122,7 @@ def results_server(
         yield notebook_nb
 
     @render.download(
-        filename="dp-creator-notebook-executed.ipynb",
+        filename="dp-wizard-notebook-executed.ipynb",
         media_type="application/x-ipynb+json",
     )
     async def download_notebook_executed():

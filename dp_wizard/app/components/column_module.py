@@ -2,10 +2,10 @@ from logging import info
 
 from shiny import ui, render, module, reactive
 
-from dp_creator_ii.utils.dp_helper import make_confidence_accuracy_histogram
-from dp_creator_ii.app.components.plots import plot_histogram
-from dp_creator_ii.utils.templates import make_column_config_block
-from dp_creator_ii.app.components.outputs import output_code_sample, demo_tooltip
+from dp_wizard.utils.dp_helper import make_confidence_accuracy_histogram
+from dp_wizard.app.components.plots import plot_histogram
+from dp_wizard.utils.templates import make_column_config_block
+from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip
 
 
 default_weight = 2

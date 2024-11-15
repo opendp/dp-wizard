@@ -32,7 +32,7 @@ jobs:
 
       - name: Check CLI
         # TODO: This won't catch most missing dependencies.
-        run: dp-creator-ii --help
+        run: dp-wizard --help
 
       - name: Install dev dependencies
         run: pip install -r requirements-dev.txt

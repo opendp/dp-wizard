@@ -1,7 +1,7 @@
 import polars as pl
 import opendp.prelude as dp
 
-from dp_creator_ii.utils.mock_data import mock_data, ColumnDef
+from dp_wizard.utils.mock_data import mock_data, ColumnDef
 
 dp.enable_features("contrib")
 

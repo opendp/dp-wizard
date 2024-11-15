@@ -7,7 +7,7 @@ We may revisit this.
 
 from pathlib import Path
 import re
-from dp_creator_ii.utils.csv_helper import name_to_identifier
+from dp_wizard.utils.csv_helper import name_to_identifier
 
 
 class _Template:
