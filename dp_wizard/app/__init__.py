@@ -3,7 +3,7 @@ import logging
 
 from shiny import App, ui, reactive, Inputs, Outputs
 
-from dp_wizard.utils.argparse_helpers import get_cli_info
+from dp_wizard.utils.argparse_helpers import get_cli_info, CLIInfo
 from dp_wizard.app import analysis_panel, dataset_panel, results_panel
 
 
@@ -25,7 +25,7 @@ def ctrl_c_reminder():  # pragma: no cover
     print("Session ended (Press CTRL+C to quit)")
 
 
-def make_server_from_cli_info(cli_info):
+def make_server_from_cli_info(cli_info: CLIInfo):
     def server(input: Inputs, output: Outputs, session):  # pragma: no cover
         csv_path = reactive.value(cli_info.csv_path)
         contributions = reactive.value(cli_info.contributions)

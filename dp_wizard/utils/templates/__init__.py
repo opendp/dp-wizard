@@ -5,6 +5,7 @@ makes some things easier, but it is also reinventing the wheel.
 We may revisit this.
 """
 
+from typing import Iterable
 from pathlib import Path
 import re
 from dp_wizard.utils.csv_helper import name_to_identifier
@@ -71,7 +72,7 @@ class _Template:
         return self._template
 
 
-def _make_margins_dict(bin_names):
+def _make_margins_dict(bin_names: Iterable[str]):
     # TODO: Don't worry too much about the formatting here.
     # Plan to run the output through black for consistency.
     # https://github.com/opendp/dp-creator-ii/issues/50
@@ -95,7 +96,13 @@ def _make_margins_dict(bin_names):
     return margins_dict
 
 
-def _make_context_for_notebook(csv_path, contributions, epsilon, weights, column_names):
+def _make_context_for_notebook(
+    csv_path,
+    contributions: int,
+    epsilon: float,
+    weights: Iterable[int],
+    column_names: Iterable[str],
+):
     privacy_unit_block = make_privacy_unit_block(contributions)
     privacy_loss_block = make_privacy_loss_block(epsilon)
     margins_dict = _make_margins_dict([f"{name}_bin" for name in column_names])
