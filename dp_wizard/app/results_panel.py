@@ -4,7 +4,6 @@ from shiny import ui, render, reactive
 
 from dp_wizard.utils.templates import make_notebook_py, make_script_py
 from dp_wizard.utils.converters import convert_py_to_nb
-from dp_wizard.app.components.outputs import output_code_sample
 
 
 def results_ui():

@@ -227,7 +227,7 @@ def make_column_config_block(name, lower_bound, upper_bound, bin_count):
     ...     upper_bound=100,
     ...     bin_count=10
     ... ))
-    # From the public information, determine the bins:
+    # From the public information, determine the bins for 'HW GRADE':
     hw_grade_cut_points = make_cut_points(
         lower_bound=0,
         upper_bound=100,
