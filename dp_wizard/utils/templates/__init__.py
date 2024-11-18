@@ -12,7 +12,7 @@ from dp_wizard.utils.csv_helper import name_to_identifier
 
 
 class _Template:
-    def __init__(self, path, template=None):
+    def __init__(self, path: str | None, template: str | None = None):
         if path is not None:
             self._path = f"_{path}.py"
             template_path = Path(__file__).parent / "no-tests" / self._path
@@ -32,26 +32,27 @@ class _Template:
         slot_re = r"\b[A-Z][A-Z_]{2,}\b"
         return set(re.findall(slot_re, self._template))
 
-    def fill_expressions(self, **kwargs):
+    def fill_expressions(self, **kwargs: dict[str, str]):
         for k, v in kwargs.items():
             k_re = re.escape(k)
             self._template = re.sub(rf"\b{k_re}\b", str(v), self._template)
         return self
 
-    def fill_values(self, **kwargs):
+    def fill_values(self, **kwargs: dict[str, str]):
         for k, v in kwargs.items():
             k_re = re.escape(k)
             self._template = re.sub(rf"\b{k_re}\b", repr(v), self._template)
         return self
 
-    def fill_blocks(self, **kwargs):
+    def fill_blocks(self, **kwargs: dict[str, str]):
         for k, v in kwargs.items():
 
-            def match_indent(match):
+            def match_indent(match: re.Match[str]):
                 # This does what we want, but binding is confusing.
-                return "\n".join(
-                    match.group(1) + line for line in v.split("\n")  # noqa: B023
-                )
+                indented_lines: list[str] = [
+                    match.group(1) + line for line in v.split("\n")  # type: ignore # noqa: B023
+                ]
+                return "\n".join(indented_lines)
 
             k_re = re.escape(k)
             self._template = re.sub(
@@ -62,7 +63,7 @@ class _Template:
             )
         return self
 
-    def __str__(self):
+    def finish(self):
         unfilled_slots = self._initial_slots & self._find_slots()
         if unfilled_slots:
             raise Exception(
@@ -97,7 +98,7 @@ def _make_margins_dict(bin_names: Iterable[str]):
 
 
 def _make_context_for_notebook(
-    csv_path,
+    csv_path: Path,
     contributions: int,
     epsilon: float,
     weights: Iterable[int],
@@ -107,7 +108,7 @@ def _make_context_for_notebook(
     privacy_loss_block = make_privacy_loss_block(epsilon)
     margins_dict = _make_margins_dict([f"{name}_bin" for name in column_names])
     columns = ", ".join([f"{name}_config" for name in column_names])
-    return str(
+    return (
         _Template("context")
         .fill_expressions(
             MARGINS_DICT=margins_dict,
@@ -121,6 +122,7 @@ def _make_context_for_notebook(
             PRIVACY_UNIT_BLOCK=privacy_unit_block,
             PRIVACY_LOSS_BLOCK=privacy_loss_block,
         )
+        .finish()
     )
 
 
@@ -129,7 +131,7 @@ def _make_context_for_script(contributions, epsilon, weights, column_names):
     privacy_loss_block = make_privacy_loss_block(epsilon)
     margins_dict = _make_margins_dict([f"{name}_bin" for name in column_names])
     columns = ",".join([f"{name}_config" for name in column_names])
-    return str(
+    return (
         _Template("context")
         .fill_expressions(
             CSV_PATH="csv_path",
@@ -144,12 +146,13 @@ def _make_context_for_script(contributions, epsilon, weights, column_names):
             PRIVACY_LOSS_BLOCK=privacy_loss_block,
             MARGINS_DICT=margins_dict,
         )
+        .finish()
     )
 
 
 def _make_imports():
     return (
-        str(_Template("imports").fill_values())
+        _Template("imports").fill_values().finish()
         + (Path(__file__).parent.parent / "shared.py").read_text()
     )
 
@@ -168,7 +171,7 @@ def _make_columns(columns):
 
 def _make_query(column_name):
     indentifier = name_to_identifier(column_name)
-    return str(
+    return (
         _Template("query")
         .fill_values(
             BIN_NAME=f"{indentifier}_bin",
@@ -178,6 +181,7 @@ def _make_query(column_name):
             ACCURACY_NAME=f"{indentifier}_accuracy",
             HISTOGRAM_NAME=f"{indentifier}_histogram",
         )
+        .finish()
     )
 
 
@@ -188,8 +192,9 @@ def _make_queries(column_names):
 
 
 def make_notebook_py(csv_path, contributions, epsilon, columns):
-    return str(
-        _Template("notebook").fill_blocks(
+    return (
+        _Template("notebook")
+        .fill_blocks(
             IMPORTS_BLOCK=_make_imports(),
             COLUMNS_BLOCK=_make_columns(columns),
             CONTEXT_BLOCK=_make_context_for_notebook(
@@ -201,12 +206,14 @@ def make_notebook_py(csv_path, contributions, epsilon, columns):
             ),
             QUERIES_BLOCK=_make_queries(columns.keys()),
         )
+        .finish()
     )
 
 
 def make_script_py(contributions, epsilon, columns):
-    return str(
-        _Template("script").fill_blocks(
+    return (
+        _Template("script")
+        .fill_blocks(
             IMPORTS_BLOCK=_make_imports(),
             COLUMNS_BLOCK=_make_columns(columns),
             CONTEXT_BLOCK=_make_context_for_script(
@@ -218,15 +225,16 @@ def make_script_py(contributions, epsilon, columns):
             ),
             QUERIES_BLOCK=_make_queries(columns.keys()),
         )
+        .finish()
     )
 
 
 def make_privacy_unit_block(contributions):
-    return str(_Template("privacy_unit").fill_values(CONTRIBUTIONS=contributions))
+    return _Template("privacy_unit").fill_values(CONTRIBUTIONS=contributions).finish()
 
 
 def make_privacy_loss_block(epsilon):
-    return str(_Template("privacy_loss").fill_values(EPSILON=epsilon))
+    return _Template("privacy_loss").fill_values(EPSILON=epsilon).finish()
 
 
 def make_column_config_block(name, lower_bound, upper_bound, bin_count):
@@ -254,7 +262,7 @@ def make_column_config_block(name, lower_bound, upper_bound, bin_count):
     <BLANKLINE>
     """
     snake_name = _snake_case(name)
-    return str(
+    return (
         _Template("column_config")
         .fill_expressions(
             CUT_LIST_NAME=f"{snake_name}_cut_points",
@@ -267,6 +275,7 @@ def make_column_config_block(name, lower_bound, upper_bound, bin_count):
             COLUMN_NAME=name,
             BIN_COLUMN_NAME=f"{snake_name}_bin",
         )
+        .finish()
     )
 
 

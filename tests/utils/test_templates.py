@@ -18,25 +18,21 @@ def test_param_conflict():
 
 def test_fill_expressions():
     template = _Template(None, template="No one VERB the ADJ NOUN!")
-    filled = str(
-        template.fill_expressions(
-            VERB="expects",
-            ADJ="Spanish",
-            NOUN="Inquisition",
-        )
-    )
+    filled = template.fill_expressions(
+        VERB="expects",
+        ADJ="Spanish",
+        NOUN="Inquisition",
+    ).finish()
     assert filled == "No one expects the Spanish Inquisition!"
 
 
 def test_fill_values():
     template = _Template(None, template="assert [STRING] * NUM == LIST")
-    filled = str(
-        template.fill_values(
-            STRING="🙂",
-            NUM=3,
-            LIST=["🙂", "🙂", "🙂"],
-        )
-    )
+    filled = template.fill_values(
+        STRING="🙂",
+        NUM=3,
+        LIST=["🙂", "🙂", "🙂"],
+    ).finish()
     assert filled == "assert ['🙂'] * 3 == ['🙂', '🙂', '🙂']"
 
 
@@ -60,7 +56,7 @@ with fake:
         THIRD="\n".join(f"{i}()" for i in "xyz"),
     )
     assert (
-        str(template)
+        template.finish()
         == """# MixedCase is OK
 
 import a
@@ -85,7 +81,7 @@ def test_fill_template_unfilled_slots():
         Exception,
         match=re.escape("context.py has unfilled slots"),
     ):
-        str(context_template.fill_values())
+        context_template.fill_values().finish()
 
 
 def test_make_notebook():

@@ -28,5 +28,5 @@ Home = "https://github.com/opendp/dp-wizard"
 
 [tool.pyright]
 include = ["dp_wizard"]
-exclude = ["**/no-tests"]
+ignore = ["**/no-tests/"]
 typeCheckingMode = "strict"

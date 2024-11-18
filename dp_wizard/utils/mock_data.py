@@ -1,11 +1,14 @@
-from collections import namedtuple
+from typing import NamedTuple
 import polars as pl
 from scipy.stats import norm  # type: ignore
 
-ColumnDef = namedtuple("ColumnDef", ["lower", "upper"])
+
+class ColumnDef(NamedTuple):
+    lower: float
+    upper: float
 
 
-def mock_data(column_defs, row_count=1000):
+def mock_data(column_defs: dict[str, ColumnDef], row_count: int = 1000):
     """
     Return values from the inverse CDF of a normal distribution,
     so in the preview the only noise is from DP,

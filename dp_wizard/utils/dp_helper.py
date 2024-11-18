@@ -7,8 +7,12 @@ from dp_wizard.utils.shared import make_cut_points
 dp.enable_features("contrib")
 
 
-def make_confidence_accuracy_histogram(
-    lower=None, upper=None, bin_count=None, contributions=None, weighted_epsilon=None
+def make_confidence_accuracy_histogram(  # type: ignore
+    lower: float,
+    upper: float,
+    bin_count: int,
+    contributions: int,
+    weighted_epsilon: float,
 ):
     """
     Creates fake data between lower and upper, and then returns a DP histogram from it.
@@ -51,7 +55,7 @@ def make_confidence_accuracy_histogram(
             .alias("bin")
             .cast(pl.String),
         ),
-        privacy_unit=dp.unit_of(
+        privacy_unit=dp.unit_of(  # type: ignore
             contributions=contributions,
         ),
         privacy_loss=dp.loss_of(
@@ -71,4 +75,4 @@ def make_confidence_accuracy_histogram(
     confidence = 0.95
     accuracy = query.summarize(alpha=1 - confidence)["accuracy"].item()  # type: ignore
     histogram = query.release().collect().sort("bin")
-    return (confidence, accuracy, histogram)
+    return (confidence, accuracy, histogram)  # type: ignore
