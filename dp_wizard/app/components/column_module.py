@@ -65,39 +65,39 @@ def column_server(
     lower_bounds: reactive.Value[dict[str, float]],
     upper_bounds: reactive.Value[dict[str, float]],
     bin_counts: reactive.Value[dict[str, int]],
-    weights: reactive.Value[dict[str, float]],
-    is_demo,
+    weights: reactive.Value[dict[str, str]],
+    is_demo: bool,
 ):  # pragma: no cover
     @reactive.effect
-    def _set_all_inputs():
+    def _set_all_inputs():  # type: ignore
         with reactive.isolate():  # Without isolate, there is an infinite loop.
             ui.update_numeric("lower", value=lower_bounds().get(name, 0))
             ui.update_numeric("upper", value=upper_bounds().get(name, 10))
             ui.update_numeric("bins", value=bin_counts().get(name, 10))
-            ui.update_numeric("weight", value=weights().get(name, default_weight))
+            ui.update_numeric("weight", value=int(weights().get(name, default_weight)))
 
     @reactive.effect
     @reactive.event(input.lower)
-    def _set_lower():
+    def _set_lower():  # type: ignore
         lower_bounds.set({**lower_bounds(), name: float(input.lower())})
 
     @reactive.effect
     @reactive.event(input.upper)
-    def _set_upper():
+    def _set_upper():  # type: ignore
         upper_bounds.set({**upper_bounds(), name: float(input.upper())})
 
     @reactive.effect
     @reactive.event(input.bins)
-    def _set_bins():
-        bin_counts.set({**bin_counts(), name: float(input.bins())})
+    def _set_bins():  # type: ignore
+        bin_counts.set({**bin_counts(), name: int(input.bins())})
 
     @reactive.effect
     @reactive.event(input.weight)
-    def _set_weight():
-        weights.set({**weights(), name: float(input.weight())})
+    def _set_weight():  # type: ignore
+        weights.set({**weights(), name: input.weight()})
 
     @render.ui
-    def bounds_tooltip_ui():
+    def bounds_tooltip_ui():  # type: ignore
         return demo_tooltip(
             is_demo,
             """
@@ -111,7 +111,7 @@ def column_server(
         )
 
     @render.ui
-    def bins_tooltip_ui():
+    def bins_tooltip_ui():  # type: ignore
         return demo_tooltip(
             is_demo,
             """
@@ -124,7 +124,7 @@ def column_server(
         )
 
     @render.ui
-    def weight_tooltip_ui():
+    def weight_tooltip_ui():  # type: ignore
         return demo_tooltip(
             is_demo,
             """
@@ -135,7 +135,7 @@ def column_server(
         )
 
     @render.code
-    def column_code():
+    def column_code():  # type: ignore
         return make_column_config_block(
             name=name,
             lower_bound=float(input.lower()),
@@ -144,12 +144,12 @@ def column_server(
         )
 
     @render.plot()
-    def column_plot():
+    def column_plot():  # type: ignore
         lower_x = float(input.lower())
         upper_x = float(input.upper())
         bin_count = int(input.bins())
         weight = float(input.weight())
-        weights_sum = sum(weights().values())
+        weights_sum = sum(float(weight) for weight in weights().values())
         info(f"Weight ratio for {name}: {weight}/{weights_sum}")
         if weights_sum == 0:
             # This function is triggered when column is removed;

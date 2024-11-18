@@ -5,7 +5,7 @@ makes some things easier, but it is also reinventing the wheel.
 We may revisit this.
 """
 
-from typing import Iterable
+from typing import Iterable, Any
 from pathlib import Path
 import re
 from dp_wizard.utils.csv_helper import name_to_identifier
@@ -32,19 +32,19 @@ class _Template:
         slot_re = r"\b[A-Z][A-Z_]{2,}\b"
         return set(re.findall(slot_re, self._template))
 
-    def fill_expressions(self, **kwargs: dict[str, str]):
+    def fill_expressions(self, **kwargs: str):
         for k, v in kwargs.items():
             k_re = re.escape(k)
             self._template = re.sub(rf"\b{k_re}\b", str(v), self._template)
         return self
 
-    def fill_values(self, **kwargs: dict[str, str]):
+    def fill_values(self, **kwargs: Any):
         for k, v in kwargs.items():
             k_re = re.escape(k)
             self._template = re.sub(rf"\b{k_re}\b", repr(v), self._template)
         return self
 
-    def fill_blocks(self, **kwargs: dict[str, str]):
+    def fill_blocks(self, **kwargs: str):
         for k, v in kwargs.items():
 
             def match_indent(match: re.Match[str]):
@@ -63,7 +63,7 @@ class _Template:
             )
         return self
 
-    def finish(self):
+    def finish(self) -> str:
         unfilled_slots = self._initial_slots & self._find_slots()
         if unfilled_slots:
             raise Exception(
@@ -98,7 +98,7 @@ def _make_margins_dict(bin_names: Iterable[str]):
 
 
 def _make_context_for_notebook(
-    csv_path: Path,
+    csv_path: str,
     contributions: int,
     epsilon: float,
     weights: Iterable[int],
@@ -126,7 +126,12 @@ def _make_context_for_notebook(
     )
 
 
-def _make_context_for_script(contributions, epsilon, weights, column_names):
+def _make_context_for_script(
+    contributions: int,
+    epsilon: float,
+    weights: Iterable[float],
+    column_names: Iterable[str],
+):
     privacy_unit_block = make_privacy_unit_block(contributions)
     privacy_loss_block = make_privacy_loss_block(epsilon)
     margins_dict = _make_margins_dict([f"{name}_bin" for name in column_names])
@@ -157,19 +162,19 @@ def _make_imports():
     )
 
 
-def _make_columns(columns):
+def _make_columns(columns: dict[str, dict[str, str]]) -> str:
     return "\n".join(
         make_column_config_block(
             name=name,
-            lower_bound=col["lower_bound"],
-            upper_bound=col["upper_bound"],
-            bin_count=col["bin_count"],
+            lower_bound=col["lower_bound"],  # type: ignore
+            upper_bound=col["upper_bound"],  # type: ignore
+            bin_count=col["bin_count"],  # type: ignore
         )
         for name, col in columns.items()
-    )
+    )  # type: ignore
 
 
-def _make_query(column_name):
+def _make_query(column_name: str):
     indentifier = name_to_identifier(column_name)
     return (
         _Template("query")
@@ -185,13 +190,18 @@ def _make_query(column_name):
     )
 
 
-def _make_queries(column_names):
+def _make_queries(column_names: Iterable[str]):
     return "confidence = 0.95\n\n" + "\n".join(
         _make_query(column_name) for column_name in column_names
     )
 
 
-def make_notebook_py(csv_path, contributions, epsilon, columns):
+def make_notebook_py(
+    csv_path: str,
+    contributions: int,
+    epsilon: float,
+    columns: dict[str, dict[str, Any]],
+):
     return (
         _Template("notebook")
         .fill_blocks(
@@ -210,7 +220,9 @@ def make_notebook_py(csv_path, contributions, epsilon, columns):
     )
 
 
-def make_script_py(contributions, epsilon, columns):
+def make_script_py(
+    contributions: int, epsilon: float, columns: dict[str, dict[str, Any]]
+):
     return (
         _Template("script")
         .fill_blocks(
@@ -229,15 +241,17 @@ def make_script_py(contributions, epsilon, columns):
     )
 
 
-def make_privacy_unit_block(contributions):
+def make_privacy_unit_block(contributions: int):
     return _Template("privacy_unit").fill_values(CONTRIBUTIONS=contributions).finish()
 
 
-def make_privacy_loss_block(epsilon):
+def make_privacy_loss_block(epsilon: float):
     return _Template("privacy_loss").fill_values(EPSILON=epsilon).finish()
 
 
-def make_column_config_block(name, lower_bound, upper_bound, bin_count):
+def make_column_config_block(
+    name: str, lower_bound: float, upper_bound: float, bin_count: int
+) -> str:
     """
     >>> print(make_column_config_block(
     ...     name="HW GRADE",

@@ -1,7 +1,7 @@
 from pathlib import Path
 import logging
 
-from shiny import App, ui, reactive, Inputs, Outputs
+from shiny import App, ui, reactive, Inputs, Outputs, Session
 
 from dp_wizard.utils.argparse_helpers import get_cli_info, CLIInfo
 from dp_wizard.app import analysis_panel, dataset_panel, results_panel, feedback_panel
@@ -27,15 +27,16 @@ def ctrl_c_reminder():  # pragma: no cover
 
 
 def make_server_from_cli_info(cli_info: CLIInfo):
-    def server(input: Inputs, output: Outputs, session):  # pragma: no cover
-        csv_path = reactive.value(cli_info.csv_path)
+    def server(input: Inputs, output: Outputs, session: Session):  # pragma: no cover
+        cli_csv_path = cli_info.csv_path
+        csv_path = reactive.value("" if cli_csv_path is None else cli_csv_path)
         contributions = reactive.value(cli_info.contributions)
 
         lower_bounds = reactive.value({})
         upper_bounds = reactive.value({})
         bin_counts = reactive.value({})
         weights = reactive.value({})
-        epsilon = reactive.value(1)
+        epsilon = reactive.value(1.0)
 
         dataset_panel.dataset_server(
             input,

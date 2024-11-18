@@ -33,12 +33,12 @@ def mock_data(column_defs: dict[str, ColumnDef], row_count: int = 1000):
     10.0
     """
     schema = {column_name: float for column_name in column_defs.keys()}
-    data = {column_name: [] for column_name in column_defs.keys()}
+    data = {column_name: [] for column_name in column_defs.keys()}  # type: ignore
 
     quantile_width = 95 / 100
     for column_name, column_def in column_defs.items():
-        lower_ppf = norm.ppf((1 - quantile_width) / 2)
-        upper_ppf = norm.ppf(1 - (1 - quantile_width) / 2)
+        lower_ppf = norm.ppf((1 - quantile_width) / 2)  # type: ignore
+        upper_ppf = norm.ppf(1 - (1 - quantile_width) / 2)  # type: ignore
         lower_bound = column_def.lower
         upper_bound = column_def.upper
         slope = (upper_bound - lower_bound) / (upper_ppf - lower_ppf)
@@ -49,7 +49,7 @@ def mock_data(column_defs: dict[str, ColumnDef], row_count: int = 1000):
         # (-inf, 0] bin.
         for i in range(1, row_count + 1):
             quantile = (quantile_width * i / (row_count)) + (1 - quantile_width) / 2
-            ppf = norm.ppf(quantile)
+            ppf = norm.ppf(quantile)  # type: ignore
             value = slope * ppf + intercept
-            data[column_name].append(value)
+            data[column_name].append(value)  # type: ignore
     return pl.DataFrame(data=data, schema=schema)

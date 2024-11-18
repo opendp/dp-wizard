@@ -1,10 +1,11 @@
 from tempfile import NamedTemporaryFile
+from typing import Any
 import subprocess
 from pathlib import Path
 import re
 import pytest
 import opendp.prelude as dp
-from dp_wizard.utils.templates import _Template, make_notebook_py, make_script_py
+from dp_wizard.utils.templates import _Template, make_notebook_py, make_script_py  # type: ignore
 
 
 fixtures_path = Path(__file__).parent.parent / "fixtures"
@@ -101,7 +102,7 @@ def test_make_notebook():
         },
     )
     print(notebook)
-    globals = {}
+    globals: dict[str, Any] = {}
     exec(notebook, globals)
     assert isinstance(globals["context"], dp.Context)
 

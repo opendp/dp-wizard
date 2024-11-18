@@ -67,7 +67,7 @@ def _clip(n: float, lower: float, upper: float) -> float:
 
 
 class CLIInfo(NamedTuple):
-    csv_path: str
+    csv_path: str | None
     contributions: int
     is_demo: bool
 

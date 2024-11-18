@@ -26,13 +26,13 @@ def results_server(
     input: Inputs,
     output: Outputs,
     session: Session,
-    csv_path,
-    contributions,
-    lower_bounds,
-    upper_bounds,
-    bin_counts,
-    weights,
-    epsilon,
+    csv_path: reactive.Value[str],
+    contributions: reactive.Value[int],
+    lower_bounds: reactive.Value[dict[str, float]],
+    upper_bounds: reactive.Value[dict[str, float]],
+    bin_counts: reactive.Value[dict[str, int]],
+    weights: reactive.Value[dict[str, str]],
+    epsilon: reactive.Value[float],
 ):  # pragma: no cover
     @reactive.calc
     def analysis_dict():
@@ -65,33 +65,33 @@ def results_server(
         )
 
     @render.text
-    def analysis_json_text():
+    def analysis_json_text():  # type: ignore
         return analysis_json()
 
     @reactive.calc
     def analysis_python():
         analysis = analysis_dict()
         return make_notebook_py(
-            csv_path=analysis["csv_path"],
-            contributions=analysis["contributions"],
-            epsilon=analysis["epsilon"],
-            columns=analysis["columns"],
+            csv_path=analysis["csv_path"],  # type: ignore
+            contributions=analysis["contributions"],  # type: ignore
+            epsilon=analysis["epsilon"],  # type: ignore
+            columns=analysis["columns"],  # type: ignore
         )
 
     @render.text
-    def analysis_python_text():
+    def analysis_python_text():  # type: ignore
         return analysis_python()
 
     @render.download(
         filename="dp-wizard-script.py",
         media_type="text/x-python",
     )
-    async def download_script():
+    async def download_script():  # type: ignore
         analysis = analysis_dict()
         script_py = make_script_py(
-            contributions=analysis["contributions"],
-            epsilon=analysis["epsilon"],
-            columns=analysis["columns"],
+            contributions=analysis["contributions"],  # type: ignore
+            epsilon=analysis["epsilon"],  # type: ignore
+            columns=analysis["columns"],  # type: ignore
         )
         yield script_py
 
@@ -99,13 +99,13 @@ def results_server(
         filename="dp-wizard-notebook.ipynb",
         media_type="application/x-ipynb+json",
     )
-    async def download_notebook():
+    async def download_notebook():  # type: ignore
         analysis = analysis_dict()
         notebook_py = make_notebook_py(
-            csv_path=analysis["csv_path"],
-            contributions=analysis["contributions"],
-            epsilon=analysis["epsilon"],
-            columns=analysis["columns"],
+            csv_path=analysis["csv_path"],  # type: ignore
+            contributions=analysis["contributions"],  # type: ignore
+            epsilon=analysis["epsilon"],  # type: ignore
+            columns=analysis["columns"],  # type: ignore
         )
         notebook_nb = convert_py_to_nb(notebook_py, execute=True)
         yield notebook_nb

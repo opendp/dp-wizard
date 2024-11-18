@@ -1,3 +1,5 @@
+from typing import Any
+
 import polars as pl
 import opendp.prelude as dp
 
@@ -13,7 +15,7 @@ def make_confidence_accuracy_histogram(  # type: ignore
     bin_count: int,
     contributions: int,
     weighted_epsilon: float,
-):
+) -> tuple[float, float, Any]:
     """
     Creates fake data between lower and upper, and then returns a DP histogram from it.
     >>> confidence, accuracy, histogram = make_confidence_accuracy_histogram(
@@ -74,5 +76,7 @@ def make_confidence_accuracy_histogram(  # type: ignore
 
     confidence = 0.95
     accuracy = query.summarize(alpha=1 - confidence)["accuracy"].item()  # type: ignore
+    # The sort is alphabetical. df_to_columns needs to be used
+    # downstream to parse interval and sort by numeric value.
     histogram = query.release().collect().sort("bin")
     return (confidence, accuracy, histogram)  # type: ignore

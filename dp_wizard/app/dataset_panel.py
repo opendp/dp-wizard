@@ -39,16 +39,21 @@ def dataset_ui():
 
 
 def dataset_server(
-    input: Inputs, output: Outputs, session: Session, csv_path, contributions, is_demo
+    input: Inputs,
+    output: Outputs,
+    session: Session,
+    csv_path: reactive.Value[str],
+    contributions: reactive.Value[int],
+    is_demo: bool,
 ):  # pragma: no cover
     @reactive.effect
     @reactive.event(input.csv_path)
-    def _on_csv_path_change():
+    def _on_csv_path_change():  # type: ignore
         csv_path.set(input.csv_path()[0]["datapath"])
 
     @reactive.effect
     @reactive.event(input.contributions)
-    def _on_contributions_change():
+    def _on_contributions_change():  # type: ignore
         contributions.set(input.contributions())
 
     @reactive.calc
@@ -60,7 +65,7 @@ def dataset_server(
         return contributions_is_set and csv_path_is_set
 
     @render.ui
-    def choose_csv_demo_tooltip_ui():
+    def choose_csv_demo_tooltip_ui():  # type: ignore
         return demo_tooltip(
             is_demo,
             "For the demo, we'll imagine we have the grades "
@@ -68,7 +73,7 @@ def dataset_server(
         )
 
     @render.ui
-    def contributions_demo_tooltip_ui():
+    def contributions_demo_tooltip_ui():  # type: ignore
         return demo_tooltip(
             is_demo,
             "For the demo, we assume that each student "
@@ -76,7 +81,7 @@ def dataset_server(
         )
 
     @render.ui
-    def python_tooltip_ui():
+    def python_tooltip_ui():  # type: ignore
         return demo_tooltip(
             is_demo,
             "Along the way, code samples will demonstrate "
@@ -86,7 +91,7 @@ def dataset_server(
         )
 
     @render.ui
-    def define_analysis_button_ui():
+    def define_analysis_button_ui():  # type: ignore
         button = ui.input_action_button(
             "go_to_analysis", "Define analysis", disabled=not button_enabled()
         )
@@ -98,10 +103,10 @@ def dataset_server(
         ]
 
     @render.code
-    def unit_of_privacy_python():
+    def unit_of_privacy_python():  # type: ignore
         return make_privacy_unit_block(contributions())
 
     @reactive.effect
     @reactive.event(input.go_to_analysis)
-    def go_to_analysis():
+    def go_to_analysis():  # type: ignore
         ui.update_navs("top_level_nav", selected="analysis_panel")
