@@ -4,7 +4,7 @@ from argparse import ArgumentParser, ArgumentTypeError
 import csv
 import random
 from warnings import warn
-from typing import NamedTuple
+from typing import NamedTuple, Optional
 
 
 def _existing_csv_type(arg: str) -> Path:
@@ -67,7 +67,7 @@ def _clip(n: float, lower: float, upper: float) -> float:
 
 
 class CLIInfo(NamedTuple):
-    csv_path: str | None
+    csv_path: Optional[str]
     contributions: int
     is_demo: bool
 

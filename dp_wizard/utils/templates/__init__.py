@@ -5,14 +5,14 @@ makes some things easier, but it is also reinventing the wheel.
 We may revisit this.
 """
 
-from typing import Iterable, Any
+from typing import Iterable, Any, Optional
 from pathlib import Path
 import re
 from dp_wizard.utils.csv_helper import name_to_identifier
 
 
 class _Template:
-    def __init__(self, path: str | None, template: str | None = None):
+    def __init__(self, path: Optional[str], template: Optional[str] = None):
         if path is not None:
             self._path = f"_{path}.py"
             template_path = Path(__file__).parent / "no-tests" / self._path
