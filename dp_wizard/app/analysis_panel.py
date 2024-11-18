@@ -1,4 +1,5 @@
 from math import pow
+from typing import Iterable, Any
 
 from shiny import ui, reactive, render, req, Inputs, Outputs, Session
 
@@ -39,7 +40,9 @@ def analysis_ui():
     )
 
 
-def _cleanup_reactive_dict(reactive_dict, keys_to_keep):  # pragma: no cover
+def _cleanup_reactive_dict(
+    reactive_dict: reactive.Value[dict[str, Any]], keys_to_keep: Iterable[str]
+):  # pragma: no cover
     reactive_dict_copy = {**reactive_dict()}
     keys_to_del = set(reactive_dict_copy.keys()) - set(keys_to_keep)
     for key in keys_to_del:
@@ -51,14 +54,14 @@ def analysis_server(
     input: Inputs,
     output: Outputs,
     session: Session,
-    csv_path,
-    contributions,
-    is_demo,
-    lower_bounds,
-    upper_bounds,
-    bin_counts,
-    weights,
-    epsilon,
+    csv_path: reactive.Value[str],
+    contributions: reactive.Value[int],
+    is_demo: bool,
+    lower_bounds: reactive.Value[dict[str, float]],
+    upper_bounds: reactive.Value[dict[str, float]],
+    bin_counts: reactive.Value[dict[str, int]],
+    weights: reactive.Value[dict[str, float]],
+    epsilon: reactive.Value[float],
 ):  # pragma: no cover
     @reactive.calc
     def button_enabled():
@@ -66,7 +69,7 @@ def analysis_server(
         return len(column_ids_selected) > 0
 
     @reactive.effect
-    def _update_checkbox_group():
+    def _update_checkbox_group():  # type: ignore unused function
         ui.update_checkbox_group(
             "columns_checkbox_group",
             label=None,
@@ -75,7 +78,7 @@ def analysis_server(
 
     @reactive.effect
     @reactive.event(input.columns_checkbox_group)
-    def _on_column_set_change():
+    def _on_column_set_change():  # type: ignore unused function
         column_ids_selected = input.columns_checkbox_group()
         # We only clean up the weights, and everything else is left in place,
         # so if you restore a column, you see the original values.
@@ -83,7 +86,7 @@ def analysis_server(
         _cleanup_reactive_dict(weights, column_ids_selected)
 
     @render.ui
-    def columns_checkbox_group_tooltip_ui():
+    def columns_checkbox_group_tooltip_ui():  # type: ignore unused function
         return demo_tooltip(
             is_demo,
             """
@@ -94,7 +97,7 @@ def analysis_server(
         )
 
     @render.ui
-    def columns_ui():
+    def columns_ui():  # type: ignore unused function
         column_ids = input.columns_checkbox_group()
         column_ids_to_names = csv_ids_names_calc()
         column_ids_to_labels = csv_ids_labels_calc()
@@ -150,7 +153,7 @@ def analysis_server(
         return read_csv_ids_labels(req(csv_path()))
 
     @render.ui
-    def epsilon_tooltip_ui():
+    def epsilon_tooltip_ui():  # type: ignore unused function
         return demo_tooltip(
             is_demo,
             """
@@ -162,24 +165,24 @@ def analysis_server(
 
     @reactive.effect
     @reactive.event(input.log_epsilon_slider)
-    def _set_epsilon():
+    def _set_epsilon():  # type: ignore unused function
         epsilon.set(pow(10, input.log_epsilon_slider()))
 
     @render.text
-    def epsilon_text():
+    def epsilon_text():  # type: ignore unused function
         return f"Epsilon: {epsilon():0.3}"
 
     @render.code
-    def privacy_loss_python():
+    def privacy_loss_python():  # type: ignore unused function
         return make_privacy_loss_block(epsilon())
 
     @reactive.effect
     @reactive.event(input.go_to_results)
-    def go_to_results():
+    def go_to_results():  # type: ignore unused function
         ui.update_navs("top_level_nav", selected="results_panel")
 
     @render.ui
-    def download_results_button_ui():
+    def download_results_button_ui():  # type: ignore unused function
         button = ui.input_action_button(
             "go_to_results", "Download results", disabled=not button_enabled()
         )
