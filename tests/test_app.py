@@ -120,3 +120,10 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     download = download_info.value
     script = download.path().read_text()
     assert "privacy_unit = dp.unit_of(contributions=42)" in script
+
+    # -- Feedback --
+    page.get_by_text("Feedback").click()
+    iframe = page.locator("#feedback-iframe")
+    expect(iframe).to_be_visible()
+    expect(iframe.content_frame.get_by_text("DP Wizard Feedback")).to_be_visible()
+    # Text comes from iframe, so this does introduce a dependency on an outside service.

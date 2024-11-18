@@ -148,7 +148,10 @@ def _make_context_for_script(contributions, epsilon, weights, column_names):
 
 
 def _make_imports():
-    return str(_Template("imports").fill_values())
+    return (
+        str(_Template("imports").fill_values())
+        + (Path(__file__).parent.parent / "shared.py").read_text()
+    )
 
 
 def _make_columns(columns):
