@@ -1,5 +1,9 @@
-# From the public information, determine the bins:
-CUT_LIST_NAME = make_cut_points(LOWER_BOUND, UPPER_BOUND, BINS)
+# From the public information, determine the bins for COLUMN_NAME:
+CUT_LIST_NAME = make_cut_points(
+    lower_bound=LOWER_BOUND,
+    upper_bound=UPPER_BOUND,
+    bin_count=BIN_COUNT,
+)
 
 # Use these bins to define a Polars column:
 POLARS_CONFIG_NAME = (

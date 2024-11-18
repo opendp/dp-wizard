@@ -3,7 +3,7 @@ from argparse import ArgumentTypeError
 
 import pytest
 
-from dp_creator_ii.utils.argparse_helpers import _get_arg_parser, _existing_csv_type
+from dp_wizard.utils.argparse_helpers import _get_arg_parser, _existing_csv_type
 
 
 fixtures_path = Path(__file__).parent.parent / "fixtures"
@@ -15,8 +15,8 @@ def test_help():
         .format_help()
         # argparse doesn't actually know the name of the script
         # and inserts the name of the running program instead.
-        .replace("__main__.py", "dp-creator-ii")
-        .replace("pytest", "dp-creator-ii")
+        .replace("__main__.py", "dp-wizard")
+        .replace("pytest", "dp-wizard")
         # Text is different under Python 3.9:
         .replace("optional arguments:", "options:")
     )

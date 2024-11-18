@@ -2,6 +2,8 @@ from argparse import ArgumentParser
 
 IMPORTS_BLOCK
 
+COLUMNS_BLOCK
+
 
 def get_context(csv_path):
     CONTEXT_BLOCK
@@ -15,4 +17,5 @@ if __name__ == "__main__":
     parser.add_argument("--csv", help="Path to csv containing private data")
     args = parser.parse_args()
     context = get_context(csv_path=args.csv)
-    print(context)
+
+    QUERIES_BLOCK

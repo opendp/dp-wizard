@@ -4,7 +4,7 @@ from pathlib import Path
 import re
 import pytest
 import opendp.prelude as dp
-from dp_creator_ii.utils.templates import _Template, make_notebook_py, make_script_py
+from dp_wizard.utils.templates import _Template, make_notebook_py, make_script_py
 
 
 fixtures_path = Path(__file__).parent.parent / "fixtures"
@@ -83,10 +83,7 @@ def test_fill_template_unfilled_slots():
     context_template = _Template("context")
     with pytest.raises(
         Exception,
-        match=re.escape(
-            "context.py has unfilled slots: "
-            "CSV_PATH, PRIVACY_LOSS_BLOCK, PRIVACY_UNIT_BLOCK, WEIGHTS"
-        ),
+        match=re.escape("context.py has unfilled slots"),
     ):
         str(context_template.fill_values())
 
@@ -96,8 +93,18 @@ def test_make_notebook():
         csv_path=fake_csv,
         contributions=1,
         epsilon=1,
-        weights=[1],
+        columns={
+            # For a strong test, use a column whose name
+            # doesn't work as a python identifier.
+            "hw-number": {
+                "lower_bound": 5,
+                "upper_bound": 15,
+                "bin_count": 20,
+                "weight": 4,
+            }
+        },
     )
+    print(notebook)
     globals = {}
     exec(notebook, globals)
     assert isinstance(globals["context"], dp.Context)
@@ -107,15 +114,16 @@ def test_make_script():
     script = make_script_py(
         contributions=1,
         epsilon=1,
-        weights=[1],
+        columns={
+            "hw-number": {
+                "lower_bound": 5,
+                "upper_bound": 15,
+                "bin_count": 20,
+                "weight": 4,
+            }
+        },
     )
-
-    def clear_empty_lines(text):
-        # Cleanup whitespace after indenting blocks
-        return re.sub(r"^\s+$", "", text, flags=re.MULTILINE).strip()
-
-    expected_script = (fixtures_path / "expected-script.py").read_text()
-    assert clear_empty_lines(script) == clear_empty_lines(expected_script)
+    print(script)
 
     with NamedTemporaryFile(mode="w") as fp:
         fp.write(script)

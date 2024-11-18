@@ -1,8 +1,8 @@
-# DP Creator II
+# DP Wizard
 
 **Under Construction**
 
-Building on what we've learned from [DP Creator](https://github.com/opendp/dpcreator), DP Creator II will offer:
+Building on what we've learned from [DP Creator](https://github.com/opendp/dpcreator), DP Wizard will offer:
 
 - Easy installation with `pip install`
 - Simplified single-user application design
@@ -15,7 +15,7 @@ We plan to implement a [proof of concept](https://docs.google.com/document/d/1dt
 ## Usage
 
 ```
-usage: dp-creator-ii [-h] [--csv CSV_PATH] [--contrib CONTRIB] [--demo]
+usage: dp-wizard [-h] [--csv CSV_PATH] [--contrib CONTRIB] [--demo]
 
 options:
   -h, --help         show this help message and exit
@@ -34,8 +34,8 @@ so let's remember [what we learned](WHAT-WE-LEARNED.md) along the way.
 
 To get started, clone the repo and install dev dependencies in a virtual environment:
 ```shell
-$ git clone https://github.com/opendp/dp-creator-ii.git
-$ cd dp-creator-ii
+$ git clone https://github.com/opendp/dp-wizard.git
+$ cd dp-wizard
 $ python3 -m venv .venv
 $ source .venv/bin/activate
 $ pip install -r requirements-dev.txt
@@ -46,7 +46,7 @@ $ playwright install
 Now install the application itself and run it:
 ```shell
 $ flit install --symlink
-$ dp-creator-ii
+$ dp-wizard
 ```
 Your browser should open and connect you to the application.
 
@@ -59,7 +59,7 @@ $ ./ci.sh
 
 We're using [Playwright](https://playwright.dev/python/) for end-to-end tests. You can use it to [generate test code](https://playwright.dev/python/docs/codegen-intro) just by interacting with the app in a browser:
 ```shell
-$ dp-creator-ii # The server will continue to run, so open a new terminal to continue.
+$ dp-wizard # The server will continue to run, so open a new terminal to continue.
 $ playwright codegen http://127.0.0.1:8000/
 ```
 

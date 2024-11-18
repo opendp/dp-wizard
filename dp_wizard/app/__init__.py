@@ -3,13 +3,8 @@ import logging
 
 from shiny import App, ui, reactive
 
-from dp_creator_ii.utils.argparse_helpers import get_cli_info
-from dp_creator_ii.app import (
-    analysis_panel,
-    dataset_panel,
-    results_panel,
-    feedback_panel,
-)
+from dp_wizard.utils.argparse_helpers import get_cli_info
+from dp_wizard.app import analysis_panel, dataset_panel, results_panel, feedback_panel
 
 
 logging.basicConfig(level=logging.INFO)
@@ -23,7 +18,7 @@ app_ui = ui.page_bootstrap(
         feedback_panel.feedback_ui(),
         id="top_level_nav",
     ),
-    title="DP Creator II",
+    title="DP Wizard",
 )
 
 

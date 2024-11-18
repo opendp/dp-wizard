@@ -4,7 +4,7 @@ import polars.testing as pl_testing
 import tempfile
 import pytest
 
-from dp_creator_ii.utils.csv_helper import read_csv_ids_labels, read_csv_ids_names
+from dp_wizard.utils.csv_helper import read_csv_ids_labels, read_csv_ids_names
 
 
 # We will not reference the encoding when reading:

@@ -2,9 +2,11 @@
 We'll use the following terms consistently throughout the application:
 - name: This is the exact column header in the CSV.
 - label: This is the string we'll display.
-- id: This is the string we'll pass as a module ID.
+- id: This is the opaque string we'll pass as a module ID.
+- identifier: This is a form that can be used as a Python identifier.
 """
 
+import re
 import polars as pl
 
 
@@ -34,3 +36,7 @@ def name_to_id(name):
     # Shiny is fussy about module IDs,
     # but we don't need them to be human readable.
     return str(hash(name)).replace("-", "_")
+
+
+def name_to_identifier(name):
+    return re.sub(r"\W+", "_", name).lower()
