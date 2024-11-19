@@ -21,11 +21,11 @@ class AnalysisPlan(NamedTuple):
 
 
 class _CodeGenerator(ABC):
-    def __init__(self, contributions, epsilon, columns, csv_path=None):
-        self.csv_path = csv_path
-        self.contributions = contributions
-        self.epsilon = epsilon
-        self.columns = columns
+    def __init__(self, analysis_plan):
+        self.csv_path = analysis_plan.csv_path
+        self.contributions = analysis_plan.contributions
+        self.epsilon = analysis_plan.epsilon
+        self.columns = analysis_plan.columns
 
     @abstractmethod
     def _make_context(self): ...  # pragma: no cover

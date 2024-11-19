@@ -63,12 +63,7 @@ def results_server(
         media_type="text/x-python",
     )
     async def download_script():
-        analysis = analysis_plan()
-        script_py = ScriptGenerator(
-            contributions=analysis.contributions,
-            epsilon=analysis.epsilon,
-            columns=analysis.columns,
-        ).make_py()
+        script_py = ScriptGenerator(analysis_plan()).make_py()
         yield script_py
 
     @render.download(
@@ -76,12 +71,6 @@ def results_server(
         media_type="application/x-ipynb+json",
     )
     async def download_notebook():
-        analysis = analysis_plan()
-        notebook_py = NotebookGenerator(
-            csv_path=analysis.csv_path,
-            contributions=analysis.contributions,
-            epsilon=analysis.epsilon,
-            columns=analysis.columns,
-        ).make_py()
+        notebook_py = NotebookGenerator(analysis_plan()).make_py()
         notebook_nb = convert_py_to_nb(notebook_py, execute=True)
         yield notebook_nb
