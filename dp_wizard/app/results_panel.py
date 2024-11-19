@@ -1,6 +1,10 @@
 from shiny import ui, render, reactive
 
-from dp_wizard.utils.templates import NotebookGenerator, ScriptGenerator, AnalysisPlan
+from dp_wizard.utils.code_generators import (
+    NotebookGenerator,
+    ScriptGenerator,
+    AnalysisPlan,
+)
 from dp_wizard.utils.converters import convert_py_to_nb
 
 

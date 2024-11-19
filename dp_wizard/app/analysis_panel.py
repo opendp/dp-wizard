@@ -6,7 +6,7 @@ from dp_wizard.app.components.inputs import log_slider
 from dp_wizard.app.components.column_module import column_ui, column_server
 from dp_wizard.utils.csv_helper import read_csv_ids_labels, read_csv_ids_names
 from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip
-from dp_wizard.utils.templates import make_privacy_loss_block
+from dp_wizard.utils.code_generators import make_privacy_loss_block
 from dp_wizard.app.components.column_module import col_widths
 
 

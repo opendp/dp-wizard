@@ -4,7 +4,7 @@ from shiny import ui, render, module, reactive
 
 from dp_wizard.utils.dp_helper import make_confidence_accuracy_histogram
 from dp_wizard.utils.shared import plot_histogram
-from dp_wizard.utils.templates import make_column_config_block
+from dp_wizard.utils.code_generators import make_column_config_block
 from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip
 
 

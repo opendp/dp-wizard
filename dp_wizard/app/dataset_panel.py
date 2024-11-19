@@ -4,7 +4,7 @@ from shiny import ui, reactive, render
 
 from dp_wizard.utils.argparse_helpers import get_cli_info
 from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip
-from dp_wizard.utils.templates import make_privacy_unit_block
+from dp_wizard.utils.code_generators import make_privacy_unit_block
 
 
 def dataset_ui():

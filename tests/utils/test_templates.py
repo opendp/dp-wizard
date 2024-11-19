@@ -4,7 +4,11 @@ from pathlib import Path
 import re
 import pytest
 import opendp.prelude as dp
-from dp_wizard.utils.templates import _Template, ScriptGenerator, NotebookGenerator
+from dp_wizard.utils.code_generators import (
+    _Template,
+    ScriptGenerator,
+    NotebookGenerator,
+)
 
 
 fixtures_path = Path(__file__).parent.parent / "fixtures"
