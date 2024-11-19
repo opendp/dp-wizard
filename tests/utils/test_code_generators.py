@@ -8,6 +8,7 @@ from dp_wizard.utils.code_generators import (
     Template,
     ScriptGenerator,
     NotebookGenerator,
+    AnalysisPlan,
     AnalysisPlanColumn,
 )
 
@@ -95,19 +96,21 @@ def test_fill_template_unfilled_slots():
 
 def test_make_notebook():
     notebook = NotebookGenerator(
-        csv_path=fake_csv,
-        contributions=1,
-        epsilon=1,
-        columns={
-            # For a strong test, use a column whose name
-            # doesn't work as a python identifier.
-            "hw-number": AnalysisPlanColumn(
-                lower_bound=5,
-                upper_bound=15,
-                bin_count=20,
-                weight=4,
-            )
-        },
+        AnalysisPlan(
+            csv_path=fake_csv,
+            contributions=1,
+            epsilon=1,
+            columns={
+                # For a strong test, use a column whose name
+                # doesn't work as a python identifier.
+                "hw-number": AnalysisPlanColumn(
+                    lower_bound=5,
+                    upper_bound=15,
+                    bin_count=20,
+                    weight=4,
+                )
+            },
+        )
     ).make_py()
     print(notebook)
     globals = {}
@@ -117,16 +120,19 @@ def test_make_notebook():
 
 def test_make_script():
     script = ScriptGenerator(
-        contributions=1,
-        epsilon=1,
-        columns={
-            "hw-number": AnalysisPlanColumn(
-                lower_bound=5,
-                upper_bound=15,
-                bin_count=20,
-                weight=4,
-            )
-        },
+        AnalysisPlan(
+            csv_path=None,
+            contributions=1,
+            epsilon=1,
+            columns={
+                "hw-number": AnalysisPlanColumn(
+                    lower_bound=5,
+                    upper_bound=15,
+                    bin_count=20,
+                    weight=4,
+                )
+            },
+        )
     ).make_py()
     print(script)
 
