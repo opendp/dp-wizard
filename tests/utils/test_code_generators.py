@@ -1,7 +1,6 @@
 from tempfile import NamedTemporaryFile
 import subprocess
 from pathlib import Path
-import re
 import pytest
 import opendp.prelude as dp
 from dp_wizard.utils.code_generators import (
@@ -131,6 +130,26 @@ with fake:
         z()
 """
     )
+
+
+def test_fill_blocks_missing_slot_in_template_alone():
+    template = Template(None, template="No block slot")
+    with pytest.raises(Exception, match=r"No 'SLOT' slot"):
+        str(template.fill_blocks(SLOT="placeholder"))
+
+
+def test_fill_blocks_missing_slot_in_template_not_alone():
+    template = Template(None, template="No block SLOT")
+    with pytest.raises(
+        Exception, match=r"Block slots must be alone on line; No 'SLOT' slot"
+    ):
+        str(template.fill_blocks(SLOT="placeholder"))
+
+
+def test_fill_blocks_extra_slot_in_template():
+    template = Template(None, template="EXTRA\nSLOT")
+    with pytest.raises(Exception, match=r"'EXTRA' slot not filled"):
+        str(template.fill_blocks(SLOT="placeholder"))
 
 
 def test_make_notebook():

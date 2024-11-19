@@ -31,7 +31,8 @@ class Template:
             self._template, count = re.subn(rf"\b{k_re}\b", str(v), self._template)
             if count == 0:
                 raise Exception(
-                    f"No '{k}' slot to fill with '{v}' in '{self._path}':\n\n{self._template}"
+                    f"No '{k}' slot to fill with '{v}' in "
+                    f"'{self._path}':\n\n{self._template}"
                 )
         return self
 
@@ -41,7 +42,8 @@ class Template:
             self._template, count = re.subn(rf"\b{k_re}\b", repr(v), self._template)
             if count == 0:
                 raise Exception(
-                    f"No '{k}' slot to fill with '{v}' in '{self._path}':\n\n{self._template}"
+                    f"No '{k}' slot to fill with '{v}' in "
+                    f"'{self._path}':\n\n{self._template}"
                 )
         return self
 
@@ -55,12 +57,23 @@ class Template:
                 )
 
             k_re = re.escape(k)
-            self._template = re.sub(
+            self._template, count = re.subn(
                 rf"^([ \t]*){k_re}$",
                 match_indent,
                 self._template,
                 flags=re.MULTILINE,
             )
+            if count == 0:
+                base_message = (
+                    f"No '{k}' slot to fill with '{v}' in "
+                    f"'{self._path}':\n\n{self._template}"
+                )
+                if k in self._template:
+                    raise Exception(
+                        f"Block slots must be alone on line; {base_message}"
+                    )
+                else:
+                    raise Exception(base_message)
         return self
 
     def __str__(self):
