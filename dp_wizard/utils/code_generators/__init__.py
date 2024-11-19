@@ -10,6 +10,7 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 import re
 from dp_wizard.utils.csv_helper import name_to_identifier
+from dp_wizard.utils.code_generators._template import Template
 
 
 class AnalysisPlan(NamedTuple):
@@ -17,67 +18,6 @@ class AnalysisPlan(NamedTuple):
     contributions: int
     epsilon: float
     columns: dict
-
-
-class _Template:
-    def __init__(self, path, template=None):
-        if path is not None:
-            self._path = f"_{path}.py"
-            template_path = Path(__file__).parent / "no-tests" / self._path
-            self._template = template_path.read_text()
-        if template is not None:
-            if path is not None:
-                raise Exception('"path" and "template" are mutually exclusive')
-            self._path = "template-instead-of-path"
-            self._template = template
-        self._initial_slots = self._find_slots()
-
-    def _find_slots(self):
-        # Slots:
-        # - are all caps or underscores
-        # - have word boundary on either side
-        # - are at least three characters
-        slot_re = r"\b[A-Z][A-Z_]{2,}\b"
-        return set(re.findall(slot_re, self._template))
-
-    def fill_expressions(self, **kwargs):
-        for k, v in kwargs.items():
-            k_re = re.escape(k)
-            self._template = re.sub(rf"\b{k_re}\b", str(v), self._template)
-        return self
-
-    def fill_values(self, **kwargs):
-        for k, v in kwargs.items():
-            k_re = re.escape(k)
-            self._template = re.sub(rf"\b{k_re}\b", repr(v), self._template)
-        return self
-
-    def fill_blocks(self, **kwargs):
-        for k, v in kwargs.items():
-
-            def match_indent(match):
-                # This does what we want, but binding is confusing.
-                return "\n".join(
-                    match.group(1) + line for line in v.split("\n")  # noqa: B023
-                )
-
-            k_re = re.escape(k)
-            self._template = re.sub(
-                rf"^([ \t]*){k_re}$",
-                match_indent,
-                self._template,
-                flags=re.MULTILINE,
-            )
-        return self
-
-    def __str__(self):
-        unfilled_slots = self._initial_slots & self._find_slots()
-        if unfilled_slots:
-            raise Exception(
-                f"Template {self._path} has unfilled slots: "
-                f'{", ".join(sorted(unfilled_slots))}\n\n{self._template}'
-            )
-        return self._template
 
 
 class _CodeGenerator(ABC):
@@ -88,11 +28,11 @@ class _CodeGenerator(ABC):
         self.columns = columns
 
     @abstractmethod
-    def _make_context(self): ...
+    def _make_context(self): ...  # pragma: no cover
 
     def make_py(self):
         return str(
-            _Template(self.root_template).fill_blocks(
+            Template(self.root_template).fill_blocks(
                 IMPORTS_BLOCK=_make_imports(),
                 COLUMNS_BLOCK=self._make_columns(self.columns),
                 CONTEXT_BLOCK=self._make_context(),
@@ -147,7 +87,7 @@ class _CodeGenerator(ABC):
         margins_dict = self._make_margins_dict([f"{name}_bin" for name in column_names])
         columns = ", ".join([f"{name}_config" for name in column_names])
         return (
-            _Template("context")
+            Template("context")
             .fill_expressions(
                 MARGINS_DICT=margins_dict,
                 COLUMNS=columns,
@@ -181,11 +121,11 @@ class ScriptGenerator(_CodeGenerator):
 
 
 def make_privacy_unit_block(contributions):
-    return str(_Template("privacy_unit").fill_values(CONTRIBUTIONS=contributions))
+    return str(Template("privacy_unit").fill_values(CONTRIBUTIONS=contributions))
 
 
 def make_privacy_loss_block(epsilon):
-    return str(_Template("privacy_loss").fill_values(EPSILON=epsilon))
+    return str(Template("privacy_loss").fill_values(EPSILON=epsilon))
 
 
 def make_column_config_block(name, lower_bound, upper_bound, bin_count):
@@ -214,7 +154,7 @@ def make_column_config_block(name, lower_bound, upper_bound, bin_count):
     """
     snake_name = _snake_case(name)
     return str(
-        _Template("column_config")
+        Template("column_config")
         .fill_expressions(
             CUT_LIST_NAME=f"{snake_name}_cut_points",
             POLARS_CONFIG_NAME=f"{snake_name}_config",
@@ -237,7 +177,7 @@ def make_column_config_block(name, lower_bound, upper_bound, bin_count):
 def _make_query(column_name):
     indentifier = name_to_identifier(column_name)
     return str(
-        _Template("query")
+        Template("query")
         .fill_values(
             BIN_NAME=f"{indentifier}_bin",
         )
@@ -259,6 +199,6 @@ def _snake_case(name: str):
 
 def _make_imports():
     return (
-        str(_Template("imports").fill_values())
+        str(Template("imports").fill_values())
         + (Path(__file__).parent.parent / "shared.py").read_text()
     )

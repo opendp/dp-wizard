@@ -5,7 +5,7 @@ import re
 import pytest
 import opendp.prelude as dp
 from dp_wizard.utils.code_generators import (
-    _Template,
+    Template,
     ScriptGenerator,
     NotebookGenerator,
 )
@@ -17,11 +17,11 @@ fake_csv = "tests/fixtures/fake.csv"
 
 def test_param_conflict():
     with pytest.raises(Exception, match=r"mutually exclusive"):
-        _Template("context", template="Not allowed if path present")
+        Template("context", template="Not allowed if path present")
 
 
 def test_fill_expressions():
-    template = _Template(None, template="No one VERB the ADJ NOUN!")
+    template = Template(None, template="No one VERB the ADJ NOUN!")
     filled = str(
         template.fill_expressions(
             VERB="expects",
@@ -33,7 +33,7 @@ def test_fill_expressions():
 
 
 def test_fill_values():
-    template = _Template(None, template="assert [STRING] * NUM == LIST")
+    template = Template(None, template="assert [STRING] * NUM == LIST")
     filled = str(
         template.fill_values(
             STRING="🙂",
@@ -46,7 +46,7 @@ def test_fill_values():
 
 def test_fill_blocks():
     # "OK" is less than three characters, so it is not a slot.
-    template = _Template(
+    template = Template(
         None,
         template="""# MixedCase is OK
 
@@ -84,7 +84,7 @@ with fake:
 
 
 def test_fill_template_unfilled_slots():
-    context_template = _Template("context")
+    context_template = Template("context")
     with pytest.raises(
         Exception,
         match=re.escape("context.py has unfilled slots"),
