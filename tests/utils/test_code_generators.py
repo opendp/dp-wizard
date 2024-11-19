@@ -34,6 +34,30 @@ def test_fill_expressions():
     assert filled == "No one expects the Spanish Inquisition!"
 
 
+def test_fill_expressions_missing_slot_in_template():
+    template = Template(None, template="No one ... the ADJ NOUN!")
+    with pytest.raises(Exception, match=r"No 'VERB' slot to fill with 'expects'"):
+        str(
+            template.fill_expressions(
+                VERB="expects",
+                ADJ="Spanish",
+                NOUN="Inquisition",
+            )
+        )
+
+
+def test_fill_expressions_extra_slot_in_template():
+    template = Template(None, template="No one VERB ARTICLE ADJ NOUN!")
+    with pytest.raises(Exception, match=r"'ARTICLE' slot not filled"):
+        str(
+            template.fill_expressions(
+                VERB="expects",
+                ADJ="Spanish",
+                NOUN="Inquisition",
+            )
+        )
+
+
 def test_fill_values():
     template = Template(None, template="assert [STRING] * NUM == LIST")
     filled = str(
@@ -44,6 +68,30 @@ def test_fill_values():
         )
     )
     assert filled == "assert ['🙂'] * 3 == ['🙂', '🙂', '🙂']"
+
+
+def test_fill_values_missing_slot_in_template():
+    template = Template(None, template="assert [STRING] * ... == LIST")
+    with pytest.raises(Exception, match=r"No 'NUM' slot to fill with '3'"):
+        str(
+            template.fill_values(
+                STRING="🙂",
+                NUM=3,
+                LIST=["🙂", "🙂", "🙂"],
+            )
+        )
+
+
+def test_fill_values_extra_slot_in_template():
+    template = Template(None, template="CMD [STRING] * NUM == LIST")
+    with pytest.raises(Exception, match=r"'CMD' slot not filled"):
+        str(
+            template.fill_values(
+                STRING="🙂",
+                NUM=3,
+                LIST=["🙂", "🙂", "🙂"],
+            )
+        )
 
 
 def test_fill_blocks():
@@ -83,15 +131,6 @@ with fake:
         z()
 """
     )
-
-
-def test_fill_template_unfilled_slots():
-    context_template = Template("context")
-    with pytest.raises(
-        Exception,
-        match=re.escape("context.py has unfilled slots"),
-    ):
-        str(context_template.fill_values())
 
 
 def test_make_notebook():

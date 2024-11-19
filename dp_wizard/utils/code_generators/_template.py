@@ -30,7 +30,9 @@ class Template:
             k_re = re.escape(k)
             self._template, count = re.subn(rf"\b{k_re}\b", str(v), self._template)
             if count == 0:
-                raise Exception(f"No slot for '{k}' in {self._path}")
+                raise Exception(
+                    f"No '{k}' slot to fill with '{v}' in '{self._path}':\n\n{self._template}"
+                )
         return self
 
     def fill_values(self, **kwargs):
@@ -38,7 +40,9 @@ class Template:
             k_re = re.escape(k)
             self._template, count = re.subn(rf"\b{k_re}\b", repr(v), self._template)
             if count == 0:
-                raise Exception(f"No slot for '{k}' in {self._path}")
+                raise Exception(
+                    f"No '{k}' slot to fill with '{v}' in '{self._path}':\n\n{self._template}"
+                )
         return self
 
     def fill_blocks(self, **kwargs):
@@ -62,8 +66,8 @@ class Template:
     def __str__(self):
         unfilled_slots = self._initial_slots & self._find_slots()
         if unfilled_slots:
+            slots_str = ", ".join(sorted(f"'{slot}'" for slot in unfilled_slots))
             raise Exception(
-                f"Template {self._path} has unfilled slots: "
-                f'{", ".join(sorted(unfilled_slots))}\n\n{self._template}'
+                f"{slots_str} slot not filled in '{self._path}':\n\n{self._template}"
             )
         return self._template
