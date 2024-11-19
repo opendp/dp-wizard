@@ -13,6 +13,8 @@ class Template:
                 raise Exception('"path" and "template" are mutually exclusive')
             self._path = "template-instead-of-path"
             self._template = template
+        # We want a list of the initial slots, because substitutions
+        # can produce sequences of upper case letters that could be mistaken for slots.
         self._initial_slots = self._find_slots()
 
     def _find_slots(self):
@@ -26,13 +28,17 @@ class Template:
     def fill_expressions(self, **kwargs):
         for k, v in kwargs.items():
             k_re = re.escape(k)
-            self._template = re.sub(rf"\b{k_re}\b", str(v), self._template)
+            self._template, count = re.subn(rf"\b{k_re}\b", str(v), self._template)
+            if count == 0:
+                raise Exception(f"No slot for '{k}' in {self._path}")
         return self
 
     def fill_values(self, **kwargs):
         for k, v in kwargs.items():
             k_re = re.escape(k)
-            self._template = re.sub(rf"\b{k_re}\b", repr(v), self._template)
+            self._template, count = re.subn(rf"\b{k_re}\b", repr(v), self._template)
+            if count == 0:
+                raise Exception(f"No slot for '{k}' in {self._path}")
         return self
 
     def fill_blocks(self, **kwargs):
