@@ -1,6 +1,6 @@
 from shiny import ui, render, reactive
 
-from dp_wizard.utils.templates import NotebookGenerator, ScriptGenerator
+from dp_wizard.utils.templates import NotebookGenerator, ScriptGenerator, AnalysisPlan
 from dp_wizard.utils.converters import convert_py_to_nb
 
 
@@ -33,7 +33,7 @@ def results_server(
     epsilon,
 ):  # pragma: no cover
     @reactive.calc
-    def analysis_dict():
+    def analysis_plan() -> AnalysisPlan:
         # weights().keys() will reflect the desired columns:
         # The others retain inactive columns, so user
         # inputs aren't lost when toggling checkboxes.
@@ -48,23 +48,23 @@ def results_server(
             }
             for col in weights().keys()
         }
-        return {
-            "csv_path": csv_path(),
-            "contributions": contributions(),
-            "epsilon": epsilon(),
-            "columns": columns,
-        }
+        return AnalysisPlan(
+            csv_path=csv_path(),
+            contributions=contributions(),
+            epsilon=epsilon(),
+            columns=columns,
+        )
 
     @render.download(
         filename="dp-wizard-script.py",
         media_type="text/x-python",
     )
     async def download_script():
-        analysis = analysis_dict()
+        analysis = analysis_plan()
         script_py = ScriptGenerator().make_py(
-            contributions=analysis["contributions"],
-            epsilon=analysis["epsilon"],
-            columns=analysis["columns"],
+            contributions=analysis.contributions,
+            epsilon=analysis.epsilon,
+            columns=analysis.columns,
         )
         yield script_py
 
@@ -73,12 +73,12 @@ def results_server(
         media_type="application/x-ipynb+json",
     )
     async def download_notebook():
-        analysis = analysis_dict()
+        analysis = analysis_plan()
         notebook_py = NotebookGenerator().make_py(
-            csv_path=analysis["csv_path"],
-            contributions=analysis["contributions"],
-            epsilon=analysis["epsilon"],
-            columns=analysis["columns"],
+            csv_path=analysis.csv_path,
+            contributions=analysis.contributions,
+            epsilon=analysis.epsilon,
+            columns=analysis.columns,
         )
         notebook_nb = convert_py_to_nb(notebook_py, execute=True)
         yield notebook_nb

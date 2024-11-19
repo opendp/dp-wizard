@@ -5,9 +5,17 @@ makes some things easier, but it is also reinventing the wheel.
 We may revisit this.
 """
 
+from typing import NamedTuple
 from pathlib import Path
 import re
 from dp_wizard.utils.csv_helper import name_to_identifier
+
+
+class AnalysisPlan(NamedTuple):
+    csv_path: str
+    contributions: int
+    epsilon: float
+    columns: dict
 
 
 class _Template:
