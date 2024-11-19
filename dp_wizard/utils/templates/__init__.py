@@ -95,51 +95,6 @@ def _make_margins_dict(bin_names):
     return margins_dict
 
 
-def _make_context_for_notebook(csv_path, contributions, epsilon, weights, column_names):
-    privacy_unit_block = make_privacy_unit_block(contributions)
-    privacy_loss_block = make_privacy_loss_block(epsilon)
-    margins_dict = _make_margins_dict([f"{name}_bin" for name in column_names])
-    columns = ", ".join([f"{name}_config" for name in column_names])
-    return str(
-        _Template("context")
-        .fill_expressions(
-            MARGINS_DICT=margins_dict,
-            COLUMNS=columns,
-        )
-        .fill_values(
-            CSV_PATH=csv_path,
-            WEIGHTS=weights,
-        )
-        .fill_blocks(
-            PRIVACY_UNIT_BLOCK=privacy_unit_block,
-            PRIVACY_LOSS_BLOCK=privacy_loss_block,
-        )
-    )
-
-
-def _make_context_for_script(contributions, epsilon, weights, column_names):
-    privacy_unit_block = make_privacy_unit_block(contributions)
-    privacy_loss_block = make_privacy_loss_block(epsilon)
-    margins_dict = _make_margins_dict([f"{name}_bin" for name in column_names])
-    columns = ",".join([f"{name}_config" for name in column_names])
-    return str(
-        _Template("context")
-        .fill_expressions(
-            CSV_PATH="csv_path",
-            MARGINS_DICT=margins_dict,
-            COLUMNS=columns,
-        )
-        .fill_values(
-            WEIGHTS=weights,
-        )
-        .fill_blocks(
-            PRIVACY_UNIT_BLOCK=privacy_unit_block,
-            PRIVACY_LOSS_BLOCK=privacy_loss_block,
-            MARGINS_DICT=margins_dict,
-        )
-    )
-
-
 def _make_imports():
     return (
         str(_Template("imports").fill_values())
@@ -180,38 +135,87 @@ def _make_queries(column_names):
     )
 
 
-def make_notebook_py(csv_path, contributions, epsilon, columns):
-    return str(
-        _Template("notebook").fill_blocks(
-            IMPORTS_BLOCK=_make_imports(),
-            COLUMNS_BLOCK=_make_columns(columns),
-            CONTEXT_BLOCK=_make_context_for_notebook(
-                csv_path=csv_path,
-                contributions=contributions,
-                epsilon=epsilon,
-                weights=[column["weight"] for column in columns.values()],
-                column_names=[name_to_identifier(name) for name in columns.keys()],
-            ),
-            QUERIES_BLOCK=_make_queries(columns.keys()),
-        )
-    )
+class CodeGenerator:
+    pass
 
 
-def make_script_py(contributions, epsilon, columns):
-    return str(
-        _Template("script").fill_blocks(
-            IMPORTS_BLOCK=_make_imports(),
-            COLUMNS_BLOCK=_make_columns(columns),
-            CONTEXT_BLOCK=_make_context_for_script(
-                # csv_path is a CLI parameter in the script
-                contributions=contributions,
-                epsilon=epsilon,
-                weights=[column["weight"] for column in columns.values()],
-                column_names=[name_to_identifier(name) for name in columns.keys()],
-            ),
-            QUERIES_BLOCK=_make_queries(columns.keys()),
+class NotebookGenerator(CodeGenerator):
+    def make_py(self, csv_path, contributions, epsilon, columns):
+        return str(
+            _Template("notebook").fill_blocks(
+                IMPORTS_BLOCK=_make_imports(),
+                COLUMNS_BLOCK=_make_columns(columns),
+                CONTEXT_BLOCK=self._make_context(
+                    csv_path=csv_path,
+                    contributions=contributions,
+                    epsilon=epsilon,
+                    weights=[column["weight"] for column in columns.values()],
+                    column_names=[name_to_identifier(name) for name in columns.keys()],
+                ),
+                QUERIES_BLOCK=_make_queries(columns.keys()),
+            )
         )
-    )
+
+    def _make_context(self, csv_path, contributions, epsilon, weights, column_names):
+        privacy_unit_block = make_privacy_unit_block(contributions)
+        privacy_loss_block = make_privacy_loss_block(epsilon)
+        margins_dict = _make_margins_dict([f"{name}_bin" for name in column_names])
+        columns = ", ".join([f"{name}_config" for name in column_names])
+        return str(
+            _Template("context")
+            .fill_expressions(
+                MARGINS_DICT=margins_dict,
+                COLUMNS=columns,
+            )
+            .fill_values(
+                CSV_PATH=csv_path,
+                WEIGHTS=weights,
+            )
+            .fill_blocks(
+                PRIVACY_UNIT_BLOCK=privacy_unit_block,
+                PRIVACY_LOSS_BLOCK=privacy_loss_block,
+            )
+        )
+
+
+class ScriptGenerator(CodeGenerator):
+    def make_py(self, contributions, epsilon, columns):
+        return str(
+            _Template("script").fill_blocks(
+                IMPORTS_BLOCK=_make_imports(),
+                COLUMNS_BLOCK=_make_columns(columns),
+                CONTEXT_BLOCK=self._make_context(
+                    # csv_path is a CLI parameter in the script
+                    contributions=contributions,
+                    epsilon=epsilon,
+                    weights=[column["weight"] for column in columns.values()],
+                    column_names=[name_to_identifier(name) for name in columns.keys()],
+                ),
+                QUERIES_BLOCK=_make_queries(columns.keys()),
+            )
+        )
+
+    def _make_context(self, contributions, epsilon, weights, column_names):
+        privacy_unit_block = make_privacy_unit_block(contributions)
+        privacy_loss_block = make_privacy_loss_block(epsilon)
+        margins_dict = _make_margins_dict([f"{name}_bin" for name in column_names])
+        columns = ",".join([f"{name}_config" for name in column_names])
+        return str(
+            _Template("context")
+            .fill_expressions(
+                CSV_PATH="csv_path",
+                MARGINS_DICT=margins_dict,
+                COLUMNS=columns,
+            )
+            .fill_values(
+                WEIGHTS=weights,
+            )
+            .fill_blocks(
+                PRIVACY_UNIT_BLOCK=privacy_unit_block,
+                PRIVACY_LOSS_BLOCK=privacy_loss_block,
+                MARGINS_DICT=margins_dict,
+            )
+        )
 
 
 def make_privacy_unit_block(contributions):

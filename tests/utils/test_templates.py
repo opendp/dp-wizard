@@ -4,7 +4,7 @@ from pathlib import Path
 import re
 import pytest
 import opendp.prelude as dp
-from dp_wizard.utils.templates import _Template, make_notebook_py, make_script_py
+from dp_wizard.utils.templates import _Template, ScriptGenerator, NotebookGenerator
 
 
 fixtures_path = Path(__file__).parent.parent / "fixtures"
@@ -89,7 +89,7 @@ def test_fill_template_unfilled_slots():
 
 
 def test_make_notebook():
-    notebook = make_notebook_py(
+    notebook = NotebookGenerator().make_py(
         csv_path=fake_csv,
         contributions=1,
         epsilon=1,
@@ -111,7 +111,7 @@ def test_make_notebook():
 
 
 def test_make_script():
-    script = make_script_py(
+    script = ScriptGenerator().make_py(
         contributions=1,
         epsilon=1,
         columns={
