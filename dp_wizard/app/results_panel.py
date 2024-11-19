@@ -4,6 +4,7 @@ from dp_wizard.utils.code_generators import (
     NotebookGenerator,
     ScriptGenerator,
     AnalysisPlan,
+    AnalysisPlanColumn,
 )
 from dp_wizard.utils.converters import convert_py_to_nb
 
@@ -42,14 +43,12 @@ def results_server(
         # The others retain inactive columns, so user
         # inputs aren't lost when toggling checkboxes.
         columns = {
-            col: {
-                "lower_bound": lower_bounds()[col],
-                "upper_bound": upper_bounds()[col],
-                "bin_count": int(bin_counts()[col]),
-                # TODO: Floats should work for weight, but they don't:
-                # https://github.com/opendp/opendp/issues/2140
-                "weight": int(weights()[col]),
-            }
+            col: AnalysisPlanColumn(
+                lower_bound=lower_bounds()[col],
+                upper_bound=upper_bounds()[col],
+                bin_count=int(bin_counts()[col]),
+                weight=int(weights()[col]),
+            )
             for col in weights().keys()
         }
         return AnalysisPlan(

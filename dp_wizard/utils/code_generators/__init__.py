@@ -6,11 +6,18 @@ from dp_wizard.utils.csv_helper import name_to_identifier
 from dp_wizard.utils.code_generators._template import Template
 
 
+class AnalysisPlanColumn(NamedTuple):
+    lower_bound: float
+    upper_bound: float
+    bin_count: int
+    weight: int
+
+
 class AnalysisPlan(NamedTuple):
     csv_path: str
     contributions: int
     epsilon: float
-    columns: dict
+    columns: dict[str, AnalysisPlanColumn]
 
 
 class _CodeGenerator(ABC):
@@ -60,9 +67,9 @@ class _CodeGenerator(ABC):
         return "\n".join(
             make_column_config_block(
                 name=name,
-                lower_bound=col["lower_bound"],
-                upper_bound=col["upper_bound"],
-                bin_count=col["bin_count"],
+                lower_bound=col.lower_bound,
+                upper_bound=col.upper_bound,
+                bin_count=col.bin_count,
             )
             for name, col in columns.items()
         )
@@ -73,7 +80,7 @@ class _CodeGenerator(ABC):
         )
 
     def _make_partial_context(self):
-        weights = [column["weight"] for column in self.columns.values()]
+        weights = [column.weight for column in self.columns.values()]
         column_names = [name_to_identifier(name) for name in self.columns.keys()]
         privacy_unit_block = make_privacy_unit_block(self.contributions)
         privacy_loss_block = make_privacy_loss_block(self.epsilon)
