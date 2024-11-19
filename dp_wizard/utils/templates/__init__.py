@@ -6,6 +6,7 @@ We may revisit this.
 """
 
 from typing import NamedTuple
+from abc import ABC, abstractmethod
 from pathlib import Path
 import re
 from dp_wizard.utils.csv_helper import name_to_identifier
@@ -79,12 +80,15 @@ class _Template:
         return self._template
 
 
-class CodeGenerator:
+class _CodeGenerator(ABC):
     def __init__(self, contributions, epsilon, columns, csv_path=None):
         self.csv_path = csv_path
         self.contributions = contributions
         self.epsilon = epsilon
         self.columns = columns
+
+    @abstractmethod
+    def _make_context(self): ...
 
     def make_py(self):
         return str(
@@ -158,14 +162,14 @@ class CodeGenerator:
         )
 
 
-class NotebookGenerator(CodeGenerator):
+class NotebookGenerator(_CodeGenerator):
     root_template = "notebook"
 
     def _make_context(self):
         return str(self._make_partial_context().fill_values(CSV_PATH=self.csv_path))
 
 
-class ScriptGenerator(CodeGenerator):
+class ScriptGenerator(_CodeGenerator):
     root_template = "script"
 
     def _make_context(self):
