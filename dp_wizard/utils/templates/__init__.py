@@ -86,6 +86,16 @@ class CodeGenerator:
         self.epsilon = epsilon
         self.columns = columns
 
+    def make_py(self):
+        return str(
+            _Template(self.root_template).fill_blocks(
+                IMPORTS_BLOCK=_make_imports(),
+                COLUMNS_BLOCK=self._make_columns(self.columns),
+                CONTEXT_BLOCK=self._make_context(),
+                QUERIES_BLOCK=self._make_queries(self.columns.keys()),
+            )
+        )
+
     def _make_margins_dict(self, bin_names):
         # TODO: Don't worry too much about the formatting here.
         # Plan to run the output through black for consistency.
@@ -127,15 +137,7 @@ class CodeGenerator:
 
 
 class NotebookGenerator(CodeGenerator):
-    def make_py(self):
-        return str(
-            _Template("notebook").fill_blocks(
-                IMPORTS_BLOCK=_make_imports(),
-                COLUMNS_BLOCK=self._make_columns(self.columns),
-                CONTEXT_BLOCK=self._make_context(),
-                QUERIES_BLOCK=self._make_queries(self.columns.keys()),
-            )
-        )
+    root_template = "notebook"
 
     def _make_context(self):
         weights = [column["weight"] for column in self.columns.values()]
@@ -162,15 +164,7 @@ class NotebookGenerator(CodeGenerator):
 
 
 class ScriptGenerator(CodeGenerator):
-    def make_py(self):
-        return str(
-            _Template("script").fill_blocks(
-                IMPORTS_BLOCK=_make_imports(),
-                COLUMNS_BLOCK=self._make_columns(self.columns),
-                CONTEXT_BLOCK=self._make_context(),
-                QUERIES_BLOCK=self._make_queries(self.columns.keys()),
-            )
-        )
+    root_template = "script"
 
     def _make_context(self):
         # csv_path is a CLI parameter in the script
