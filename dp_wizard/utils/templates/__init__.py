@@ -135,25 +135,20 @@ class CodeGenerator:
             _make_query(column_name) for column_name in column_names
         )
 
-
-class NotebookGenerator(CodeGenerator):
-    root_template = "notebook"
-
-    def _make_context(self):
+    def _make_partial_context(self):
         weights = [column["weight"] for column in self.columns.values()]
         column_names = [name_to_identifier(name) for name in self.columns.keys()]
         privacy_unit_block = make_privacy_unit_block(self.contributions)
         privacy_loss_block = make_privacy_loss_block(self.epsilon)
         margins_dict = self._make_margins_dict([f"{name}_bin" for name in column_names])
         columns = ", ".join([f"{name}_config" for name in column_names])
-        return str(
+        return (
             _Template("context")
             .fill_expressions(
                 MARGINS_DICT=margins_dict,
                 COLUMNS=columns,
             )
             .fill_values(
-                CSV_PATH=self.csv_path,
                 WEIGHTS=weights,
             )
             .fill_blocks(
@@ -161,35 +156,20 @@ class NotebookGenerator(CodeGenerator):
                 PRIVACY_LOSS_BLOCK=privacy_loss_block,
             )
         )
+
+
+class NotebookGenerator(CodeGenerator):
+    root_template = "notebook"
+
+    def _make_context(self):
+        return str(self._make_partial_context().fill_values(CSV_PATH=self.csv_path))
 
 
 class ScriptGenerator(CodeGenerator):
     root_template = "script"
 
     def _make_context(self):
-        # csv_path is a CLI parameter in the script
-        weights = [column["weight"] for column in self.columns.values()]
-        column_names = [name_to_identifier(name) for name in self.columns.keys()]
-        privacy_unit_block = make_privacy_unit_block(self.contributions)
-        privacy_loss_block = make_privacy_loss_block(self.epsilon)
-        margins_dict = self._make_margins_dict([f"{name}_bin" for name in column_names])
-        columns = ",".join([f"{name}_config" for name in column_names])
-        return str(
-            _Template("context")
-            .fill_expressions(
-                CSV_PATH="csv_path",
-                MARGINS_DICT=margins_dict,
-                COLUMNS=columns,
-            )
-            .fill_values(
-                WEIGHTS=weights,
-            )
-            .fill_blocks(
-                PRIVACY_UNIT_BLOCK=privacy_unit_block,
-                PRIVACY_LOSS_BLOCK=privacy_loss_block,
-                MARGINS_DICT=margins_dict,
-            )
-        )
+        return str(self._make_partial_context().fill_expressions(CSV_PATH="csv_path"))
 
 
 # Public functions used to generate code snippets in the UI;
