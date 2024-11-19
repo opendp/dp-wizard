@@ -89,7 +89,7 @@ def test_fill_template_unfilled_slots():
 
 
 def test_make_notebook():
-    notebook = NotebookGenerator().make_py(
+    notebook = NotebookGenerator(
         csv_path=fake_csv,
         contributions=1,
         epsilon=1,
@@ -103,7 +103,7 @@ def test_make_notebook():
                 "weight": 4,
             }
         },
-    )
+    ).make_py()
     print(notebook)
     globals = {}
     exec(notebook, globals)
@@ -111,7 +111,7 @@ def test_make_notebook():
 
 
 def test_make_script():
-    script = ScriptGenerator().make_py(
+    script = ScriptGenerator(
         contributions=1,
         epsilon=1,
         columns={
@@ -122,7 +122,7 @@ def test_make_script():
                 "weight": 4,
             }
         },
-    )
+    ).make_py()
     print(script)
 
     with NamedTemporaryFile(mode="w") as fp:

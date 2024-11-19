@@ -80,6 +80,12 @@ class _Template:
 
 
 class CodeGenerator:
+    def __init__(self, contributions, epsilon, columns, csv_path=None):
+        self.csv_path = csv_path
+        self.contributions = contributions
+        self.epsilon = epsilon
+        self.columns = columns
+
     def _make_margins_dict(self, bin_names):
         # TODO: Don't worry too much about the formatting here.
         # Plan to run the output through black for consistency.
@@ -121,25 +127,21 @@ class CodeGenerator:
 
 
 class NotebookGenerator(CodeGenerator):
-    def make_py(self, csv_path, contributions, epsilon, columns):
+    def make_py(self):
         return str(
             _Template("notebook").fill_blocks(
                 IMPORTS_BLOCK=_make_imports(),
-                COLUMNS_BLOCK=self._make_columns(columns),
-                CONTEXT_BLOCK=self._make_context(
-                    csv_path=csv_path,
-                    contributions=contributions,
-                    epsilon=epsilon,
-                    weights=[column["weight"] for column in columns.values()],
-                    column_names=[name_to_identifier(name) for name in columns.keys()],
-                ),
-                QUERIES_BLOCK=self._make_queries(columns.keys()),
+                COLUMNS_BLOCK=self._make_columns(self.columns),
+                CONTEXT_BLOCK=self._make_context(),
+                QUERIES_BLOCK=self._make_queries(self.columns.keys()),
             )
         )
 
-    def _make_context(self, csv_path, contributions, epsilon, weights, column_names):
-        privacy_unit_block = make_privacy_unit_block(contributions)
-        privacy_loss_block = make_privacy_loss_block(epsilon)
+    def _make_context(self):
+        weights = [column["weight"] for column in self.columns.values()]
+        column_names = [name_to_identifier(name) for name in self.columns.keys()]
+        privacy_unit_block = make_privacy_unit_block(self.contributions)
+        privacy_loss_block = make_privacy_loss_block(self.epsilon)
         margins_dict = self._make_margins_dict([f"{name}_bin" for name in column_names])
         columns = ", ".join([f"{name}_config" for name in column_names])
         return str(
@@ -149,7 +151,7 @@ class NotebookGenerator(CodeGenerator):
                 COLUMNS=columns,
             )
             .fill_values(
-                CSV_PATH=csv_path,
+                CSV_PATH=self.csv_path,
                 WEIGHTS=weights,
             )
             .fill_blocks(
@@ -160,25 +162,22 @@ class NotebookGenerator(CodeGenerator):
 
 
 class ScriptGenerator(CodeGenerator):
-    def make_py(self, contributions, epsilon, columns):
+    def make_py(self):
         return str(
             _Template("script").fill_blocks(
                 IMPORTS_BLOCK=_make_imports(),
-                COLUMNS_BLOCK=self._make_columns(columns),
-                CONTEXT_BLOCK=self._make_context(
-                    # csv_path is a CLI parameter in the script
-                    contributions=contributions,
-                    epsilon=epsilon,
-                    weights=[column["weight"] for column in columns.values()],
-                    column_names=[name_to_identifier(name) for name in columns.keys()],
-                ),
-                QUERIES_BLOCK=self._make_queries(columns.keys()),
+                COLUMNS_BLOCK=self._make_columns(self.columns),
+                CONTEXT_BLOCK=self._make_context(),
+                QUERIES_BLOCK=self._make_queries(self.columns.keys()),
             )
         )
 
-    def _make_context(self, contributions, epsilon, weights, column_names):
-        privacy_unit_block = make_privacy_unit_block(contributions)
-        privacy_loss_block = make_privacy_loss_block(epsilon)
+    def _make_context(self):
+        # csv_path is a CLI parameter in the script
+        weights = [column["weight"] for column in self.columns.values()]
+        column_names = [name_to_identifier(name) for name in self.columns.keys()]
+        privacy_unit_block = make_privacy_unit_block(self.contributions)
+        privacy_loss_block = make_privacy_loss_block(self.epsilon)
         margins_dict = self._make_margins_dict([f"{name}_bin" for name in column_names])
         columns = ",".join([f"{name}_config" for name in column_names])
         return str(
