@@ -79,72 +79,45 @@ class _Template:
         return self._template
 
 
-def _make_margins_dict(bin_names):
-    # TODO: Don't worry too much about the formatting here.
-    # Plan to run the output through black for consistency.
-    # https://github.com/opendp/dp-creator-ii/issues/50
-    margins = (
-        [
-            """
-        (): dp.polars.Margin(
-            public_info="lengths",
-        ),"""
-        ]
-        + [
-            f"""
-        ("{bin_name}",): dp.polars.Margin(
-            public_info="keys",
-        ),"""
-            for bin_name in bin_names
-        ]
-    )
-
-    margins_dict = "{" + "".join(margins) + "\n    }"
-    return margins_dict
-
-
-def _make_imports():
-    return (
-        str(_Template("imports").fill_values())
-        + (Path(__file__).parent.parent / "shared.py").read_text()
-    )
-
-
-def _make_columns(columns):
-    return "\n".join(
-        make_column_config_block(
-            name=name,
-            lower_bound=col["lower_bound"],
-            upper_bound=col["upper_bound"],
-            bin_count=col["bin_count"],
-        )
-        for name, col in columns.items()
-    )
-
-
-def _make_query(column_name):
-    indentifier = name_to_identifier(column_name)
-    return str(
-        _Template("query")
-        .fill_values(
-            BIN_NAME=f"{indentifier}_bin",
-        )
-        .fill_expressions(
-            QUERY_NAME=f"{indentifier}_query",
-            ACCURACY_NAME=f"{indentifier}_accuracy",
-            HISTOGRAM_NAME=f"{indentifier}_histogram",
-        )
-    )
-
-
-def _make_queries(column_names):
-    return "confidence = 0.95\n\n" + "\n".join(
-        _make_query(column_name) for column_name in column_names
-    )
-
-
 class CodeGenerator:
-    pass
+    def _make_margins_dict(self, bin_names):
+        # TODO: Don't worry too much about the formatting here.
+        # Plan to run the output through black for consistency.
+        # https://github.com/opendp/dp-creator-ii/issues/50
+        margins = (
+            [
+                """
+            (): dp.polars.Margin(
+                public_info="lengths",
+            ),"""
+            ]
+            + [
+                f"""
+            ("{bin_name}",): dp.polars.Margin(
+                public_info="keys",
+            ),"""
+                for bin_name in bin_names
+            ]
+        )
+
+        margins_dict = "{" + "".join(margins) + "\n    }"
+        return margins_dict
+
+    def _make_columns(self, columns):
+        return "\n".join(
+            make_column_config_block(
+                name=name,
+                lower_bound=col["lower_bound"],
+                upper_bound=col["upper_bound"],
+                bin_count=col["bin_count"],
+            )
+            for name, col in columns.items()
+        )
+
+    def _make_queries(self, column_names):
+        return "confidence = 0.95\n\n" + "\n".join(
+            _make_query(column_name) for column_name in column_names
+        )
 
 
 class NotebookGenerator(CodeGenerator):
@@ -152,7 +125,7 @@ class NotebookGenerator(CodeGenerator):
         return str(
             _Template("notebook").fill_blocks(
                 IMPORTS_BLOCK=_make_imports(),
-                COLUMNS_BLOCK=_make_columns(columns),
+                COLUMNS_BLOCK=self._make_columns(columns),
                 CONTEXT_BLOCK=self._make_context(
                     csv_path=csv_path,
                     contributions=contributions,
@@ -160,14 +133,14 @@ class NotebookGenerator(CodeGenerator):
                     weights=[column["weight"] for column in columns.values()],
                     column_names=[name_to_identifier(name) for name in columns.keys()],
                 ),
-                QUERIES_BLOCK=_make_queries(columns.keys()),
+                QUERIES_BLOCK=self._make_queries(columns.keys()),
             )
         )
 
     def _make_context(self, csv_path, contributions, epsilon, weights, column_names):
         privacy_unit_block = make_privacy_unit_block(contributions)
         privacy_loss_block = make_privacy_loss_block(epsilon)
-        margins_dict = _make_margins_dict([f"{name}_bin" for name in column_names])
+        margins_dict = self._make_margins_dict([f"{name}_bin" for name in column_names])
         columns = ", ".join([f"{name}_config" for name in column_names])
         return str(
             _Template("context")
@@ -191,7 +164,7 @@ class ScriptGenerator(CodeGenerator):
         return str(
             _Template("script").fill_blocks(
                 IMPORTS_BLOCK=_make_imports(),
-                COLUMNS_BLOCK=_make_columns(columns),
+                COLUMNS_BLOCK=self._make_columns(columns),
                 CONTEXT_BLOCK=self._make_context(
                     # csv_path is a CLI parameter in the script
                     contributions=contributions,
@@ -199,14 +172,14 @@ class ScriptGenerator(CodeGenerator):
                     weights=[column["weight"] for column in columns.values()],
                     column_names=[name_to_identifier(name) for name in columns.keys()],
                 ),
-                QUERIES_BLOCK=_make_queries(columns.keys()),
+                QUERIES_BLOCK=self._make_queries(columns.keys()),
             )
         )
 
     def _make_context(self, contributions, epsilon, weights, column_names):
         privacy_unit_block = make_privacy_unit_block(contributions)
         privacy_loss_block = make_privacy_loss_block(epsilon)
-        margins_dict = _make_margins_dict([f"{name}_bin" for name in column_names])
+        margins_dict = self._make_margins_dict([f"{name}_bin" for name in column_names])
         columns = ",".join([f"{name}_config" for name in column_names])
         return str(
             _Template("context")
@@ -224,6 +197,10 @@ class ScriptGenerator(CodeGenerator):
                 MARGINS_DICT=margins_dict,
             )
         )
+
+
+# Public functions used to generate code snippets in the UI;
+# These do not require an entire analysis plan, so they stand on their own.
 
 
 def make_privacy_unit_block(contributions):
@@ -275,9 +252,36 @@ def make_column_config_block(name, lower_bound, upper_bound, bin_count):
     )
 
 
+# Private helper functions:
+# These do not depend on the AnalysisPlan,
+# so it's better to keep them out of the class.
+
+
+def _make_query(column_name):
+    indentifier = name_to_identifier(column_name)
+    return str(
+        _Template("query")
+        .fill_values(
+            BIN_NAME=f"{indentifier}_bin",
+        )
+        .fill_expressions(
+            QUERY_NAME=f"{indentifier}_query",
+            ACCURACY_NAME=f"{indentifier}_accuracy",
+            HISTOGRAM_NAME=f"{indentifier}_histogram",
+        )
+    )
+
+
 def _snake_case(name: str):
     """
     >>> _snake_case("HW GRADE")
     'hw_grade'
     """
     return re.sub(r"\W+", "_", name.lower())
+
+
+def _make_imports():
+    return (
+        str(_Template("imports").fill_values())
+        + (Path(__file__).parent.parent / "shared.py").read_text()
+    )
