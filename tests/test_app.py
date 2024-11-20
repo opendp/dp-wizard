@@ -88,6 +88,8 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     # Set column details:
     page.get_by_label("grade").check()
     expect_visible(simulation)
+    weight_message = "Weight doesn't matter with only one column"
+    expect_visible(weight_message)
     # Check that default is set correctly:
     assert page.get_by_label("Upper").input_value() == "10"
     # Reset, and confirm:
@@ -100,8 +102,11 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     page.get_by_label("grade").check()
     expect_visible(simulation)
     assert page.get_by_label("Upper").input_value() == new_value
+    # Add a second column:
+    page.get_by_label("blank").check()
+    expect_not_visible(weight_message)
     # TODO: Setting more inputs without checking for updates
-    # cause recalculations to pile up, and these cause timeouts on CI:
+    # causes recalculations to pile up, and these cause timeouts on CI:
     # It is still rerendering the graph after hitting "Download results".
     # https://github.com/opendp/dp-wizard/issues/116
     expect_no_error()
