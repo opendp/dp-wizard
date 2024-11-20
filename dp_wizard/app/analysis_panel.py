@@ -8,11 +8,15 @@ from dp_wizard.utils.csv_helper import read_csv_ids_labels, read_csv_ids_names
 from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip
 from dp_wizard.utils.code_generators import make_privacy_loss_block
 from dp_wizard.app.components.column_module import col_widths
+from dp_wizard.app import results_panel
+
+analysis_panel_id = "2_analysis_panel"
 
 
 def analysis_ui():
     return ui.nav_panel(
         "Define Analysis",
+        ui.output_text("current_panel_text_on_analysis"),
         ui.markdown(
             "Select numeric columns of interest, "
             "and for each numeric column indicate the expected range, "
@@ -35,7 +39,7 @@ def analysis_ui():
         ui.output_text("epsilon_text"),
         output_code_sample("Privacy Loss", "privacy_loss_python"),
         ui.output_ui("download_results_button_ui"),
-        value="analysis_panel",
+        value=analysis_panel_id,
     )
 
 
@@ -59,9 +63,12 @@ def analysis_server(
     bin_counts,
     weights,
     epsilon,
-    is_ahead,
-    is_behind,
+    current_panel,
 ):  # pragma: no cover
+    @render.text
+    def current_panel_text_on_analysis():
+        return current_panel()
+
     @reactive.calc
     def button_enabled():
         column_ids_selected = input.columns_checkbox_group()
@@ -178,7 +185,8 @@ def analysis_server(
     @reactive.effect
     @reactive.event(input.go_to_results)
     def go_to_results():
-        ui.update_navs("top_level_nav", selected="results_panel")
+        current_panel.set(results_panel.results_panel_id)
+        ui.update_navs("top_level_nav", selected=results_panel.results_panel_id)
 
     @render.ui
     def download_results_button_ui():

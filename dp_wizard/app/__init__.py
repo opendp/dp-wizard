@@ -11,7 +11,6 @@ logging.basicConfig(level=logging.INFO)
 
 app_ui = ui.page_bootstrap(
     ui.head_content(ui.include_css(Path(__file__).parent / "css" / "styles.css")),
-    ui.output_text("current_panel"),
     ui.navset_tab(
         dataset_panel.dataset_ui(),
         analysis_panel.analysis_ui(),
@@ -37,10 +36,11 @@ def make_server_from_cli_info(cli_info):
         bin_counts = reactive.value({})
         weights = reactive.value({})
         epsilon = reactive.value(1)
+        current_panel = reactive.value(dataset_panel.dataset_panel_id)
 
         @render.text
-        def current_panel():
-            return input.top_level_nav()
+        def current_panel_text():
+            return current_panel()
 
         dataset_panel.dataset_server(
             input,
@@ -49,8 +49,7 @@ def make_server_from_cli_info(cli_info):
             is_demo=cli_info.is_demo,
             csv_path=csv_path,
             contributions=contributions,
-            is_ahead=False,
-            is_behind=False,
+            current_panel=current_panel,
         )
         analysis_panel.analysis_server(
             input,
@@ -64,8 +63,7 @@ def make_server_from_cli_info(cli_info):
             bin_counts=bin_counts,
             weights=weights,
             epsilon=epsilon,
-            is_ahead=False,
-            is_behind=False,
+            current_panel=current_panel,
         )
         results_panel.results_server(
             input,
@@ -78,8 +76,7 @@ def make_server_from_cli_info(cli_info):
             bin_counts=bin_counts,
             weights=weights,
             epsilon=epsilon,
-            is_ahead=False,
-            is_behind=False,
+            current_panel=current_panel,
         )
         feedback_panel.feedback_server(
             input,

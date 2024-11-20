@@ -5,6 +5,9 @@ from shiny import ui, reactive, render
 from dp_wizard.utils.argparse_helpers import get_cli_info
 from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip
 from dp_wizard.utils.code_generators import make_privacy_unit_block
+from dp_wizard.app import analysis_panel
+
+dataset_panel_id = "1_dataset_panel"
 
 
 def dataset_ui():
@@ -15,6 +18,7 @@ def dataset_ui():
 
     return ui.nav_panel(
         "Select Dataset",
+        ui.output_text("current_panel_text_on_dataset"),
         # Doesn't seem to be possible to preset the actual value,
         # but the placeholder string is a good substitute.
         ui.input_file(
@@ -36,7 +40,7 @@ def dataset_ui():
         ui.output_ui("python_tooltip_ui"),
         output_code_sample("Unit of Privacy", "unit_of_privacy_python"),
         ui.output_ui("define_analysis_button_ui"),
-        value="dataset_panel",
+        value=dataset_panel_id,
     )
 
 
@@ -47,9 +51,12 @@ def dataset_server(
     csv_path,
     contributions,
     is_demo,
-    is_ahead,
-    is_behind,
+    current_panel,
 ):  # pragma: no cover
+    @render.text
+    def current_panel_text_on_dataset():
+        return current_panel()
+
     @reactive.effect
     @reactive.event(input.csv_path)
     def _on_csv_path_change():
@@ -113,4 +120,5 @@ def dataset_server(
     @reactive.effect
     @reactive.event(input.go_to_analysis)
     def go_to_analysis():
-        ui.update_navs("top_level_nav", selected="analysis_panel")
+        current_panel.set(analysis_panel.analysis_panel_id)
+        ui.update_navs("top_level_nav", selected=analysis_panel.analysis_panel_id)

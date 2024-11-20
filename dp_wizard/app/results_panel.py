@@ -8,10 +8,13 @@ from dp_wizard.utils.code_generators import (
 )
 from dp_wizard.utils.converters import convert_py_to_nb
 
+results_panel_id = "3_results_panel"
+
 
 def results_ui():
     return ui.nav_panel(
         "Download results",
+        ui.output_text("current_panel_text_on_results"),
         ui.markdown("You can now make a differentially private release of your data."),
         ui.download_button(
             "download_script",
@@ -21,7 +24,7 @@ def results_ui():
             "download_notebook",
             "Download Notebook (.ipynb)",
         ),
-        value="results_panel",
+        value=results_panel_id,
     )
 
 
@@ -36,9 +39,12 @@ def results_server(
     bin_counts,
     weights,
     epsilon,
-    is_ahead,
-    is_behind,
+    current_panel,
 ):  # pragma: no cover
+    @render.text
+    def current_panel_text_on_results():
+        return current_panel()
+
     @reactive.calc
     def analysis_plan() -> AnalysisPlan:
         # weights().keys() will reflect the desired columns:
