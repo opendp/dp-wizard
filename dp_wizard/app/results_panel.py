@@ -36,6 +36,8 @@ def results_server(
     bin_counts,
     weights,
     epsilon,
+    is_ahead,
+    is_behind,
 ):  # pragma: no cover
     @reactive.calc
     def analysis_plan() -> AnalysisPlan:

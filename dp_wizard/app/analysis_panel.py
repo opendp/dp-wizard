@@ -59,6 +59,8 @@ def analysis_server(
     bin_counts,
     weights,
     epsilon,
+    is_ahead,
+    is_behind,
 ):  # pragma: no cover
     @reactive.calc
     def button_enabled():

@@ -41,7 +41,14 @@ def dataset_ui():
 
 
 def dataset_server(
-    input, output, session, csv_path=None, contributions=None, is_demo=None
+    input,
+    output,
+    session,
+    csv_path,
+    contributions,
+    is_demo,
+    is_ahead,
+    is_behind,
 ):  # pragma: no cover
     @reactive.effect
     @reactive.event(input.csv_path)
