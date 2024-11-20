@@ -59,6 +59,7 @@ def column_server(
     bin_counts,
     weights,
     is_demo,
+    is_single_column,
 ):  # pragma: no cover
     @reactive.effect
     def _set_all_inputs():
@@ -117,7 +118,7 @@ def column_server(
 
     @render.ui
     def optional_weight_ui():
-        return ui.input_select(
+        weight_select = ui.input_select(
             "weight",
             ["Weight", ui.output_ui("weight_tooltip_ui")],
             choices={
@@ -127,6 +128,11 @@ def column_server(
             },
             selected=default_weight,
             width=label_width,
+        )
+        return (
+            weight_select
+            if not is_single_column
+            else [weight_select, "Weight doesn't matter with only one column."]
         )
 
     @render.ui

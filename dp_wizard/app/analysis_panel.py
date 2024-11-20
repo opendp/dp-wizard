@@ -109,6 +109,7 @@ def analysis_server(
                 bin_counts=bin_counts,
                 weights=weights,
                 is_demo=is_demo,
+                is_single_column=len(column_ids) == 1,
             )
         return [
             [
