@@ -1,7 +1,7 @@
 from pathlib import Path
 import logging
 
-from shiny import App, ui, reactive
+from shiny import App, ui, reactive, render
 
 from dp_wizard.utils.argparse_helpers import get_cli_info
 from dp_wizard.app import analysis_panel, dataset_panel, results_panel, feedback_panel
@@ -36,6 +36,11 @@ def make_server_from_cli_info(cli_info):
         bin_counts = reactive.value({})
         weights = reactive.value({})
         epsilon = reactive.value(1)
+        current_panel = reactive.value(dataset_panel.dataset_panel_id)
+
+        @render.text
+        def current_panel_text():
+            return current_panel()
 
         dataset_panel.dataset_server(
             input,
@@ -44,6 +49,7 @@ def make_server_from_cli_info(cli_info):
             is_demo=cli_info.is_demo,
             csv_path=csv_path,
             contributions=contributions,
+            current_panel=current_panel,
         )
         analysis_panel.analysis_server(
             input,
@@ -57,6 +63,7 @@ def make_server_from_cli_info(cli_info):
             bin_counts=bin_counts,
             weights=weights,
             epsilon=epsilon,
+            current_panel=current_panel,
         )
         results_panel.results_server(
             input,
@@ -69,6 +76,7 @@ def make_server_from_cli_info(cli_info):
             bin_counts=bin_counts,
             weights=weights,
             epsilon=epsilon,
+            current_panel=current_panel,
         )
         feedback_panel.feedback_server(
             input,
