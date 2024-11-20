@@ -76,7 +76,11 @@ class _CodeGenerator(ABC):
         )
 
     def _make_queries(self, column_names):
-        return f"confidence = {confidence}\n\n" + "\n".join(
+        confidence_note = (
+            "The actual value is within the shown range "
+            f"with {int(confidence * 100)}% confidence."
+        )
+        return f"confidence = {confidence} # {confidence_note}\n\n" + "\n".join(
             _make_query(column_name) for column_name in column_names
         )
 

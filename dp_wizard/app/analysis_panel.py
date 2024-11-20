@@ -5,6 +5,7 @@ from shiny import ui, reactive, render, req
 from dp_wizard.app.components.inputs import log_slider
 from dp_wizard.app.components.column_module import column_ui, column_server
 from dp_wizard.utils.csv_helper import read_csv_ids_labels, read_csv_ids_names
+from dp_wizard.utils.dp_helper import confidence
 from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip
 from dp_wizard.utils.code_generators import make_privacy_loss_block
 from dp_wizard.app.components.column_module import col_widths
@@ -110,6 +111,14 @@ def analysis_server(
                 weights=weights,
                 is_demo=is_demo,
             )
+        confidence_percent = f"{int(confidence * 100)}%"
+        note_md = f"""
+        This simulation assumes a normal distribution between the specified
+        lower and upper bounds. Your CSV has not been read except to
+        determine the columns.
+
+        The confidence interval is {confidence_percent}.
+        """
         return [
             [
                 [
@@ -122,17 +131,7 @@ def analysis_server(
                 (
                     ui.layout_columns(
                         [],
-                        [
-                            ui.markdown(
-                                """
-                            This simulation assumes a normal
-                            distribution between the specified
-                            lower and upper bounds. Your data
-                            file has not been read except to
-                            determine the columns.
-                            """
-                            )
-                        ],
+                        [ui.markdown(note_md)],
                         col_widths=col_widths,
                     )
                     if column_ids
