@@ -4,6 +4,7 @@ from pathlib import Path
 import re
 from dp_wizard.utils.csv_helper import name_to_identifier
 from dp_wizard.utils.code_generators._template import Template
+from dp_wizard.utils.dp_helper import confidence
 
 
 class AnalysisPlanColumn(NamedTuple):
@@ -75,7 +76,7 @@ class _CodeGenerator(ABC):
         )
 
     def _make_queries(self, column_names):
-        return "confidence = 0.95\n\n" + "\n".join(
+        return f"confidence = {confidence}\n\n" + "\n".join(
             _make_query(column_name) for column_name in column_names
         )
 
