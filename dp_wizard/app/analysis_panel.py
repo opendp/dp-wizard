@@ -9,6 +9,7 @@ from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip
 from dp_wizard.utils.code_generators import make_privacy_loss_block
 from dp_wizard.app.components.column_module import col_widths
 from dp_wizard.app import results_panel
+from dp_wizard.app.components.outputs import info_box
 
 analysis_panel_id = "2_analysis_panel"
 
@@ -68,16 +69,20 @@ def analysis_server(
     @render.ui
     def analysis_panel_warning():
         if current_panel() > analysis_panel_id:
-            return """
+            return info_box(
+                """
                 Once you've confirmed your analysis settings
                 they are locked. The privacy budget should be considered
                 a finite resource.
                 """
+            )
         if current_panel() < analysis_panel_id:
-            return """
+            return info_box(
+                """
                 This form is locked until you've confirmed your
                 dataset and unit of privacy.
                 """
+            )
         return ""
 
     @reactive.calc
@@ -209,5 +214,5 @@ def analysis_server(
             return button
         return [
             button,
-            "Select one or more columns before proceeding.",
+            info_box("Select one or more columns before proceeding."),
         ]

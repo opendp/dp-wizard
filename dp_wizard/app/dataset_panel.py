@@ -6,6 +6,7 @@ from dp_wizard.utils.argparse_helpers import get_cli_info
 from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip
 from dp_wizard.utils.code_generators import make_privacy_unit_block
 from dp_wizard.app import analysis_panel
+from dp_wizard.app.components.outputs import info_box
 
 dataset_panel_id = "1_dataset_panel"
 
@@ -56,12 +57,14 @@ def dataset_server(
     @render.ui
     def dataset_panel_warning():
         if current_panel() > dataset_panel_id:
-            return """
+            return info_box(
+                """
                 Once you've confirmed your dataset and the unit of privacy
                 they are locked. The unit of privacy is a characteristic
                 of your dataset and shouldn't be tweaked just to improve
                 utility.
                 """
+            )
         return ""
 
     @reactive.effect
@@ -117,7 +120,7 @@ def dataset_server(
             return button
         return [
             button,
-            "Choose CSV and Contributions before proceeding.",
+            info_box("Choose CSV and Contributions before proceeding."),
         ]
 
     @render.code

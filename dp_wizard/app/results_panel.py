@@ -7,6 +7,7 @@ from dp_wizard.utils.code_generators import (
     AnalysisPlanColumn,
 )
 from dp_wizard.utils.converters import convert_py_to_nb
+from dp_wizard.app.components.outputs import info_box
 
 results_panel_id = "3_results_panel"
 
@@ -44,10 +45,12 @@ def results_server(
     @render.text
     def results_panel_warning():
         if current_panel() < results_panel_id:
-            return """
+            return info_box(
+                """
                 This tab is locked until you've confirmed your
                 analysis details.
                 """
+            )
         return ""
 
     @reactive.calc

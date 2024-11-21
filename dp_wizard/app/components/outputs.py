@@ -17,3 +17,7 @@ def demo_tooltip(is_demo, text):  # pragma: no cover
             text,
             placement="right",
         )
+
+
+def info_box(text):  # pragma: no cover
+    return ui.div(text, class_="alert alert-info col-md-10 col-lg-8", role="alert")
