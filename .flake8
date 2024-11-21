@@ -9,4 +9,4 @@ extend-ignore = E203,E501,E701
 
 per-file-ignores =
     # Ignore undefined names in templates.
-    */templates/no-tests/*.py:F821,F401,E302
+    */code_generators/no-tests/*.py:F821,F401,E302

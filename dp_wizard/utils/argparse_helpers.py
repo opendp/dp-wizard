@@ -87,10 +87,10 @@ def _get_demo_csv_contrib() -> CLIInfo:
     """
     random.seed(0)  # So the mock data will be stable across runs.
 
-    csv_path = "/tmp/demo.csv"
+    csv_path = Path(__file__).parent.parent / "tmp" / "demo.csv"
     contributions = 10
 
-    with open(csv_path, "w", newline="") as demo_handle:
+    with csv_path.open("w", newline="") as demo_handle:
         fields = ["student_id", "class_year", "hw_number", "grade"]
         writer = csv.DictWriter(demo_handle, fieldnames=fields)
         writer.writeheader()
@@ -109,7 +109,7 @@ def _get_demo_csv_contrib() -> CLIInfo:
                     }
                 )
 
-    return CLIInfo(csv_path=csv_path, contributions=contributions, is_demo=True)
+    return CLIInfo(csv_path=str(csv_path), contributions=contributions, is_demo=True)
 
 
 def get_cli_info():  # pragma: no cover
