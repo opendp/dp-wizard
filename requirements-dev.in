@@ -27,6 +27,7 @@ scipy<1.14
 # Conversion:
 jupytext
 jupyter-client
+pyyaml
 nbconvert
 ipykernel
 # May also require:
