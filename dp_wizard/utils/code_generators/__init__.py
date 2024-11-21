@@ -1,4 +1,4 @@
-from typing import NamedTuple
+from typing import NamedTuple, Optional, Iterable
 from abc import ABC, abstractmethod
 from pathlib import Path
 import re
@@ -14,7 +14,7 @@ class AnalysisPlanColumn(NamedTuple):
 
 
 class AnalysisPlan(NamedTuple):
-    csv_path: str
+    csv_path: Optional[str]
     contributions: int
     epsilon: float
     columns: dict[str, AnalysisPlanColumn]
@@ -23,7 +23,7 @@ class AnalysisPlan(NamedTuple):
 class _CodeGenerator(ABC):
     root_template = "placeholder"
 
-    def __init__(self, analysis_plan):
+    def __init__(self, analysis_plan: AnalysisPlan):
         self.csv_path = analysis_plan.csv_path
         self.contributions = analysis_plan.contributions
         self.epsilon = analysis_plan.epsilon
@@ -42,7 +42,7 @@ class _CodeGenerator(ABC):
             )
         )
 
-    def _make_margins_dict(self, bin_names):
+    def _make_margins_dict(self, bin_names: Iterable[str]):
         # TODO: Don't worry too much about the formatting here.
         # Plan to run the output through black for consistency.
         # https://github.com/opendp/dp-creator-ii/issues/50
@@ -65,7 +65,7 @@ class _CodeGenerator(ABC):
         margins_dict = "{" + "".join(margins) + "\n    }"
         return margins_dict
 
-    def _make_columns(self, columns):
+    def _make_columns(self, columns: dict[str, AnalysisPlanColumn]):
         return "\n".join(
             make_column_config_block(
                 name=name,
@@ -76,7 +76,7 @@ class _CodeGenerator(ABC):
             for name, col in columns.items()
         )
 
-    def _make_queries(self, column_names):
+    def _make_queries(self, column_names: Iterable[str]):
         return "confidence = 0.95\n\n" + "\n".join(
             _make_query(column_name) for column_name in column_names
         )
@@ -122,15 +122,17 @@ class ScriptGenerator(_CodeGenerator):
 # These do not require an entire analysis plan, so they stand on their own.
 
 
-def make_privacy_unit_block(contributions):
+def make_privacy_unit_block(contributions: int):
     return str(Template("privacy_unit").fill_values(CONTRIBUTIONS=contributions))
 
 
-def make_privacy_loss_block(epsilon):
+def make_privacy_loss_block(epsilon: float):
     return str(Template("privacy_loss").fill_values(EPSILON=epsilon))
 
 
-def make_column_config_block(name, lower_bound, upper_bound, bin_count):
+def make_column_config_block(
+    name: str, lower_bound: float, upper_bound: float, bin_count: int
+):
     """
     >>> print(make_column_config_block(
     ...     name="HW GRADE",
