@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from shiny import ui, reactive, render
+from shiny import ui, reactive, render, Inputs, Outputs, Session
 
 from dp_wizard.utils.argparse_helpers import get_cli_info
 from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip
@@ -9,9 +9,7 @@ from dp_wizard.utils.code_generators import make_privacy_unit_block
 
 def dataset_ui():
     cli_info = get_cli_info()
-    csv_placeholder = (
-        None if cli_info.csv_path is None else Path(cli_info.csv_path).name
-    )
+    csv_placeholder = "" if cli_info.csv_path is None else Path(cli_info.csv_path).name
 
     return ui.nav_panel(
         "Select Dataset",
@@ -41,7 +39,12 @@ def dataset_ui():
 
 
 def dataset_server(
-    input, output, session, csv_path=None, contributions=None, is_demo=None
+    input: Inputs,
+    output: Outputs,
+    session: Session,
+    csv_path: reactive.Value[str],
+    contributions: reactive.Value[int],
+    is_demo: bool,
 ):  # pragma: no cover
     @reactive.effect
     @reactive.event(input.csv_path)

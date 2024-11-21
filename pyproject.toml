@@ -25,3 +25,7 @@ dp-wizard = "dp_wizard:main"
 
 [project.urls]
 Home = "https://github.com/opendp/dp-wizard"
+
+[tool.pyright]
+include = ["dp_wizard"]
+ignore = ["**/no-tests/"]

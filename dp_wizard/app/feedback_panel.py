@@ -1,4 +1,4 @@
-from shiny import ui
+from shiny import ui, Inputs, Outputs, Session
 from htmltools import HTML
 
 
@@ -25,8 +25,8 @@ def feedback_ui():
 
 
 def feedback_server(
-    input,
-    output,
-    session,
+    input: Inputs,
+    output: Outputs,
+    session: Session,
 ):  # pragma: no cover
     pass

@@ -1,3 +1,5 @@
+from typing import Any
+
 import polars as pl
 import opendp.prelude as dp
 
@@ -7,15 +9,20 @@ from dp_wizard.utils.shared import make_cut_points
 dp.enable_features("contrib")
 
 
-def make_confidence_accuracy_histogram(
-    lower=None, upper=None, bin_count=None, contributions=None, weighted_epsilon=None
-):
+confidence = 0.95
+
+
+def make_accuracy_histogram(
+    lower: float,
+    upper: float,
+    bin_count: int,
+    contributions: int,
+    weighted_epsilon: float,
+) -> tuple[float, Any]:
     """
     Creates fake data between lower and upper, and then returns a DP histogram from it.
-    >>> confidence, accuracy, histogram = make_confidence_accuracy_histogram(
+    >>> accuracy, histogram = make_accuracy_histogram(
     ...     lower=0, upper=10, bin_count=5, contributions=1, weighted_epsilon=1)
-    >>> confidence
-    0.95
     >>> accuracy
     3.37...
     >>> histogram
@@ -60,15 +67,16 @@ def make_confidence_accuracy_histogram(
         ),
         split_by_weights=[1],
         margins={
-            ("bin",): dp.polars.Margin(
+            ("bin",): dp.polars.Margin(  # type: ignore
                 max_partition_length=row_count,
                 public_info="keys",
             ),
         },
     )
-    query = context.query().group_by("bin").agg(pl.len().dp.noise())
+    query = context.query().group_by("bin").agg(pl.len().dp.noise())  # type: ignore
 
-    confidence = 0.95
-    accuracy = query.summarize(alpha=1 - confidence)["accuracy"].item()
+    accuracy = query.summarize(alpha=1 - confidence)["accuracy"].item()  # type: ignore
+    # The sort is alphabetical. df_to_columns needs to be used
+    # downstream to parse interval and sort by numeric value.
     histogram = query.release().collect().sort("bin")
-    return (confidence, accuracy, histogram)
+    return (accuracy, histogram)

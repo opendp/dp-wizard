@@ -1,10 +1,12 @@
 from math import pow
+from typing import Iterable, Any
 
-from shiny import ui, reactive, render, req
+from shiny import ui, reactive, render, req, Inputs, Outputs, Session
 
 from dp_wizard.app.components.inputs import log_slider
 from dp_wizard.app.components.column_module import column_ui, column_server
 from dp_wizard.utils.csv_helper import read_csv_ids_labels, read_csv_ids_names
+from dp_wizard.utils.dp_helper import confidence
 from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip
 from dp_wizard.utils.code_generators import make_privacy_loss_block
 from dp_wizard.app.components.column_module import col_widths
@@ -39,7 +41,9 @@ def analysis_ui():
     )
 
 
-def _cleanup_reactive_dict(reactive_dict, keys_to_keep):  # pragma: no cover
+def _cleanup_reactive_dict(
+    reactive_dict: reactive.Value[dict[str, Any]], keys_to_keep: Iterable[str]
+):  # pragma: no cover
     reactive_dict_copy = {**reactive_dict()}
     keys_to_del = set(reactive_dict_copy.keys()) - set(keys_to_keep)
     for key in keys_to_del:
@@ -48,17 +52,17 @@ def _cleanup_reactive_dict(reactive_dict, keys_to_keep):  # pragma: no cover
 
 
 def analysis_server(
-    input,
-    output,
-    session,
-    csv_path,
-    contributions,
-    is_demo,
-    lower_bounds,
-    upper_bounds,
-    bin_counts,
-    weights,
-    epsilon,
+    input: Inputs,
+    output: Outputs,
+    session: Session,
+    csv_path: reactive.Value[str],
+    contributions: reactive.Value[int],
+    is_demo: bool,
+    lower_bounds: reactive.Value[dict[str, float]],
+    upper_bounds: reactive.Value[dict[str, float]],
+    bin_counts: reactive.Value[dict[str, int]],
+    weights: reactive.Value[dict[str, str]],
+    epsilon: reactive.Value[float],
 ):  # pragma: no cover
     @reactive.calc
     def button_enabled():
@@ -111,6 +115,14 @@ def analysis_server(
                 is_demo=is_demo,
                 is_single_column=len(column_ids) == 1,
             )
+        confidence_percent = f"{int(confidence * 100)}%"
+        note_md = f"""
+        This simulation assumes a normal distribution between the specified
+        lower and upper bounds. Your CSV has not been read except to
+        determine the columns.
+
+        The confidence interval is {confidence_percent}.
+        """
         return [
             [
                 [
@@ -123,18 +135,8 @@ def analysis_server(
                 (
                     ui.layout_columns(
                         [],
-                        [
-                            ui.markdown(
-                                """
-                            This simulation assumes a normal
-                            distribution between the specified
-                            lower and upper bounds. Your data
-                            file has not been read except to
-                            determine the columns.
-                            """
-                            )
-                        ],
-                        col_widths=col_widths,
+                        [ui.markdown(note_md)],
+                        col_widths=col_widths,  # type: ignore
                     )
                     if column_ids
                     else []

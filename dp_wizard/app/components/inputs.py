@@ -2,7 +2,7 @@ from math import log10
 from shiny import ui
 
 
-def log_slider(id, lower, upper):
+def log_slider(id: str, lower: float, upper: float):
     # Rather than engineer a new widget, hide the numbers we don't want.
     # The rendered widget doesn't have a unique ID, but the following
     # element does, so we can use some fancy CSS to get the preceding element.

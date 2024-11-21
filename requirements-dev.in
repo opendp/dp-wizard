@@ -12,7 +12,7 @@ pre-commit
 # Testing:
 pytest
 pytest-playwright
-mypy
+pyright
 coverage
 
 
