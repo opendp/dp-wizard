@@ -69,7 +69,7 @@ def column_server(
     is_demo: bool,
 ):  # pragma: no cover
     @reactive.effect
-    def _set_all_inputs():  # type: ignore
+    def _set_all_inputs():
         with reactive.isolate():  # Without isolate, there is an infinite loop.
             ui.update_numeric("lower", value=lower_bounds().get(name, 0))
             ui.update_numeric("upper", value=upper_bounds().get(name, 10))
@@ -78,26 +78,26 @@ def column_server(
 
     @reactive.effect
     @reactive.event(input.lower)
-    def _set_lower():  # type: ignore
+    def _set_lower():
         lower_bounds.set({**lower_bounds(), name: float(input.lower())})
 
     @reactive.effect
     @reactive.event(input.upper)
-    def _set_upper():  # type: ignore
+    def _set_upper():
         upper_bounds.set({**upper_bounds(), name: float(input.upper())})
 
     @reactive.effect
     @reactive.event(input.bins)
-    def _set_bins():  # type: ignore
+    def _set_bins():
         bin_counts.set({**bin_counts(), name: int(input.bins())})
 
     @reactive.effect
     @reactive.event(input.weight)
-    def _set_weight():  # type: ignore
+    def _set_weight():
         weights.set({**weights(), name: input.weight()})
 
     @render.ui
-    def bounds_tooltip_ui():  # type: ignore
+    def bounds_tooltip_ui():
         return demo_tooltip(
             is_demo,
             """
@@ -111,7 +111,7 @@ def column_server(
         )
 
     @render.ui
-    def bins_tooltip_ui():  # type: ignore
+    def bins_tooltip_ui():
         return demo_tooltip(
             is_demo,
             """
@@ -124,7 +124,7 @@ def column_server(
         )
 
     @render.ui
-    def weight_tooltip_ui():  # type: ignore
+    def weight_tooltip_ui():
         return demo_tooltip(
             is_demo,
             """
@@ -135,7 +135,7 @@ def column_server(
         )
 
     @render.code
-    def column_code():  # type: ignore
+    def column_code():
         return make_column_config_block(
             name=name,
             lower_bound=float(input.lower()),
@@ -144,7 +144,7 @@ def column_server(
         )
 
     @render.plot()
-    def column_plot():  # type: ignore
+    def column_plot():
         lower_x = float(input.lower())
         upper_x = float(input.upper())
         bin_count = int(input.bins())

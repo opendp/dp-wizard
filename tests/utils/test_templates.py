@@ -5,7 +5,7 @@ from pathlib import Path
 import re
 import pytest
 import opendp.prelude as dp
-from dp_wizard.utils.templates import _Template, make_notebook_py, make_script_py  # type: ignore
+from dp_wizard.utils.templates import _Template, make_notebook_py, make_script_py
 
 
 fixtures_path = Path(__file__).parent.parent / "fixtures"

@@ -9,7 +9,7 @@ from dp_wizard.utils.shared import make_cut_points
 dp.enable_features("contrib")
 
 
-def make_confidence_accuracy_histogram(  # type: ignore
+def make_confidence_accuracy_histogram(
     lower: float,
     upper: float,
     bin_count: int,
@@ -57,7 +57,7 @@ def make_confidence_accuracy_histogram(  # type: ignore
             .alias("bin")
             .cast(pl.String),
         ),
-        privacy_unit=dp.unit_of(  # type: ignore
+        privacy_unit=dp.unit_of(
             contributions=contributions,
         ),
         privacy_loss=dp.loss_of(
@@ -79,4 +79,4 @@ def make_confidence_accuracy_histogram(  # type: ignore
     # The sort is alphabetical. df_to_columns needs to be used
     # downstream to parse interval and sort by numeric value.
     histogram = query.release().collect().sort("bin")
-    return (confidence, accuracy, histogram)  # type: ignore
+    return (confidence, accuracy, histogram)

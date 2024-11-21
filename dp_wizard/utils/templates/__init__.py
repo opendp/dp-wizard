@@ -50,7 +50,7 @@ class _Template:
             def match_indent(match: re.Match[str]):
                 # This does what we want, but binding is confusing.
                 indented_lines: list[str] = [
-                    match.group(1) + line for line in v.split("\n")  # type: ignore # noqa: B023
+                    match.group(1) + line for line in v.split("\n")  # noqa: B023
                 ]
                 return "\n".join(indented_lines)
 
@@ -170,8 +170,8 @@ def _make_columns(columns: dict[str, dict[str, str]]) -> str:
             upper_bound=col["upper_bound"],  # type: ignore
             bin_count=col["bin_count"],  # type: ignore
         )
-        for name, col in columns.items()
-    )  # type: ignore
+        for name, col in columns.items()  # type: ignore
+    )
 
 
 def _make_query(column_name: str):

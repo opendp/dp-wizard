@@ -65,33 +65,33 @@ def results_server(
         )
 
     @render.text
-    def analysis_json_text():  # type: ignore
+    def analysis_json_text():
         return analysis_json()
 
     @reactive.calc
     def analysis_python():
         analysis = analysis_dict()
         return make_notebook_py(
-            csv_path=analysis["csv_path"],  # type: ignore
-            contributions=analysis["contributions"],  # type: ignore
-            epsilon=analysis["epsilon"],  # type: ignore
-            columns=analysis["columns"],  # type: ignore
+            csv_path=analysis["csv_path"],
+            contributions=analysis["contributions"],
+            epsilon=analysis["epsilon"],
+            columns=analysis["columns"],
         )
 
     @render.text
-    def analysis_python_text():  # type: ignore
+    def analysis_python_text():
         return analysis_python()
 
     @render.download(
         filename="dp-wizard-script.py",
         media_type="text/x-python",
     )
-    async def download_script():  # type: ignore
+    async def download_script():
         analysis = analysis_dict()
         script_py = make_script_py(
-            contributions=analysis["contributions"],  # type: ignore
-            epsilon=analysis["epsilon"],  # type: ignore
-            columns=analysis["columns"],  # type: ignore
+            contributions=analysis["contributions"],
+            epsilon=analysis["epsilon"],
+            columns=analysis["columns"],
         )
         yield script_py
 
@@ -99,13 +99,13 @@ def results_server(
         filename="dp-wizard-notebook.ipynb",
         media_type="application/x-ipynb+json",
     )
-    async def download_notebook():  # type: ignore
+    async def download_notebook():
         analysis = analysis_dict()
         notebook_py = make_notebook_py(
-            csv_path=analysis["csv_path"],  # type: ignore
-            contributions=analysis["contributions"],  # type: ignore
-            epsilon=analysis["epsilon"],  # type: ignore
-            columns=analysis["columns"],  # type: ignore
+            csv_path=analysis["csv_path"],
+            contributions=analysis["contributions"],
+            epsilon=analysis["epsilon"],
+            columns=analysis["columns"],
         )
         notebook_nb = convert_py_to_nb(notebook_py, execute=True)
         yield notebook_nb

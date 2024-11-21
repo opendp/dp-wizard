@@ -51,10 +51,10 @@ def plot_histogram(
     mod = (len(bins) // 12) + 1
     majors = [label for i, label in enumerate(bins) if i % mod == 0]
     minors = [label for i, label in enumerate(bins) if i % mod != 0]
-    _figure, axes = plt.subplots()  # type: ignore
+    _figure, axes = plt.subplots()
     bar_colors = ["blue" if v > cutoff else "lightblue" for v in values]
-    axes.bar(bins, values, color=bar_colors, yerr=error)  # type: ignore
-    axes.set_xticks(majors, majors)  # type: ignore
-    axes.set_xticks(minors, ["" for _ in minors], minor=True)  # type: ignore
-    axes.axhline(cutoff, color="lightgrey", zorder=-1)  # type: ignore
+    axes.bar(bins, values, color=bar_colors, yerr=error)
+    axes.set_xticks(majors, majors)
+    axes.set_xticks(minors, ["" for _ in minors], minor=True)
+    axes.axhline(cutoff, color="lightgrey", zorder=-1)
     axes.set_ylim(bottom=0)
