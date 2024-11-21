@@ -16,7 +16,7 @@ analysis_panel_id = "2_analysis_panel"
 def analysis_ui():
     return ui.nav_panel(
         "Define Analysis",
-        ui.output_text("current_panel_text_on_analysis"),
+        ui.output_ui("analysis_panel_warning"),
         ui.markdown(
             "Select numeric columns of interest, "
             "and for each numeric column indicate the expected range, "
@@ -65,9 +65,20 @@ def analysis_server(
     epsilon,
     current_panel,
 ):  # pragma: no cover
-    @render.text
-    def current_panel_text_on_analysis():
-        return current_panel()
+    @render.ui
+    def analysis_panel_warning():
+        if current_panel() > analysis_panel_id:
+            return """
+                Once you've confirmed your analysis settings
+                they are locked. The privacy budget should be considered
+                a finite resource.
+                """
+        if current_panel() < analysis_panel_id:
+            return """
+                This form is locked until you've confirmed your
+                dataset and unit of privacy.
+                """
+        return ""
 
     @reactive.calc
     def button_enabled():

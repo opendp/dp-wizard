@@ -18,7 +18,7 @@ def dataset_ui():
 
     return ui.nav_panel(
         "Select Dataset",
-        ui.output_text("current_panel_text_on_dataset"),
+        ui.output_ui("dataset_panel_warning"),
         # Doesn't seem to be possible to preset the actual value,
         # but the placeholder string is a good substitute.
         ui.input_file(
@@ -53,9 +53,16 @@ def dataset_server(
     is_demo,
     current_panel,
 ):  # pragma: no cover
-    @render.text
-    def current_panel_text_on_dataset():
-        return current_panel()
+    @render.ui
+    def dataset_panel_warning():
+        if current_panel() > dataset_panel_id:
+            return """
+                Once you've confirmed your dataset and the unit of privacy
+                they are locked. The unit of privacy is a characteristic
+                of your dataset and shouldn't be tweaked just to improve
+                utility.
+                """
+        return ""
 
     @reactive.effect
     @reactive.event(input.csv_path)
