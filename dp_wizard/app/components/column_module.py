@@ -5,7 +5,7 @@ from shiny import ui, render, module, reactive
 from dp_wizard.utils.dp_helper import make_confidence_accuracy_histogram
 from dp_wizard.utils.shared import plot_histogram
 from dp_wizard.utils.code_generators import make_column_config_block
-from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip
+from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip, hide_if
 
 
 default_weight = 2
@@ -118,21 +118,19 @@ def column_server(
 
     @render.ui
     def optional_weight_ui():
-        weight_select = ui.input_select(
-            "weight",
-            ["Weight", ui.output_ui("weight_tooltip_ui")],
-            choices={
-                1: "Less accurate",
-                default_weight: "Default",
-                4: "More accurate",
-            },
-            selected=default_weight,
-            width=label_width,
-        )
-        return (
-            weight_select
-            if not is_single_column
-            else [weight_select, "Weight doesn't matter with only one column."]
+        return hide_if(
+            is_single_column,
+            ui.input_select(
+                "weight",
+                ["Weight", ui.output_ui("weight_tooltip_ui")],
+                choices={
+                    1: "Less accurate",
+                    default_weight: "Default",
+                    4: "More accurate",
+                },
+                selected=default_weight,
+                width=label_width,
+            ),
         )
 
     @render.ui
