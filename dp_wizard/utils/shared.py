@@ -1,7 +1,8 @@
 # These functions are used both in the application and in generated notebooks.
+from polars import DataFrame
 
 
-def make_cut_points(lower_bound, upper_bound, bin_count):
+def make_cut_points(lower_bound: float, upper_bound: float, bin_count: int):
     """
     Returns one more cut point than the bin_count.
     (There are actually two more bins, extending to
@@ -14,7 +15,7 @@ def make_cut_points(lower_bound, upper_bound, bin_count):
     return [round(lower_bound + i * bin_width, 2) for i in range(bin_count + 1)]
 
 
-def interval_bottom(interval):
+def interval_bottom(interval: str):
     """
     >>> interval_bottom("(10, 20]")
     10.0
@@ -22,7 +23,7 @@ def interval_bottom(interval):
     return float(interval.split(",")[0][1:])
 
 
-def df_to_columns(df):
+def df_to_columns(df: DataFrame):
     """
     Transform a Dataframe into a format that is easier to plot,
     parsing the interval strings to sort them as numbers.
@@ -38,7 +39,9 @@ def df_to_columns(df):
     return tuple(zip(*sorted_rows))
 
 
-def plot_histogram(histogram_df, error, cutoff):  # pragma: no cover
+def plot_histogram(
+    histogram_df: DataFrame, error: float, cutoff: float
+):  # pragma: no cover
     """
     Given a Dataframe for a histogram, plot the data.
     """

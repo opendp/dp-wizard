@@ -1,6 +1,6 @@
 from logging import info
 
-from shiny import ui, render, module, reactive
+from shiny import ui, render, module, reactive, Inputs, Outputs, Session
 
 from dp_wizard.utils.dp_helper import make_accuracy_histogram
 from dp_wizard.utils.shared import plot_histogram
@@ -8,14 +8,14 @@ from dp_wizard.utils.code_generators import make_column_config_block
 from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip
 
 
-default_weight = 2
+default_weight = "2"
 
 col_widths = {
     # Controls stay roughly a constant width;
     # Graph expands to fill space.
-    "sm": (4, 8),
-    "md": (3, 9),
-    "lg": (2, 10),
+    "sm": [4, 8],
+    "md": [3, 9],
+    "lg": [2, 10],
 }
 
 
@@ -37,9 +37,9 @@ def column_ui():  # pragma: no cover
                 "weight",
                 ["Weight", ui.output_ui("weight_tooltip_ui")],
                 choices={
-                    1: "Less accurate",
+                    "1": "Less accurate",
                     default_weight: "Default",
-                    4: "More accurate",
+                    "4": "More accurate",
                 },
                 selected=default_weight,
                 width=width,
@@ -50,23 +50,23 @@ def column_ui():  # pragma: no cover
             # Make plot smaller than default: about the same size as the other column.
             output_code_sample("Column Definition", "column_code"),
         ],
-        col_widths=col_widths,
+        col_widths=col_widths,  # type: ignore
     )
 
 
 @module.server
 def column_server(
-    input,
-    output,
-    session,
-    name,
-    contributions,
-    epsilon,
-    lower_bounds,
-    upper_bounds,
-    bin_counts,
-    weights,
-    is_demo,
+    input: Inputs,
+    output: Outputs,
+    session: Session,
+    name: str,
+    contributions: int,
+    epsilon: float,
+    lower_bounds: reactive.Value[dict[str, float]],
+    upper_bounds: reactive.Value[dict[str, float]],
+    bin_counts: reactive.Value[dict[str, int]],
+    weights: reactive.Value[dict[str, str]],
+    is_demo: bool,
 ):  # pragma: no cover
     @reactive.effect
     def _set_all_inputs():
@@ -74,7 +74,7 @@ def column_server(
             ui.update_numeric("lower", value=lower_bounds().get(name, 0))
             ui.update_numeric("upper", value=upper_bounds().get(name, 10))
             ui.update_numeric("bins", value=bin_counts().get(name, 10))
-            ui.update_numeric("weight", value=weights().get(name, default_weight))
+            ui.update_numeric("weight", value=int(weights().get(name, default_weight)))
 
     @reactive.effect
     @reactive.event(input.lower)
@@ -89,12 +89,12 @@ def column_server(
     @reactive.effect
     @reactive.event(input.bins)
     def _set_bins():
-        bin_counts.set({**bin_counts(), name: float(input.bins())})
+        bin_counts.set({**bin_counts(), name: int(input.bins())})
 
     @reactive.effect
     @reactive.event(input.weight)
     def _set_weight():
-        weights.set({**weights(), name: float(input.weight())})
+        weights.set({**weights(), name: input.weight()})
 
     @render.ui
     def bounds_tooltip_ui():
@@ -149,7 +149,7 @@ def column_server(
         upper_x = float(input.upper())
         bin_count = int(input.bins())
         weight = float(input.weight())
-        weights_sum = sum(weights().values())
+        weights_sum = sum(float(weight) for weight in weights().values())
         info(f"Weight ratio for {name}: {weight}/{weights_sum}")
         if weights_sum == 0:
             # This function is triggered when column is removed;

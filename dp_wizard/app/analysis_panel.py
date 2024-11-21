@@ -1,6 +1,7 @@
 from math import pow
+from typing import Iterable, Any
 
-from shiny import ui, reactive, render, req
+from shiny import ui, reactive, render, req, Inputs, Outputs, Session
 
 from dp_wizard.app.components.inputs import log_slider
 from dp_wizard.app.components.column_module import column_ui, column_server
@@ -40,7 +41,9 @@ def analysis_ui():
     )
 
 
-def _cleanup_reactive_dict(reactive_dict, keys_to_keep):  # pragma: no cover
+def _cleanup_reactive_dict(
+    reactive_dict: reactive.Value[dict[str, Any]], keys_to_keep: Iterable[str]
+):  # pragma: no cover
     reactive_dict_copy = {**reactive_dict()}
     keys_to_del = set(reactive_dict_copy.keys()) - set(keys_to_keep)
     for key in keys_to_del:
@@ -49,17 +52,17 @@ def _cleanup_reactive_dict(reactive_dict, keys_to_keep):  # pragma: no cover
 
 
 def analysis_server(
-    input,
-    output,
-    session,
-    csv_path,
-    contributions,
-    is_demo,
-    lower_bounds,
-    upper_bounds,
-    bin_counts,
-    weights,
-    epsilon,
+    input: Inputs,
+    output: Outputs,
+    session: Session,
+    csv_path: reactive.Value[str],
+    contributions: reactive.Value[int],
+    is_demo: bool,
+    lower_bounds: reactive.Value[dict[str, float]],
+    upper_bounds: reactive.Value[dict[str, float]],
+    bin_counts: reactive.Value[dict[str, int]],
+    weights: reactive.Value[dict[str, str]],
+    epsilon: reactive.Value[float],
 ):  # pragma: no cover
     @reactive.calc
     def button_enabled():
@@ -132,7 +135,7 @@ def analysis_server(
                     ui.layout_columns(
                         [],
                         [ui.markdown(note_md)],
-                        col_widths=col_widths,
+                        col_widths=col_widths,  # type: ignore
                     )
                     if column_ids
                     else []

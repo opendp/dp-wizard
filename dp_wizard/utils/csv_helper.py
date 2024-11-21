@@ -10,7 +10,7 @@ import re
 import polars as pl
 
 
-def read_csv_names(csv_path):
+def read_csv_names(csv_path: str):
     # Polars is overkill, but it is more robust against
     # variations in encoding than Python stdlib csv.
     # However, it could be slow:
@@ -21,22 +21,22 @@ def read_csv_names(csv_path):
     return lf.collect_schema().names()
 
 
-def read_csv_ids_labels(csv_path):
+def read_csv_ids_labels(csv_path: str):
     return {
         name_to_id(name): f"{i+1}: {name or '[blank]'}"
         for i, name in enumerate(read_csv_names(csv_path))
     }
 
 
-def read_csv_ids_names(csv_path):
+def read_csv_ids_names(csv_path: str):
     return {name_to_id(name): name for name in read_csv_names(csv_path)}
 
 
-def name_to_id(name):
+def name_to_id(name: str):
     # Shiny is fussy about module IDs,
     # but we don't need them to be human readable.
     return str(hash(name)).replace("-", "_")
 
 
-def name_to_identifier(name):
+def name_to_identifier(name: str):
     return re.sub(r"\W+", "_", name).lower()
