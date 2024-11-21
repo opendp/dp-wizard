@@ -14,7 +14,7 @@ results_panel_id = "3_results_panel"
 def results_ui():
     return ui.nav_panel(
         "Download results",
-        ui.output_text("current_panel_text_on_results"),
+        ui.output_ui("results_panel_warning"),
         ui.markdown("You can now make a differentially private release of your data."),
         ui.download_button(
             "download_script",
@@ -42,8 +42,13 @@ def results_server(
     current_panel,
 ):  # pragma: no cover
     @render.text
-    def current_panel_text_on_results():
-        return current_panel()
+    def results_panel_warning():
+        if current_panel() < results_panel_id:
+            return """
+                This tab is locked until you've confirmed your
+                analysis details.
+                """
+        return ""
 
     @reactive.calc
     def analysis_plan() -> AnalysisPlan:
