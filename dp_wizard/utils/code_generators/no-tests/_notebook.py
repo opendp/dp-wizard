@@ -34,3 +34,9 @@ CONTEXT_BLOCK
 # +
 QUERIES_BLOCK
 # -
+
+# The code below produces a summary report.
+
+# +
+REPORTS_BLOCK
+# -

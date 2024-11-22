@@ -33,6 +33,9 @@ class _CodeGenerator(ABC):
     @abstractmethod
     def _make_context(self) -> str: ...  # pragma: no cover
 
+    def extra_root_template_blocks(self):
+        return {}
+
     def make_py(self):
         return str(
             Template(self.root_template).fill_blocks(
@@ -40,6 +43,7 @@ class _CodeGenerator(ABC):
                 COLUMNS_BLOCK=self._make_columns(self.columns),
                 CONTEXT_BLOCK=self._make_context(),
                 QUERIES_BLOCK=self._make_queries(self.columns.keys()),
+                **self.extra_root_template_blocks(),
             )
         )
 
@@ -114,6 +118,9 @@ class NotebookGenerator(_CodeGenerator):
 
     def _make_context(self):
         return str(self._make_partial_context().fill_values(CSV_PATH=self.csv_path))
+
+    def extra_root_template_blocks(self):
+        return {"REPORTS_BLOCK": "# TODO"}
 
 
 class ScriptGenerator(_CodeGenerator):
