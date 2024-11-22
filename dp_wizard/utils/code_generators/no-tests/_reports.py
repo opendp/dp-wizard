@@ -1,7 +1,10 @@
 from yaml import dump
 from pathlib import Path
 
-report = {"outputs": OUTPUTS_DICT}
+report = {
+    "inputs": INPUTS,
+    "outputs": OUTPUTS,
+}
 
 
 print(dump(report))
