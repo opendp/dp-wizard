@@ -1,4 +1,4 @@
-from typing import NamedTuple, Optional, Iterable
+from typing import NamedTuple, Optional, Iterable, MutableMapping
 from abc import ABC, abstractmethod
 from pathlib import Path
 import re
@@ -218,6 +218,37 @@ def make_column_config_block(
 # Private helper functions:
 # These do not depend on the AnalysisPlan,
 # so it's better to keep them out of the class.
+
+
+# https://stackoverflow.com/a/6027615/10727889
+def _flatten_dict(dictionary, parent_key=""):
+    """
+    Walk tree to return flat dictionary.
+    >>> from pprint import pp
+    >>> pp(_flatten_dict({
+    ...     "inputs": {
+    ...         "data": "fake.csv"
+    ...     },
+    ...     "outputs": {
+    ...         "a column": {
+    ...             "(0, 1]": 24,
+    ...             "(1, 2]": 42,
+    ...         }
+    ...     }
+    ... }))
+    {'inputs: data': 'fake.csv',
+     'outputs: a column: (0, 1]': 24,
+     'outputs: a column: (1, 2]': 42}
+    """
+    separator = ": "
+    items = []
+    for key, value in dictionary.items():
+        new_key = parent_key + separator + key if parent_key else key
+        if isinstance(value, MutableMapping):
+            items.extend(_flatten_dict(value, new_key).items())
+        else:
+            items.append((new_key, value))
+    return dict(items)
 
 
 def _make_query(column_name):
