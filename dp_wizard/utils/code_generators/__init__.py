@@ -140,9 +140,15 @@ class NotebookGenerator(_CodeGenerator):
             + "}"
         )
         reports_block = str(
-            Template("reports").fill_expressions(
-                CSV_PATH=self.csv_path,
+            Template("reports")
+            .fill_expressions(
                 OUTPUTS=outputs_expression,
+            )
+            .fill_values(
+                CSV_PATH=self.csv_path,
+                REPORT_PATH=str(
+                    Path(__file__).parent.parent.parent / "tmp" / "report.txt"
+                ),
             )
         )
         return {"REPORTS_BLOCK": reports_block}

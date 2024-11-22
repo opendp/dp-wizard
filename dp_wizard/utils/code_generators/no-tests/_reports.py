@@ -8,7 +8,5 @@ report = {
     "outputs": OUTPUTS,
 }
 
-
 print(dump(report))
-
-Path("/tmp/report.txt").write_text(dump(report))
+Path(REPORT_PATH).write_text(dump(report))
