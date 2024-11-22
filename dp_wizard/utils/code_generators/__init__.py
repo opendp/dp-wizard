@@ -120,7 +120,27 @@ class NotebookGenerator(_CodeGenerator):
         return str(self._make_partial_context().fill_values(CSV_PATH=self.csv_path))
 
     def extra_root_template_blocks(self):
-        return {"REPORTS_BLOCK": "# TODO"}
+        identifiers = [name_to_identifier(name) for name in self.columns.keys()]
+        outputs_dict_expression = (
+            "{"
+            + ",".join(
+                str(
+                    Template("report_kv")
+                    .fill_values(
+                        IDENTIFIER=id,
+                    )
+                    .fill_expressions(
+                        IDENTIFIER_HISTOGRAM=f"{id}_histogram",
+                    )
+                )
+                for id in identifiers
+            )
+            + "}"
+        )
+        reports_block = str(
+            Template("reports").fill_expressions(OUTPUTS_DICT=outputs_dict_expression)
+        )
+        return {"REPORTS_BLOCK": reports_block}
 
 
 class ScriptGenerator(_CodeGenerator):
