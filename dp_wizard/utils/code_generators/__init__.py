@@ -33,6 +33,9 @@ class _CodeGenerator(ABC):
     @abstractmethod
     def _make_context(self) -> str: ...  # pragma: no cover
 
+    def _make_extra_blocks(self):
+        return {}
+
     def make_py(self):
         return str(
             Template(self.root_template).fill_blocks(
@@ -40,6 +43,7 @@ class _CodeGenerator(ABC):
                 COLUMNS_BLOCK=self._make_columns(self.columns),
                 CONTEXT_BLOCK=self._make_context(),
                 QUERIES_BLOCK=self._make_queries(self.columns.keys()),
+                **self._make_extra_blocks(),
             )
         )
 
@@ -114,6 +118,40 @@ class NotebookGenerator(_CodeGenerator):
 
     def _make_context(self):
         return str(self._make_partial_context().fill_values(CSV_PATH=self.csv_path))
+
+    def _make_extra_blocks(self):
+        identifiers = [name_to_identifier(name) for name in self.columns.keys()]
+        outputs_expression = (
+            "{"
+            + ",".join(
+                str(
+                    Template("report_kv")
+                    .fill_values(
+                        IDENTIFIER=id,
+                        CONFIDENCE=confidence,
+                    )
+                    .fill_expressions(
+                        IDENTIFIER_HISTOGRAM=f"{id}_histogram",
+                        IDENTIFIER_ACCURACY=f"{id}_accuracy",
+                    )
+                )
+                for id in identifiers
+            )
+            + "}"
+        )
+        reports_block = str(
+            Template("reports")
+            .fill_expressions(
+                OUTPUTS=outputs_expression,
+            )
+            .fill_values(
+                CSV_PATH=self.csv_path,
+                REPORT_PATH=str(
+                    Path(__file__).parent.parent.parent / "tmp" / "report.txt"
+                ),
+            )
+        )
+        return {"REPORTS_BLOCK": reports_block}
 
 
 class ScriptGenerator(_CodeGenerator):
