@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from shiny import ui, render, reactive, Inputs, Outputs, Session
 
 from dp_wizard.utils.code_generators import (
@@ -13,6 +15,10 @@ def results_ui():
     return ui.nav_panel(
         "Download results",
         ui.markdown("You can now make a differentially private release of your data."),
+        ui.download_button(
+            "download_report",
+            "Download Report (.txt)",
+        ),
         ui.download_button(
             "download_script",
             "Download Script (.py)",
@@ -58,6 +64,15 @@ def results_server(
             columns=columns,
         )
 
+    @reactive.calc
+    def notebook_nb():
+        # This creates the notebook, and evaluates it,
+        # and drops reports in the tmp dir.
+        # Could be slow!
+        # Luckily, reactive calcs are lazy.
+        notebook_py = NotebookGenerator(analysis_plan()).make_py()
+        return convert_py_to_nb(notebook_py, execute=True)
+
     @render.download(
         filename="dp-wizard-script.py",
         media_type="text/x-python",
@@ -71,6 +86,13 @@ def results_server(
         media_type="application/x-ipynb+json",
     )
     async def download_notebook():
-        notebook_py = NotebookGenerator(analysis_plan()).make_py()
-        notebook_nb = convert_py_to_nb(notebook_py, execute=True)
-        yield notebook_nb
+        yield notebook_nb()
+
+    @render.download(
+        filename="dp-wizard-report.txt",
+        media_type="text/plain",
+    )
+    async def download_report():
+        notebook_nb()  # Evaluate just for the side effect of creating report.
+        report_txt = (Path(__file__).parent.parent / "tmp" / "report.txt").read_text()
+        yield report_txt
