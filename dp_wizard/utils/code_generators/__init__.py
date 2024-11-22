@@ -120,22 +120,21 @@ class NotebookGenerator(_CodeGenerator):
         return str(self._make_partial_context().fill_values(CSV_PATH=self.csv_path))
 
     def _make_extra_blocks(self):
-        identifiers = [name_to_identifier(name) for name in self.columns.keys()]
         outputs_expression = (
             "{"
             + ",".join(
                 str(
                     Template("report_kv")
                     .fill_values(
-                        IDENTIFIER=id,
+                        NAME=name,
                         CONFIDENCE=confidence,
                     )
                     .fill_expressions(
-                        IDENTIFIER_HISTOGRAM=f"{id}_histogram",
-                        IDENTIFIER_ACCURACY=f"{id}_accuracy",
+                        IDENTIFIER_HISTOGRAM=f"{name_to_identifier(name)}_histogram",
+                        IDENTIFIER_ACCURACY=f"{name_to_identifier(name)}_accuracy",
                     )
                 )
-                for id in identifiers
+                for name in self.columns.keys()
             )
             + "}"
         )

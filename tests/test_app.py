@@ -117,7 +117,7 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     expect_visible(download_results_text)
     expect_no_error()
 
-    # Notebook:
+    # Report:
     with page.expect_download() as report_download_info:
         page.get_by_text("Download report").click()
     expect_no_error()
