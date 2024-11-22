@@ -128,9 +128,11 @@ class NotebookGenerator(_CodeGenerator):
                     Template("report_kv")
                     .fill_values(
                         IDENTIFIER=id,
+                        CONFIDENCE=confidence,
                     )
                     .fill_expressions(
                         IDENTIFIER_HISTOGRAM=f"{id}_histogram",
+                        IDENTIFIER_ACCURACY=f"{id}_accuracy",
                     )
                 )
                 for id in identifiers
