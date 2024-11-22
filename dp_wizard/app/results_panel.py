@@ -11,6 +11,9 @@ from dp_wizard.utils.code_generators import (
 from dp_wizard.utils.converters import convert_py_to_nb
 
 
+wait_message = "Please wait."
+
+
 def results_ui():
     return ui.nav_panel(
         "Download results",
@@ -78,21 +81,28 @@ def results_server(
         media_type="text/x-python",
     )
     async def download_script():
-        script_py = ScriptGenerator(analysis_plan()).make_py()
-        yield script_py
+        with ui.Progress() as progress:
+            progress.set(message=wait_message)
+            yield ScriptGenerator(analysis_plan()).make_py()
 
     @render.download(
         filename="dp-wizard-notebook.ipynb",
         media_type="application/x-ipynb+json",
     )
     async def download_notebook():
-        yield notebook_nb()
+        with ui.Progress() as progress:
+            progress.set(message=wait_message)
+            yield notebook_nb()
 
     @render.download(
         filename="dp-wizard-report.txt",
         media_type="text/plain",
     )
     async def download_report():
-        notebook_nb()  # Evaluate just for the side effect of creating report.
-        report_txt = (Path(__file__).parent.parent / "tmp" / "report.txt").read_text()
-        yield report_txt
+        with ui.Progress() as progress:
+            progress.set(message=wait_message)
+            notebook_nb()  # Evaluate just for the side effect of creating report.
+            report_txt = (
+                Path(__file__).parent.parent / "tmp" / "report.txt"
+            ).read_text()
+            yield report_txt
