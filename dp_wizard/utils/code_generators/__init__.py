@@ -121,7 +121,6 @@ class NotebookGenerator(_CodeGenerator):
 
     def _make_extra_blocks(self):
         identifiers = [name_to_identifier(name) for name in self.columns.keys()]
-        inputs_expression = "{}"
         outputs_expression = (
             "{"
             + ",".join(
@@ -142,7 +141,7 @@ class NotebookGenerator(_CodeGenerator):
         )
         reports_block = str(
             Template("reports").fill_expressions(
-                INPUTS=inputs_expression,
+                CSV_PATH=self.csv_path,
                 OUTPUTS=outputs_expression,
             )
         )

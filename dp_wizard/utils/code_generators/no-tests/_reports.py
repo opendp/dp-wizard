@@ -2,7 +2,9 @@ from yaml import dump
 from pathlib import Path
 
 report = {
-    "inputs": INPUTS,
+    "inputs": {
+        "data": CSV_PATH,
+    },
     "outputs": OUTPUTS,
 }
 
