@@ -19,8 +19,12 @@ def results_ui():
         "Download results",
         ui.markdown("You can now make a differentially private release of your data."),
         ui.download_button(
-            "download_report",
+            "download_txt_report",
             "Download Report (.txt)",
+        ),
+        ui.download_button(
+            "download_csv_report",
+            "Download Report (.csv)",
         ),
         ui.download_button(
             "download_script",
@@ -98,7 +102,7 @@ def results_server(
         filename="dp-wizard-report.txt",
         media_type="text/plain",
     )
-    async def download_report():
+    async def download_txt_report():
         with ui.Progress() as progress:
             progress.set(message=wait_message)
             notebook_nb()  # Evaluate just for the side effect of creating report.
@@ -106,3 +110,16 @@ def results_server(
                 Path(__file__).parent.parent / "tmp" / "report.txt"
             ).read_text()
             yield report_txt
+
+    @render.download(
+        filename="dp-wizard-report.csv",
+        media_type="text/plain",
+    )
+    async def download_csv_report():
+        with ui.Progress() as progress:
+            progress.set(message=wait_message)
+            notebook_nb()  # Evaluate just for the side effect of creating report.
+            report_csv = (
+                Path(__file__).parent.parent / "tmp" / "report.csv"
+            ).read_text()
+            yield report_csv

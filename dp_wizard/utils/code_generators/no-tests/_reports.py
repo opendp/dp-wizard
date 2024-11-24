@@ -47,5 +47,5 @@ Path(TXT_REPORT_PATH).write_text(dump(report))
 flat_report = flatten_dict(report)
 with Path(CSV_REPORT_PATH).open(mode="w", newline="") as handle:
     writer = csv.writer(handle)
-    for k, v in flat_report.items():
-        writer.write_row(k, v)
+    for kv_pair in flat_report.items():
+        writer.writerow(kv_pair)
