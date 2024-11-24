@@ -117,14 +117,23 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     expect_visible(download_results_text)
     expect_no_error()
 
-    # Report:
-    with page.expect_download() as report_download_info:
-        page.get_by_text("Download report").click()
+    # Text Report:
+    with page.expect_download() as text_report_download_info:
+        page.get_by_text("Download report (.txt)").click()
     expect_no_error()
 
-    report_download = report_download_info.value
+    report_download = text_report_download_info.value
     report = report_download.path().read_text()
-    assert "inputs:" in report
+    assert "confidence: 0.95" in report
+
+    # CSV Report:
+    with page.expect_download() as csv_report_download_info:
+        page.get_by_text("Download report (.csv)").click()
+    expect_no_error()
+
+    report_download = csv_report_download_info.value
+    report = report_download.path().read_text()
+    assert "outputs: grade: confidence,0.95" in report
 
     # Script:
     with page.expect_download() as script_download_info:
