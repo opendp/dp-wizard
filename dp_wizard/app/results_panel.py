@@ -16,54 +16,34 @@ from dp_wizard.utils.converters import convert_py_to_nb
 wait_message = "Please wait."
 
 
+def td_button(name: str, ext: str, icon: str):
+    function_name = f'download_{name.lower().replace(" ", "_")}'
+    return (
+        td(
+            ui.download_button(
+                function_name,
+                [
+                    icon_svg(icon, margin_right="0.5em"),
+                    f"Download {name} ({ext})",
+                ],
+                width="20em",
+            )
+        ),
+    )
+
+
 def results_ui():
     return ui.nav_panel(
         "Download results",
         ui.markdown("You can now make a differentially private release of your data."),
         table(
             tr(
-                td(
-                    ui.download_button(
-                        "download_notebook",
-                        [
-                            icon_svg("book", margin_right="0.5em"),
-                            "Download Notebook (.ipynb)",
-                        ],
-                        width="20em",
-                    )
-                ),
-                td(
-                    ui.download_button(
-                        "download_script",
-                        [
-                            icon_svg("python", margin_right="0.5em"),
-                            "Download Script (.py)",
-                        ],
-                        width="20em",
-                    )
-                ),
+                td_button("Notebook", ".ipynb", "book"),
+                td_button("Script", ".py", "python"),
             ),
             tr(
-                td(
-                    ui.download_button(
-                        "download_txt_report",
-                        [
-                            icon_svg("file-lines", margin_right="0.5em"),
-                            "Download Report (.txt)",
-                        ],
-                        width="20em",
-                    )
-                ),
-                td(
-                    ui.download_button(
-                        "download_csv_report",
-                        [
-                            icon_svg("file-csv", margin_right="0.5em"),
-                            "Download Report (.csv)",
-                        ],
-                        width="20em",
-                    )
-                ),
+                td_button("Report", ".txt", "file-lines"),
+                td_button("Table", ".csv", "file-csv"),
             ),
         ),
         value="results_panel",
@@ -134,7 +114,7 @@ def results_server(
         filename="dp-wizard-report.txt",
         media_type="text/plain",
     )
-    async def download_txt_report():
+    async def download_report():
         with ui.Progress() as progress:
             progress.set(message=wait_message)
             notebook_nb()  # Evaluate just for the side effect of creating report.
@@ -147,7 +127,7 @@ def results_server(
         filename="dp-wizard-report.csv",
         media_type="text/plain",
     )
-    async def download_csv_report():
+    async def download_table():
         with ui.Progress() as progress:
             progress.set(message=wait_message)
             notebook_nb()  # Evaluate just for the side effect of creating report.
