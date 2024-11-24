@@ -54,6 +54,7 @@ def column_server(
     name: str,
     contributions: int,
     epsilon: float,
+    row_count: int,
     lower_bounds: reactive.Value[dict[str, float]],
     upper_bounds: reactive.Value[dict[str, float]],
     bin_counts: reactive.Value[dict[str, int]],
@@ -166,6 +167,7 @@ def column_server(
             # Exit early to avoid divide-by-zero.
             return None
         accuracy, histogram = make_accuracy_histogram(
+            row_count=row_count,
             lower=lower_x,
             upper=upper_x,
             bin_count=bin_count,

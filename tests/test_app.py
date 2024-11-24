@@ -85,6 +85,10 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     download_results_button = page.get_by_role("button", name="Download results")
     assert download_results_button.is_disabled()
 
+    # Currently the only change when the estimated rows changes is the plot,
+    # but we could have the confidence interval in the text...
+    page.get_by_label("Estimated Rows").select_option("1000")
+
     # Set column details:
     page.get_by_label("grade").check()
     expect_visible(simulation)
@@ -103,7 +107,7 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     assert page.get_by_label("Upper").input_value() == new_value
     # Add a second column:
     page.get_by_label("blank").check()
-    expect_visible("Weight")
+    expect(page.get_by_text("Weight")).to_have_count(2)
     # TODO: Setting more inputs without checking for updates
     # causes recalculations to pile up, and these cause timeouts on CI:
     # It is still rerendering the graph after hitting "Download results".

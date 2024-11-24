@@ -28,6 +28,16 @@ def analysis_ui():
         ),
         ui.output_ui("columns_ui"),
         ui.markdown(
+            "What is the approximate number of rows in the dataset? "
+            "This number is only used for the simulation and not the final calculation."
+        ),
+        ui.input_select(
+            "row_count",
+            "Estimated Rows",
+            choices=["100", "1000", "10000"],
+            selected="100",
+        ),
+        ui.markdown(
             "What is your privacy budget for this release? "
             "Values above 1 will add less noise to the data, "
             "but have a greater risk of revealing individual data."
@@ -108,6 +118,7 @@ def analysis_server(
                 name=column_ids_to_names[column_id],
                 contributions=contributions(),
                 epsilon=epsilon(),
+                row_count=int(input.row_count()),
                 lower_bounds=lower_bounds,
                 upper_bounds=upper_bounds,
                 bin_counts=bin_counts,
@@ -135,7 +146,7 @@ def analysis_server(
                 (
                     ui.layout_columns(
                         [],
-                        [ui.markdown(note_md)],
+                        ui.markdown(note_md),
                         col_widths=col_widths,  # type: ignore
                     )
                     if column_ids
