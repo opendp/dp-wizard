@@ -128,7 +128,7 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
 
     # CSV Report:
     with page.expect_download() as csv_report_download_info:
-        page.get_by_text("Download report (.csv)").click()
+        page.get_by_text("Download table (.csv)").click()
     expect_no_error()
 
     report_download = csv_report_download_info.value
