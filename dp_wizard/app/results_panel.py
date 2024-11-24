@@ -1,6 +1,8 @@
 from pathlib import Path
 
 from shiny import ui, render, reactive, Inputs, Outputs, Session
+from faicons import icon_svg
+from htmltools.tags import table, tr, td
 
 from dp_wizard.utils.code_generators import (
     NotebookGenerator,
@@ -18,21 +20,51 @@ def results_ui():
     return ui.nav_panel(
         "Download results",
         ui.markdown("You can now make a differentially private release of your data."),
-        ui.download_button(
-            "download_txt_report",
-            "Download Report (.txt)",
-        ),
-        ui.download_button(
-            "download_csv_report",
-            "Download Report (.csv)",
-        ),
-        ui.download_button(
-            "download_script",
-            "Download Script (.py)",
-        ),
-        ui.download_button(
-            "download_notebook",
-            "Download Notebook (.ipynb)",
+        table(
+            tr(
+                td(
+                    ui.download_button(
+                        "download_notebook",
+                        [
+                            icon_svg("book", margin_right="0.5em"),
+                            "Download Notebook (.ipynb)",
+                        ],
+                        width="20em",
+                    )
+                ),
+                td(
+                    ui.download_button(
+                        "download_script",
+                        [
+                            icon_svg("python", margin_right="0.5em"),
+                            "Download Script (.py)",
+                        ],
+                        width="20em",
+                    )
+                ),
+            ),
+            tr(
+                td(
+                    ui.download_button(
+                        "download_txt_report",
+                        [
+                            icon_svg("file-lines", margin_right="0.5em"),
+                            "Download Report (.txt)",
+                        ],
+                        width="20em",
+                    )
+                ),
+                td(
+                    ui.download_button(
+                        "download_csv_report",
+                        [
+                            icon_svg("file-csv", margin_right="0.5em"),
+                            "Download Report (.csv)",
+                        ],
+                        width="20em",
+                    )
+                ),
+            ),
         ),
         value="results_panel",
     )
