@@ -23,7 +23,12 @@ def make_accuracy_histogram(
     """
     Creates fake data between lower and upper, and then returns a DP histogram from it.
     >>> accuracy, histogram = make_accuracy_histogram(
-    ...     lower=0, upper=10, bin_count=5, contributions=1, weighted_epsilon=1)
+    ...     row_count=100,
+    ...     lower=0, upper=10,
+    ...     bin_count=5,
+    ...     contributions=1,
+    ...     weighted_epsilon=1
+    ... )
     >>> accuracy
     3.37...
     >>> histogram

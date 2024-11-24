@@ -29,11 +29,11 @@ def analysis_ui():
         ui.output_ui("columns_ui"),
         ui.markdown(
             "What is the approximate number of rows in the dataset? "
-            "This number is only used for the preview and not the final calculation."
+            "This number is only used for the simulation and not the final calculation."
         ),
         ui.input_select(
             "row_count",
-            "Approximate Rows",
+            "Estimated Rows",
             choices=["100", "1000", "10000"],
             selected="100",
         ),
