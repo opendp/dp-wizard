@@ -9,7 +9,7 @@ demo_app = create_app_fixture(Path(__file__).parent / "fixtures/demo_app.py")
 default_app = create_app_fixture(Path(__file__).parent / "fixtures/default_app.py")
 tooltip = "#choose_csv_demo_tooltip_ui svg"
 for_the_demo = "For the demo, we'll imagine"
-simulation = "This simulation assumes a normal distribution"
+simulation = "This simulation will assume a normal distribution"
 
 
 # TODO: Why is incomplete coverage reported here?
@@ -96,14 +96,14 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     page.get_by_label("Upper").fill(new_value)
     # Uncheck the column:
     page.get_by_label("grade").uncheck()
-    expect_not_visible(simulation)
+    expect_visible(simulation)
     # Recheck the column:
     page.get_by_label("grade").check()
     expect_visible(simulation)
     assert page.get_by_label("Upper").input_value() == new_value
     # Add a second column:
     page.get_by_label("blank").check()
-    expect_visible("Weight")
+    expect(page.get_by_text("Weight")).to_have_count(2)
     # TODO: Setting more inputs without checking for updates
     # causes recalculations to pile up, and these cause timeouts on CI:
     # It is still rerendering the graph after hitting "Download results".
