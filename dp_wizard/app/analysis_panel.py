@@ -15,27 +15,35 @@ from dp_wizard.app.components.column_module import col_widths
 def analysis_ui():
     return ui.nav_panel(
         "Define Analysis",
-        ui.markdown(
-            "Select numeric columns of interest, "
-            "and for each numeric column indicate the expected range, "
-            "the number of bins for the histogram, "
-            "and its relative share of the privacy budget."
-        ),
-        ui.input_checkbox_group(
-            "columns_checkbox_group",
-            ["Columns", ui.output_ui("columns_checkbox_group_tooltip_ui")],
-            [],
+        ui.layout_columns(
+            ui.card(
+                ui.card_header("Columns"),
+                ui.markdown(
+                    "Select numeric columns of interest, "
+                    "and for each numeric column indicate the expected range, "
+                    "the number of bins for the histogram, "
+                    "and its relative share of the privacy budget."
+                ),
+                ui.input_checkbox_group(
+                    "columns_checkbox_group",
+                    ["Columns", ui.output_ui("columns_checkbox_group_tooltip_ui")],
+                    [],
+                ),
+            ),
+            ui.card(
+                ui.card_header("Privacy Budget"),
+                ui.markdown(
+                    "What is your privacy budget for this release? "
+                    "Values above 1 will add less noise to the data, "
+                    "but have a greater risk of revealing individual data."
+                ),
+                ui.output_ui("epsilon_tooltip_ui"),
+                log_slider("log_epsilon_slider", 0.1, 10.0),
+                ui.output_text("epsilon_text"),
+                output_code_sample("Privacy Loss", "privacy_loss_python"),
+            ),
         ),
         ui.output_ui("columns_ui"),
-        ui.markdown(
-            "What is your privacy budget for this release? "
-            "Values above 1 will add less noise to the data, "
-            "but have a greater risk of revealing individual data."
-        ),
-        ui.output_ui("epsilon_tooltip_ui"),
-        log_slider("log_epsilon_slider", 0.1, 10.0),
-        ui.output_text("epsilon_text"),
-        output_code_sample("Privacy Loss", "privacy_loss_python"),
         ui.output_ui("download_results_button_ui"),
         value="analysis_panel",
     )
