@@ -160,7 +160,7 @@ def column_server(
         optional_upper = input.upper()
         optional_bin_count = input.bins()
         if None in [optional_lower, optional_upper, optional_bin_count]:
-            raise SilentException()
+            raise Exception("All inputs are required.")
 
         lower = float(optional_lower)
         upper = float(optional_upper)
