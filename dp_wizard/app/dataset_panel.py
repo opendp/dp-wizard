@@ -31,6 +31,7 @@ def dataset_ui():
             cli_info.contributions,
             min=1,
         ),
+        ui.output_text("contributions_error"),
         ui.output_ui("python_tooltip_ui"),
         output_code_sample("Unit of Privacy", "unit_of_privacy_python"),
         ui.output_ui("define_analysis_button_ui"),
@@ -58,7 +59,7 @@ def dataset_server(
 
     @reactive.calc
     def button_enabled():
-        contributions_is_set = input.contributions() is not None
+        contributions_is_set = int(input.contributions() or 0) >= 1
         csv_path_is_set = (
             input.csv_path() is not None and len(input.csv_path()) > 0
         ) or is_demo
@@ -79,6 +80,11 @@ def dataset_server(
             "For the demo, we assume that each student "
             f"can occur at most {contributions()} times in the dataset. ",
         )
+
+    @render.text
+    def contributions_error():
+        if not int(input.contributions() or 0) >= 1:
+            raise Exception("Contributions must be at least 1.")
 
     @render.ui
     def python_tooltip_ui():

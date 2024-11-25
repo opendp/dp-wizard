@@ -51,11 +51,25 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     # Button disabled until upload:
     define_analysis_button = page.get_by_role("button", name="Define analysis")
     assert define_analysis_button.is_disabled()
+    button_error = "Choose CSV and Contributions before proceeding"
+    expect_visible(button_error)
 
     # Now upload:
     csv_path = Path(__file__).parent / "fixtures" / "fake.csv"
     page.get_by_label("Choose CSV file").set_input_files(csv_path.resolve())
     expect_no_error()
+
+    # Contributions error checks:
+    contributions_error = "Contributions must be at least 1"
+    page.get_by_label("Contributions").fill("")
+    expect_visible(contributions_error)
+    expect_visible(button_error)
+    page.get_by_label("Contributions").fill("0")
+    expect_visible(contributions_error)
+    expect_visible(button_error)
+    page.get_by_label("Contributions").fill("42")
+    expect_not_visible(contributions_error)
+    expect_not_visible(button_error)
 
     # -- Define analysis --
     define_analysis_button.click()
