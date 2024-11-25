@@ -124,13 +124,7 @@ def analysis_server(
         The confidence interval is {confidence_percent}.
         """
         return [
-            [
-                [
-                    ui.h3(column_ids_to_labels[column_id]),
-                    column_ui(column_id),
-                ]
-                for column_id in column_ids
-            ],
+            [column_ui(column_id) for column_id in column_ids],
             [
                 (
                     ui.layout_columns(
