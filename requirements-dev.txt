@@ -43,8 +43,10 @@ click==8.1.7
     #   uvicorn
 comm==0.2.2
     # via ipykernel
-contourpy==1.3.1
-    # via matplotlib
+contourpy==1.3.0
+    # via
+    #   -r requirements-dev.in
+    #   matplotlib
 coverage==7.6.8
     # via -r requirements-dev.in
 cycler==0.12.1
