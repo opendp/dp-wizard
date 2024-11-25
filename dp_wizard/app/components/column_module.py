@@ -1,6 +1,7 @@
 from logging import info
 
 from shiny import ui, render, module, reactive, Inputs, Outputs, Session
+from shiny.types import SilentException
 
 from dp_wizard.utils.dp_helper import make_accuracy_histogram
 from dp_wizard.utils.shared import plot_histogram
@@ -155,9 +156,16 @@ def column_server(
 
     @render.plot()
     def column_plot():
-        lower_x = float(input.lower())
-        upper_x = float(input.upper())
-        bin_count = int(input.bins())
+        optional_lower = input.lower()
+        optional_upper = input.upper()
+        optional_bin_count = input.bins()
+        if None in [optional_lower, optional_upper, optional_bin_count]:
+            raise SilentException()
+
+        lower = float(optional_lower)
+        upper = float(optional_upper)
+        bin_count = int(optional_bin_count)
+
         weight = float(input.weight())
         weights_sum = sum(float(weight) for weight in weights().values())
         info(f"Weight ratio for {name}: {weight}/{weights_sum}")
@@ -165,9 +173,10 @@ def column_server(
             # This function is triggered when column is removed;
             # Exit early to avoid divide-by-zero.
             return None
+
         accuracy, histogram = make_accuracy_histogram(
-            lower=lower_x,
-            upper=upper_x,
+            lower=lower,
+            upper=upper,
             bin_count=bin_count,
             contributions=contributions,
             weighted_epsilon=epsilon * weight / weights_sum,
