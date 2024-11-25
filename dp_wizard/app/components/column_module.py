@@ -10,17 +10,17 @@ from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip, h
 
 default_weight = "2"
 label_width = "10em"  # Just wide enough so the text isn't trucated.
-col_widths = {
-    # Controls stay roughly a constant width;
-    # Graph expands to fill space.
-    "sm": [4, 8],
-    "md": [3, 9],
-    "lg": [2, 10],
-}
 
 
 @module.ui
 def column_ui():  # pragma: no cover
+    col_widths = {
+        # Controls stay roughly a constant width;
+        # Graph expands to fill space.
+        "sm": [4, 8],
+        "md": [3, 9],
+        "lg": [2, 10],
+    }
     return ui.card(
         ui.card_header(ui.output_text("card_header")),
         ui.layout_columns(
@@ -44,7 +44,8 @@ def column_ui():  # pragma: no cover
             ],
             [
                 ui.output_plot("column_plot", height="300px"),
-                # Make plot smaller than default: about the same size as the other column.
+                # Make plot smaller than default:
+                # about the same size as the other column.
                 output_code_sample("Column Definition", "column_code"),
             ],
             col_widths=col_widths,  # type: ignore

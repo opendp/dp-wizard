@@ -9,7 +9,6 @@ from dp_wizard.utils.csv_helper import read_csv_ids_labels, read_csv_ids_names
 from dp_wizard.utils.dp_helper import confidence
 from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip
 from dp_wizard.utils.code_generators import make_privacy_loss_block
-from dp_wizard.app.components.column_module import col_widths
 
 
 def analysis_ui():
@@ -46,9 +45,10 @@ def analysis_ui():
                 ui.card_header("Simulation"),
                 ui.markdown(
                     f"""
-                    This simulation will assume a normal distribution between the specified
-                    lower and upper bounds. Until you make a release,
-                    your CSV will not be read except to determine the columns.
+                    This simulation will assume a normal distribution
+                    between the specified lower and upper bounds.
+                    Until you make a release, your CSV will not be
+                    read except to determine the columns.
 
                     The actual value is within the error bar
                     with {int(confidence * 100)}% confidence.
@@ -122,7 +122,6 @@ def analysis_server(
     def columns_ui():
         column_ids = input.columns_checkbox_group()
         column_ids_to_names = csv_ids_names_calc()
-        column_ids_to_labels = csv_ids_labels_calc()
         for column_id in column_ids:
             column_server(
                 column_id,
