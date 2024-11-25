@@ -42,6 +42,19 @@ def analysis_ui():
                 ui.output_text("epsilon_text"),
                 output_code_sample("Privacy Loss", "privacy_loss_python"),
             ),
+            ui.card(
+                ui.card_header("Simulation"),
+                ui.markdown(
+                    f"""
+                    This simulation will assume a normal distribution between the specified
+                    lower and upper bounds. Until you make a release,
+                    your CSV will not be read except to determine the columns.
+
+                    The actual value is within the error bar
+                    with {int(confidence * 100)}% confidence.
+                    """
+                ),
+            ),
         ),
         ui.output_ui("columns_ui"),
         ui.output_ui("download_results_button_ui"),
@@ -123,28 +136,7 @@ def analysis_server(
                 is_demo=is_demo,
                 is_single_column=len(column_ids) == 1,
             )
-        confidence_percent = f"{int(confidence * 100)}%"
-        note_md = f"""
-        This simulation assumes a normal distribution between the specified
-        lower and upper bounds. Your CSV has not been read except to
-        determine the columns.
-
-        The confidence interval is {confidence_percent}.
-        """
-        return [
-            [column_ui(column_id) for column_id in column_ids],
-            [
-                (
-                    ui.layout_columns(
-                        [],
-                        [ui.markdown(note_md)],
-                        col_widths=col_widths,  # type: ignore
-                    )
-                    if column_ids
-                    else []
-                )
-            ],
-        ]
+        return [column_ui(column_id) for column_id in column_ids]
 
     @reactive.calc
     def csv_ids_names_calc():
