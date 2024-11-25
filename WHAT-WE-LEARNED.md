@@ -2,6 +2,15 @@
 
 Even if it seems obvious in retrospect, what have we learned about Python Shiny in this project?
 
+## Unless we use modules, namespaces overlap
+
+The practice of just using regular functions to separate UI elements can lead to problems
+if server function names are repeated. Is it safer to just always use modules?
+
+## Input validation: `None` or `SilentException`?
+
+I had been returning `None`, but is there an advantage to `SilentException`?
+
 ## Some basic html attributes are not supported
 
 I can mark a button as disabled, but it doesn't seem that a `ui.input_select` can be disabled.
