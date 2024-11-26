@@ -2,6 +2,9 @@ from typing import NamedTuple, Optional, Iterable
 from abc import ABC, abstractmethod
 from pathlib import Path
 import re
+
+import black
+
 from dp_wizard.utils.csv_helper import name_to_identifier
 from dp_wizard.utils.code_generators._template import Template
 from dp_wizard.utils.dp_helper import confidence
@@ -34,7 +37,7 @@ class _CodeGenerator(ABC):
     def _make_context(self) -> str: ...  # pragma: no cover
 
     def make_py(self):
-        return (
+        code = (
             Template(self.root_template)
             .fill_blocks(
                 IMPORTS_BLOCK=_make_imports(),
@@ -44,26 +47,13 @@ class _CodeGenerator(ABC):
             )
             .finish()
         )
+        return black.format_str(code, mode=black.Mode())
 
     def _make_margins_dict(self, bin_names: Iterable[str]):
-        # TODO: Don't worry too much about the formatting here.
-        # Plan to run the output through black for consistency.
-        # https://github.com/opendp/dp-creator-ii/issues/50
-        margins = (
-            [
-                """
-            (): dp.polars.Margin(
-                public_info="lengths",
-            ),"""
-            ]
-            + [
-                f"""
-            ("{bin_name}",): dp.polars.Margin(
-                public_info="keys",
-            ),"""
-                for bin_name in bin_names
-            ]
-        )
+        margins = ["(): dp.polars.Margin(public_info='lengths',),"] + [
+            f"('{bin_name}',): dp.polars.Margin(public_info='keys',),"
+            for bin_name in bin_names
+        ]
 
         margins_dict = "{" + "".join(margins) + "\n    }"
         return margins_dict
