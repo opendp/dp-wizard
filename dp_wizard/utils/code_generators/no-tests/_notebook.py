@@ -31,6 +31,4 @@ CONTEXT_BLOCK
 #
 # Finally, we run the queries and plot the results.
 
-# +
 QUERIES_BLOCK
-# -

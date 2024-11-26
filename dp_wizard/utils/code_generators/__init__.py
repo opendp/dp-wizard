@@ -82,7 +82,7 @@ class _CodeGenerator(ABC):
             "The actual value is within the shown range "
             f"with {int(confidence * 100)}% confidence."
         )
-        return f"confidence = {confidence} # {confidence_note}\n\n" + "\n".join(
+        return f"# +\nconfidence = {confidence} # {confidence_note}\n# -\n" + "\n".join(
             _make_query(column_name) for column_name in column_names
         )
 
