@@ -1,0 +1,3 @@
+print(TITLE)
+print(ACCURACY_NAME)
+print(HISTOGRAM_NAME)

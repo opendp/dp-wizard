@@ -99,7 +99,44 @@ class _CodeGenerator(ABC):
         return (
             f"{pre}confidence = {confidence} # {confidence_note}\n{post}"
             + "\n".join(
-                f"{pre}{_make_query(column_name)}{post}" for column_name in column_names
+                f"{pre}{self._make_query(column_name)}{post}"
+                for column_name in column_names
+            )
+        )
+
+    def _make_query(self, column_name):
+        indentifier = name_to_identifier(column_name)
+        title = f"DP counts for {column_name}"
+        accuracy_name = f"{indentifier}_accuracy"
+        histogram_name = f"{indentifier}_histogram"
+        return str(
+            Template("query")
+            .fill_values(
+                BIN_NAME=f"{indentifier}_bin",
+            )
+            .fill_expressions(
+                QUERY_NAME=f"{indentifier}_query",
+                ACCURACY_NAME=accuracy_name,
+                HISTOGRAM_NAME=histogram_name,
+            )
+            .fill_blocks(
+                OUTPUT_BLOCK=self._make_output(
+                    title=title,
+                    accuracy_name=accuracy_name,
+                    histogram_name=histogram_name,
+                )
+            )
+        )
+
+    def _make_output(self, title: str, accuracy_name: str, histogram_name: str):
+        return str(
+            Template(f"{self.root_template}_output")
+            .fill_values(
+                TITLE=title,
+            )
+            .fill_expressions(
+                ACCURACY_NAME=accuracy_name,
+                HISTOGRAM_NAME=histogram_name,
             )
         )
 
@@ -204,21 +241,6 @@ def make_column_config_block(
 # Private helper functions:
 # These do not depend on the AnalysisPlan,
 # so it's better to keep them out of the class.
-
-
-def _make_query(column_name):
-    indentifier = name_to_identifier(column_name)
-    return str(
-        Template("query")
-        .fill_values(
-            BIN_NAME=f"{indentifier}_bin", TITLE=f"DP counts for {column_name}"
-        )
-        .fill_expressions(
-            QUERY_NAME=f"{indentifier}_query",
-            ACCURACY_NAME=f"{indentifier}_accuracy",
-            HISTOGRAM_NAME=f"{indentifier}_histogram",
-        )
-    )
 
 
 def _snake_case(name: str):
