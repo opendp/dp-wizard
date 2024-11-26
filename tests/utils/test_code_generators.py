@@ -191,5 +191,12 @@ def test_make_script():
         fp.write(script)
         fp.flush()
 
-        result = subprocess.run(["python", fp.name, "--csv", fake_csv])
+        result = subprocess.run(
+            ["python", fp.name, "--csv", fake_csv], capture_output=True
+        )
         assert result.returncode == 0
+        output = result.stdout.decode()
+        print(output)
+        assert "DP counts for hw-number" in output
+        assert "95% confidence interval 3.3" in output
+        assert "hw_number_bin" in output

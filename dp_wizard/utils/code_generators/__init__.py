@@ -81,15 +81,14 @@ class _CodeGenerator(ABC):
         """
         return ""
 
+    def _make_confidence_note(self):
+        return f"{int(confidence * 100)}% confidence interval"
+
     def _make_queries(self, column_names: Iterable[str]):
-        confidence_note = (
-            "The actual value is within the shown range "
-            f"with {int(confidence * 100)}% confidence."
-        )
         pre = self._make_pre()
         post = self._make_post()
         return (
-            f"{pre}confidence = {confidence} # {confidence_note}\n{post}"
+            f"{pre}confidence = {confidence} # {self._make_confidence_note()}\n{post}"
             + "\n".join(
                 f"{pre}{self._make_query(column_name)}{post}"
                 for column_name in column_names
@@ -130,6 +129,7 @@ class _CodeGenerator(ABC):
             .fill_expressions(
                 ACCURACY_NAME=accuracy_name,
                 HISTOGRAM_NAME=histogram_name,
+                CONFIDENCE_NOTE=self._make_confidence_note(),
             )
             .finish()
         )
@@ -177,6 +177,11 @@ class ScriptGenerator(_CodeGenerator):
         return (
             self._make_partial_context().fill_expressions(CSV_PATH="csv_path").finish()
         )
+
+    def _make_confidence_note(self):
+        # In the superclass, the string is unquoted so it can be
+        # used in comments: It needs to be wrapped here.
+        return repr(super()._make_confidence_note())
 
 
 # Public functions used to generate code snippets in the UI;
