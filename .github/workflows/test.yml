@@ -27,22 +27,29 @@ jobs:
       - name: Install flit
         run: pip install flit
 
-      - name: Install package
-        run: flit install
+      - name: Install production deps
+        run: flit install --deps production
 
-      - name: Check CLI
-        # TODO: This won't catch most missing dependencies.
-        run: dp-wizard --help
+      - name: Install subset of test deps
+        run:
+          pip install pytest pytest-playwright
+
+      - name: Install browsers
+        # TODO: Why doesn't work to just install chromium now?
+        # Install just one browser instead of the default three.
+        # https://playwright.dev/python/docs/browsers#managing-browser-binaries
+        run: playwright install
+
+      - name: Run end-to-end test
+        # We want to make sure there aren't hidden dependencies
+        # on dev tools in production code, and that it still works
+        # when dependencies aren't pinned.
+        run: pytest -k test_app
 
       - name: Install dev dependencies
         run: pip install -r requirements-dev.txt
 
-      - name: Install browsers
-        # Install just one browser instead of the default three.
-        # https://playwright.dev/python/docs/browsers#managing-browser-binaries
-        run: playwright install chromium
-
-      - name: Test
+      - name: Run full tests
         run: ./ci.sh
 
       - uses: actions/upload-artifact@v4
