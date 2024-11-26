@@ -188,7 +188,7 @@ def _make_query(column_name):
     return str(
         Template("query")
         .fill_values(
-            BIN_NAME=f"{indentifier}_bin",
+            BIN_NAME=f"{indentifier}_bin", TITLE=f"DP counts for {column_name}"
         )
         .fill_expressions(
             QUERY_NAME=f"{indentifier}_query",
