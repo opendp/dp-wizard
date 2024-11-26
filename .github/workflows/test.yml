@@ -24,15 +24,11 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install flit
-        run: pip install flit
+      - name: Install subset of dev deps
+        run: pip install flit pytest pytest-playwright
 
       - name: Install production deps
         run: flit install --deps production
-
-      - name: Install subset of test deps
-        run:
-          pip install pytest pytest-playwright
 
       - name: Install browsers
         # Install just one browser instead of the default three.

@@ -23,6 +23,10 @@ def test_demo_app(page: Page, demo_app: ShinyAppProc):  # pragma: no cover
 
 
 def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
+    # Default 5s timeout works for me in dev,
+    # but in CI or fresh venv it is slower.
+    expect.set_options(timeout=10_000)
+
     pick_dataset_text = "How many rows of the CSV"
     perform_analysis_text = "Select numeric columns of interest"
     download_results_text = "You can now make a differentially private release"
