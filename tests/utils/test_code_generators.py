@@ -194,6 +194,11 @@ def test_make_script():
     ).make_py()
     print(script)
 
+    # Make sure jupytext formatting doesn't bleed into the script.
+    # https://jupytext.readthedocs.io/en/latest/formats-scripts.html#the-light-format
+    assert "# -" not in script
+    assert "# +" not in script
+
     with NamedTemporaryFile(mode="w") as fp:
         fp.write(script)
         fp.flush()

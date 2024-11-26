@@ -77,13 +77,30 @@ class _CodeGenerator(ABC):
             for name, col in columns.items()
         )
 
+    def _make_pre(self) -> str:
+        """
+        If generating a notebook, this will open a new code paragraph.
+        """
+        return ""
+
+    def _make_post(self) -> str:
+        """
+        If generating a notebook, this will close a new code paragraph.
+        """
+        return ""
+
     def _make_queries(self, column_names: Iterable[str]):
         confidence_note = (
             "The actual value is within the shown range "
             f"with {int(confidence * 100)}% confidence."
         )
-        return f"# +\nconfidence = {confidence} # {confidence_note}\n# -\n" + "\n".join(
-            _make_query(column_name) for column_name in column_names
+        pre = self._make_pre()
+        post = self._make_post()
+        return (
+            f"{pre}confidence = {confidence} # {confidence_note}\n{post}"
+            + "\n".join(
+                f"{pre}{_make_query(column_name)}{post}" for column_name in column_names
+            )
         )
 
     def _make_partial_context(self):
@@ -114,6 +131,12 @@ class NotebookGenerator(_CodeGenerator):
 
     def _make_context(self):
         return str(self._make_partial_context().fill_values(CSV_PATH=self.csv_path))
+
+    def _make_pre(self):
+        return "# +\n"
+
+    def _make_post(self):
+        return "# -\n"
 
 
 class ScriptGenerator(_CodeGenerator):
