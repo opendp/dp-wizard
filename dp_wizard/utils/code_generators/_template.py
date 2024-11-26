@@ -26,6 +26,9 @@ class Template:
         return set(re.findall(slot_re, self._template))
 
     def fill_expressions(self, **kwargs):
+        """
+        Fill in variable names, or dicts or lists represented as strings.
+        """
         for k, v in kwargs.items():
             k_re = re.escape(k)
             self._template, count = re.subn(rf"\b{k_re}\b", str(v), self._template)
@@ -37,6 +40,9 @@ class Template:
         return self
 
     def fill_values(self, **kwargs):
+        """
+        Fill in string or numeric values. `repr` is called before filling.
+        """
         for k, v in kwargs.items():
             k_re = re.escape(k)
             self._template, count = re.subn(rf"\b{k_re}\b", repr(v), self._template)
@@ -48,6 +54,9 @@ class Template:
         return self
 
     def fill_blocks(self, **kwargs):
+        """
+        Fill in code blocks. Slot must be alone on line.
+        """
         for k, v in kwargs.items():
 
             def match_indent(match):
@@ -76,7 +85,7 @@ class Template:
                     raise Exception(base_message)
         return self
 
-    def __str__(self):
+    def finish(self):
         unfilled_slots = self._initial_slots & self._find_slots()
         if unfilled_slots:
             slots_str = ", ".join(sorted(f"'{slot}'" for slot in unfilled_slots))

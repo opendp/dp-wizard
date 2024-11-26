@@ -34,13 +34,15 @@ class _CodeGenerator(ABC):
     def _make_context(self) -> str: ...  # pragma: no cover
 
     def make_py(self):
-        return str(
-            Template(self.root_template).fill_blocks(
+        return (
+            Template(self.root_template)
+            .fill_blocks(
                 IMPORTS_BLOCK=_make_imports(),
                 COLUMNS_BLOCK=self._make_columns(self.columns),
                 CONTEXT_BLOCK=self._make_context(),
                 QUERIES_BLOCK=self._make_queries(self.columns.keys()),
             )
+            .finish()
         )
 
     def _make_margins_dict(self, bin_names: Iterable[str]):
@@ -109,7 +111,7 @@ class _CodeGenerator(ABC):
         title = f"DP counts for {column_name}"
         accuracy_name = f"{indentifier}_accuracy"
         histogram_name = f"{indentifier}_histogram"
-        return str(
+        return (
             Template("query")
             .fill_values(
                 BIN_NAME=f"{indentifier}_bin",
@@ -126,10 +128,11 @@ class _CodeGenerator(ABC):
                     histogram_name=histogram_name,
                 )
             )
+            .finish()
         )
 
     def _make_output(self, title: str, accuracy_name: str, histogram_name: str):
-        return str(
+        return (
             Template(f"{self.root_template}_output")
             .fill_values(
                 TITLE=title,
@@ -138,6 +141,7 @@ class _CodeGenerator(ABC):
                 ACCURACY_NAME=accuracy_name,
                 HISTOGRAM_NAME=histogram_name,
             )
+            .finish()
         )
 
     def _make_partial_context(self):
@@ -167,7 +171,7 @@ class NotebookGenerator(_CodeGenerator):
     root_template = "notebook"
 
     def _make_context(self):
-        return str(self._make_partial_context().fill_values(CSV_PATH=self.csv_path))
+        return self._make_partial_context().fill_values(CSV_PATH=self.csv_path).finish()
 
     def _make_pre(self):
         return "# +\n"
@@ -180,7 +184,9 @@ class ScriptGenerator(_CodeGenerator):
     root_template = "script"
 
     def _make_context(self):
-        return str(self._make_partial_context().fill_expressions(CSV_PATH="csv_path"))
+        return (
+            self._make_partial_context().fill_expressions(CSV_PATH="csv_path").finish()
+        )
 
 
 # Public functions used to generate code snippets in the UI;
@@ -188,11 +194,11 @@ class ScriptGenerator(_CodeGenerator):
 
 
 def make_privacy_unit_block(contributions: int):
-    return str(Template("privacy_unit").fill_values(CONTRIBUTIONS=contributions))
+    return Template("privacy_unit").fill_values(CONTRIBUTIONS=contributions).finish()
 
 
 def make_privacy_loss_block(epsilon: float):
-    return str(Template("privacy_loss").fill_values(EPSILON=epsilon))
+    return Template("privacy_loss").fill_values(EPSILON=epsilon).finish()
 
 
 def make_column_config_block(
@@ -222,7 +228,7 @@ def make_column_config_block(
     <BLANKLINE>
     """
     snake_name = _snake_case(name)
-    return str(
+    return (
         Template("column_config")
         .fill_expressions(
             CUT_LIST_NAME=f"{snake_name}_cut_points",
@@ -235,6 +241,7 @@ def make_column_config_block(
             COLUMN_NAME=name,
             BIN_COLUMN_NAME=f"{snake_name}_bin",
         )
+        .finish()
     )
 
 
@@ -253,6 +260,6 @@ def _snake_case(name: str):
 
 def _make_imports():
     return (
-        str(Template("imports").fill_values())
+        Template("imports").fill_values().finish()
         + (Path(__file__).parent.parent / "shared.py").read_text()
     )
