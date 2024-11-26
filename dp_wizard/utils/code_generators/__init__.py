@@ -244,8 +244,14 @@ def _snake_case(name: str):
     """
     >>> _snake_case("HW GRADE")
     'hw_grade'
+    >>> _snake_case("123")
+    '_123'
     """
-    return re.sub(r"\W+", "_", name.lower())
+    snake = re.sub(r"\W+", "_", name.lower())
+    # TODO: More validation in UI so we don't get zero-length strings.
+    if snake == "" or not re.match(r"[a-z]", snake[0]):
+        snake = f"_{snake}"
+    return snake
 
 
 def _make_imports():
