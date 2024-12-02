@@ -3,7 +3,7 @@ from tempfile import TemporaryDirectory
 import subprocess
 
 
-def convert_py_to_nb(python_str, execute=False):
+def convert_py_to_nb(python_str: str, execute: bool = False):
     """
     Given Python code as a string, returns a notebook as a string.
     Calls jupytext as a subprocess:

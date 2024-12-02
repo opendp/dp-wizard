@@ -2,6 +2,10 @@
 
 Even if it seems obvious in retrospect, what have we learned about Python Shiny in this project?
 
+## Some basic html attributes are not supported
+
+I can mark a button as disabled, but it doesn't seem that a `ui.input_select` can be disabled.
+
 ## No warning if ID mismatch / type mismatch
 
 Unless I'm missing something, there doesn't seem to be any warning when there isn't a matching function name in the server for an ID in the UI. Either from typos, or fumbling some more complicated display logic, there have been times where this could have been helpful.

@@ -1,13 +1,14 @@
 from math import pow
+from typing import Iterable, Any
 
-from shiny import ui, reactive, render, req
+from shiny import ui, reactive, render, req, Inputs, Outputs, Session
 
 from dp_wizard.app.components.inputs import log_slider
 from dp_wizard.app.components.column_module import column_ui, column_server
 from dp_wizard.utils.csv_helper import read_csv_ids_labels, read_csv_ids_names
+from dp_wizard.utils.dp_helper import confidence
 from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip
 from dp_wizard.utils.code_generators import make_privacy_loss_block
-from dp_wizard.app.components.column_module import col_widths
 from dp_wizard.app import results_panel
 from dp_wizard.app.components.outputs import info_box
 
@@ -18,33 +19,70 @@ def analysis_ui():
     return ui.nav_panel(
         "Define Analysis",
         ui.output_ui("analysis_panel_warning"),
-        ui.markdown(
-            "Select numeric columns of interest, "
-            "and for each numeric column indicate the expected range, "
-            "the number of bins for the histogram, "
-            "and its relative share of the privacy budget."
-        ),
-        ui.input_checkbox_group(
-            "columns_checkbox_group",
-            ["Columns", ui.output_ui("columns_checkbox_group_tooltip_ui")],
-            [],
+        ui.layout_columns(
+            ui.card(
+                ui.card_header("Columns"),
+                ui.markdown(
+                    "Select numeric columns of interest, "
+                    "and for each numeric column indicate the expected range, "
+                    "the number of bins for the histogram, "
+                    "and its relative share of the privacy budget."
+                ),
+                ui.input_checkbox_group(
+                    "columns_checkbox_group",
+                    ["Columns", ui.output_ui("columns_checkbox_group_tooltip_ui")],
+                    [],
+                ),
+            ),
+            ui.card(
+                ui.card_header("Privacy Budget"),
+                ui.markdown(
+                    "What is your privacy budget for this release? "
+                    "Values above 1 will add less noise to the data, "
+                    "but have a greater risk of revealing individual data."
+                ),
+                ui.output_ui("epsilon_tooltip_ui"),
+                log_slider("log_epsilon_slider", 0.1, 10.0),
+                ui.output_text("epsilon_text"),
+                output_code_sample("Privacy Loss", "privacy_loss_python"),
+            ),
+            ui.card(
+                ui.card_header("Simulation"),
+                ui.markdown(
+                    f"""
+                    This simulation will assume a normal distribution
+                    between the specified lower and upper bounds.
+                    Until you make a release, your CSV will not be
+                    read except to determine the columns.
+
+                    The actual value is within the error bar
+                    with {int(confidence * 100)}% confidence.
+                    """
+                ),
+                ui.markdown(
+                    """
+                    What is the approximate number of rows in the dataset?
+                    This number is only used for the simulation
+                    and not the final calculation.
+                    """
+                ),
+                ui.input_select(
+                    "row_count",
+                    "Estimated Rows",
+                    choices=["100", "1000", "10000"],
+                    selected="100",
+                ),
+            ),
         ),
         ui.output_ui("columns_ui"),
-        ui.markdown(
-            "What is your privacy budget for this release? "
-            "Values above 1 will add less noise to the data, "
-            "but have a greater risk of revealing individual data."
-        ),
-        ui.output_ui("epsilon_tooltip_ui"),
-        log_slider("log_epsilon_slider", 0.1, 10.0),
-        ui.output_text("epsilon_text"),
-        output_code_sample("Privacy Loss", "privacy_loss_python"),
         ui.output_ui("download_results_button_ui"),
         value=analysis_panel_id,
     )
 
 
-def _cleanup_reactive_dict(reactive_dict, keys_to_keep):  # pragma: no cover
+def _cleanup_reactive_dict(
+    reactive_dict: reactive.Value[dict[str, Any]], keys_to_keep: Iterable[str]
+):  # pragma: no cover
     reactive_dict_copy = {**reactive_dict()}
     keys_to_del = set(reactive_dict_copy.keys()) - set(keys_to_keep)
     for key in keys_to_del:
@@ -53,17 +91,17 @@ def _cleanup_reactive_dict(reactive_dict, keys_to_keep):  # pragma: no cover
 
 
 def analysis_server(
-    input,
-    output,
-    session,
-    csv_path,
-    contributions,
-    is_demo,
-    lower_bounds,
-    upper_bounds,
-    bin_counts,
-    weights,
-    epsilon,
+    input: Inputs,
+    output: Outputs,
+    session: Session,
+    csv_path: reactive.Value[str],
+    contributions: reactive.Value[int],
+    is_demo: bool,
+    lower_bounds: reactive.Value[dict[str, float]],
+    upper_bounds: reactive.Value[dict[str, float]],
+    bin_counts: reactive.Value[dict[str, int]],
+    weights: reactive.Value[dict[str, str]],
+    epsilon: reactive.Value[float],
     current_panel,
 ):  # pragma: no cover
     @render.ui
@@ -122,49 +160,21 @@ def analysis_server(
     def columns_ui():
         column_ids = input.columns_checkbox_group()
         column_ids_to_names = csv_ids_names_calc()
-        column_ids_to_labels = csv_ids_labels_calc()
         for column_id in column_ids:
             column_server(
                 column_id,
                 name=column_ids_to_names[column_id],
                 contributions=contributions(),
                 epsilon=epsilon(),
+                row_count=int(input.row_count()),
                 lower_bounds=lower_bounds,
                 upper_bounds=upper_bounds,
                 bin_counts=bin_counts,
                 weights=weights,
                 is_demo=is_demo,
+                is_single_column=len(column_ids) == 1,
             )
-        return [
-            [
-                [
-                    ui.h3(column_ids_to_labels[column_id]),
-                    column_ui(column_id),
-                ]
-                for column_id in column_ids
-            ],
-            [
-                (
-                    ui.layout_columns(
-                        [],
-                        [
-                            ui.markdown(
-                                """
-                            This simulation assumes a normal
-                            distribution between the specified
-                            lower and upper bounds. Your data
-                            file has not been read except to
-                            determine the columns.
-                            """
-                            )
-                        ],
-                        col_widths=col_widths,
-                    )
-                    if column_ids
-                    else []
-                )
-            ],
-        ]
+        return [column_ui(column_id) for column_id in column_ids]
 
     @reactive.calc
     def csv_ids_names_calc():

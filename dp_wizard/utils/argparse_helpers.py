@@ -4,10 +4,10 @@ from argparse import ArgumentParser, ArgumentTypeError
 import csv
 import random
 from warnings import warn
-from collections import namedtuple
+from typing import NamedTuple, Optional
 
 
-def _existing_csv_type(arg):
+def _existing_csv_type(arg: str) -> Path:
     path = Path(arg)
     if not path.exists():
         raise ArgumentTypeError(f"No such file: {arg}")
@@ -54,7 +54,7 @@ def _get_args():
         return arg_parser.parse_args()  # pragma: no cover
 
 
-def _clip(n, lower, upper):
+def _clip(n: float, lower: float, upper: float) -> float:
     """
     >>> _clip(-5, 0, 10)
     0
@@ -66,7 +66,13 @@ def _clip(n, lower, upper):
     return max(min(n, upper), lower)
 
 
-def _get_demo_csv_contrib():
+class CLIInfo(NamedTuple):
+    csv_path: Optional[str]
+    contributions: int
+    is_demo: bool
+
+
+def _get_demo_csv_contrib() -> CLIInfo:
     """
     >>> csv_path, contributions, is_demo = _get_demo_csv_contrib()
     >>> with open(csv_path, newline="") as csv_handle:
@@ -103,10 +109,7 @@ def _get_demo_csv_contrib():
                     }
                 )
 
-    return CLIInfo(csv_path=csv_path, contributions=contributions, is_demo=True)
-
-
-CLIInfo = namedtuple("CLIInfo", ["csv_path", "contributions", "is_demo"])
+    return CLIInfo(csv_path=str(csv_path), contributions=contributions, is_demo=True)
 
 
 def get_cli_info():  # pragma: no cover

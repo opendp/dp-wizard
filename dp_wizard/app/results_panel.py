@@ -1,4 +1,4 @@
-from shiny import ui, render, reactive
+from shiny import ui, render, reactive, Inputs, Outputs, Session
 
 from dp_wizard.utils.code_generators import (
     NotebookGenerator,
@@ -30,19 +30,19 @@ def results_ui():
 
 
 def results_server(
-    input,
-    output,
-    session,
-    csv_path,
-    contributions,
-    lower_bounds,
-    upper_bounds,
-    bin_counts,
-    weights,
-    epsilon,
-    current_panel,
+    input: Inputs,
+    output: Outputs,
+    session: Session,
+    csv_path: reactive.Value[str],
+    contributions: reactive.Value[int],
+    lower_bounds: reactive.Value[dict[str, float]],
+    upper_bounds: reactive.Value[dict[str, float]],
+    bin_counts: reactive.Value[dict[str, int]],
+    weights: reactive.Value[dict[str, str]],
+    epsilon: reactive.Value[float],
+    current_panel: reactive.Value[str],
 ):  # pragma: no cover
-    @render.text
+    @render.ui
     def results_panel_warning():
         if current_panel() < results_panel_id:
             return info_box(
