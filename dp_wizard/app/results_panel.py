@@ -1,6 +1,8 @@
 from pathlib import Path
 
 from shiny import ui, render, reactive, Inputs, Outputs, Session
+from faicons import icon_svg
+from htmltools.tags import table, tr, td
 
 from dp_wizard.utils.code_generators import (
     NotebookGenerator,
@@ -14,21 +16,35 @@ from dp_wizard.utils.converters import convert_py_to_nb
 wait_message = "Please wait."
 
 
+def td_button(name: str, ext: str, icon: str):
+    function_name = f'download_{name.lower().replace(" ", "_")}'
+    return (
+        td(
+            ui.download_button(
+                function_name,
+                [
+                    icon_svg(icon, margin_right="0.5em"),
+                    f"Download {name} ({ext})",
+                ],
+                width="20em",
+            )
+        ),
+    )
+
+
 def results_ui():
     return ui.nav_panel(
         "Download results",
         ui.markdown("You can now make a differentially private release of your data."),
-        ui.download_button(
-            "download_report",
-            "Download Report (.txt)",
-        ),
-        ui.download_button(
-            "download_script",
-            "Download Script (.py)",
-        ),
-        ui.download_button(
-            "download_notebook",
-            "Download Notebook (.ipynb)",
+        table(
+            tr(
+                td_button("Notebook", ".ipynb", "book"),
+                td_button("Script", ".py", "python"),
+            ),
+            tr(
+                td_button("Report", ".txt", "file-lines"),
+                td_button("Table", ".csv", "file-csv"),
+            ),
         ),
         value="results_panel",
     )
@@ -106,3 +122,16 @@ def results_server(
                 Path(__file__).parent.parent / "tmp" / "report.txt"
             ).read_text()
             yield report_txt
+
+    @render.download(
+        filename="dp-wizard-report.csv",
+        media_type="text/plain",
+    )
+    async def download_table():
+        with ui.Progress() as progress:
+            progress.set(message=wait_message)
+            notebook_nb()  # Evaluate just for the side effect of creating report.
+            report_csv = (
+                Path(__file__).parent.parent / "tmp" / "report.csv"
+            ).read_text()
+            yield report_csv

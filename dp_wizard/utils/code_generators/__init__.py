@@ -138,6 +138,7 @@ class NotebookGenerator(_CodeGenerator):
             )
             + "}"
         )
+        tmp_path = Path(__file__).parent.parent.parent / "tmp"
         reports_block = str(
             Template("reports")
             .fill_expressions(
@@ -145,9 +146,8 @@ class NotebookGenerator(_CodeGenerator):
             )
             .fill_values(
                 CSV_PATH=self.csv_path,
-                REPORT_PATH=str(
-                    Path(__file__).parent.parent.parent / "tmp" / "report.txt"
-                ),
+                TXT_REPORT_PATH=str(tmp_path / "report.txt"),
+                CSV_REPORT_PATH=str(tmp_path / "report.csv"),
             )
         )
         return {"REPORTS_BLOCK": reports_block}
