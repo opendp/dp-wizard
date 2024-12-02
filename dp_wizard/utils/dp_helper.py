@@ -13,6 +13,7 @@ confidence = 0.95
 
 
 def make_accuracy_histogram(
+    row_count: int,
     lower: float,
     upper: float,
     bin_count: int,
@@ -22,7 +23,12 @@ def make_accuracy_histogram(
     """
     Creates fake data between lower and upper, and then returns a DP histogram from it.
     >>> accuracy, histogram = make_accuracy_histogram(
-    ...     lower=0, upper=10, bin_count=5, contributions=1, weighted_epsilon=1)
+    ...     row_count=100,
+    ...     lower=0, upper=10,
+    ...     bin_count=5,
+    ...     contributions=1,
+    ...     weighted_epsilon=1
+    ... )
     >>> accuracy
     3.37...
     >>> histogram
@@ -42,7 +48,6 @@ def make_accuracy_histogram(
     # Mock data only depends on lower and upper bounds, so it could be cached,
     # but I'd guess this is dominated by the DP operations,
     # so not worth optimizing.
-    row_count = 100
     df = mock_data({"value": ColumnDef(lower, upper)}, row_count=row_count)
 
     # TODO: When this is stable, merge it to templates, so we can be

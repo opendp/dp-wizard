@@ -54,6 +54,19 @@ def analysis_ui():
                     with {int(confidence * 100)}% confidence.
                     """
                 ),
+                ui.markdown(
+                    """
+                    What is the approximate number of rows in the dataset?
+                    This number is only used for the simulation
+                    and not the final calculation.
+                    """
+                ),
+                ui.input_select(
+                    "row_count",
+                    "Estimated Rows",
+                    choices=["100", "1000", "10000"],
+                    selected="100",
+                ),
             ),
         ),
         ui.output_ui("columns_ui"),
@@ -128,6 +141,7 @@ def analysis_server(
                 name=column_ids_to_names[column_id],
                 contributions=contributions(),
                 epsilon=epsilon(),
+                row_count=int(input.row_count()),
                 lower_bounds=lower_bounds,
                 upper_bounds=upper_bounds,
                 bin_counts=bin_counts,

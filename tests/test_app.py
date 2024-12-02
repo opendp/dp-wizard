@@ -85,6 +85,10 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     download_results_button = page.get_by_role("button", name="Download results")
     assert download_results_button.is_disabled()
 
+    # Currently the only change when the estimated rows changes is the plot,
+    # but we could have the confidence interval in the text...
+    page.get_by_label("Estimated Rows").select_option("1000")
+
     # Set column details:
     page.get_by_label("grade").check()
     expect_visible(simulation)
