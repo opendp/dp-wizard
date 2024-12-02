@@ -40,7 +40,7 @@ def df_to_columns(df: DataFrame):
 
 
 def plot_histogram(
-    histogram_df: DataFrame, error: float, cutoff: float
+    histogram_df: DataFrame, error: float, cutoff: float, title: str
 ):  # pragma: no cover
     """
     Given a Dataframe for a histogram, plot the data.
@@ -58,3 +58,4 @@ def plot_histogram(
     axes.set_xticks(minors, ["" for _ in minors], minor=True)
     axes.axhline(cutoff, color="lightgrey", zorder=-1)
     axes.set_ylim(bottom=0)
+    axes.set_title(title)

@@ -189,4 +189,5 @@ def column_server(
             histogram,
             error=accuracy,
             cutoff=0,  # TODO
+            title=f"Simulated {name}, assuming normal distribution",
         )

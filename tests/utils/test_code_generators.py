@@ -23,74 +23,62 @@ def test_param_conflict():
 
 def test_fill_expressions():
     template = Template(None, template="No one VERB the ADJ NOUN!")
-    filled = str(
-        template.fill_expressions(
-            VERB="expects",
-            ADJ="Spanish",
-            NOUN="Inquisition",
-        )
-    )
+    filled = template.fill_expressions(
+        VERB="expects",
+        ADJ="Spanish",
+        NOUN="Inquisition",
+    ).finish()
     assert filled == "No one expects the Spanish Inquisition!"
 
 
 def test_fill_expressions_missing_slot_in_template():
     template = Template(None, template="No one ... the ADJ NOUN!")
     with pytest.raises(Exception, match=r"No 'VERB' slot to fill with 'expects'"):
-        str(
-            template.fill_expressions(
-                VERB="expects",
-                ADJ="Spanish",
-                NOUN="Inquisition",
-            )
-        )
+        template.fill_expressions(
+            VERB="expects",
+            ADJ="Spanish",
+            NOUN="Inquisition",
+        ).finish()
 
 
 def test_fill_expressions_extra_slot_in_template():
     template = Template(None, template="No one VERB ARTICLE ADJ NOUN!")
     with pytest.raises(Exception, match=r"'ARTICLE' slot not filled"):
-        str(
-            template.fill_expressions(
-                VERB="expects",
-                ADJ="Spanish",
-                NOUN="Inquisition",
-            )
-        )
+        template.fill_expressions(
+            VERB="expects",
+            ADJ="Spanish",
+            NOUN="Inquisition",
+        ).finish()
 
 
 def test_fill_values():
     template = Template(None, template="assert [STRING] * NUM == LIST")
-    filled = str(
-        template.fill_values(
-            STRING="🙂",
-            NUM=3,
-            LIST=["🙂", "🙂", "🙂"],
-        )
-    )
+    filled = template.fill_values(
+        STRING="🙂",
+        NUM=3,
+        LIST=["🙂", "🙂", "🙂"],
+    ).finish()
     assert filled == "assert ['🙂'] * 3 == ['🙂', '🙂', '🙂']"
 
 
 def test_fill_values_missing_slot_in_template():
     template = Template(None, template="assert [STRING] * ... == LIST")
     with pytest.raises(Exception, match=r"No 'NUM' slot to fill with '3'"):
-        str(
-            template.fill_values(
-                STRING="🙂",
-                NUM=3,
-                LIST=["🙂", "🙂", "🙂"],
-            )
-        )
+        template.fill_values(
+            STRING="🙂",
+            NUM=3,
+            LIST=["🙂", "🙂", "🙂"],
+        ).finish()
 
 
 def test_fill_values_extra_slot_in_template():
     template = Template(None, template="CMD [STRING] * NUM == LIST")
     with pytest.raises(Exception, match=r"'CMD' slot not filled"):
-        str(
-            template.fill_values(
-                STRING="🙂",
-                NUM=3,
-                LIST=["🙂", "🙂", "🙂"],
-            )
-        )
+        template.fill_values(
+            STRING="🙂",
+            NUM=3,
+            LIST=["🙂", "🙂", "🙂"],
+        ).finish()
 
 
 def test_fill_blocks():
@@ -113,7 +101,7 @@ with fake:
         THIRD="\n".join(f"{i}()" for i in "xyz"),
     )
     assert (
-        str(template)
+        template.finish()
         == """# MixedCase is OK
 
 import a
@@ -135,7 +123,7 @@ with fake:
 def test_fill_blocks_missing_slot_in_template_alone():
     template = Template(None, template="No block slot")
     with pytest.raises(Exception, match=r"No 'SLOT' slot"):
-        str(template.fill_blocks(SLOT="placeholder"))
+        template.fill_blocks(SLOT="placeholder").finish()
 
 
 def test_fill_blocks_missing_slot_in_template_not_alone():
@@ -143,13 +131,13 @@ def test_fill_blocks_missing_slot_in_template_not_alone():
     with pytest.raises(
         Exception, match=r"Block slots must be alone on line; No 'SLOT' slot"
     ):
-        str(template.fill_blocks(SLOT="placeholder"))
+        template.fill_blocks(SLOT="placeholder").finish()
 
 
 def test_fill_blocks_extra_slot_in_template():
     template = Template(None, template="EXTRA\nSLOT")
     with pytest.raises(Exception, match=r"'EXTRA' slot not filled"):
-        str(template.fill_blocks(SLOT="placeholder"))
+        template.fill_blocks(SLOT="placeholder").finish()
 
 
 def test_make_notebook():
@@ -194,9 +182,21 @@ def test_make_script():
     ).make_py()
     print(script)
 
+    # Make sure jupytext formatting doesn't bleed into the script.
+    # https://jupytext.readthedocs.io/en/latest/formats-scripts.html#the-light-format
+    assert "# -" not in script
+    assert "# +" not in script
+
     with NamedTemporaryFile(mode="w") as fp:
         fp.write(script)
         fp.flush()
 
-        result = subprocess.run(["python", fp.name, "--csv", fake_csv])
+        result = subprocess.run(
+            ["python", fp.name, "--csv", fake_csv], capture_output=True
+        )
         assert result.returncode == 0
+        output = result.stdout.decode()
+        print(output)
+        assert "DP counts for hw-number" in output
+        assert "95% confidence interval 3.3" in output
+        assert "hw_number_bin" in output
