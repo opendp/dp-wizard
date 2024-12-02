@@ -5,6 +5,10 @@ from shiny import ui, reactive, render, Inputs, Outputs, Session
 from dp_wizard.utils.argparse_helpers import get_cli_info
 from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip
 from dp_wizard.utils.code_generators import make_privacy_unit_block
+from dp_wizard.app import analysis_panel
+from dp_wizard.app.components.outputs import info_box
+
+dataset_panel_id = "1_dataset_panel"
 
 
 def dataset_ui():
@@ -13,6 +17,7 @@ def dataset_ui():
 
     return ui.nav_panel(
         "Select Dataset",
+        ui.output_ui("dataset_panel_warning"),
         # Doesn't seem to be possible to preset the actual value,
         # but the placeholder string is a good substitute.
         ui.input_file(
@@ -34,7 +39,7 @@ def dataset_ui():
         ui.output_ui("python_tooltip_ui"),
         output_code_sample("Unit of Privacy", "unit_of_privacy_python"),
         ui.output_ui("define_analysis_button_ui"),
-        value="dataset_panel",
+        value=dataset_panel_id,
     )
 
 
@@ -45,7 +50,21 @@ def dataset_server(
     csv_path: reactive.Value[str],
     contributions: reactive.Value[int],
     is_demo: bool,
+    current_panel: reactive.Value[str],
 ):  # pragma: no cover
+    @render.ui
+    def dataset_panel_warning():
+        if current_panel() > dataset_panel_id:
+            return info_box(
+                """
+                Once you've confirmed your dataset and the unit of privacy
+                they are locked. The unit of privacy is a characteristic
+                of your dataset and shouldn't be tweaked just to improve
+                utility.
+                """
+            )
+        return ""
+
     @reactive.effect
     @reactive.event(input.csv_path)
     def _on_csv_path_change():
@@ -99,7 +118,7 @@ def dataset_server(
             return button
         return [
             button,
-            "Choose CSV and Contributions before proceeding.",
+            info_box("Choose CSV and Contributions before proceeding."),
         ]
 
     @render.code
@@ -109,4 +128,5 @@ def dataset_server(
     @reactive.effect
     @reactive.event(input.go_to_analysis)
     def go_to_analysis():
-        ui.update_navs("top_level_nav", selected="analysis_panel")
+        current_panel.set(analysis_panel.analysis_panel_id)
+        ui.update_navs("top_level_nav", selected=analysis_panel.analysis_panel_id)
