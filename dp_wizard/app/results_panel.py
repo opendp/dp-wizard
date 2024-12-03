@@ -11,6 +11,9 @@ from dp_wizard.utils.code_generators import (
     AnalysisPlanColumn,
 )
 from dp_wizard.utils.converters import convert_py_to_nb
+from dp_wizard.app.components.outputs import info_box
+
+results_panel_id = "3_results_panel"
 
 
 wait_message = "Please wait."
@@ -35,6 +38,7 @@ def td_button(name: str, ext: str, icon: str):
 def results_ui():
     return ui.nav_panel(
         "Download results",
+        ui.output_ui("results_panel_warning"),
         ui.markdown("You can now make a differentially private release of your data."),
         table(
             tr(
@@ -46,7 +50,7 @@ def results_ui():
                 td_button("Table", ".csv", "file-csv"),
             ),
         ),
-        value="results_panel",
+        value=results_panel_id,
     )
 
 
@@ -61,7 +65,19 @@ def results_server(
     bin_counts: reactive.Value[dict[str, int]],
     weights: reactive.Value[dict[str, str]],
     epsilon: reactive.Value[float],
+    current_panel: reactive.Value[str],
 ):  # pragma: no cover
+    @render.ui
+    def results_panel_warning():
+        if current_panel() < results_panel_id:
+            return info_box(
+                """
+                This tab is locked until you've confirmed your
+                analysis details.
+                """
+            )
+        return ""
+
     @reactive.calc
     def analysis_plan() -> AnalysisPlan:
         # weights().keys() will reflect the desired columns:
