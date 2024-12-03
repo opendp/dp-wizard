@@ -40,9 +40,9 @@ class _CodeGenerator(ABC):
         return str(
             Template(self.root_template).fill_blocks(
                 IMPORTS_BLOCK=_make_imports(),
-                COLUMNS_BLOCK=self._make_columns(self.columns),
+                COLUMNS_BLOCK=self._make_columns(),
                 CONTEXT_BLOCK=self._make_context(),
-                QUERIES_BLOCK=self._make_queries(self.columns.keys()),
+                QUERIES_BLOCK=self._make_queries(),
                 **self._make_extra_blocks(),
             )
         )
@@ -70,7 +70,7 @@ class _CodeGenerator(ABC):
         margins_dict = "{" + "".join(margins) + "\n    }"
         return margins_dict
 
-    def _make_columns(self, columns: dict[str, AnalysisPlanColumn]):
+    def _make_columns(self):
         return "\n".join(
             make_column_config_block(
                 name=name,
@@ -78,14 +78,15 @@ class _CodeGenerator(ABC):
                 upper_bound=col.upper_bound,
                 bin_count=col.bin_count,
             )
-            for name, col in columns.items()
+            for name, col in self.columns.items()
         )
 
-    def _make_queries(self, column_names: Iterable[str]):
+    def _make_queries(self):
         confidence_note = (
             "The actual value is within the shown range "
             f"with {int(confidence * 100)}% confidence."
         )
+        column_names = self.columns.keys()
         return f"confidence = {confidence} # {confidence_note}\n\n" + "\n".join(
             _make_query(column_name) for column_name in column_names
         )
