@@ -144,6 +144,7 @@ class NotebookGenerator(_CodeGenerator):
             Template("reports")
             .fill_expressions(
                 OUTPUTS=outputs_expression,
+                COLUMNS={k: v._asdict() for k, v in self.columns.items()},
             )
             .fill_values(
                 CSV_PATH=self.csv_path,

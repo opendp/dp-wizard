@@ -38,6 +38,7 @@ report = {
     "inputs": {
         "data": CSV_PATH,
         "epsilon": EPSILON,
+        "columns": COLUMNS,
     },
     "outputs": OUTPUTS,
 }
