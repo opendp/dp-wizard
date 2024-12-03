@@ -18,6 +18,7 @@ dependencies = [
     "jupyter-client",
     "nbconvert",
     "ipykernel",
+    "pyyaml",
 ]
 
 [project.scripts]

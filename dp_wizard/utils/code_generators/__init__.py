@@ -33,13 +33,17 @@ class _CodeGenerator(ABC):
     @abstractmethod
     def _make_context(self) -> str: ...  # pragma: no cover
 
+    def _make_extra_blocks(self):
+        return {}
+
     def make_py(self):
         return str(
             Template(self.root_template).fill_blocks(
                 IMPORTS_BLOCK=_make_imports(),
-                COLUMNS_BLOCK=self._make_columns(self.columns),
+                COLUMNS_BLOCK=self._make_columns(),
                 CONTEXT_BLOCK=self._make_context(),
-                QUERIES_BLOCK=self._make_queries(self.columns.keys()),
+                QUERIES_BLOCK=self._make_queries(),
+                **self._make_extra_blocks(),
             )
         )
 
@@ -66,7 +70,7 @@ class _CodeGenerator(ABC):
         margins_dict = "{" + "".join(margins) + "\n    }"
         return margins_dict
 
-    def _make_columns(self, columns: dict[str, AnalysisPlanColumn]):
+    def _make_columns(self):
         return "\n".join(
             make_column_config_block(
                 name=name,
@@ -74,14 +78,15 @@ class _CodeGenerator(ABC):
                 upper_bound=col.upper_bound,
                 bin_count=col.bin_count,
             )
-            for name, col in columns.items()
+            for name, col in self.columns.items()
         )
 
-    def _make_queries(self, column_names: Iterable[str]):
+    def _make_queries(self):
         confidence_note = (
             "The actual value is within the shown range "
             f"with {int(confidence * 100)}% confidence."
         )
+        column_names = self.columns.keys()
         return f"confidence = {confidence} # {confidence_note}\n\n" + "\n".join(
             _make_query(column_name) for column_name in column_names
         )
@@ -114,6 +119,41 @@ class NotebookGenerator(_CodeGenerator):
 
     def _make_context(self):
         return str(self._make_partial_context().fill_values(CSV_PATH=self.csv_path))
+
+    def _make_extra_blocks(self):
+        outputs_expression = (
+            "{"
+            + ",".join(
+                str(
+                    Template("report_kv")
+                    .fill_values(
+                        NAME=name,
+                        CONFIDENCE=confidence,
+                    )
+                    .fill_expressions(
+                        IDENTIFIER_HISTOGRAM=f"{name_to_identifier(name)}_histogram",
+                        IDENTIFIER_ACCURACY=f"{name_to_identifier(name)}_accuracy",
+                    )
+                )
+                for name in self.columns.keys()
+            )
+            + "}"
+        )
+        tmp_path = Path(__file__).parent.parent.parent / "tmp"
+        reports_block = str(
+            Template("reports")
+            .fill_expressions(
+                OUTPUTS=outputs_expression,
+                COLUMNS={k: v._asdict() for k, v in self.columns.items()},
+            )
+            .fill_values(
+                CSV_PATH=self.csv_path,
+                EPSILON=self.epsilon,
+                TXT_REPORT_PATH=str(tmp_path / "report.txt"),
+                CSV_REPORT_PATH=str(tmp_path / "report.csv"),
+            )
+        )
+        return {"REPORTS_BLOCK": reports_block}
 
 
 class ScriptGenerator(_CodeGenerator):
