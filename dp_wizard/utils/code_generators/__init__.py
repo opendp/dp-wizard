@@ -146,6 +146,7 @@ class NotebookGenerator(_CodeGenerator):
             )
             .fill_values(
                 CSV_PATH=self.csv_path,
+                EPSILON=self.epsilon,
                 TXT_REPORT_PATH=str(tmp_path / "report.txt"),
                 CSV_REPORT_PATH=str(tmp_path / "report.csv"),
             )

@@ -37,6 +37,7 @@ def flatten_dict(dictionary, parent_key=""):
 report = {
     "inputs": {
         "data": CSV_PATH,
+        "epsilon": EPSILON,
     },
     "outputs": OUTPUTS,
 }
