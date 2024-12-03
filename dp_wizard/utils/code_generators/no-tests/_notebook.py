@@ -32,3 +32,10 @@ CONTEXT_BLOCK
 # Finally, we run the queries and plot the results.
 
 QUERIES_BLOCK
+# -
+
+# The code below produces a summary report.
+
+# +
+REPORTS_BLOCK
+# -

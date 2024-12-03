@@ -9,43 +9,67 @@ from dp_wizard.utils.csv_helper import read_csv_ids_labels, read_csv_ids_names
 from dp_wizard.utils.dp_helper import confidence
 from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip
 from dp_wizard.utils.code_generators import make_privacy_loss_block
-from dp_wizard.app.components.column_module import col_widths
 
 
 def analysis_ui():
     return ui.nav_panel(
         "Define Analysis",
-        ui.markdown(
-            "Select numeric columns of interest, "
-            "and for each numeric column indicate the expected range, "
-            "the number of bins for the histogram, "
-            "and its relative share of the privacy budget."
-        ),
-        ui.input_checkbox_group(
-            "columns_checkbox_group",
-            ["Columns", ui.output_ui("columns_checkbox_group_tooltip_ui")],
-            [],
+        ui.layout_columns(
+            ui.card(
+                ui.card_header("Columns"),
+                ui.markdown(
+                    "Select numeric columns of interest, "
+                    "and for each numeric column indicate the expected range, "
+                    "the number of bins for the histogram, "
+                    "and its relative share of the privacy budget."
+                ),
+                ui.input_checkbox_group(
+                    "columns_checkbox_group",
+                    ["Columns", ui.output_ui("columns_checkbox_group_tooltip_ui")],
+                    [],
+                ),
+            ),
+            ui.card(
+                ui.card_header("Privacy Budget"),
+                ui.markdown(
+                    "What is your privacy budget for this release? "
+                    "Values above 1 will add less noise to the data, "
+                    "but have a greater risk of revealing individual data."
+                ),
+                ui.output_ui("epsilon_tooltip_ui"),
+                log_slider("log_epsilon_slider", 0.1, 10.0),
+                ui.output_text("epsilon_text"),
+                output_code_sample("Privacy Loss", "privacy_loss_python"),
+            ),
+            ui.card(
+                ui.card_header("Simulation"),
+                ui.markdown(
+                    f"""
+                    This simulation will assume a normal distribution
+                    between the specified lower and upper bounds.
+                    Until you make a release, your CSV will not be
+                    read except to determine the columns.
+
+                    The actual value is within the error bar
+                    with {int(confidence * 100)}% confidence.
+                    """
+                ),
+                ui.markdown(
+                    """
+                    What is the approximate number of rows in the dataset?
+                    This number is only used for the simulation
+                    and not the final calculation.
+                    """
+                ),
+                ui.input_select(
+                    "row_count",
+                    "Estimated Rows",
+                    choices=["100", "1000", "10000"],
+                    selected="100",
+                ),
+            ),
         ),
         ui.output_ui("columns_ui"),
-        ui.markdown(
-            "What is the approximate number of rows in the dataset? "
-            "This number is only used for the simulation and not the final calculation."
-        ),
-        ui.input_select(
-            "row_count",
-            "Estimated Rows",
-            choices=["100", "1000", "10000"],
-            selected="100",
-        ),
-        ui.markdown(
-            "What is your privacy budget for this release? "
-            "Values above 1 will add less noise to the data, "
-            "but have a greater risk of revealing individual data."
-        ),
-        ui.output_ui("epsilon_tooltip_ui"),
-        log_slider("log_epsilon_slider", 0.1, 10.0),
-        ui.output_text("epsilon_text"),
-        output_code_sample("Privacy Loss", "privacy_loss_python"),
         ui.output_ui("download_results_button_ui"),
         value="analysis_panel",
     )
@@ -111,7 +135,6 @@ def analysis_server(
     def columns_ui():
         column_ids = input.columns_checkbox_group()
         column_ids_to_names = csv_ids_names_calc()
-        column_ids_to_labels = csv_ids_labels_calc()
         for column_id in column_ids:
             column_server(
                 column_id,
@@ -126,34 +149,7 @@ def analysis_server(
                 is_demo=is_demo,
                 is_single_column=len(column_ids) == 1,
             )
-        confidence_percent = f"{int(confidence * 100)}%"
-        note_md = f"""
-        This simulation assumes a normal distribution between the specified
-        lower and upper bounds. Your CSV has not been read except to
-        determine the columns.
-
-        The confidence interval is {confidence_percent}.
-        """
-        return [
-            [
-                [
-                    ui.h3(column_ids_to_labels[column_id]),
-                    column_ui(column_id),
-                ]
-                for column_id in column_ids
-            ],
-            [
-                (
-                    ui.layout_columns(
-                        [],
-                        ui.markdown(note_md),
-                        col_widths=col_widths,  # type: ignore
-                    )
-                    if column_ids
-                    else []
-                )
-            ],
-        ]
+        return [column_ui(column_id) for column_id in column_ids]
 
     @reactive.calc
     def csv_ids_names_calc():

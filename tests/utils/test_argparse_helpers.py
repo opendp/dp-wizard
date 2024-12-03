@@ -22,8 +22,13 @@ def test_help():
     )
     print(help)
 
-    readme_md = (Path(__file__).parent.parent.parent / "README.md").read_text()
+    root_path = Path(__file__).parent.parent.parent
+
+    readme_md = (root_path / "README.md").read_text()
     assert help in readme_md
+
+    readme_pypi_md = (root_path / "README-PYPI.md").read_text()
+    assert help in readme_pypi_md
 
 
 def test_arg_validation_no_file():

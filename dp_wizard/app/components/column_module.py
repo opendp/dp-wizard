@@ -10,39 +10,46 @@ from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip, h
 
 default_weight = "2"
 label_width = "10em"  # Just wide enough so the text isn't trucated.
-col_widths = {
-    # Controls stay roughly a constant width;
-    # Graph expands to fill space.
-    "sm": [4, 8],
-    "md": [3, 9],
-    "lg": [2, 10],
-}
 
 
 @module.ui
 def column_ui():  # pragma: no cover
-    return ui.layout_columns(
-        [
-            # The initial values on these inputs
-            # should be overridden by the reactive.effect.
-            ui.input_numeric(
-                "lower",
-                ["Lower", ui.output_ui("bounds_tooltip_ui")],
-                0,
-                width=label_width,
-            ),
-            ui.input_numeric("upper", "Upper", 0, width=label_width),
-            ui.input_numeric(
-                "bins", ["Bins", ui.output_ui("bins_tooltip_ui")], 0, width=label_width
-            ),
-            ui.output_ui("optional_weight_ui"),
-        ],
-        [
-            ui.output_plot("column_plot", height="300px"),
-            # Make plot smaller than default: about the same size as the other column.
-            output_code_sample("Column Definition", "column_code"),
-        ],
-        col_widths=col_widths,  # type: ignore
+    col_widths = {
+        # Controls stay roughly a constant width;
+        # Graph expands to fill space.
+        "sm": [4, 8],
+        "md": [3, 9],
+        "lg": [2, 10],
+    }
+    return ui.card(
+        ui.card_header(ui.output_text("card_header")),
+        ui.layout_columns(
+            [
+                # The initial values on these inputs
+                # should be overridden by the reactive.effect.
+                ui.input_numeric(
+                    "lower",
+                    ["Lower", ui.output_ui("bounds_tooltip_ui")],
+                    0,
+                    width=label_width,
+                ),
+                ui.input_numeric("upper", "Upper", 0, width=label_width),
+                ui.input_numeric(
+                    "bins",
+                    ["Bins", ui.output_ui("bins_tooltip_ui")],
+                    0,
+                    width=label_width,
+                ),
+                ui.output_ui("optional_weight_ui"),
+            ],
+            [
+                ui.output_plot("column_plot", height="300px"),
+                # Make plot smaller than default:
+                # about the same size as the other column.
+                output_code_sample("Column Definition", "column_code"),
+            ],
+            col_widths=col_widths,  # type: ignore
+        ),
     )
 
 
@@ -89,6 +96,10 @@ def column_server(
     @reactive.event(input.weight)
     def _set_weight():
         weights.set({**weights(), name: input.weight()})
+
+    @render.text
+    def card_header():
+        return name
 
     @render.ui
     def bounds_tooltip_ui():
