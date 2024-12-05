@@ -5,6 +5,15 @@ from playwright.sync_api import Page, expect
 from shiny.pytest import create_app_fixture
 
 
+bp = "BREAKPOINT()".lower()
+if bp in Path(__file__).read_text():
+    raise Exception(  # pragma: no cover
+        f"Instead of `{bp}`, use `page.pause()` in playwright tests. "
+        "See https://playwright.dev/python/docs/debug"
+        "#run-a-test-from-a-specific-breakpoint"
+    )
+
+
 demo_app = create_app_fixture(Path(__file__).parent / "fixtures/demo_app.py")
 default_app = create_app_fixture(Path(__file__).parent / "fixtures/default_app.py")
 tooltip = "#choose_csv_demo_tooltip_ui svg"
