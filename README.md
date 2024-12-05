@@ -45,7 +45,7 @@ $ playwright install
 
 Now install the application itself and run it:
 ```shell
-$ pip install --editable .
+$ flit install --symlink
 $ dp-wizard
 ```
 Your browser should open and connect you to the application.
