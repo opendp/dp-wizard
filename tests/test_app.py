@@ -7,7 +7,7 @@ from shiny.pytest import create_app_fixture
 
 bp = "BREAKPOINT()".lower()
 if bp in Path(__file__).read_text():
-    raise Exception(
+    raise Exception(  # pragma: no cover
         f"Instead of `{bp}`, use `page.pause()` in playwright tests. "
         "See https://playwright.dev/python/docs/debug"
         "#run-a-test-from-a-specific-breakpoint"
