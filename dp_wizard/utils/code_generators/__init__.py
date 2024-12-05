@@ -100,15 +100,6 @@ class _CodeGenerator(ABC):
             )
         )
 
-    # def _make_queries(self):
-    #     confidence_note = (
-    #         "The actual value is within the shown range "
-    #         f"with {int(confidence * 100)}% confidence."
-    #     )
-    #     column_names = self.columns.keys()
-    #     return f"confidence = {confidence} # {confidence_note}\n\n" + "\n".join(
-    #         _make_query(column_name) for column_name in column_names
-
     def _make_query(self, column_name):
         indentifier = name_to_identifier(column_name)
         title = f"DP counts for {column_name}"
