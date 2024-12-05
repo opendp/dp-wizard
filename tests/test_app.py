@@ -9,7 +9,8 @@ bp = "BREAKPOINT()".lower()
 if bp in Path(__file__).read_text():
     raise Exception(
         f"Instead of `{bp}`, use `page.pause()` in playwright tests. "
-        "See https://playwright.dev/python/docs/debug#run-a-test-from-a-specific-breakpoint"
+        "See https://playwright.dev/python/docs/debug"
+        "#run-a-test-from-a-specific-breakpoint"
     )
 
 
