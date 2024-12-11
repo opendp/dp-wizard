@@ -310,6 +310,6 @@ def _snake_case(name: str):
 
 def _make_imports():
     return (
-        Template("imports").fill_values().finish()
+        Template("imports").finish()
         + (Path(__file__).parent.parent / "shared.py").read_text()
     )

@@ -1,16 +1,14 @@
 # DP Wizard
 
-**Under Construction**
+[![pypi](https://img.shields.io/pypi/v/dp_wizard)](https://pypi.org/project/dp_wizard/)
 
-Building on what we've learned from [DP Creator](https://github.com/opendp/dpcreator), DP Wizard will offer:
+Building on what we've learned from [DP Creator](https://github.com/opendp/dpcreator), DP Wizard offers:
 
-- Easy installation with `pip install`
+- Easy installation with `pip install dp_wizard`
 - Simplified single-user application design
 - Streamlined workflow that doesn't assume familiarity with differential privacy
 - Interactive visualization of privacy budget choices
 - UI development in Python with [Shiny](https://shiny.posit.co/py/)
-
-We plan to implement a [proof of concept](https://docs.google.com/document/d/1dteip598-jYj6KFuoYRyrZDPUuwDl9fHgxARiSieVGw/edit) over a couple months, and then get feedback from users before deciding on next steps.
 
 ## Usage
 
