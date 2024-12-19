@@ -31,7 +31,7 @@ def make_accuracy_histogram(
     ... )
     >>> accuracy
     3.37...
-    >>> histogram
+    >>> histogram.sort("bin")
     shape: (5, 2)
     ┌─────────┬─────┐
     │ bin     ┆ len │
@@ -81,7 +81,5 @@ def make_accuracy_histogram(
     query = context.query().group_by("bin").agg(pl.len().dp.noise())  # type: ignore
 
     accuracy = query.summarize(alpha=1 - confidence)["accuracy"].item()  # type: ignore
-    # The sort is alphabetical. df_to_columns needs to be used
-    # downstream to parse interval and sort by numeric value.
-    histogram = query.release().collect().sort("bin")
+    histogram = query.release().collect()
     return (accuracy, histogram)
