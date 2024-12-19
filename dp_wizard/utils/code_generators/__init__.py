@@ -42,6 +42,7 @@ class _CodeGenerator(ABC):
     def make_py(self):
         code = (
             Template(self.root_template)
+            .fill_expressions(DEPENDENCIES="'opendp[polars]' matplotlib pyyaml")
             .fill_blocks(
                 IMPORTS_BLOCK=_make_imports(),
                 COLUMNS_BLOCK=self._make_columns(),

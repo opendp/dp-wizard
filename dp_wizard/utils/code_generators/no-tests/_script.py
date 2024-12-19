@@ -1,7 +1,7 @@
-from argparse import ArgumentParser
-
 # Install the following dependencies, if you haven't already:
-# pip install opendp[polars] matplotlib pyyaml
+# pip install DEPENDENCIES
+
+from argparse import ArgumentParser
 
 IMPORTS_BLOCK
 

@@ -5,8 +5,7 @@
 # First install the required dependencies:
 
 # +
-# Uncomment the following line and install dependencies, if you haven't already.
-# %pip install opendp[polars] matplotlib pyyaml
+# %pip install DEPENDENCIES
 # -
 
 # +
