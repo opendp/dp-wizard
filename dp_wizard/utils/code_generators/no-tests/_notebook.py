@@ -1,6 +1,13 @@
 # This is a demonstration of how OpenDP can be used to create
 # a differentially private release. To learn more about what's
 # going on here, see the documentation for OpenDP: https://docs.opendp.org/
+#
+# First install the required dependencies:
+
+# +
+# Uncomment the following line and install dependencies, if you haven't already.
+# %pip install opendp[polars] matplotlib pyyaml
+# -
 
 # +
 IMPORTS_BLOCK

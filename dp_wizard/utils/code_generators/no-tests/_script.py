@@ -1,5 +1,8 @@
 from argparse import ArgumentParser
 
+# Install the following dependencies, if you haven't already:
+# pip install opendp[polars] matplotlib pyyaml
+
 IMPORTS_BLOCK
 
 COLUMNS_BLOCK
