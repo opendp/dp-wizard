@@ -1,1 +1,2 @@
-privacy_unit = dp.unit_of(contributions=CONTRIBUTIONS)
+contributions = CONTRIBUTIONS
+privacy_unit = dp.unit_of(contributions=contributions)

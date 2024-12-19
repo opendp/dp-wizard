@@ -186,7 +186,10 @@ def column_server(
             weighted_epsilon=epsilon * weight / weights_sum,
         )
         s = "s" if contributions > 1 else ""
-        title = f"Simulated {name}: normal distribution, {contributions} contribution{s} / invidual"
+        title = (
+            f"Simulated {name}: normal distribution, "
+            f"{contributions} contribution{s} / invidual"
+        )
         return plot_histogram(
             histogram,
             error=accuracy,

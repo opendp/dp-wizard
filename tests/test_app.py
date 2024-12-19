@@ -54,7 +54,7 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     expect_not_visible(download_results_text)
     page.get_by_label("Contributions").fill("42")
     page.get_by_text("Code sample: Unit of Privacy").click()
-    expect_visible("dp.unit_of(contributions=42)")
+    expect_visible("contributions = 42")
     expect_no_error()
 
     # Button disabled until upload:
@@ -156,7 +156,7 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
 
     script_download = script_download_info.value
     script = script_download.path().read_text()
-    assert "privacy_unit = dp.unit_of(contributions=42)" in script
+    assert "contributions = 42" in script
 
     # Notebook:
     with page.expect_download() as notebook_download_info:
@@ -165,7 +165,7 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
 
     notebook_download = notebook_download_info.value
     notebook = notebook_download.path().read_text()
-    assert "privacy_unit = dp.unit_of(contributions=42)" in notebook
+    assert "contributions = 42" in notebook
 
     # -- Feedback --
     page.get_by_text("Feedback").click()
