@@ -39,6 +39,7 @@ report = {
         "data": CSV_PATH,
         "epsilon": EPSILON,
         "columns": COLUMNS,
+        "contributions": contributions,
     },
     "outputs": OUTPUTS,
 }
