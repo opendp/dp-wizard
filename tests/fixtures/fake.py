@@ -2,7 +2,7 @@
 
 print(2 + 2)
 
-# # Coda:
+# # Coda
 # Conclusion
 
 print("goodbye!")
