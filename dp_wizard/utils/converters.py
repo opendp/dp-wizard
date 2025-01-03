@@ -42,3 +42,13 @@ def convert_py_to_nb(python_str: str, execute: bool = False):
             result = subprocess.run(argv, check=True, text=True, capture_output=True)
 
         return result.stdout.strip()
+
+
+def strip_nb_coda(nb_json: str):
+    """
+    Given a notebook as a string of JSON, remove the coda cells.
+    (These produce reports that we do need,
+    but the code isn't actually interesting to end users.)
+    """
+    print(nb_json)
+    return nb_json
