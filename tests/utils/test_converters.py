@@ -53,6 +53,12 @@ def test_convert_py_to_nb_execute():
     assert normed_actual_strip_nb_str == normed_expected_strip_nb_str
 
 
+def test_strip_nb_coda():
+    # Trivial test just to get 100% branch coverage.
+    nb = {"cells": []}
+    assert nb == json.loads(strip_nb_coda(json.dumps(nb)))
+
+
 def test_convert_py_to_nb_error():
     python_str = "Invalid python!"
     with pytest.raises(subprocess.CalledProcessError):
