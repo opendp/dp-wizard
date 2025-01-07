@@ -43,7 +43,7 @@ def analysis_ui():
             ui.card(
                 ui.card_header("Simulation"),
                 ui.markdown(
-                    f"""
+                    """
                     This simulation will assume a normal distribution
                     between the specified lower and upper bounds.
                     Until you make a release, your CSV will not be

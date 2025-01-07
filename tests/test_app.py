@@ -114,6 +114,10 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     page.get_by_label("grade").check()
     expect_visible(simulation)
     assert page.get_by_label("Upper").input_value() == new_value
+    expect_visible("The 95% confidence interval is ±794")
+    page.get_by_text("Data Table").click()
+    expect_visible("(0, 2]")
+
     # Add a second column:
     # page.get_by_label("blank").check()
     # TODO: Test is flaky?
