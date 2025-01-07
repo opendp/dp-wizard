@@ -189,11 +189,13 @@ def column_server(
 
         return [
             ui.output_plot("column_plot", height="300px"),
-            ui.output_data_frame("data_frame"),
-            ui.markdown(
-                f"The {confidence:.0%} confidence interval is ±{accuracy:.3g}."
+            ui.layout_columns(
+                ui.markdown(
+                    f"The {confidence:.0%} confidence interval is ±{accuracy:.3g}."
+                ),
+                ui.output_data_frame("data_frame"),
+                output_code_sample("Column Definition", "column_code"),
             ),
-            output_code_sample("Column Definition", "column_code"),
         ]
 
     @render.data_frame
