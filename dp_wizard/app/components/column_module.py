@@ -1,5 +1,6 @@
 from logging import info
 
+from htmltools.tags import details, summary
 from shiny import ui, render, module, reactive, Inputs, Outputs, Session
 from shiny.types import SilentException
 
@@ -186,14 +187,16 @@ def column_server(
     @render.ui
     def column_plot_ui():
         accuracy, histogram = accuracy_histogram()
-
         return [
             ui.output_plot("column_plot", height="300px"),
             ui.layout_columns(
                 ui.markdown(
                     f"The {confidence:.0%} confidence interval is ±{accuracy:.3g}."
                 ),
-                ui.output_data_frame("data_frame"),
+                details(
+                    summary("Data Table"),
+                    ui.output_data_frame("data_frame"),
+                ),
                 output_code_sample("Column Definition", "column_code"),
             ),
         ]
