@@ -1,7 +1,6 @@
-from typing import Any
 from logging import info
 
-from shiny import ui, render, module, reactive, Inputs, Outputs, Session, req
+from shiny import ui, render, module, reactive, Inputs, Outputs, Session
 from shiny.types import SilentException
 
 from dp_wizard.utils.dp_helper import make_accuracy_histogram
