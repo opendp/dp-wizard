@@ -1,6 +1,7 @@
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import subprocess
+import json
 
 
 def convert_py_to_nb(python_str: str, execute: bool = False):
@@ -42,3 +43,19 @@ def convert_py_to_nb(python_str: str, execute: bool = False):
             result = subprocess.run(argv, check=True, text=True, capture_output=True)
 
         return result.stdout.strip()
+
+
+def strip_nb_coda(nb_json: str):
+    """
+    Given a notebook as a string of JSON, remove the coda.
+    (These produce reports that we do need,
+    but the code isn't actually interesting to end users.)
+    """
+    nb = json.loads(nb_json)
+    new_cells = []
+    for cell in nb["cells"]:
+        if "# Coda\n" in cell["source"]:
+            break
+        new_cells.append(cell)
+    nb["cells"] = new_cells
+    return json.dumps(nb, indent=1)

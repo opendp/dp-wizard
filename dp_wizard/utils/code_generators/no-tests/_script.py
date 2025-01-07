@@ -1,3 +1,6 @@
+# Install the following dependencies, if you haven't already:
+# pip install DEPENDENCIES
+
 from argparse import ArgumentParser
 
 IMPORTS_BLOCK
@@ -5,9 +8,9 @@ IMPORTS_BLOCK
 COLUMNS_BLOCK
 
 
-def get_context(csv_path):
+def get_context_contributions(csv_path):
     CONTEXT_BLOCK
-    return context
+    return context, contributions
 
 
 if __name__ == "__main__":
@@ -18,6 +21,6 @@ if __name__ == "__main__":
         "--csv", required=True, help="Path to csv containing private data"
     )
     args = parser.parse_args()
-    context = get_context(csv_path=args.csv)
+    context, contributions = get_context_contributions(csv_path=args.csv)
 
     QUERIES_BLOCK

@@ -42,6 +42,7 @@ class _CodeGenerator(ABC):
     def make_py(self):
         code = (
             Template(self.root_template)
+            .fill_expressions(DEPENDENCIES="'opendp[polars]' matplotlib pyyaml")
             .fill_blocks(
                 IMPORTS_BLOCK=_make_imports(),
                 COLUMNS_BLOCK=self._make_columns(),
@@ -102,7 +103,6 @@ class _CodeGenerator(ABC):
 
     def _make_query(self, column_name):
         indentifier = name_to_identifier(column_name)
-        title = f"DP counts for {column_name}"
         accuracy_name = f"{indentifier}_accuracy"
         histogram_name = f"{indentifier}_histogram"
         return (
@@ -117,7 +117,7 @@ class _CodeGenerator(ABC):
             )
             .fill_blocks(
                 OUTPUT_BLOCK=self._make_output(
-                    title=title,
+                    column_name=column_name,
                     accuracy_name=accuracy_name,
                     histogram_name=histogram_name,
                 )
@@ -125,11 +125,11 @@ class _CodeGenerator(ABC):
             .finish()
         )
 
-    def _make_output(self, title: str, accuracy_name: str, histogram_name: str):
+    def _make_output(self, column_name: str, accuracy_name: str, histogram_name: str):
         return (
             Template(f"{self.root_template}_output")
             .fill_values(
-                TITLE=title,
+                COLUMN_NAME=column_name,
             )
             .fill_expressions(
                 ACCURACY_NAME=accuracy_name,

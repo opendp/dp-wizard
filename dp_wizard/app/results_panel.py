@@ -10,7 +10,7 @@ from dp_wizard.utils.code_generators import (
     AnalysisPlan,
     AnalysisPlanColumn,
 )
-from dp_wizard.utils.converters import convert_py_to_nb
+from dp_wizard.utils.converters import convert_py_to_nb, strip_nb_coda
 
 
 wait_message = "Please wait."
@@ -90,7 +90,8 @@ def results_server(
         # Could be slow!
         # Luckily, reactive calcs are lazy.
         notebook_py = NotebookGenerator(analysis_plan()).make_py()
-        return convert_py_to_nb(notebook_py, execute=True)
+        notebook_json = convert_py_to_nb(notebook_py, execute=True)
+        return strip_nb_coda(notebook_json)
 
     @render.download(
         filename="dp-wizard-script.py",

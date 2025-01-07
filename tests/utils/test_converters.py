@@ -2,25 +2,27 @@ import re
 from pathlib import Path
 import subprocess
 import pytest
-from dp_wizard.utils.converters import convert_py_to_nb
+import json
+from dp_wizard.utils.converters import convert_py_to_nb, strip_nb_coda
 
 
 fixtures_path = Path(__file__).parent.parent / "fixtures"
 
 
 def norm_nb(nb_str):
-    normed_nb_str = nb_str
-    normed_nb_str = re.sub(r'"id": "[^"]+"', '"id": "12345678"', normed_nb_str)
-    normed_nb_str = re.sub(
+    nb_str = re.sub(r'"id": "[^"]+"', '"id": "12345678"', nb_str)
+    nb_str = re.sub(
         r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z",
         "2024-01-01T00:00:00.000000Z",
-        normed_nb_str,
+        nb_str,
     )
-    # language_info added when saved by VSCode:
-    normed_nb_str = re.sub(r',\s+"language_info": \{[^}]*\}', "", normed_nb_str)
-    # version will be different between dev environment and CI:
-    normed_nb_str = re.sub(r'"version": "[^"]+"', '"version": "3.0.0"', normed_nb_str)
-    return normed_nb_str.strip()
+
+    nb = json.loads(nb_str)
+    nb["metadata"] = {}
+    for cell in nb["cells"]:
+        cell["metadata"] = {}
+
+    return json.dumps(nb, indent=1)
 
 
 def test_convert_py_to_nb():
@@ -41,6 +43,20 @@ def test_convert_py_to_nb_execute():
     normed_actual_nb_str = norm_nb(actual_nb_str)
     normed_expected_nb_str = norm_nb(expected_nb_str)
     assert normed_actual_nb_str == normed_expected_nb_str
+
+    # strip_nb_coda: Easier to extend this test than to make a separate one.
+    actual_strip_nb_str = strip_nb_coda(actual_nb_str)
+    expected_strip_nb_str = (fixtures_path / "fake-stripped.ipynb").read_text()
+
+    normed_actual_strip_nb_str = norm_nb(actual_strip_nb_str)
+    normed_expected_strip_nb_str = norm_nb(expected_strip_nb_str)
+    assert normed_actual_strip_nb_str == normed_expected_strip_nb_str
+
+
+def test_strip_nb_coda():
+    # Trivial test just to get 100% branch coverage.
+    nb = {"cells": []}
+    assert nb == json.loads(strip_nb_coda(json.dumps(nb)))
 
 
 def test_convert_py_to_nb_error():

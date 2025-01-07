@@ -1,6 +1,12 @@
 # This is a demonstration of how OpenDP can be used to create
 # a differentially private release. To learn more about what's
 # going on here, see the documentation for OpenDP: https://docs.opendp.org/
+#
+# First install the required dependencies:
+
+# +
+# %pip install DEPENDENCIES
+# -
 
 # +
 IMPORTS_BLOCK
@@ -33,6 +39,7 @@ CONTEXT_BLOCK
 
 QUERIES_BLOCK
 
+# # Coda
 # The code below produces a summary report.
 
 # +

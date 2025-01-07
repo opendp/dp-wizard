@@ -208,10 +208,14 @@ def column_server(
     @render.plot
     def column_plot():
         accuracy, histogram = accuracy_histogram()
-
+        s = "s" if contributions > 1 else ""
+        title = (
+            f"Simulated {name}: normal distribution, "
+            f"{contributions} contribution{s} / invidual"
+        )
         return plot_histogram(
             histogram,
             error=accuracy,
             cutoff=0,  # TODO
-            title=f"Simulated {name}, assuming normal distribution",
+            title=title,
         )
