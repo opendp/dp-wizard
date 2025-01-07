@@ -6,7 +6,6 @@ from shiny import ui, reactive, render, req, Inputs, Outputs, Session
 from dp_wizard.app.components.inputs import log_slider
 from dp_wizard.app.components.column_module import column_ui, column_server
 from dp_wizard.utils.csv_helper import read_csv_ids_labels, read_csv_ids_names
-from dp_wizard.utils.dp_helper import confidence
 from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip
 from dp_wizard.utils.code_generators import make_privacy_loss_block
 
@@ -50,12 +49,6 @@ def analysis_ui():
                     Until you make a release, your CSV will not be
                     read except to determine the columns.
 
-                    The actual value is within the error bar
-                    with {int(confidence * 100)}% confidence.
-                    """
-                ),
-                ui.markdown(
-                    """
                     What is the approximate number of rows in the dataset?
                     This number is only used for the simulation
                     and not the final calculation.
@@ -96,6 +89,7 @@ def analysis_server(
     upper_bounds: reactive.Value[dict[str, float]],
     bin_counts: reactive.Value[dict[str, int]],
     weights: reactive.Value[dict[str, str]],
+    accuracy_histograms: reactive.Value[dict[str, tuple[float, Any]]],
     epsilon: reactive.Value[float],
 ):  # pragma: no cover
     @reactive.calc
@@ -146,6 +140,7 @@ def analysis_server(
                 upper_bounds=upper_bounds,
                 bin_counts=bin_counts,
                 weights=weights,
+                accuracy_histograms=accuracy_histograms,
                 is_demo=is_demo,
                 is_single_column=len(column_ids) == 1,
             )
