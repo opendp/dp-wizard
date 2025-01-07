@@ -1,14 +1,10 @@
-from logging import info
-
-from htmltools.tags import details, summary
 from shiny import ui, render, module, reactive, Inputs, Outputs, Session
-from shiny.types import SilentException
 
-from dp_wizard.utils.dp_helper import make_accuracy_histogram
-from dp_wizard.utils.shared import plot_histogram
-from dp_wizard.utils.code_generators import make_column_config_block
-from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip, hide_if
-from dp_wizard.utils.dp_helper import confidence
+from dp_wizard.app.components.outputs import demo_tooltip, hide_if
+from dp_wizard.app.components.histogram_preview_module import (
+    histogram_preview_ui,
+    histogram_preview_server,
+)
 
 
 default_weight = "2"
@@ -45,7 +41,7 @@ def column_ui():  # pragma: no cover
                 ),
                 ui.output_ui("optional_weight_ui"),
             ],
-            ui.output_ui("histogram_preview_ui"),
+            histogram_preview_ui("TODO"),
             col_widths=col_widths,  # type: ignore
         ),
     )
@@ -67,6 +63,15 @@ def column_server(
     is_demo: bool,
     is_single_column: bool,
 ):  # pragma: no cover
+    histogram_preview_server(
+        "TODO",
+        name=name,
+        contributions=contributions,
+        epsilon=epsilon,
+        row_count=row_count,
+        weights=weights,
+    )
+
     @reactive.effect
     def _set_all_inputs():
         with reactive.isolate():  # Without isolate, there is an infinite loop.
@@ -94,27 +99,6 @@ def column_server(
     @reactive.event(input.weight)
     def _set_weight():
         weights.set({**weights(), name: input.weight()})
-
-    @reactive.calc()
-    def accuracy_histogram():
-        lower_x = float(input.lower())
-        upper_x = float(input.upper())
-        bin_count = int(input.bins())
-        weight = float(input.weight())
-        weights_sum = sum(float(weight) for weight in weights().values())
-        info(f"Weight ratio for {name}: {weight}/{weights_sum}")
-        if weights_sum == 0:
-            # This function is triggered when column is removed;
-            # Exit early to avoid divide-by-zero.
-            raise SilentException("weights_sum == 0")
-        return make_accuracy_histogram(
-            row_count=row_count,
-            lower=lower_x,
-            upper=upper_x,
-            bin_count=bin_count,
-            contributions=contributions,
-            weighted_epsilon=epsilon * weight / weights_sum,
-        )
 
     @render.text
     def card_header():
@@ -173,50 +157,4 @@ def column_server(
             how to allocate it. For simplicity, we limit the options here,
             but when using the library you can fine tune this.
             """,
-        )
-
-    @render.code
-    def column_code():
-        return make_column_config_block(
-            name=name,
-            lower_bound=float(input.lower()),
-            upper_bound=float(input.upper()),
-            bin_count=int(input.bins()),
-        )
-
-    @render.ui
-    def histogram_preview_ui():
-        accuracy, histogram = accuracy_histogram()
-        return [
-            ui.output_plot("histogram_preview_plot", height="300px"),
-            ui.layout_columns(
-                ui.markdown(
-                    f"The {confidence:.0%} confidence interval is ±{accuracy:.3g}."
-                ),
-                details(
-                    summary("Data Table"),
-                    ui.output_data_frame("data_frame"),
-                ),
-                output_code_sample("Column Definition", "column_code"),
-            ),
-        ]
-
-    @render.data_frame
-    def data_frame():
-        accuracy, histogram = accuracy_histogram()
-        return render.DataGrid(histogram)
-
-    @render.plot
-    def histogram_preview_plot():
-        accuracy, histogram = accuracy_histogram()
-        s = "s" if contributions > 1 else ""
-        title = (
-            f"Simulated {name}: normal distribution, "
-            f"{contributions} contribution{s} / invidual"
-        )
-        return plot_histogram(
-            histogram,
-            error=accuracy,
-            cutoff=0,  # TODO
-            title=title,
         )
