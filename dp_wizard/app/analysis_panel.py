@@ -89,7 +89,6 @@ def analysis_server(
     upper_bounds: reactive.Value[dict[str, float]],
     bin_counts: reactive.Value[dict[str, int]],
     weights: reactive.Value[dict[str, str]],
-    accuracy_histograms: reactive.Value[dict[str, tuple[float, Any]]],
     epsilon: reactive.Value[float],
 ):  # pragma: no cover
     @reactive.calc
@@ -140,7 +139,6 @@ def analysis_server(
                 upper_bounds=upper_bounds,
                 bin_counts=bin_counts,
                 weights=weights,
-                accuracy_histograms=accuracy_histograms,
                 is_demo=is_demo,
                 is_single_column=len(column_ids) == 1,
             )

@@ -64,7 +64,6 @@ def column_server(
     upper_bounds: reactive.Value[dict[str, float]],
     bin_counts: reactive.Value[dict[str, int]],
     weights: reactive.Value[dict[str, str]],
-    accuracy_histograms: reactive.Value[dict[str, tuple[float, Any]]],
     is_demo: bool,
     is_single_column: bool,
 ):  # pragma: no cover
@@ -96,12 +95,8 @@ def column_server(
     def _set_weight():
         weights.set({**weights(), name: input.weight()})
 
-    @reactive.effect()
-    @reactive.event(input.lower)
-    @reactive.event(input.upper)
-    @reactive.event(input.bins)
-    @reactive.event(input.weight)
-    def _set_accuracy_histogram():
+    @reactive.calc()
+    def accuracy_histogram():
         lower_x = float(input.lower())
         upper_x = float(input.upper())
         bin_count = int(input.bins())
@@ -112,7 +107,7 @@ def column_server(
             # This function is triggered when column is removed;
             # Exit early to avoid divide-by-zero.
             return None
-        accuracy, histogram = make_accuracy_histogram(
+        return make_accuracy_histogram(
             row_count=row_count,
             lower=lower_x,
             upper=upper_x,
@@ -120,7 +115,6 @@ def column_server(
             contributions=contributions,
             weighted_epsilon=epsilon * weight / weights_sum,
         )
-        accuracy_histograms.set({**accuracy_histograms(), name: (accuracy, histogram)})
 
     @render.text
     def card_header():
@@ -192,7 +186,7 @@ def column_server(
 
     @render.ui()
     def column_plot_ui():
-        accuracy, histogram = accuracy_histograms().get(name, (0, None))
+        accuracy, histogram = accuracy_histogram()
 
         return [
             ui.output_plot("column_plot", height="300px"),
@@ -209,10 +203,7 @@ def column_server(
 
     @render.plot()
     def column_plot():
-        try:
-            accuracy, histogram = accuracy_histograms()[name]
-        except KeyError:
-            raise SilentException()
+        accuracy, histogram = accuracy_histogram()
 
         return plot_histogram(
             histogram,

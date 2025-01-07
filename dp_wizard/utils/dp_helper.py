@@ -19,7 +19,7 @@ def make_accuracy_histogram(
     bin_count: int,
     contributions: int,
     weighted_epsilon: float,
-) -> tuple[float, Any]:
+) -> tuple[float, Any]:  # TODO: Dataframe type!
     """
     Creates fake data between lower and upper, and then returns a DP histogram from it.
     >>> accuracy, histogram = make_accuracy_histogram(

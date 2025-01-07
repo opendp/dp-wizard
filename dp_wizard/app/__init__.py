@@ -36,7 +36,6 @@ def make_server_from_cli_info(cli_info: CLIInfo):
         upper_bounds = reactive.value({})
         bin_counts = reactive.value({})
         weights = reactive.value({})
-        accuracy_histograms = reactive.value({})
         epsilon = reactive.value(1.0)
 
         dataset_panel.dataset_server(
@@ -58,7 +57,6 @@ def make_server_from_cli_info(cli_info: CLIInfo):
             upper_bounds=upper_bounds,
             bin_counts=bin_counts,
             weights=weights,
-            accuracy_histograms=accuracy_histograms,
             epsilon=epsilon,
         )
         results_panel.results_server(
