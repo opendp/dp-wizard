@@ -192,10 +192,7 @@ def column_server(
             ui.output_plot("column_plot", height="300px"),
             ui.output_data_frame("data_frame"),
             ui.markdown(
-                f"""
-                The {confidence:.0%} confidence interval is
-                ±{accuracy:.3g}.
-                """
+                f"The {confidence:.0%} confidence interval is ±{accuracy:.3g}."
             ),
             output_code_sample("Column Definition", "column_code"),
         ]
