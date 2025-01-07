@@ -45,7 +45,7 @@ def column_ui():  # pragma: no cover
                 ),
                 ui.output_ui("optional_weight_ui"),
             ],
-            ui.output_ui("column_plot_ui"),
+            ui.output_ui("histogram_preview_ui"),
             col_widths=col_widths,  # type: ignore
         ),
     )
@@ -185,10 +185,10 @@ def column_server(
         )
 
     @render.ui
-    def column_plot_ui():
+    def histogram_preview_ui():
         accuracy, histogram = accuracy_histogram()
         return [
-            ui.output_plot("column_plot", height="300px"),
+            ui.output_plot("histogram_preview_plot", height="300px"),
             ui.layout_columns(
                 ui.markdown(
                     f"The {confidence:.0%} confidence interval is ±{accuracy:.3g}."
@@ -207,7 +207,7 @@ def column_server(
         return render.DataGrid(histogram)
 
     @render.plot
-    def column_plot():
+    def histogram_preview_plot():
         accuracy, histogram = accuracy_histogram()
         s = "s" if contributions > 1 else ""
         title = (
