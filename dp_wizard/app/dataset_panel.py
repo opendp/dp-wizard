@@ -3,7 +3,7 @@ from pathlib import Path
 from shiny import ui, reactive, render, Inputs, Outputs, Session
 
 from dp_wizard.utils.argparse_helpers import get_cli_info
-from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip
+from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip, info_box
 from dp_wizard.utils.code_generators import make_privacy_unit_block
 
 
@@ -25,11 +25,14 @@ def dataset_ui():
             "How many rows of the CSV can one individual contribute to? "
             'This is the "unit of privacy" which will be protected.'
         ),
-        ui.input_numeric(
-            "contributions",
-            ["Contributions", ui.output_ui("contributions_demo_tooltip_ui")],
-            cli_info.contributions,
-            min=1,
+        ui.row(
+            ui.input_numeric(
+                "contributions",
+                ["Contributions", ui.output_ui("contributions_demo_tooltip_ui")],
+                cli_info.contributions,
+                min=1,
+            ),
+            ui.output_ui("contributions_validation_ui"),
         ),
         ui.output_ui("python_tooltip_ui"),
         output_code_sample("Unit of Privacy", "unit_of_privacy_python"),
@@ -79,6 +82,10 @@ def dataset_server(
             "For the demo, we assume that each student "
             f"can occur at most {contributions()} times in the dataset. ",
         )
+
+    @render.ui
+    def contributions_validation_ui():
+        return info_box(ui.markdown("TODO: conditional warning here."))
 
     @render.ui
     def python_tooltip_ui():
