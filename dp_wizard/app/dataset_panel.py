@@ -88,11 +88,15 @@ def dataset_server(
             f"can occur at most {contributions()} times in the dataset. ",
         )
 
+    @reactive.calc
+    def contributions_valid():
+        contributions = input.contributions()
+        return isinstance(contributions, int) and contributions >= 1
+
     @render.ui
     def contributions_validation_ui():
-        contributions = input.contributions()
         return hide_if(
-            isinstance(contributions, int) and contributions >= 1,
+            contributions_valid(),
             info_box(ui.markdown("Contributions must be 1 or greater.")),
         )
 
@@ -111,7 +115,7 @@ def dataset_server(
         button = ui.input_action_button(
             "go_to_analysis", "Define analysis", disabled=not button_enabled()
         )
-        if button_enabled():
+        if button_enabled() and contributions_valid():
             return button
         return [
             button,
