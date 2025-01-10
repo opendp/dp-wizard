@@ -64,6 +64,18 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     # Now upload:
     csv_path = Path(__file__).parent / "fixtures" / "fake.csv"
     page.get_by_label("Choose CSV file").set_input_files(csv_path.resolve())
+
+    # Check validation of contributions:
+    # Playwright itself won't let us fill non-numbers in this field.
+    # "assert define_analysis_button.is_enabled()" has spurious errors.
+    page.get_by_label("Contributions").fill("0")
+    expect_visible("Contributions must be 1 or greater")
+    expect_visible("Choose CSV and Contributions before proceeding")
+
+    page.get_by_label("Contributions").fill("42")
+    expect_not_visible("Contributions must be 1 or greater")
+    expect_not_visible("Choose CSV and Contributions before proceeding")
+
     expect_no_error()
 
     # -- Define analysis --
