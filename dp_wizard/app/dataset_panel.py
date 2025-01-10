@@ -3,7 +3,12 @@ from pathlib import Path
 from shiny import ui, reactive, render, Inputs, Outputs, Session
 
 from dp_wizard.utils.argparse_helpers import get_cli_info
-from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip, info_box
+from dp_wizard.app.components.outputs import (
+    output_code_sample,
+    demo_tooltip,
+    info_box,
+    hide_if,
+)
 from dp_wizard.utils.code_generators import make_privacy_unit_block
 
 
@@ -85,7 +90,11 @@ def dataset_server(
 
     @render.ui
     def contributions_validation_ui():
-        return info_box(ui.markdown("TODO: conditional warning here."))
+        contributions = input.contributions()
+        return hide_if(
+            isinstance(contributions, int) and contributions >= 1,
+            info_box(ui.markdown("Contributions must be 1 or greater.")),
+        )
 
     @render.ui
     def python_tooltip_ui():
