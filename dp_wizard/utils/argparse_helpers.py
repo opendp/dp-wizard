@@ -19,7 +19,8 @@ def _existing_csv_type(arg: str) -> Path:
 def _get_arg_parser():
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        description="DP Wizard makes it easier to get started with Differential Privacy.",
+        description="DP Wizard makes it easier to get started with "
+        "Differential Privacy.",
         epilog="""
 Use "--public_csv" if you have a public data set, and are curious how
 DP can be applied: The preview visualizations will use your public data.
@@ -98,25 +99,9 @@ class CLIInfo(NamedTuple):
     is_demo: bool
 
 
-def _get_demo_cli_info() -> CLIInfo:
-    """
-    >>> cli_info = _get_demo_cli_info()
-    >>> with open(cli_info.private_csv_path, newline="") as csv_handle:
-    ...     reader = csv.DictReader(csv_handle)
-    ...     reader.fieldnames
-    ...     rows = list(reader)
-    ...     rows[0]
-    ...     rows[-1]
-    ['student_id', 'class_year', 'hw_number', 'grade']
-    {'student_id': '1', 'class_year': '2', 'hw_number': '1', 'grade': '73'}
-    {'student_id': '100', 'class_year': '1', 'hw_number': '10', 'grade': '78'}
-    """
+def _make_fake_data(path: Path, contributions):
     random.seed(0)  # So the mock data will be stable across runs.
-
-    private_csv_path = Path(__file__).parent.parent / "tmp" / "demo.csv"
-    contributions = 10
-
-    with private_csv_path.open("w", newline="") as demo_handle:
+    with path.open("w", newline="") as demo_handle:
         fields = ["student_id", "class_year", "hw_number", "grade"]
         writer = csv.DictWriter(demo_handle, fieldnames=fields)
         writer.writeheader()
@@ -134,6 +119,24 @@ def _get_demo_cli_info() -> CLIInfo:
                         "grade": grade,
                     }
                 )
+
+
+def _get_demo_cli_info() -> CLIInfo:
+    """
+    >>> cli_info = _get_demo_cli_info()
+    >>> with open(cli_info.private_csv_path, newline="") as csv_handle:
+    ...     reader = csv.DictReader(csv_handle)
+    ...     reader.fieldnames
+    ...     rows = list(reader)
+    ...     rows[0]
+    ...     rows[-1]
+    ['student_id', 'class_year', 'hw_number', 'grade']
+    {'student_id': '1', 'class_year': '2', 'hw_number': '1', 'grade': '73'}
+    {'student_id': '100', 'class_year': '1', 'hw_number': '10', 'grade': '78'}
+    """
+    private_csv_path = Path(__file__).parent.parent / "tmp" / "demo.csv"
+    contributions = 10
+    _make_fake_data(private_csv_path, contributions)
 
     return CLIInfo(
         public_csv_path=None,
