@@ -21,6 +21,11 @@ def extract_block(md):
     ... """
     >>> extract_block(fake_md)
     'block'
+
+    >>> extract_block('sorry')
+    Traceback (most recent call last):
+    ...
+    Exception: no match for block
     '''
     match = re.search(r"```\n(.*?)\n```", md, flags=re.DOTALL)
     if match:
