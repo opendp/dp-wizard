@@ -19,10 +19,18 @@ def _existing_csv_type(arg: str) -> Path:
 def _get_arg_parser():
     parser = ArgumentParser(description=__doc__)
     parser.add_argument(
-        "--csv",
-        dest="csv_path",
+        "--public_csv",
+        dest="public_csv_path",
         type=_existing_csv_type,
-        help="Path to CSV containing private data",
+        help="Path to public CSV to be used for previews",
+    )
+    parser.add_argument(
+        "--private_csv",
+        dest="private_csv_path",
+        type=_existing_csv_type,
+        help="Path to private CSV: Apart from the headers, "
+        "will not be read until analysis is defined, "
+        "and the differentially private release is made.",
     )
     parser.add_argument(
         "--contrib",
@@ -41,7 +49,7 @@ def _get_arg_parser():
 def _get_args():
     """
     >>> _get_args()
-    Namespace(csv_path=None, contributions=1, demo=False)
+    Namespace(public_csv_path=None, private_csv_path=None, contributions=1, demo=False)
     """
     arg_parser = _get_arg_parser()
 
@@ -67,15 +75,16 @@ def _clip(n: float, lower: float, upper: float) -> float:
 
 
 class CLIInfo(NamedTuple):
-    csv_path: Optional[str]
+    public_csv_path: Optional[str]
+    private_csv_path: Optional[str]
     contributions: int
     is_demo: bool
 
 
-def _get_demo_csv_contrib() -> CLIInfo:
+def _get_demo_cli_info() -> CLIInfo:
     """
-    >>> csv_path, contributions, is_demo = _get_demo_csv_contrib()
-    >>> with open(csv_path, newline="") as csv_handle:
+    >>> cli_info = _get_demo_cli_info()
+    >>> with open(cli_info.private_csv_path, newline="") as csv_handle:
     ...     reader = csv.DictReader(csv_handle)
     ...     reader.fieldnames
     ...     rows = list(reader)
@@ -87,10 +96,10 @@ def _get_demo_csv_contrib() -> CLIInfo:
     """
     random.seed(0)  # So the mock data will be stable across runs.
 
-    csv_path = Path(__file__).parent.parent / "tmp" / "demo.csv"
+    private_csv_path = Path(__file__).parent.parent / "tmp" / "demo.csv"
     contributions = 10
 
-    with csv_path.open("w", newline="") as demo_handle:
+    with private_csv_path.open("w", newline="") as demo_handle:
         fields = ["student_id", "class_year", "hw_number", "grade"]
         writer = csv.DictWriter(demo_handle, fieldnames=fields)
         writer.writeheader()
@@ -109,15 +118,23 @@ def _get_demo_csv_contrib() -> CLIInfo:
                     }
                 )
 
-    return CLIInfo(csv_path=str(csv_path), contributions=contributions, is_demo=True)
+    return CLIInfo(
+        public_csv_path=None,
+        private_csv_path=str(private_csv_path),
+        contributions=contributions,
+        is_demo=True,
+    )
 
 
-def get_cli_info():  # pragma: no cover
+def get_cli_info() -> CLIInfo:  # pragma: no cover
     args = _get_args()
     if args.demo:
         if args.csv_path is not None:
             warn('"--demo" overrides "--csv" and "--contrib"')
-        return _get_demo_csv_contrib()
+        return _get_demo_cli_info()
     return CLIInfo(
-        csv_path=args.csv_path, contributions=args.contributions, is_demo=False
+        public_csv_path=args.public_csv_path,
+        private_csv_path=args.private_csv_path,
+        contributions=args.contributions,
+        is_demo=False,
     )

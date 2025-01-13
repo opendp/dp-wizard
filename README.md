@@ -13,13 +13,18 @@ Building on what we've learned from [DP Creator](https://github.com/opendp/dpcre
 ## Usage
 
 ```
-usage: dp-wizard [-h] [--csv CSV_PATH] [--contrib CONTRIB] [--demo]
+usage: dp-wizard [-h] [--public_csv PUBLIC_CSV_PATH] [--private_csv PRIVATE_CSV_PATH] [--contrib CONTRIB] [--demo]
 
 options:
-  -h, --help         show this help message and exit
-  --csv CSV_PATH     Path to CSV containing private data
-  --contrib CONTRIB  How many rows can an individual contribute?
-  --demo             Use generated fake CSV for a quick demo
+  -h, --help            show this help message and exit
+  --public_csv PUBLIC_CSV_PATH
+                        Path to public CSV to be used for previews
+  --private_csv PRIVATE_CSV_PATH
+                        Path to private CSV: Apart from the headers, will not
+                        be read until analysis is defined, and the
+                        differentially private release is made.
+  --contrib CONTRIB     How many rows can an individual contribute?
+  --demo                Use generated fake CSV for a quick demo
 ```
 
 

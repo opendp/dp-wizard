@@ -28,8 +28,16 @@ def ctrl_c_reminder():  # pragma: no cover
 
 def make_server_from_cli_info(cli_info: CLIInfo):
     def server(input: Inputs, output: Outputs, session: Session):  # pragma: no cover
-        cli_csv_path = cli_info.csv_path
-        csv_path = reactive.value("" if cli_csv_path is None else cli_csv_path)
+        cli_public_csv_path = cli_info.public_csv_path
+        public_csv_path = reactive.value(  # noqa: F841 # TODO
+            "" if cli_public_csv_path is None else cli_public_csv_path
+        )
+
+        cli_private_csv_path = cli_info.public_csv_path
+        private_csv_path = reactive.value(
+            "" if cli_private_csv_path is None else cli_private_csv_path
+        )
+
         contributions = reactive.value(cli_info.contributions)
 
         lower_bounds = reactive.value({})
@@ -43,7 +51,7 @@ def make_server_from_cli_info(cli_info: CLIInfo):
             output,
             session,
             is_demo=cli_info.is_demo,
-            csv_path=csv_path,
+            csv_path=private_csv_path,
             contributions=contributions,
         )
         analysis_panel.analysis_server(
@@ -51,7 +59,7 @@ def make_server_from_cli_info(cli_info: CLIInfo):
             output,
             session,
             is_demo=cli_info.is_demo,
-            csv_path=csv_path,
+            csv_path=private_csv_path,
             contributions=contributions,
             lower_bounds=lower_bounds,
             upper_bounds=upper_bounds,
@@ -63,7 +71,7 @@ def make_server_from_cli_info(cli_info: CLIInfo):
             input,
             output,
             session,
-            csv_path=csv_path,
+            csv_path=private_csv_path,
             contributions=contributions,
             lower_bounds=lower_bounds,
             upper_bounds=upper_bounds,

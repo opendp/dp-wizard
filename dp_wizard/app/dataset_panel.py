@@ -9,7 +9,11 @@ from dp_wizard.utils.code_generators import make_privacy_unit_block
 
 def dataset_ui():
     cli_info = get_cli_info()
-    csv_placeholder = "" if cli_info.csv_path is None else Path(cli_info.csv_path).name
+    csv_placeholder = (
+        ""
+        if cli_info.private_csv_path is None
+        else Path(cli_info.private_csv_path).name
+    )
 
     return ui.nav_panel(
         "Select Dataset",
