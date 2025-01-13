@@ -9,7 +9,10 @@ from dp_wizard.utils.code_generators import make_privacy_unit_block
 
 def dataset_ui():
     cli_info = get_cli_info()
-    csv_placeholder = (
+    public_csv_placeholder = (
+        "" if cli_info.public_csv_path is None else Path(cli_info.public_csv_path).name
+    )
+    private_csv_placeholder = (
         ""
         if cli_info.private_csv_path is None
         else Path(cli_info.private_csv_path).name
@@ -17,48 +20,54 @@ def dataset_ui():
 
     return ui.nav_panel(
         "Select Dataset",
-        ui.markdown(
-            """
-Choose **Public CSV** if you have a public data set, and are curious how
-DP can be applied: The preview visualizations will use your public data.
+        ui.card(
+            ui.card_header("Input CSVs"),
+            ui.markdown(
+                """
+    Choose **Public CSV** if you have a public data set, and are curious how
+    DP can be applied: The preview visualizations will use your public data.
 
-Choose **Private CSV** if you only have a private data set, and want to
-make a release from it: The preview visualizations will only use
-simulated data, and apart from the headers, the private CSV is not
-read until the release.
+    Choose **Private CSV** if you only have a private data set, and want to
+    make a release from it: The preview visualizations will only use
+    simulated data, and apart from the headers, the private CSV is not
+    read until the release.
 
-Choose both **Public CSV** and **Private CSV** if you have two files
-with the same structure. Perhaps the public CSV is older and no longer
-sensitive. Preview visualizations will be made with the public data,
-but the release will be made with private data.
-"""
+    Choose both **Public CSV** and **Private CSV** if you have two files
+    with the same structure. Perhaps the public CSV is older and no longer
+    sensitive. Preview visualizations will be made with the public data,
+    but the release will be made with private data.
+    """
+            ),
+            # Doesn't seem to be possible to preset the actual value,
+            # but the placeholder string is a good substitute.
+            ui.input_file(
+                "public_csv_path",
+                ["Choose public CSV file", ui.output_ui("choose_csv_demo_tooltip_ui")],
+                accept=[".csv"],
+                placeholder=public_csv_placeholder,
+            ),
+            ui.input_file(
+                "private_csv_path",
+                "Choose private CSV file",
+                accept=[".csv"],
+                placeholder=private_csv_placeholder,
+            ),
         ),
-        # Doesn't seem to be possible to preset the actual value,
-        # but the placeholder string is a good substitute.
-        ui.input_file(
-            "public_csv_path",
-            ["Choose public CSV file", ui.output_ui("choose_csv_demo_tooltip_ui")],
-            accept=[".csv"],
-            placeholder=csv_placeholder,
+        ui.card(
+            ui.card_header("Unit of privacy"),
+            ui.markdown(
+                "How many rows of the CSV can one individual contribute to? "
+                'This is the "unit of privacy" which will be protected.'
+            ),
+            ui.input_numeric(
+                "contributions",
+                ["Contributions", ui.output_ui("contributions_demo_tooltip_ui")],
+                cli_info.contributions,
+                min=1,
+            ),
+            ui.output_ui("python_tooltip_ui"),
+            output_code_sample("Unit of Privacy", "unit_of_privacy_python"),
         ),
-        ui.input_file(
-            "private_csv_path",
-            "Choose private CSV file",
-            accept=[".csv"],
-            placeholder=csv_placeholder,
-        ),
-        ui.markdown(
-            "How many rows of the CSV can one individual contribute to? "
-            'This is the "unit of privacy" which will be protected.'
-        ),
-        ui.input_numeric(
-            "contributions",
-            ["Contributions", ui.output_ui("contributions_demo_tooltip_ui")],
-            cli_info.contributions,
-            min=1,
-        ),
-        ui.output_ui("python_tooltip_ui"),
-        output_code_sample("Unit of Privacy", "unit_of_privacy_python"),
         ui.output_ui("define_analysis_button_ui"),
         value="dataset_panel",
     )
