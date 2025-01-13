@@ -1,6 +1,6 @@
 from sys import argv
 from pathlib import Path
-from argparse import ArgumentParser, ArgumentTypeError
+import argparse
 import csv
 import random
 from warnings import warn
@@ -10,27 +10,44 @@ from typing import NamedTuple, Optional
 def _existing_csv_type(arg: str) -> Path:
     path = Path(arg)
     if not path.exists():
-        raise ArgumentTypeError(f"No such file: {arg}")
+        raise argparse.ArgumentTypeError(f"No such file: {arg}")
     if path.suffix != ".csv":
-        raise ArgumentTypeError(f'Must have ".csv" extension: {arg}')
+        raise argparse.ArgumentTypeError(f'Must have ".csv" extension: {arg}')
     return path
 
 
 def _get_arg_parser():
-    parser = ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description="DP Wizard makes it easier to get started with Differential Privacy.",
+        epilog="""
+Use "--public_csv" if you have a public data set, and are curious how
+DP can be applied: The preview visualizations will use your public data.
+
+Use "--private_csv" if you only have a private data set, and want to
+make a release from it: The preview visualizations will only use
+simulated data, and apart from the headers, the private CSV is not
+read until the release.
+
+Use "--public_csv" and "--private_csv" together if you have two CSVs
+with the same structure. Perhaps the public CSV is older and no longer
+sensitive. Preview visualizations will be made with the public data,
+but the release will be made with private data.
+""",
+    )
     parser.add_argument(
         "--public_csv",
         dest="public_csv_path",
+        metavar="CSV",
         type=_existing_csv_type,
-        help="Path to public CSV to be used for previews",
+        help="Path to public CSV",
     )
     parser.add_argument(
         "--private_csv",
         dest="private_csv_path",
+        metavar="CSV",
         type=_existing_csv_type,
-        help="Path to private CSV: Apart from the headers, "
-        "will not be read until analysis is defined, "
-        "and the differentially private release is made.",
+        help="Path to private CSV",
     )
     parser.add_argument(
         "--contrib",
