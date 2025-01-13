@@ -3,7 +3,6 @@ from pathlib import Path
 import argparse
 import csv
 import random
-from warnings import warn
 from typing import NamedTuple, Optional
 
 
@@ -87,7 +86,8 @@ def _get_args():
         set_args = [k for k in other_args if getattr(args, k) is not None]
         if set_args:
             arg_parser.error(
-                f"When --demo is set, other arguments should be skipped: {', '.join(set_args)}"
+                "When --demo is set, other arguments should be skipped: "
+                + ", ".join(set_args)
             )
     return args
 
