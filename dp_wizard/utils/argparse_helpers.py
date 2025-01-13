@@ -74,10 +74,22 @@ def _get_args():
     if "pytest" in argv[0] or ("shiny" in argv[0] and "run" == argv[1]):
         # We are running a test,
         # and ARGV is polluted, so override:
-        return arg_parser.parse_args([])
+        args = arg_parser.parse_args([])
     else:
         # Normal parsing:
-        return arg_parser.parse_args()  # pragma: no cover
+        args = arg_parser.parse_args()  # pragma: no cover
+
+    if args.demo:
+        other_args = {arg for arg in dir(args) if not arg.startswith("_")} - {
+            "demo",
+            "contributions",
+        }
+        set_args = [k for k in other_args if getattr(args, k) is not None]
+        if set_args:
+            arg_parser.error(
+                f"When --demo is set, other arguments should be skipped: {', '.join(set_args)}"
+            )
+    return args
 
 
 def _clip(n: float, lower: float, upper: float) -> float:
@@ -149,8 +161,6 @@ def _get_demo_cli_info() -> CLIInfo:
 def get_cli_info() -> CLIInfo:  # pragma: no cover
     args = _get_args()
     if args.demo:
-        if args.csv_path is not None:
-            warn('"--demo" overrides "--csv" and "--contrib"')
         return _get_demo_cli_info()
     return CLIInfo(
         public_csv_path=args.public_csv_path,
