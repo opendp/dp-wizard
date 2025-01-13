@@ -46,14 +46,15 @@ def dataset_server(
     input: Inputs,
     output: Outputs,
     session: Session,
-    csv_path: reactive.Value[str],
+    public_csv_path: reactive.Value[str],
+    private_csv_path: reactive.Value[str],
     contributions: reactive.Value[int],
     is_demo: bool,
 ):  # pragma: no cover
     @reactive.effect
     @reactive.event(input.csv_path)
     def _on_csv_path_change():
-        csv_path.set(input.csv_path()[0]["datapath"])
+        private_csv_path.set(input.csv_path()[0]["datapath"])
 
     @reactive.effect
     @reactive.event(input.contributions)

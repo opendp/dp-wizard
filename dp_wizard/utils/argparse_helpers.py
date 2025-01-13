@@ -78,7 +78,7 @@ def _get_args():
         # Normal parsing:
         args = arg_parser.parse_args()  # pragma: no cover
 
-    if args.demo:
+    if args.demo:  # pragma: no cover
         other_args = {arg for arg in dir(args) if not arg.startswith("_")} - {
             "demo",
             "contributions",

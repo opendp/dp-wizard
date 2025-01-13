@@ -82,7 +82,8 @@ def analysis_server(
     input: Inputs,
     output: Outputs,
     session: Session,
-    csv_path: reactive.Value[str],
+    public_csv_path: reactive.Value[str],
+    private_csv_path: reactive.Value[str],
     contributions: reactive.Value[int],
     is_demo: bool,
     lower_bounds: reactive.Value[dict[str, float]],
@@ -146,11 +147,11 @@ def analysis_server(
 
     @reactive.calc
     def csv_ids_names_calc():
-        return read_csv_ids_names(req(csv_path()))
+        return read_csv_ids_names(req(private_csv_path()))
 
     @reactive.calc
     def csv_ids_labels_calc():
-        return read_csv_ids_labels(req(csv_path()))
+        return read_csv_ids_labels(req(private_csv_path()))
 
     @render.ui
     def epsilon_tooltip_ui():
