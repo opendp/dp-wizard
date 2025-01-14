@@ -1,8 +1,10 @@
 from pathlib import Path
+import csv
 
 from shiny import ui, reactive, render, Inputs, Outputs, Session
 
 from dp_wizard.utils.argparse_helpers import get_cli_info
+from dp_wizard.utils.csv_helper import csv_names_mismatch
 from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip
 from dp_wizard.utils.code_generators import make_privacy_unit_block
 
@@ -93,12 +95,30 @@ def dataset_server(
     def _on_private_csv_path_change():
         private_csv_path.set(input.private_csv_path()[0]["datapath"])
 
-    @render.ui
-    def csv_column_match_ui():
+    @reactive.calc
+    def csv_column_match_calc() -> tuple[set, set] | None:
         public = public_csv_path()
         private = private_csv_path()
         if public and private:
-            return f"TODO: read files and check columns: public: {public_csv_path()}, private: {private_csv_path()}"
+            just_public, just_private = csv_names_mismatch(Path(public), Path(private))
+            if just_public or just_private:
+                return just_public, just_private
+
+    @render.ui
+    def csv_column_match_ui():
+        mismatch = csv_column_match_calc()
+        if mismatch:
+            just_public, just_private = mismatch
+            messages = []
+            if just_public:
+                messages.append(
+                    f"- Only the public CSV contains: {', '.join(just_public)}."
+                )
+            if just_private:
+                messages.append(
+                    f"- Only the private CSV contains: {', '.join(just_private)}."
+                )
+            return ui.markdown("\n".join(messages))
 
     @reactive.effect
     @reactive.event(input.contributions)
@@ -109,8 +129,13 @@ def dataset_server(
     def button_enabled():
         contributions_is_set = input.contributions() is not None
         csv_path_is_set = (
-            input.csv_path() is not None and len(input.csv_path()) > 0
-        ) or is_demo
+            (input.public_csv_path() is not None and len(input.public_csv_path()) > 0)
+            or (
+                input.private_csv_path() is not None
+                and len(input.private_csv_path()) > 0
+            )
+            or is_demo
+        )
         return contributions_is_set and csv_path_is_set
 
     @render.ui
