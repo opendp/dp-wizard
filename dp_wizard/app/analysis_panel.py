@@ -43,24 +43,7 @@ def analysis_ui():
             ),
             ui.card(
                 ui.card_header("Simulation"),
-                ui.markdown(
-                    """
-                    This simulation will assume a normal distribution
-                    between the specified lower and upper bounds.
-                    Until you make a release, your CSV will not be
-                    read except to determine the columns.
-
-                    What is the approximate number of rows in the dataset?
-                    This number is only used for the simulation
-                    and not the final calculation.
-                    """
-                ),
-                ui.input_select(
-                    "row_count",
-                    "Estimated Rows",
-                    choices=["100", "1000", "10000"],
-                    selected="100",
-                ),
+                ui.output_ui("simulation_card_ui"),
             ),
         ),
         ui.output_ui("columns_ui"),
@@ -125,6 +108,29 @@ def analysis_server(
             each column has a smaller share of the privacy budget.
             """,
         )
+
+    @render.ui
+    def simulation_card_ui():
+        return [
+            ui.markdown(
+                """
+                This simulation will assume a normal distribution
+                between the specified lower and upper bounds.
+                Until you make a release, your CSV will not be
+                read except to determine the columns.
+
+                What is the approximate number of rows in the dataset?
+                This number is only used for the simulation
+                and not the final calculation.
+                """
+            ),
+            ui.input_select(
+                "row_count",
+                "Estimated Rows",
+                choices=["100", "1000", "10000"],
+                selected="100",
+            ),
+        ]
 
     @render.ui
     def columns_ui():
