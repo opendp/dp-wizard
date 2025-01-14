@@ -148,11 +148,13 @@ def analysis_server(
 
     @reactive.calc
     def csv_ids_names_calc():
-        return read_csv_ids_names(Path(req(private_csv_path())))
+        # The previous tab validated that if both public and private are given,
+        # the columns match, so it shouldn't matter which is read.
+        return read_csv_ids_names(Path(req(public_csv_path() or private_csv_path())))
 
     @reactive.calc
     def csv_ids_labels_calc():
-        return read_csv_ids_labels(Path(req(private_csv_path())))
+        return read_csv_ids_labels(Path(req(public_csv_path() or private_csv_path())))
 
     @render.ui
     def epsilon_tooltip_ui():
