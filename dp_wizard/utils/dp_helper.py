@@ -1,7 +1,6 @@
 import polars as pl
 import opendp.prelude as dp
 
-from dp_wizard.utils.mock_data import mock_data, ColumnDef
 from dp_wizard.utils.shared import make_cut_points
 
 dp.enable_features("contrib")
@@ -11,6 +10,7 @@ confidence = 0.95
 
 
 def make_accuracy_histogram(
+    df: pl.DataFrame,
     row_count: int,
     lower: float,
     upper: float,
@@ -20,7 +20,13 @@ def make_accuracy_histogram(
 ) -> tuple[float, pl.DataFrame]:
     """
     Creates fake data between lower and upper, and then returns a DP histogram from it.
+
+    >>> from dp_wizard.utils.mock_data import mock_data, ColumnDef
+    >>> lower, upper = 0, 10
+    >>> row_count = 100
+    >>> df = mock_data({"value": ColumnDef(lower, upper)}, row_count=row_count)
     >>> accuracy, histogram = make_accuracy_histogram(
+    ...     df=df,
     ...     row_count=100,
     ...     lower=0, upper=10,
     ...     bin_count=5,
@@ -43,12 +49,8 @@ def make_accuracy_histogram(
     │ (8, 10] ┆ ... │
     └─────────┴─────┘
     """
-    # Mock data only depends on lower and upper bounds, so it could be cached,
-    # but I'd guess this is dominated by the DP operations,
-    # so not worth optimizing.
-    df = mock_data({"value": ColumnDef(lower, upper)}, row_count=row_count)
-
-    # TODO: When this is stable, merge it to templates, so we can be
+    # TODO: https://github.com/opendp/dp-wizard/issues/219
+    # When this is stable, merge it to templates, so we can be
     # sure that we're using the same code in the preview that we
     # use in the generated notebook.
     cut_points = make_cut_points(lower, upper, bin_count)
