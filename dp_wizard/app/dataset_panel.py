@@ -4,7 +4,12 @@ from shiny import ui, reactive, render, Inputs, Outputs, Session
 
 from dp_wizard.utils.argparse_helpers import get_cli_info
 from dp_wizard.utils.csv_helper import csv_names_mismatch
-from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip
+from dp_wizard.app.components.outputs import (
+    output_code_sample,
+    demo_tooltip,
+    hide_if,
+    info_box,
+)
 from dp_wizard.utils.code_generators import make_privacy_unit_block
 
 
@@ -108,9 +113,9 @@ def dataset_server(
     @render.ui
     def csv_column_match_ui():
         mismatch = csv_column_match_calc()
+        messages = []
         if mismatch:
             just_public, just_private = mismatch
-            messages = []
             if just_public:
                 messages.append(
                     "- Only the public CSV contains: "
@@ -121,7 +126,7 @@ def dataset_server(
                     "- Only the private CSV contains: "
                     + ", ".join(f"`{name}`" for name in just_private)
                 )
-            return ui.markdown("\n".join(messages))
+        return hide_if(not messages, info_box(ui.markdown("\n".join(messages))))
 
     @reactive.effect
     @reactive.event(input.contributions)
@@ -138,7 +143,7 @@ def dataset_server(
                 and len(input.private_csv_path()) > 0
             )
             or is_demo
-        )
+        ) and not csv_column_match_calc()
         return contributions_is_set and csv_path_is_set
 
     @render.ui
