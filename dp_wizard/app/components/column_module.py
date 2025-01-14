@@ -3,6 +3,7 @@ from logging import info
 from htmltools.tags import details, summary
 from shiny import ui, render, module, reactive, Inputs, Outputs, Session
 from shiny.types import SilentException
+import polars as pl
 
 from dp_wizard.utils.dp_helper import make_accuracy_histogram
 from dp_wizard.utils.shared import plot_histogram
@@ -57,6 +58,7 @@ def column_server(
     input: Inputs,
     output: Outputs,
     session: Session,
+    public_csv_path: str,
     name: str,
     contributions: int,
     epsilon: float,
@@ -113,9 +115,15 @@ def column_server(
         # but I'd guess this is dominated by the DP operations,
         # so not worth optimizing.
         # TODO: Use real public data, if we have it!
-        df = mock_data({"value": ColumnDef(lower_x, upper_x)}, row_count=row_count)
+        if public_csv_path:
+            lf = pl.scan_csv(public_csv_path)
+        else:
+            lf = pl.LazyFrame(
+                mock_data({name: ColumnDef(lower_x, upper_x)}, row_count=row_count)
+            )
         return make_accuracy_histogram(
-            df=df,
+            lf=lf,
+            column_name=name,
             row_count=row_count,
             lower=lower_x,
             upper=upper_x,

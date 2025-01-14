@@ -165,6 +165,7 @@ def analysis_server(
         for column_id in column_ids:
             column_server(
                 column_id,
+                public_csv_path=public_csv_path(),
                 name=column_ids_to_names[column_id],
                 contributions=contributions(),
                 epsilon=epsilon(),
