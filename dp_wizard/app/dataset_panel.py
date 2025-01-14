@@ -102,7 +102,7 @@ def dataset_server(
         private_csv_path.set(input.private_csv_path()[0]["datapath"])
 
     @reactive.calc
-    def csv_column_match_calc() -> tuple[set, set] | None:
+    def csv_column_mismatch_calc() -> tuple[set, set] | None:
         public = public_csv_path()
         private = private_csv_path()
         if public and private:
@@ -112,7 +112,7 @@ def dataset_server(
 
     @render.ui
     def csv_column_match_ui():
-        mismatch = csv_column_match_calc()
+        mismatch = csv_column_mismatch_calc()
         messages = []
         if mismatch:
             just_public, just_private = mismatch
@@ -143,7 +143,7 @@ def dataset_server(
         )
         csv_path_is_set = (
             public_csv_path_is_set or private_csv_path_is_set or is_demo
-        ) and not csv_column_match_calc()
+        ) and not csv_column_mismatch_calc()
         contributions_is_set = input.contributions() is not None
         return contributions_is_set and csv_path_is_set
 
