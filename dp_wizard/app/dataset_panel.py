@@ -3,7 +3,7 @@ from pathlib import Path
 from shiny import ui, reactive, render, Inputs, Outputs, Session
 
 from dp_wizard.utils.argparse_helpers import get_cli_info
-from dp_wizard.utils.csv_helper import csv_names_mismatch
+from dp_wizard.utils.csv_helper import get_csv_names_mismatch
 from dp_wizard.app.components.outputs import (
     output_code_sample,
     demo_tooltip,
@@ -106,7 +106,9 @@ def dataset_server(
         public = public_csv_path()
         private = private_csv_path()
         if public and private:
-            just_public, just_private = csv_names_mismatch(Path(public), Path(private))
+            just_public, just_private = get_csv_names_mismatch(
+                Path(public), Path(private)
+            )
             if just_public or just_private:
                 return just_public, just_private
 

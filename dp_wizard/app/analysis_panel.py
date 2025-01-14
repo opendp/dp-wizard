@@ -6,8 +6,12 @@ from shiny import ui, reactive, render, req, Inputs, Outputs, Session
 
 from dp_wizard.app.components.inputs import log_slider
 from dp_wizard.app.components.column_module import column_ui, column_server
-from dp_wizard.utils.csv_helper import read_csv_ids_labels, read_csv_ids_names
-from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip
+from dp_wizard.utils.csv_helper import (
+    read_csv_ids_labels,
+    read_csv_ids_names,
+    get_csv_row_count,
+)
+from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip, hide_if
 from dp_wizard.utils.code_generators import make_privacy_loss_block
 
 
@@ -111,26 +115,48 @@ def analysis_server(
 
     @render.ui
     def simulation_card_ui():
-        return [
-            ui.markdown(
-                """
-                This simulation will assume a normal distribution
-                between the specified lower and upper bounds.
-                Until you make a release, your CSV will not be
-                read except to determine the columns.
+        if public_csv_path():
+            row_count = get_csv_row_count(Path(public_csv_path()))
+            return [
+                ui.markdown(
+                    f"""
+                    Because you've provided a public CSV,
+                    it *will be read* to generate previews.
 
-                What is the approximate number of rows in the dataset?
-                This number is only used for the simulation
-                and not the final calculation.
-                """
-            ),
-            ui.input_select(
-                "row_count",
-                "Estimated Rows",
-                choices=["100", "1000", "10000"],
-                selected="100",
-            ),
-        ]
+                    The confidence interval depends on the number of rows.
+                    Your public CSV has {row_count} rows,
+                    but if you believe the private CSV will be
+                    much larger or smaller, please update.
+                    """
+                ),
+                ui.input_select(
+                    "row_count",
+                    "Estimated Rows",
+                    choices=[row_count, "100", "1000", "10000"],
+                    selected=row_count,
+                ),
+            ]
+        else:
+            return [
+                ui.markdown(
+                    """
+                    This simulation will assume a normal distribution
+                    between the specified lower and upper bounds.
+                    Until you make a release, your CSV will not be
+                    read except to determine the columns.
+
+                    What is the approximate number of rows in the dataset?
+                    This number is only used for the simulation
+                    and not the final calculation.
+                    """
+                ),
+                ui.input_select(
+                    "row_count",
+                    "Estimated Rows",
+                    choices=["100", "1000", "10000"],
+                    selected="100",
+                ),
+            ]
 
     @render.ui
     def columns_ui():

@@ -22,12 +22,17 @@ def read_csv_names(csv_path: Path):
     return lf.collect_schema().names()
 
 
-def csv_names_mismatch(public_csv_path: Path, private_csv_path: Path):
+def get_csv_names_mismatch(public_csv_path: Path, private_csv_path: Path):
     public_names = set(read_csv_names(public_csv_path))
     private_names = set(read_csv_names(private_csv_path))
     extra_public = public_names - private_names
     extra_private = private_names - public_names
     return (extra_public, extra_private)
+
+
+def get_csv_row_count(csv_path: Path):
+    lf = pl.scan_csv(csv_path)
+    return lf.select(pl.len()).collect().item()
 
 
 def read_csv_ids_labels(csv_path: Path):
