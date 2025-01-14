@@ -52,6 +52,7 @@ def dataset_ui():
                 accept=[".csv"],
                 placeholder=private_csv_placeholder,
             ),
+            ui.output_ui("csv_column_match_ui"),
         ),
         ui.card(
             ui.card_header("Unit of privacy"),
@@ -83,9 +84,21 @@ def dataset_server(
     is_demo: bool,
 ):  # pragma: no cover
     @reactive.effect
-    @reactive.event(input.csv_path)
-    def _on_csv_path_change():
-        private_csv_path.set(input.csv_path()[0]["datapath"])
+    @reactive.event(input.public_csv_path)
+    def _on_public_csv_path_change():
+        public_csv_path.set(input.public_csv_path()[0]["datapath"])
+
+    @reactive.effect
+    @reactive.event(input.private_csv_path)
+    def _on_private_csv_path_change():
+        private_csv_path.set(input.private_csv_path()[0]["datapath"])
+
+    @render.ui
+    def csv_column_match_ui():
+        public = public_csv_path()
+        private = private_csv_path()
+        if public and private:
+            return f"TODO: read files and check columns: public: {public_csv_path()}, private: {private_csv_path()}"
 
     @reactive.effect
     @reactive.event(input.contributions)
