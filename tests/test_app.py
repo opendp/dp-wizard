@@ -63,7 +63,7 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
 
     # Now upload:
     csv_path = Path(__file__).parent / "fixtures" / "fake.csv"
-    page.get_by_label("Choose CSV file").set_input_files(csv_path.resolve())
+    page.get_by_label("Choose Private CSV").set_input_files(csv_path.resolve())
     expect_no_error()
 
     # -- Define analysis --
