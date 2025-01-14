@@ -44,13 +44,13 @@ def dataset_ui():
             # but the placeholder string is a good substitute.
             ui.input_file(
                 "public_csv_path",
-                ["Choose public CSV file", ui.output_ui("choose_csv_demo_tooltip_ui")],
+                ["Choose Public CSV", ui.output_ui("choose_csv_demo_tooltip_ui")],
                 accept=[".csv"],
                 placeholder=public_csv_placeholder,
             ),
             ui.input_file(
                 "private_csv_path",
-                "Choose private CSV file",
+                "Choose Private CSV",
                 accept=[".csv"],
                 placeholder=private_csv_placeholder,
             ),
@@ -112,11 +112,11 @@ def dataset_server(
             messages = []
             if just_public:
                 messages.append(
-                    f"- Only the public CSV contains: {', '.join(just_public)}."
+                    f"- Only the public CSV contains: {', '.join(f'`{name}`' for name in just_public)}."
                 )
             if just_private:
                 messages.append(
-                    f"- Only the private CSV contains: {', '.join(just_private)}."
+                    f"- Only the private CSV contains: {', '.join(f'`{name}`' for name in just_private)}."
                 )
             return ui.markdown("\n".join(messages))
 
