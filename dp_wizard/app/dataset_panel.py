@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Optional
 
 from shiny import ui, reactive, render, Inputs, Outputs, Session
 
@@ -102,7 +103,7 @@ def dataset_server(
         private_csv_path.set(input.private_csv_path()[0]["datapath"])
 
     @reactive.calc
-    def csv_column_mismatch_calc() -> tuple[set, set] | None:
+    def csv_column_mismatch_calc() -> Optional[tuple[set, set]]:
         public = public_csv_path()
         private = private_csv_path()
         if public and private:
