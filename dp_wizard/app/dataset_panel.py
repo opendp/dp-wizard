@@ -135,15 +135,16 @@ def dataset_server(
 
     @reactive.calc
     def button_enabled():
-        contributions_is_set = input.contributions() is not None
+        public_csv_path_is_set = (
+            input.public_csv_path() is not None and len(input.public_csv_path()) > 0
+        )
+        private_csv_path_is_set = (
+            input.private_csv_path() is not None and len(input.private_csv_path()) > 0
+        )
         csv_path_is_set = (
-            (input.public_csv_path() is not None and len(input.public_csv_path()) > 0)
-            or (
-                input.private_csv_path() is not None
-                and len(input.private_csv_path()) > 0
-            )
-            or is_demo
+            public_csv_path_is_set or private_csv_path_is_set or is_demo
         ) and not csv_column_match_calc()
+        contributions_is_set = input.contributions() is not None
         return contributions_is_set and csv_path_is_set
 
     @render.ui
