@@ -1,5 +1,6 @@
 from math import pow
 from typing import Iterable, Any
+from pathlib import Path
 
 from shiny import ui, reactive, render, req, Inputs, Outputs, Session
 
@@ -147,11 +148,11 @@ def analysis_server(
 
     @reactive.calc
     def csv_ids_names_calc():
-        return read_csv_ids_names(req(private_csv_path()))
+        return read_csv_ids_names(Path(req(private_csv_path())))
 
     @reactive.calc
     def csv_ids_labels_calc():
-        return read_csv_ids_labels(req(private_csv_path()))
+        return read_csv_ids_labels(Path(req(private_csv_path())))
 
     @render.ui
     def epsilon_tooltip_ui():

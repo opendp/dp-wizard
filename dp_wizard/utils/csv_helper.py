@@ -8,7 +8,6 @@ We'll use the following terms consistently throughout the application:
 
 import re
 import polars as pl
-from tempfile import tempdir
 from pathlib import Path
 
 

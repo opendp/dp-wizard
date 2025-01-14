@@ -1,5 +1,4 @@
 from pathlib import Path
-import csv
 
 from shiny import ui, reactive, render, Inputs, Outputs, Session
 
@@ -40,19 +39,21 @@ def dataset_ui():
     but the release will be made with private data.
     """
             ),
-            # Doesn't seem to be possible to preset the actual value,
-            # but the placeholder string is a good substitute.
-            ui.input_file(
-                "public_csv_path",
-                ["Choose Public CSV", ui.output_ui("choose_csv_demo_tooltip_ui")],
-                accept=[".csv"],
-                placeholder=public_csv_placeholder,
-            ),
-            ui.input_file(
-                "private_csv_path",
-                "Choose Private CSV",
-                accept=[".csv"],
-                placeholder=private_csv_placeholder,
+            ui.row(
+                # Doesn't seem to be possible to preset the actual value,
+                # but the placeholder string is a good substitute.
+                ui.input_file(
+                    "public_csv_path",
+                    ["Choose Public CSV", ui.output_ui("choose_csv_demo_tooltip_ui")],
+                    accept=[".csv"],
+                    placeholder=public_csv_placeholder,
+                ),
+                ui.input_file(
+                    "private_csv_path",
+                    "Choose Private CSV",
+                    accept=[".csv"],
+                    placeholder=private_csv_placeholder,
+                ),
             ),
             ui.output_ui("csv_column_match_ui"),
         ),
@@ -112,11 +113,13 @@ def dataset_server(
             messages = []
             if just_public:
                 messages.append(
-                    f"- Only the public CSV contains: {', '.join(f'`{name}`' for name in just_public)}."
+                    "- Only the public CSV contains: "
+                    + ", ".join(f"`{name}`" for name in just_public)
                 )
             if just_private:
                 messages.append(
-                    f"- Only the private CSV contains: {', '.join(f'`{name}`' for name in just_private)}."
+                    "- Only the private CSV contains: "
+                    + ", ".join(f"`{name}`" for name in just_private)
                 )
             return ui.markdown("\n".join(messages))
 
