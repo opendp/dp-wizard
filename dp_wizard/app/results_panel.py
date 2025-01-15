@@ -78,7 +78,8 @@ def results_server(
             for col in weights().keys()
         }
         return AnalysisPlan(
-            csv_path=private_csv_path(),
+            # Prefer private CSV, if available:
+            csv_path=private_csv_path() or public_csv_path(),
             contributions=contributions(),
             epsilon=epsilon(),
             columns=columns,

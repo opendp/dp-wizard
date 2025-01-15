@@ -18,7 +18,6 @@ demo_app = create_app_fixture(Path(__file__).parent / "fixtures/demo_app.py")
 default_app = create_app_fixture(Path(__file__).parent / "fixtures/default_app.py")
 tooltip = "#choose_csv_demo_tooltip_ui svg"
 for_the_demo = "For the demo, we'll imagine"
-simulation = "This simulation will assume a normal distribution"
 
 
 # TODO: Why is incomplete coverage reported here?
@@ -67,8 +66,7 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
 
     # Now upload:
     csv_path = Path(__file__).parent / "fixtures" / "fake.csv"
-    # TODO: Switch to public
-    page.get_by_label("Choose Private CSV").set_input_files(csv_path.resolve())
+    page.get_by_label("Choose Public CSV").set_input_files(csv_path.resolve())
     expect_no_error()
 
     # -- Define analysis --
@@ -95,8 +93,7 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     page.locator(".irs-bar").click()
     expect_visible("Epsilon: 0.158")
     # Simulation
-    # TODO: Should be public!
-    expect_visible("This simulation will assume")
+    expect_visible("Because you've provided a public CSV")
 
     # Button disabled until column selected:
     download_results_button = page.get_by_role("button", name="Download results")
@@ -108,7 +105,6 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
 
     # Set column details:
     page.get_by_label("grade").check()
-    expect_visible(simulation)
     expect_not_visible("Weight")
     # Check that default is set correctly:
     assert page.get_by_label("Upper").input_value() == "10"
@@ -117,14 +113,12 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     page.get_by_label("Upper").fill(new_value)
     # Uncheck the column:
     page.get_by_label("grade").uncheck()
-    expect_visible(simulation)
     # Recheck the column:
     page.get_by_label("grade").check()
-    expect_visible(simulation)
     assert page.get_by_label("Upper").input_value() == new_value
     expect_visible("The 95% confidence interval is ±794")
     page.get_by_text("Data Table").click()
-    expect_visible("(0, 2]")
+    expect_visible(f"({new_value}, inf]")  # Because values are well above the bins.
 
     # Add a second column:
     # page.get_by_label("blank").check()
