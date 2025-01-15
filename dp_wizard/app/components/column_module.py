@@ -226,9 +226,11 @@ def column_server(
     def histogram_preview_plot():
         accuracy, histogram = accuracy_histogram()
         s = "s" if contributions > 1 else ""
-        title = (
-            f"Simulated {name}: normal distribution, "
-            f"{contributions} contribution{s} / invidual"
+        title = ", ".join(
+            [
+                name if public_csv_path else f"Simulated {name}: normal distribution",
+                f"{contributions} contribution{s} / invidual",
+            ]
         )
         return plot_histogram(
             histogram,
