@@ -30,6 +30,10 @@ def test_demo_app(page: Page, demo_app: ShinyAppProc):  # pragma: no cover
     page.locator(tooltip).hover()
     expect(page.get_by_text(for_the_demo)).to_be_visible()
 
+    # -- Define analysis --
+    page.get_by_role("button", name="Define analysis").click()
+    expect(page.get_by_text("This simulation will assume")).to_be_visible()
+
 
 def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     pick_dataset_text = "How many rows of the CSV"
@@ -63,6 +67,7 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
 
     # Now upload:
     csv_path = Path(__file__).parent / "fixtures" / "fake.csv"
+    # TODO: Switch to public
     page.get_by_label("Choose Private CSV").set_input_files(csv_path.resolve())
     expect_no_error()
 
@@ -89,6 +94,9 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     expect_visible("Epsilon: 0.316")
     page.locator(".irs-bar").click()
     expect_visible("Epsilon: 0.158")
+    # Simulation
+    # TODO: Should be public!
+    expect_visible("This simulation will assume")
 
     # Button disabled until column selected:
     download_results_button = page.get_by_role("button", name="Download results")
