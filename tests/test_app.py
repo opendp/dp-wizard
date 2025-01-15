@@ -68,6 +68,7 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     # Check validation of contributions:
     # Playwright itself won't let us fill non-numbers in this field.
     # "assert define_analysis_button.is_enabled()" has spurious errors.
+    # https://github.com/opendp/dp-wizard/issues/221
     page.get_by_label("Contributions").fill("0")
     expect_visible("Contributions must be 1 or greater")
     expect_visible("Choose CSV and Contributions before proceeding")
