@@ -36,12 +36,11 @@ def dataset_ui():
             ui.card_header("Input CSVs"),
             ui.markdown(
                 f"""
-    Choose **Public CSV** {PUBLIC_TEXT}
+Choose **Public CSV** {PUBLIC_TEXT}
 
-    Choose **Private CSV** {PRIVATE_TEXT}
+Choose **Private CSV** {PRIVATE_TEXT}
 
-    Choose both **Public CSV** and **Private CSV** {PUBLIC_PRIVATE_TEXT}
-    """
+Choose both **Public CSV** and **Private CSV** {PUBLIC_PRIVATE_TEXT}"""
             ),
             ui.row(
                 # Doesn't seem to be possible to preset the actual value,

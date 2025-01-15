@@ -16,15 +16,15 @@ def _existing_csv_type(arg: str) -> Path:
 
 
 PUBLIC_TEXT = """if you have a public data set, and are curious how
-    DP can be applied: The preview visualizations will use your public data."""
+DP can be applied: The preview visualizations will use your public data."""
 PRIVATE_TEXT = """if you only have a private data set, and want to
-    make a release from it: The preview visualizations will only use
-    simulated data, and apart from the headers, the private CSV is not
-    read until the release."""
+make a release from it: The preview visualizations will only use
+simulated data, and apart from the headers, the private CSV is not
+read until the release."""
 PUBLIC_PRIVATE_TEXT = """if you have two CSVs
-    with the same structure. Perhaps the public CSV is older and no longer
-    sensitive. Preview visualizations will be made with the public data,
-    but the release will be made with private data."""
+with the same structure. Perhaps the public CSV is older and no longer
+sensitive. Preview visualizations will be made with the public data,
+but the release will be made with private data."""
 
 
 def _get_arg_parser():
@@ -32,7 +32,7 @@ def _get_arg_parser():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description="DP Wizard makes it easier to get started with "
         "Differential Privacy.",
-        epilog="""
+        epilog=f"""
 Use "--public_csv" {PUBLIC_TEXT}
 
 Use "--private_csv" {PRIVATE_TEXT}
