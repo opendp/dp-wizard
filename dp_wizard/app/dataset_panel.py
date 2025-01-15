@@ -3,7 +3,12 @@ from typing import Optional
 
 from shiny import ui, reactive, render, Inputs, Outputs, Session
 
-from dp_wizard.utils.argparse_helpers import get_cli_info
+from dp_wizard.utils.argparse_helpers import (
+    get_cli_info,
+    PUBLIC_TEXT,
+    PRIVATE_TEXT,
+    PUBLIC_PRIVATE_TEXT,
+)
 from dp_wizard.utils.csv_helper import get_csv_names_mismatch
 from dp_wizard.app.components.outputs import (
     output_code_sample,
@@ -30,19 +35,12 @@ def dataset_ui():
         ui.card(
             ui.card_header("Input CSVs"),
             ui.markdown(
-                """
-    Choose **Public CSV** if you have a public data set, and are curious how
-    DP can be applied: The preview visualizations will use your public data.
+                f"""
+    Choose **Public CSV** {PUBLIC_TEXT}
 
-    Choose **Private CSV** if you only have a private data set, and want to
-    make a release from it: The preview visualizations will only use
-    simulated data, and apart from the headers, the private CSV is not
-    read until the release.
+    Choose **Private CSV** {PRIVATE_TEXT}
 
-    Choose both **Public CSV** and **Private CSV** if you have two files
-    with the same structure. Perhaps the public CSV is older and no longer
-    sensitive. Preview visualizations will be made with the public data,
-    but the release will be made with private data.
+    Choose both **Public CSV** and **Private CSV** {PUBLIC_PRIVATE_TEXT}
     """
             ),
             ui.row(
