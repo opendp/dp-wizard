@@ -1,11 +1,16 @@
 from math import pow
 from typing import Iterable, Any
+from pathlib import Path
 
 from shiny import ui, reactive, render, req, Inputs, Outputs, Session
 
 from dp_wizard.app.components.inputs import log_slider
 from dp_wizard.app.components.column_module import column_ui, column_server
-from dp_wizard.utils.csv_helper import read_csv_ids_labels, read_csv_ids_names
+from dp_wizard.utils.csv_helper import (
+    read_csv_ids_labels,
+    read_csv_ids_names,
+    get_csv_row_count,
+)
 from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip
 from dp_wizard.utils.code_generators import make_privacy_loss_block
 
@@ -42,24 +47,7 @@ def analysis_ui():
             ),
             ui.card(
                 ui.card_header("Simulation"),
-                ui.markdown(
-                    """
-                    This simulation will assume a normal distribution
-                    between the specified lower and upper bounds.
-                    Until you make a release, your CSV will not be
-                    read except to determine the columns.
-
-                    What is the approximate number of rows in the dataset?
-                    This number is only used for the simulation
-                    and not the final calculation.
-                    """
-                ),
-                ui.input_select(
-                    "row_count",
-                    "Estimated Rows",
-                    choices=["100", "1000", "10000"],
-                    selected="100",
-                ),
+                ui.output_ui("simulation_card_ui"),
             ),
         ),
         ui.output_ui("columns_ui"),
@@ -82,7 +70,8 @@ def analysis_server(
     input: Inputs,
     output: Outputs,
     session: Session,
-    csv_path: reactive.Value[str],
+    public_csv_path: reactive.Value[str],
+    private_csv_path: reactive.Value[str],
     contributions: reactive.Value[int],
     is_demo: bool,
     lower_bounds: reactive.Value[dict[str, float]],
@@ -125,12 +114,58 @@ def analysis_server(
         )
 
     @render.ui
+    def simulation_card_ui():
+        if public_csv_path():
+            row_count = get_csv_row_count(Path(public_csv_path()))
+            return [
+                ui.markdown(
+                    f"""
+                    Because you've provided a public CSV,
+                    it *will be read* to generate previews.
+
+                    The confidence interval depends on the number of rows.
+                    Your public CSV has {row_count} rows,
+                    but if you believe the private CSV will be
+                    much larger or smaller, please update.
+                    """
+                ),
+                ui.input_select(
+                    "row_count",
+                    "Estimated Rows",
+                    choices=[row_count, "100", "1000", "10000"],
+                    selected=row_count,
+                ),
+            ]
+        else:
+            return [
+                ui.markdown(
+                    """
+                    This simulation will assume a normal distribution
+                    between the specified lower and upper bounds.
+                    Until you make a release, your CSV will not be
+                    read except to determine the columns.
+
+                    What is the approximate number of rows in the dataset?
+                    This number is only used for the simulation
+                    and not the final calculation.
+                    """
+                ),
+                ui.input_select(
+                    "row_count",
+                    "Estimated Rows",
+                    choices=["100", "1000", "10000"],
+                    selected="100",
+                ),
+            ]
+
+    @render.ui
     def columns_ui():
         column_ids = input.columns_checkbox_group()
         column_ids_to_names = csv_ids_names_calc()
         for column_id in column_ids:
             column_server(
                 column_id,
+                public_csv_path=public_csv_path(),
                 name=column_ids_to_names[column_id],
                 contributions=contributions(),
                 epsilon=epsilon(),
@@ -146,11 +181,13 @@ def analysis_server(
 
     @reactive.calc
     def csv_ids_names_calc():
-        return read_csv_ids_names(req(csv_path()))
+        # The previous tab validated that if both public and private are given,
+        # the columns match, so it shouldn't matter which is read.
+        return read_csv_ids_names(Path(req(public_csv_path() or private_csv_path())))
 
     @reactive.calc
     def csv_ids_labels_calc():
-        return read_csv_ids_labels(req(csv_path()))
+        return read_csv_ids_labels(Path(req(public_csv_path() or private_csv_path())))
 
     @render.ui
     def epsilon_tooltip_ui():

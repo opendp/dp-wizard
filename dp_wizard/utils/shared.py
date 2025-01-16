@@ -47,6 +47,8 @@ def plot_histogram(
     """
     import matplotlib.pyplot as plt
 
+    plt.rcParams["figure.figsize"] = (12, 4)
+
     bins, values = df_to_columns(histogram_df)
     mod = (len(bins) // 12) + 1
     majors = [label for i, label in enumerate(bins) if i % mod == 0]

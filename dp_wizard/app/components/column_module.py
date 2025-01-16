@@ -3,12 +3,14 @@ from logging import info
 from htmltools.tags import details, summary
 from shiny import ui, render, module, reactive, Inputs, Outputs, Session
 from shiny.types import SilentException
+import polars as pl
 
 from dp_wizard.utils.dp_helper import make_accuracy_histogram
 from dp_wizard.utils.shared import plot_histogram
 from dp_wizard.utils.code_generators import make_column_config_block
 from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip, hide_if
 from dp_wizard.utils.dp_helper import confidence
+from dp_wizard.utils.mock_data import mock_data, ColumnDef
 
 
 default_weight = "2"
@@ -56,6 +58,7 @@ def column_server(
     input: Inputs,
     output: Outputs,
     session: Session,
+    public_csv_path: str,
     name: str,
     contributions: int,
     epsilon: float,
@@ -107,7 +110,20 @@ def column_server(
             # This function is triggered when column is removed;
             # Exit early to avoid divide-by-zero.
             raise SilentException("weights_sum == 0")
+
+        # Mock data only depends on lower and upper bounds, so it could be cached,
+        # but I'd guess this is dominated by the DP operations,
+        # so not worth optimizing.
+        # TODO: Use real public data, if we have it!
+        if public_csv_path:
+            lf = pl.scan_csv(public_csv_path)
+        else:
+            lf = pl.LazyFrame(
+                mock_data({name: ColumnDef(lower_x, upper_x)}, row_count=row_count)
+            )
         return make_accuracy_histogram(
+            lf=lf,
+            column_name=name,
             row_count=row_count,
             lower=lower_x,
             upper=upper_x,
@@ -210,9 +226,11 @@ def column_server(
     def histogram_preview_plot():
         accuracy, histogram = accuracy_histogram()
         s = "s" if contributions > 1 else ""
-        title = (
-            f"Simulated {name}: normal distribution, "
-            f"{contributions} contribution{s} / invidual"
+        title = ", ".join(
+            [
+                name if public_csv_path else f"Simulated {name}: normal distribution",
+                f"{contributions} contribution{s} / invidual",
+            ]
         )
         return plot_histogram(
             histogram,

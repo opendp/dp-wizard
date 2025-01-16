@@ -8,9 +8,10 @@ We'll use the following terms consistently throughout the application:
 
 import re
 import polars as pl
+from pathlib import Path
 
 
-def read_csv_names(csv_path: str):
+def read_csv_names(csv_path: Path):
     # Polars is overkill, but it is more robust against
     # variations in encoding than Python stdlib csv.
     # However, it could be slow:
@@ -21,14 +22,27 @@ def read_csv_names(csv_path: str):
     return lf.collect_schema().names()
 
 
-def read_csv_ids_labels(csv_path: str):
+def get_csv_names_mismatch(public_csv_path: Path, private_csv_path: Path):
+    public_names = set(read_csv_names(public_csv_path))
+    private_names = set(read_csv_names(private_csv_path))
+    extra_public = public_names - private_names
+    extra_private = private_names - public_names
+    return (extra_public, extra_private)
+
+
+def get_csv_row_count(csv_path: Path):
+    lf = pl.scan_csv(csv_path)
+    return lf.select(pl.len()).collect().item()
+
+
+def read_csv_ids_labels(csv_path: Path):
     return {
         name_to_id(name): f"{i+1}: {name or '[blank]'}"
         for i, name in enumerate(read_csv_names(csv_path))
     }
 
 
-def read_csv_ids_names(csv_path: str):
+def read_csv_ids_names(csv_path: Path):
     return {name_to_id(name): name for name in read_csv_names(csv_path)}
 
 

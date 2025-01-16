@@ -1,28 +1,58 @@
 from sys import argv
 from pathlib import Path
-from argparse import ArgumentParser, ArgumentTypeError
+import argparse
 import csv
 import random
-from warnings import warn
 from typing import NamedTuple, Optional
 
 
 def _existing_csv_type(arg: str) -> Path:
     path = Path(arg)
     if not path.exists():
-        raise ArgumentTypeError(f"No such file: {arg}")
+        raise argparse.ArgumentTypeError(f"No such file: {arg}")
     if path.suffix != ".csv":
-        raise ArgumentTypeError(f'Must have ".csv" extension: {arg}')
+        raise argparse.ArgumentTypeError(f'Must have ".csv" extension: {arg}')
     return path
 
 
+PUBLIC_TEXT = """if you have a public data set, and are curious how
+DP can be applied: The preview visualizations will use your public data."""
+PRIVATE_TEXT = """if you only have a private data set, and want to
+make a release from it: The preview visualizations will only use
+simulated data, and apart from the headers, the private CSV is not
+read until the release."""
+PUBLIC_PRIVATE_TEXT = """if you have two CSVs
+with the same structure. Perhaps the public CSV is older and no longer
+sensitive. Preview visualizations will be made with the public data,
+but the release will be made with private data."""
+
+
 def _get_arg_parser():
-    parser = ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description="DP Wizard makes it easier to get started with "
+        "Differential Privacy.",
+        epilog=f"""
+Use "--public_csv" {PUBLIC_TEXT}
+
+Use "--private_csv" {PRIVATE_TEXT}
+
+Use "--public_csv" and "--private_csv" together {PUBLIC_PRIVATE_TEXT}
+""",
+    )
     parser.add_argument(
-        "--csv",
-        dest="csv_path",
+        "--public_csv",
+        dest="public_csv_path",
+        metavar="CSV",
         type=_existing_csv_type,
-        help="Path to CSV containing private data",
+        help="Path to public CSV",
+    )
+    parser.add_argument(
+        "--private_csv",
+        dest="private_csv_path",
+        metavar="CSV",
+        type=_existing_csv_type,
+        help="Path to private CSV",
     )
     parser.add_argument(
         "--contrib",
@@ -41,17 +71,30 @@ def _get_arg_parser():
 def _get_args():
     """
     >>> _get_args()
-    Namespace(csv_path=None, contributions=1, demo=False)
+    Namespace(public_csv_path=None, private_csv_path=None, contributions=1, demo=False)
     """
     arg_parser = _get_arg_parser()
 
     if "pytest" in argv[0] or ("shiny" in argv[0] and "run" == argv[1]):
         # We are running a test,
         # and ARGV is polluted, so override:
-        return arg_parser.parse_args([])
+        args = arg_parser.parse_args([])
     else:
         # Normal parsing:
-        return arg_parser.parse_args()  # pragma: no cover
+        args = arg_parser.parse_args()  # pragma: no cover
+
+    if args.demo:  # pragma: no cover
+        other_args = {arg for arg in dir(args) if not arg.startswith("_")} - {
+            "demo",
+            "contributions",
+        }
+        set_args = [k for k in other_args if getattr(args, k) is not None]
+        if set_args:
+            arg_parser.error(
+                "When --demo is set, other arguments should be skipped: "
+                + ", ".join(set_args)
+            )
+    return args
 
 
 def _clip(n: float, lower: float, upper: float) -> float:
@@ -67,30 +110,15 @@ def _clip(n: float, lower: float, upper: float) -> float:
 
 
 class CLIInfo(NamedTuple):
-    csv_path: Optional[str]
+    public_csv_path: Optional[str]
+    private_csv_path: Optional[str]
     contributions: int
     is_demo: bool
 
 
-def _get_demo_csv_contrib() -> CLIInfo:
-    """
-    >>> csv_path, contributions, is_demo = _get_demo_csv_contrib()
-    >>> with open(csv_path, newline="") as csv_handle:
-    ...     reader = csv.DictReader(csv_handle)
-    ...     reader.fieldnames
-    ...     rows = list(reader)
-    ...     rows[0]
-    ...     rows[-1]
-    ['student_id', 'class_year', 'hw_number', 'grade']
-    {'student_id': '1', 'class_year': '2', 'hw_number': '1', 'grade': '73'}
-    {'student_id': '100', 'class_year': '1', 'hw_number': '10', 'grade': '78'}
-    """
+def _make_fake_data(path: Path, contributions):
     random.seed(0)  # So the mock data will be stable across runs.
-
-    csv_path = Path(__file__).parent.parent / "tmp" / "demo.csv"
-    contributions = 10
-
-    with csv_path.open("w", newline="") as demo_handle:
+    with path.open("w", newline="") as demo_handle:
         fields = ["student_id", "class_year", "hw_number", "grade"]
         writer = csv.DictWriter(demo_handle, fieldnames=fields)
         writer.writeheader()
@@ -109,15 +137,39 @@ def _get_demo_csv_contrib() -> CLIInfo:
                     }
                 )
 
-    return CLIInfo(csv_path=str(csv_path), contributions=contributions, is_demo=True)
+
+def _get_demo_cli_info() -> CLIInfo:
+    """
+    >>> cli_info = _get_demo_cli_info()
+    >>> with open(cli_info.private_csv_path, newline="") as csv_handle:
+    ...     reader = csv.DictReader(csv_handle)
+    ...     reader.fieldnames
+    ...     rows = list(reader)
+    ...     rows[0]
+    ...     rows[-1]
+    ['student_id', 'class_year', 'hw_number', 'grade']
+    {'student_id': '1', 'class_year': '2', 'hw_number': '1', 'grade': '73'}
+    {'student_id': '100', 'class_year': '1', 'hw_number': '10', 'grade': '78'}
+    """
+    private_csv_path = Path(__file__).parent.parent / "tmp" / "demo.csv"
+    contributions = 10
+    _make_fake_data(private_csv_path, contributions)
+
+    return CLIInfo(
+        public_csv_path=None,
+        private_csv_path=str(private_csv_path),
+        contributions=contributions,
+        is_demo=True,
+    )
 
 
-def get_cli_info():  # pragma: no cover
+def get_cli_info() -> CLIInfo:  # pragma: no cover
     args = _get_args()
     if args.demo:
-        if args.csv_path is not None:
-            warn('"--demo" overrides "--csv" and "--contrib"')
-        return _get_demo_csv_contrib()
+        return _get_demo_cli_info()
     return CLIInfo(
-        csv_path=args.csv_path, contributions=args.contributions, is_demo=False
+        public_csv_path=args.public_csv_path,
+        private_csv_path=args.private_csv_path,
+        contributions=args.contributions,
+        is_demo=False,
     )

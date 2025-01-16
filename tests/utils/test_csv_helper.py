@@ -4,7 +4,32 @@ import polars.testing as pl_testing
 import tempfile
 import pytest
 
-from dp_wizard.utils.csv_helper import read_csv_ids_labels, read_csv_ids_names
+from pathlib import Path
+
+from dp_wizard.utils.csv_helper import (
+    read_csv_ids_labels,
+    read_csv_ids_names,
+    get_csv_names_mismatch,
+    get_csv_row_count,
+)
+
+
+def test_get_csv_names_mismatch():
+    with tempfile.TemporaryDirectory() as tmp:
+        a_path = Path(tmp) / "a.csv"
+        a_path.write_text("a,b,c")
+        b_path = Path(tmp) / "b.csv"
+        b_path.write_text("b,c,d")
+        just_a, just_b = get_csv_names_mismatch(a_path, b_path)
+        assert just_a == {"a"}
+        assert just_b == {"d"}
+
+
+def test_get_csv_row_count():
+    with tempfile.TemporaryDirectory() as tmp:
+        path = Path(tmp) / "a.csv"
+        path.write_text("a,b,c\n1,2,3")
+        assert get_csv_row_count(path) == 1
 
 
 # We will not reference the encoding when reading:

@@ -1,7 +1,6 @@
 import polars as pl
 import opendp.prelude as dp
 
-from dp_wizard.utils.mock_data import mock_data, ColumnDef
 from dp_wizard.utils.shared import make_cut_points
 
 dp.enable_features("contrib")
@@ -11,6 +10,8 @@ confidence = 0.95
 
 
 def make_accuracy_histogram(
+    lf: pl.LazyFrame,
+    column_name: str,
     row_count: int,
     lower: float,
     upper: float,
@@ -19,8 +20,16 @@ def make_accuracy_histogram(
     weighted_epsilon: float,
 ) -> tuple[float, pl.DataFrame]:
     """
-    Creates fake data between lower and upper, and then returns a DP histogram from it.
+    Given a LazyFrame and column, and calculate a DP histogram.
+
+    >>> from dp_wizard.utils.mock_data import mock_data, ColumnDef
+    >>> lower, upper = 0, 10
+    >>> row_count = 100
+    >>> column_name = "value"
+    >>> df = mock_data({column_name: ColumnDef(lower, upper)}, row_count=row_count)
     >>> accuracy, histogram = make_accuracy_histogram(
+    ...     lf=pl.LazyFrame(df),
+    ...     column_name=column_name,
     ...     row_count=100,
     ...     lower=0, upper=10,
     ...     bin_count=5,
@@ -43,20 +52,16 @@ def make_accuracy_histogram(
     │ (8, 10] ┆ ... │
     └─────────┴─────┘
     """
-    # Mock data only depends on lower and upper bounds, so it could be cached,
-    # but I'd guess this is dominated by the DP operations,
-    # so not worth optimizing.
-    df = mock_data({"value": ColumnDef(lower, upper)}, row_count=row_count)
-
-    # TODO: When this is stable, merge it to templates, so we can be
+    # TODO: https://github.com/opendp/dp-wizard/issues/219
+    # When this is stable, merge it to templates, so we can be
     # sure that we're using the same code in the preview that we
     # use in the generated notebook.
     cut_points = make_cut_points(lower, upper, bin_count)
     context = dp.Context.compositor(
-        data=pl.LazyFrame(df).with_columns(
+        data=lf.with_columns(
             # The cut() method returns a Polars categorical type.
             # Cast to string to get the human-readable label.
-            pl.col("value")
+            pl.col(column_name)
             .cut(cut_points)
             .alias("bin")
             .cast(pl.String),

@@ -14,6 +14,10 @@ def convert_py_to_nb(python_str: str, execute: bool = False):
         temp_dir_path = Path(temp_dir)
         py_path = temp_dir_path / "input.py"
         py_path.write_text(python_str)
+
+        # DEBUG:
+        Path("/tmp/script.py").write_text(python_str)
+
         argv = (
             [
                 "jupytext",
