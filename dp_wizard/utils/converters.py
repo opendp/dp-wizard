@@ -2,7 +2,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import subprocess
 import json
-from logging import warning
+from warnings import warn
 
 
 def convert_py_to_nb(python_str: str, execute: bool = False):
@@ -36,7 +36,7 @@ def convert_py_to_nb(python_str: str, execute: bool = False):
         try:
             result = subprocess.run(argv, check=True, text=True, capture_output=True)
         except subprocess.CalledProcessError as e:
-            warning(f'STDERR from "{cmd}":\n{e.stderr}')
+            warn(f'STDERR from "{cmd}":\n{e.stderr}')
             if not execute:
                 # Might reach here if jupytext is not installed.
                 # Error quickly instead of trying to recover.
@@ -50,7 +50,7 @@ def convert_py_to_nb(python_str: str, execute: bool = False):
             result = subprocess.run(argv, check=True, text=True, capture_output=True)
 
         if result.stderr:
-            warning(f'STDERR from "{cmd}":\n{result.stderr}')  # pragma: no cover
+            warn(f'STDERR from "{cmd}":\n{result.stderr}')  # pragma: no cover
         return result.stdout.strip()
 
 
