@@ -52,7 +52,8 @@ def results_ui():
             tr(
                 td_button("Notebook", ".ipynb", "book"),
                 td_details(
-                    "Other notebook formats", button("HTML", ".html", "file-code")
+                    "Other notebook formats",
+                    button("HTML", ".html", "file-code"),
                 ),
             ),
             tr(
