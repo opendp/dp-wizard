@@ -15,8 +15,8 @@ def convert_py_to_nb(python_str: str, execute: bool = False):
         py_path = temp_dir_path / "input.py"
         py_path.write_text(python_str)
 
-        # DEBUG:
-        Path("/tmp/script.py").write_text(python_str)
+        # for debugging:
+        # Path("/tmp/script.py").write_text(python_str)
 
         argv = (
             [
@@ -46,10 +46,10 @@ def convert_py_to_nb(python_str: str, execute: bool = False):
             )
             result = subprocess.run(argv, check=True, text=True, capture_output=True)
 
-        return strip_nb_coda(result.stdout.strip())
+        return _strip_nb_coda(result.stdout.strip())
 
 
-def strip_nb_coda(nb_json: str):
+def _strip_nb_coda(nb_json: str):
     """
     Given a notebook as a string of JSON, remove the coda.
     (These produce reports that we do need,

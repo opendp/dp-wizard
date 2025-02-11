@@ -3,7 +3,7 @@ from pathlib import Path
 import subprocess
 import pytest
 import json
-from dp_wizard.utils.converters import convert_py_to_nb, strip_nb_coda
+from dp_wizard.utils.converters import convert_py_to_nb, _strip_nb_coda
 
 
 fixtures_path = Path(__file__).parent.parent / "fixtures"
@@ -44,19 +44,11 @@ def test_convert_py_to_nb_execute():
     normed_expected_nb_str = norm_nb(expected_nb_str)
     assert normed_actual_nb_str == normed_expected_nb_str
 
-    # strip_nb_coda: Easier to extend this test than to make a separate one.
-    actual_strip_nb_str = strip_nb_coda(actual_nb_str)
-    expected_strip_nb_str = (fixtures_path / "fake-stripped.ipynb").read_text()
-
-    normed_actual_strip_nb_str = norm_nb(actual_strip_nb_str)
-    normed_expected_strip_nb_str = norm_nb(expected_strip_nb_str)
-    assert normed_actual_strip_nb_str == normed_expected_strip_nb_str
-
 
 def test_strip_nb_coda():
     # Trivial test just to get 100% branch coverage.
     nb = {"cells": []}
-    assert nb == json.loads(strip_nb_coda(json.dumps(nb)))
+    assert nb == json.loads(_strip_nb_coda(json.dumps(nb)))
 
 
 def test_convert_py_to_nb_error():
