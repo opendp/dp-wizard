@@ -171,6 +171,15 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     html = html_download.path().read_text()
     assert "<!DOCTYPE html>" in html
 
+    # ... pdf:
+    with page.expect_download() as pdf_download_info:
+        page.get_by_text("Download PDF").click()
+    expect_no_error()
+
+    pdf_download = pdf_download_info.value
+    pdf = pdf_download.path().read_bytes()
+    assert b"%PDF-1.4" in pdf
+
     # Reports ...
 
     # ... text:
