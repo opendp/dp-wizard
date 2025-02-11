@@ -32,6 +32,17 @@ def td_button(name: str, ext: str, icon: str):
     return td(button(name, ext, icon))
 
 
+def td_details(summary_str: str, *args):
+    return (
+        td(
+            details(
+                summary(summary_str),
+                *args,
+            ),
+        ),
+    )
+
+
 def results_ui():
     return ui.nav_panel(
         "Download results",
@@ -39,20 +50,16 @@ def results_ui():
         table(
             tr(
                 td_button("Notebook", ".ipynb", "book"),
-                td(
-                    details(
-                        summary("Other notebook formats"),
-                        "TODO: html",
-                    ),
+                td_details(
+                    "Other notebook formats",
+                    "TODO: html",
                 ),
             ),
             tr(
                 td_button("Report", ".txt", "file-lines"),
-                td(
-                    details(
-                        summary("Other report formats"),
-                        button("Table", ".csv", "file-csv"),
-                    ),
+                td_details(
+                    "Other report formats",
+                    button("Table", ".csv", "file-csv"),
                 ),
             ),
             tr(
