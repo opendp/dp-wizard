@@ -150,7 +150,9 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     expect_visible(download_results_text)
     expect_no_error()
 
-    # Notebook:
+    # Notebooks ...
+
+    # ... ipynb:
     with page.expect_download() as notebook_download_info:
         page.get_by_text("Download notebook").click()
     expect_no_error()
@@ -159,7 +161,19 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     notebook = notebook_download.path().read_text()
     assert "contributions = 42" in notebook
 
-    # Text Report:
+    # ... html:
+    page.get_by_text("Other notebook formats").click()
+    with page.expect_download() as html_download_info:
+        page.get_by_text("Download HTML").click()
+    expect_no_error()
+
+    html_download = html_download_info.value
+    html = html_download.path().read_text()
+    assert "<!DOCTYPE html>" in html
+
+    # Reports ...
+
+    # ... text:
     with page.expect_download() as text_report_download_info:
         page.get_by_text("Download report (.txt)").click()
     expect_no_error()
@@ -168,7 +182,7 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     report = report_download.path().read_text()
     assert "confidence: 0.95" in report
 
-    # CSV Report:
+    # ... csv:
     page.get_by_text("Other report formats").click()
     with page.expect_download() as csv_report_download_info:
         page.get_by_text("Download table (.csv)").click()
