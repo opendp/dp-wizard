@@ -150,6 +150,15 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     expect_visible(download_results_text)
     expect_no_error()
 
+    # Notebook:
+    with page.expect_download() as notebook_download_info:
+        page.get_by_text("Download notebook").click()
+    expect_no_error()
+
+    notebook_download = notebook_download_info.value
+    notebook = notebook_download.path().read_text()
+    assert "contributions = 42" in notebook
+
     # Text Report:
     with page.expect_download() as text_report_download_info:
         page.get_by_text("Download report (.txt)").click()
@@ -177,15 +186,6 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     script_download = script_download_info.value
     script = script_download.path().read_text()
     assert "contributions = 42" in script
-
-    # Notebook:
-    with page.expect_download() as notebook_download_info:
-        page.get_by_text("Download notebook").click()
-    expect_no_error()
-
-    notebook_download = notebook_download_info.value
-    notebook = notebook_download.path().read_text()
-    assert "contributions = 42" in notebook
 
     # -- Feedback --
     page.get_by_text("Feedback").click()
