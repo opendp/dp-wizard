@@ -2,6 +2,8 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import subprocess
 import json
+import nbformat
+import nbconvert
 
 
 def convert_py_to_nb(python_str: str, execute: bool = False):
@@ -63,3 +65,10 @@ def _strip_nb_coda(nb_json: str):
         new_cells.append(cell)
     nb["cells"] = new_cells
     return json.dumps(nb, indent=1)
+
+
+def convert_nb_to_html(python_nb: str):
+    notebook = nbformat.reads(python_nb, as_version=4)
+    html_exporter = nbconvert.HTMLExporter(template_name="classic")
+    (body, _resources) = html_exporter.from_notebook_node(notebook)
+    return body

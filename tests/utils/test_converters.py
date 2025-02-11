@@ -3,7 +3,11 @@ from pathlib import Path
 import subprocess
 import pytest
 import json
-from dp_wizard.utils.converters import convert_py_to_nb, _strip_nb_coda
+from dp_wizard.utils.converters import (
+    convert_py_to_nb,
+    _strip_nb_coda,
+    convert_nb_to_html,
+)
 
 
 fixtures_path = Path(__file__).parent.parent / "fixtures"
@@ -55,3 +59,10 @@ def test_convert_py_to_nb_error():
     python_str = "Invalid python!"
     with pytest.raises(subprocess.CalledProcessError):
         convert_py_to_nb(python_str, execute=True)
+
+
+def test_convert_nb_to_html():
+    notebook = (fixtures_path / "fake-executed.ipynb").read_text()
+    html = convert_nb_to_html(notebook)
+    assert "[1]:" in html
+    assert "<pre>4" in html
