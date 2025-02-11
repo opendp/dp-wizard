@@ -122,17 +122,11 @@ def results_server(
 
     @reactive.calc
     def notebook_html():
-        # TODO: Factor notebook_by out into a calc.
-        notebook_py = NotebookGenerator(analysis_plan()).make_py()
-        notebook_json = convert_py_to_nb(notebook_py, execute=True)
-        return convert_nb_to_html(notebook_json)
+        return convert_nb_to_html(notebook_nb())
 
     @reactive.calc
     def notebook_pdf():
-        # TODO: Factor notebook_by out into a calc.
-        notebook_py = NotebookGenerator(analysis_plan()).make_py()
-        notebook_json = convert_py_to_nb(notebook_py, execute=True)
-        return convert_nb_to_pdf(notebook_json)
+        return convert_nb_to_pdf(notebook_nb())
 
     @render.download(
         filename="dp-wizard-script.py",
