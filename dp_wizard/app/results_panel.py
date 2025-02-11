@@ -10,7 +10,11 @@ from dp_wizard.utils.code_generators import (
     AnalysisPlan,
     AnalysisPlanColumn,
 )
-from dp_wizard.utils.converters import convert_py_to_nb, convert_nb_to_html
+from dp_wizard.utils.converters import (
+    convert_py_to_nb,
+    convert_nb_to_html,
+    convert_nb_to_pdf,
+)
 
 
 wait_message = "Please wait."
@@ -54,6 +58,7 @@ def results_ui():
                 td_details(
                     "Other notebook formats",
                     button("HTML", ".html", "file-code"),
+                    button("PDF", ".pdf", "file-pdf"),
                 ),
             ),
             tr(
@@ -122,6 +127,13 @@ def results_server(
         notebook_json = convert_py_to_nb(notebook_py, execute=True)
         return convert_nb_to_html(notebook_json)
 
+    @reactive.calc
+    def notebook_pdf():
+        # TODO: Factor notebook_by out into a calc.
+        notebook_py = NotebookGenerator(analysis_plan()).make_py()
+        notebook_json = convert_py_to_nb(notebook_py, execute=True)
+        return convert_nb_to_pdf(notebook_json)
+
     @render.download(
         filename="dp-wizard-script.py",
         media_type="text/x-python",
@@ -148,6 +160,15 @@ def results_server(
         with ui.Progress() as progress:
             progress.set(message=wait_message)
             yield notebook_html()
+
+    @render.download(
+        filename="dp-wizard-notebook.pdf",
+        media_type="application/pdf",
+    )  # pyright: ignore
+    async def download_pdf():
+        with ui.Progress() as progress:
+            progress.set(message=wait_message)
+            yield notebook_pdf()
 
     @render.download(
         filename="dp-wizard-report.txt",

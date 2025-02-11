@@ -69,6 +69,15 @@ def _strip_nb_coda(nb_json: str):
 
 def convert_nb_to_html(python_nb: str):
     notebook = nbformat.reads(python_nb, as_version=4)
-    html_exporter = nbconvert.HTMLExporter(template_name="classic")
-    (body, _resources) = html_exporter.from_notebook_node(notebook)
+    exporter = nbconvert.HTMLExporter(template_name="classic")
+    (body, _resources) = exporter.from_notebook_node(notebook)
+    return body
+
+
+def convert_nb_to_pdf(python_nb: str):
+    notebook = nbformat.reads(python_nb, as_version=4)
+    # PDFExporter uses LaTeX as an intermediate representation.
+    # WebPDFExporter uses HTML.
+    exporter = nbconvert.WebPDFExporter(template_name="classic")
+    (body, _resources) = exporter.from_notebook_node(notebook)
     return body

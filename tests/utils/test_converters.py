@@ -7,6 +7,7 @@ from dp_wizard.utils.converters import (
     convert_py_to_nb,
     _strip_nb_coda,
     convert_nb_to_html,
+    convert_nb_to_pdf,
 )
 
 
@@ -66,3 +67,9 @@ def test_convert_nb_to_html():
     html = convert_nb_to_html(notebook)
     assert "[1]:" in html
     assert "<pre>4" in html
+
+
+def test_convert_nb_to_pdf():
+    notebook = (fixtures_path / "fake-executed.ipynb").read_text()
+    pdf = convert_nb_to_pdf(notebook)
+    assert b"%PDF-1.4" in pdf
