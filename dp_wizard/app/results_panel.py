@@ -10,7 +10,7 @@ from dp_wizard.utils.code_generators import (
     AnalysisPlan,
     AnalysisPlanColumn,
 )
-from dp_wizard.utils.converters import convert_py_to_nb
+from dp_wizard.utils.converters import convert_py_to_nb, convert_nb_to_html
 
 
 wait_message = "Please wait."
@@ -47,12 +47,12 @@ def results_ui():
     return ui.nav_panel(
         "Download results",
         ui.markdown("You can now make a differentially private release of your data."),
+        # Find more icons on Font Awesome: https://fontawesome.com/search?ic=free
         table(
             tr(
                 td_button("Notebook", ".ipynb", "book"),
                 td_details(
-                    "Other notebook formats",
-                    "TODO: html",
+                    "Other notebook formats", button("HTML", ".html", "file-code")
                 ),
             ),
             tr(
@@ -114,6 +114,13 @@ def results_server(
         notebook_py = NotebookGenerator(analysis_plan()).make_py()
         return convert_py_to_nb(notebook_py, execute=True)
 
+    @reactive.calc
+    def notebook_html():
+        # TODO: Factor notebook_by out into a calc.
+        notebook_py = NotebookGenerator(analysis_plan()).make_py()
+        notebook_json = convert_py_to_nb(notebook_py, execute=True)
+        return convert_nb_to_html(notebook_json)
+
     @render.download(
         filename="dp-wizard-script.py",
         media_type="text/x-python",
@@ -131,6 +138,15 @@ def results_server(
         with ui.Progress() as progress:
             progress.set(message=wait_message)
             yield notebook_nb()
+
+    @render.download(
+        filename="dp-wizard-notebook.html",
+        media_type="text/html",
+    )
+    async def download_html():
+        with ui.Progress() as progress:
+            progress.set(message=wait_message)
+            yield notebook_html()
 
     @render.download(
         filename="dp-wizard-report.txt",
