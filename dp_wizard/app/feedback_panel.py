@@ -7,6 +7,8 @@ def feedback_ui():
         "Feedback",
         ui.div(
             HTML(
+                # Responses to this survey are at:
+                # https://docs.google.com/forms/d/1l7-RK1R1nRuhHr8pTck1D4RU8Bi6Ehr124bkYvH-96c/edit
                 """
                 <iframe
                     src="https://docs.google.com/forms/d/e/1FAIpQLScaGdKS-vj-RrM7SCV_lAwZmxQ2bOqFrAkyDp4djxTqkTkinA/viewform?embedded=true"
