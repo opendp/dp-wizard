@@ -46,7 +46,7 @@ def convert_py_to_nb(python_str: str, execute: bool = False):
             )
             result = subprocess.run(argv, check=True, text=True, capture_output=True)
 
-        return result.stdout.strip()
+        return strip_nb_coda(result.stdout.strip())
 
 
 def strip_nb_coda(nb_json: str):
