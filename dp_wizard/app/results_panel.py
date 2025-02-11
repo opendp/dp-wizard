@@ -2,7 +2,7 @@ from pathlib import Path
 
 from shiny import ui, render, reactive, Inputs, Outputs, Session
 from faicons import icon_svg
-from htmltools.tags import table, tr, td
+from htmltools.tags import table, tr, td, details, summary
 
 from dp_wizard.utils.code_generators import (
     NotebookGenerator,
@@ -16,20 +16,20 @@ from dp_wizard.utils.converters import convert_py_to_nb
 wait_message = "Please wait."
 
 
-def td_button(name: str, ext: str, icon: str):
+def button(name: str, ext: str, icon: str):
     function_name = f'download_{name.lower().replace(" ", "_")}'
-    return (
-        td(
-            ui.download_button(
-                function_name,
-                [
-                    icon_svg(icon, margin_right="0.5em"),
-                    f"Download {name} ({ext})",
-                ],
-                width="20em",
-            )
-        ),
+    return ui.download_button(
+        function_name,
+        [
+            icon_svg(icon, margin_right="0.5em"),
+            f"Download {name} ({ext})",
+        ],
+        width="20em",
     )
+
+
+def td_button(name: str, ext: str, icon: str):
+    return td(button(name, ext, icon))
 
 
 def results_ui():
@@ -39,11 +39,24 @@ def results_ui():
         table(
             tr(
                 td_button("Notebook", ".ipynb", "book"),
-                td_button("Script", ".py", "python"),
+                td(
+                    details(
+                        summary("Other notebook formats"),
+                        "TODO: html",
+                    ),
+                ),
             ),
             tr(
                 td_button("Report", ".txt", "file-lines"),
-                td_button("Table", ".csv", "file-csv"),
+                td(
+                    details(
+                        summary("Other report formats"),
+                        button("Table", ".csv", "file-csv"),
+                    ),
+                ),
+            ),
+            tr(
+                td_button("Script", ".py", "python"),
             ),
         ),
         value="results_panel",
