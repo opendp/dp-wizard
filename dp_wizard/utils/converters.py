@@ -40,10 +40,10 @@ def convert_py_to_nb(python_str: str, execute: bool = False):
             )
             result = subprocess.run(argv, check=True, text=True, capture_output=True)
 
-        return _strip_nb_coda(result.stdout.strip())
+        return _clean_nb(result.stdout.strip())
 
 
-def _strip_nb_coda(nb_json: str):
+def _clean_nb(nb_json: str):
     """
     Given a notebook as a string of JSON, remove the coda.
     (These produce reports that we do need,
@@ -52,6 +52,8 @@ def _strip_nb_coda(nb_json: str):
     nb = json.loads(nb_json)
     new_cells = []
     for cell in nb["cells"]:
+        if "pip install" in cell["source"][0]:
+            cell["outputs"] = []
         if "# Coda\n" in cell["source"]:
             break
         new_cells.append(cell)
