@@ -45,8 +45,8 @@ def convert_py_to_nb(python_str: str, execute: bool = False):
 
 def _clean_nb(nb_json: str):
     """
-    Given a notebook as a string of JSON, remove the coda.
-    (These produce reports that we do need,
+    Given a notebook as a string of JSON, remove the coda and pip output.
+    (The code produces reports that we do need,
     but the code isn't actually interesting to end users.)
     """
     nb = json.loads(nb_json)

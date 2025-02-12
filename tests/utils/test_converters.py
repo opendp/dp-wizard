@@ -50,7 +50,7 @@ def test_convert_py_to_nb_execute():
     assert normed_actual_nb_str == normed_expected_nb_str
 
 
-def test_strip_nb_coda():
+def test_clean_nb():
     # Trivial test just to get 100% branch coverage.
     nb = {"cells": []}
     assert nb == json.loads(_clean_nb(json.dumps(nb)))
