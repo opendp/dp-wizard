@@ -21,15 +21,7 @@ def convert_py_to_nb(python_str: str, execute: bool = False):
         # Path("/tmp/script.py").write_text(python_str)
 
         argv = (
-            [
-                "jupytext",
-                "--from",
-                ".py",
-                "--to",
-                ".ipynb",
-                "--output",
-                "-",
-            ]
+            "jupytext --from .py --to .ipynb --output -".split(" ")
             + (["--execute"] if execute else [])
             + [str(py_path.absolute())]  # Input
         )
