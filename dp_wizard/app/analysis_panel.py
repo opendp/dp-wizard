@@ -20,6 +20,13 @@ def analysis_ui():
         "Define Analysis",
         ui.layout_columns(
             ui.card(
+                ui.card_header("Groups"),
+                ui.markdown(
+                    "Select columns to group by, or leave empty "
+                    "to calculate stats across the whole CSV."
+                ),
+            ),
+            ui.card(
                 ui.card_header("Columns"),
                 ui.markdown(
                     "Select numeric columns of interest, "
@@ -49,6 +56,11 @@ def analysis_ui():
                 ui.card_header("Simulation"),
                 ui.output_ui("simulation_card_ui"),
             ),
+            col_widths={
+                "sm": [12, 12, 12, 12],  # 4 rows
+                "md": [6, 6, 6, 6],  # 2 rows
+                "xxl": [3, 3, 3, 3],  # 1 row
+            },
         ),
         ui.output_ui("columns_ui"),
         ui.output_ui("download_results_button_ui"),
