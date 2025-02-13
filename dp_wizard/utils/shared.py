@@ -28,14 +28,23 @@ def df_to_columns(df: DataFrame):
     Transform a Dataframe into a format that is easier to plot,
     parsing the interval strings to sort them as numbers.
     >>> import polars as pl
-    >>> df = pl.DataFrame({
+    >>> df_2 = pl.DataFrame({
     ...     "bin": ["(-inf, 5]", "(10, 20]", "(5, 10]"],
     ...     "len": [0, 20, 10],
     ... })
-    >>> df_to_columns(df)
+    >>> df_to_columns(df_2)
     (('(-inf, 5]', '(5, 10]', '(10, 20]'), (0, 10, 20))
+
+    >>> df_3 = pl.DataFrame({
+    ...     "bin": ["(0, 1]", "(1, 2]", "(0, 1]", "(1, 2]"],
+    ...     "etc": ["A", "A", "B", "B"],
+    ...     "len": [0, 10, 20, 30],
+    ... })
+    >>> df_to_columns(df_3)
+    (('(0, 1] A', '(0, 1] B', '(1, 2] A', '(1, 2] B'), (0, 20, 10, 30))
     """
-    sorted_rows = sorted(df.rows(), key=lambda pair: interval_bottom(pair[0]))
+    merged_key_rows = [(" ".join(keys), value) for (*keys, value) in df.rows()]
+    sorted_rows = sorted(merged_key_rows, key=lambda row: interval_bottom(row[0]))
     return tuple(zip(*sorted_rows))
 
 
