@@ -20,10 +20,16 @@ def analysis_ui():
         "Define Analysis",
         ui.layout_columns(
             ui.card(
-                ui.card_header("Groups"),
+                ui.card_header("Grouping"),
                 ui.markdown(
                     "Select columns to group by, or leave empty "
-                    "to calculate stats across the whole CSV."
+                    "to calculate statistics across the entire dataset."
+                ),
+                ui.input_selectize(
+                    "grouping_selectize",
+                    "Group by",
+                    ["cat", "dog", "mouse"],
+                    multiple=True,
                 ),
             ),
             ui.card(
