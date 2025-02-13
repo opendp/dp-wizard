@@ -28,7 +28,7 @@ def analysis_ui():
                 ui.input_selectize(
                     "grouping_selectize",
                     "Group by",
-                    ["cat", "dog", "mouse"],
+                    [],
                     multiple=True,
                 ),
             ),
@@ -104,11 +104,17 @@ def analysis_server(
         return len(column_ids_selected) > 0
 
     @reactive.effect
-    def _update_checkbox_group():
+    def _update_columns():
+        csv_ids_labels = csv_ids_labels_calc()
+        ui.update_selectize(
+            "grouping_selectize",
+            label=None,
+            choices=csv_ids_labels,
+        )
         ui.update_checkbox_group(
             "columns_checkbox_group",
             label=None,
-            choices=csv_ids_labels_calc(),
+            choices=csv_ids_labels,
         )
 
     @reactive.effect
