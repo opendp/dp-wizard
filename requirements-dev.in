@@ -20,7 +20,7 @@ coverage
 # Everything below should also be listed in pyproject.toml:
 
 # OpenDP:
-opendp[polars]
+opendp[polars]==0.12.0
 # For Python 3.9:
 scipy<1.14
 contourpy<1.3.1
