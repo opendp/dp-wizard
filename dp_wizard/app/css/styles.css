@@ -32,3 +32,8 @@ so any of these might be applied.
 .bs-tooltip-auto[data-popper-placement^="top"] .tooltip-arrow::before {
     border-top-color: lightgray;
 }
+
+/*
+Selectize menus should overflow the containing card.
+*/
+.card, .card-body { overflow: visible !important; }

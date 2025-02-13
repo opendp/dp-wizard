@@ -34,16 +34,12 @@ def analysis_ui():
             ),
             ui.card(
                 ui.card_header("Columns"),
-                ui.markdown(
-                    "Select numeric columns of interest, "
-                    "and for each numeric column indicate the expected range, "
-                    "the number of bins for the histogram, "
-                    "and its relative share of the privacy budget."
-                ),
-                ui.input_checkbox_group(
-                    "columns_checkbox_group",
-                    ["Columns", ui.output_ui("columns_checkbox_group_tooltip_ui")],
+                ui.markdown("Select columns to calculate statistics on."),
+                ui.input_selectize(
+                    "columns_selectize",
+                    ["Columns", ui.output_ui("columns_selectize_tooltip_ui")],
                     [],
+                    multiple=True,
                 ),
             ),
             ui.card(
@@ -100,7 +96,7 @@ def analysis_server(
 ):  # pragma: no cover
     @reactive.calc
     def button_enabled():
-        column_ids_selected = input.columns_checkbox_group()
+        column_ids_selected = input.columns_selectize()
         return len(column_ids_selected) > 0
 
     @reactive.effect
@@ -111,23 +107,23 @@ def analysis_server(
             label=None,
             choices=csv_ids_labels,
         )
-        ui.update_checkbox_group(
-            "columns_checkbox_group",
+        ui.update_selectize(
+            "columns_selectize",
             label=None,
             choices=csv_ids_labels,
         )
 
     @reactive.effect
-    @reactive.event(input.columns_checkbox_group)
+    @reactive.event(input.columns_selectize)
     def _on_column_set_change():
-        column_ids_selected = input.columns_checkbox_group()
+        column_ids_selected = input.columns_selectize()
         # We only clean up the weights, and everything else is left in place,
         # so if you restore a column, you see the original values.
         # (Except for weight, which goes back to the default.)
         _cleanup_reactive_dict(weights, column_ids_selected)
 
     @render.ui
-    def columns_checkbox_group_tooltip_ui():
+    def columns_selectize_tooltip_ui():
         return demo_tooltip(
             is_demo,
             """
@@ -184,7 +180,7 @@ def analysis_server(
 
     @render.ui
     def columns_ui():
-        column_ids = input.columns_checkbox_group()
+        column_ids = input.columns_selectize()
         column_ids_to_names = csv_ids_names_calc()
         for column_id in column_ids:
             column_server(
