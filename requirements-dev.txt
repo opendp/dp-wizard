@@ -131,8 +131,10 @@ jupyterlab-pygments==0.3.0
     # via nbconvert
 jupytext==1.16.7
     # via -r requirements-dev.in
-kiwisolver==1.4.8
-    # via matplotlib
+kiwisolver==1.4.7
+    # via
+    #   -r requirements-dev.in
+    #   matplotlib
 linkify-it-py==2.0.3
     # via shiny
 markdown-it-py==3.0.0
