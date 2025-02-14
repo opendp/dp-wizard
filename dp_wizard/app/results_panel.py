@@ -54,7 +54,8 @@ def results_ui():
                 button("Report", ".txt", "file-lines", primary=True),
                 p(
                     "A report which includes your parameter choices and the results. "
-                    "Intended to be human-readable, but it does use YAML, so it could be parsed by other programs."
+                    "Intended to be human-readable, but it does use YAML, "
+                    "so it can be parsed by other programs."
                 ),
                 button("Table", ".csv", "file-csv"),
                 p("The same information, but condensed into a two-column CSV."),
@@ -64,7 +65,9 @@ def results_ui():
                 button("Script", ".py", "python", primary=True),
                 p(
                     "The same code as the notebook, but extracted into "
-                    "a Python script that can be run from the command line."
+                    "a Python script which can be run from the command line. "
+                    "The script itself does not contain any data "
+                    "or analysis results."
                 ),
             ),
         ),
