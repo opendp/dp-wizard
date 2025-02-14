@@ -38,7 +38,7 @@ def results_ui():
         # Find more icons on Font Awesome: https://fontawesome.com/search?ic=free
         ui.accordion(
             ui.accordion_panel(
-                "Notebook",
+                "Notebooks",
                 button("Notebook", ".ipynb", "book", primary=True),
                 p(
                     "An executed Jupyter notebook which references your CSV "
@@ -50,7 +50,7 @@ def results_ui():
                 p("The same content, but exported as PDF."),
             ),
             ui.accordion_panel(
-                "Report",
+                "Reports",
                 button("Report", ".txt", "file-lines", primary=True),
                 p(
                     "A report which includes your parameter choices and the results. "
@@ -61,7 +61,7 @@ def results_ui():
                 p("The same information, but condensed into a two-column CSV."),
             ),
             ui.accordion_panel(
-                "Script",
+                "Scripts",
                 button("Script", ".py", "python", primary=True),
                 p(
                     "The same code as the notebook, but extracted into "
