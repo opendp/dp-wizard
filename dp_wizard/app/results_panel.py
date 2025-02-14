@@ -20,15 +20,14 @@ from dp_wizard.utils.converters import (
 wait_message = "Please wait."
 
 
-def button(name: str, ext: str, icon: str):
+def button(name: str, ext: str, icon: str, primary=False):
     function_name = f'download_{name.lower().replace(" ", "_")}'
     return ui.download_button(
         function_name,
-        [
-            icon_svg(icon, margin_right="0.5em"),
-            f"Download {name} ({ext})",
-        ],
+        f"Download {name} ({ext})",
+        icon=icon_svg(icon, margin_right="0.5em"),
         width="20em",
+        class_="btn-primary" if primary else None,
     )
 
 
@@ -40,7 +39,7 @@ def results_ui():
         ui.accordion(
             ui.accordion_panel(
                 "Notebook",
-                button("Notebook", ".ipynb", "book"),
+                button("Notebook", ".ipynb", "book", primary=True),
                 p(
                     "An executed Jupyter notebook which references your CSV "
                     "and shows the result of a differentially private analysis."
@@ -52,7 +51,7 @@ def results_ui():
             ),
             ui.accordion_panel(
                 "Report",
-                button("Report", ".txt", "file-lines"),
+                button("Report", ".txt", "file-lines", primary=True),
                 p(
                     "A report which includes your parameter choices and the results. "
                     "Intended to be human-readable, but it does use YAML, so it could be parsed by other programs."
@@ -62,7 +61,7 @@ def results_ui():
             ),
             ui.accordion_panel(
                 "Script",
-                button("Script", ".py", "python"),
+                button("Script", ".py", "python", primary=True),
                 p(
                     "The same code as the notebook, but extracted into "
                     "a Python script that can be run from the command line."
