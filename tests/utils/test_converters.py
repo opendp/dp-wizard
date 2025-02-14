@@ -58,8 +58,15 @@ def test_strip_nb_coda():
 
 def test_convert_py_to_nb_error():
     python_str = "Invalid python!"
-    with pytest.raises(subprocess.CalledProcessError):
-        convert_py_to_nb(python_str, execute=True)
+    with pytest.raises(
+        subprocess.CalledProcessError,
+        match=r"jupytext.*returned non-zero exit status",
+    ):
+        with pytest.warns(
+            UserWarning,
+            match=r'STDERR from "jupytext',
+        ):
+            convert_py_to_nb(python_str, execute=True)
 
 
 def test_convert_nb_to_html():
