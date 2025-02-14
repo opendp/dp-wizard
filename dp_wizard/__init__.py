@@ -1,11 +1,10 @@
 """DP Wizard makes it easier to get started with Differential Privacy."""
 
-from pathlib import Path
 import shiny
 from dp_wizard.utils.argparse_helpers import get_cli_info
 
 
-__version__ = (Path(__file__).parent / "VERSION").read_text().strip()
+__version__ = "0.0.1"
 
 
 def main():  # pragma: no cover
