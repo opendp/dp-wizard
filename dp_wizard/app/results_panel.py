@@ -2,7 +2,7 @@ from pathlib import Path
 
 from shiny import ui, render, reactive, Inputs, Outputs, Session
 from faicons import icon_svg
-from htmltools.tags import table, tr, td, details, summary
+from htmltools.tags import p
 
 from dp_wizard.utils.code_generators import (
     NotebookGenerator,
@@ -20,30 +20,14 @@ from dp_wizard.utils.converters import (
 wait_message = "Please wait."
 
 
-def button(name: str, ext: str, icon: str):
+def button(name: str, ext: str, icon: str, primary=False):
     function_name = f'download_{name.lower().replace(" ", "_")}'
     return ui.download_button(
         function_name,
-        [
-            icon_svg(icon, margin_right="0.5em"),
-            f"Download {name} ({ext})",
-        ],
+        f"Download {name} ({ext})",
+        icon=icon_svg(icon, margin_right="0.5em"),
         width="20em",
-    )
-
-
-def td_button(name: str, ext: str, icon: str):
-    return td(button(name, ext, icon))
-
-
-def td_details(summary_str: str, *args):
-    return (
-        td(
-            details(
-                summary(summary_str),
-                *args,
-            ),
-        ),
+        class_="btn-primary" if primary else None,
     )
 
 
@@ -52,24 +36,39 @@ def results_ui():
         "Download results",
         ui.markdown("You can now make a differentially private release of your data."),
         # Find more icons on Font Awesome: https://fontawesome.com/search?ic=free
-        table(
-            tr(
-                td_button("Notebook", ".ipynb", "book"),
-                td_details(
-                    "Other notebook formats",
-                    button("HTML", ".html", "file-code"),
-                    button("PDF", ".pdf", "file-pdf"),
+        ui.accordion(
+            ui.accordion_panel(
+                "Notebooks",
+                button("Notebook", ".ipynb", "book", primary=True),
+                p(
+                    "An executed Jupyter notebook which references your CSV "
+                    "and shows the result of a differentially private analysis."
                 ),
+                button("HTML", ".html", "file-code"),
+                p("The same content, but exported as HTML."),
+                button("PDF", ".pdf", "file-pdf"),
+                p("The same content, but exported as PDF."),
             ),
-            tr(
-                td_button("Report", ".txt", "file-lines"),
-                td_details(
-                    "Other report formats",
-                    button("Table", ".csv", "file-csv"),
+            ui.accordion_panel(
+                "Reports",
+                button("Report", ".txt", "file-lines", primary=True),
+                p(
+                    "A report which includes your parameter choices and the results. "
+                    "Intended to be human-readable, but it does use YAML, "
+                    "so it can be parsed by other programs."
                 ),
+                button("Table", ".csv", "file-csv"),
+                p("The same information, but condensed into a two-column CSV."),
             ),
-            tr(
-                td_button("Script", ".py", "python"),
+            ui.accordion_panel(
+                "Scripts",
+                button("Script", ".py", "python", primary=True),
+                p(
+                    "The same code as the notebook, but extracted into "
+                    "a Python script which can be run from the command line. "
+                    "The script itself does not contain any data "
+                    "or analysis results."
+                ),
             ),
         ),
         value="results_panel",
