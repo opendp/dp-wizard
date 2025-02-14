@@ -8,10 +8,14 @@ root_path = Path(__file__).parent
 
 
 def get_prev_version():
+    """
+    >>> len(get_prev_version().splitlines())
+    1
+    """
     return (root_path / "dp_wizard" / "VERSION").read_text().strip()
 
 
-def log_until(match):
+def log_until(match):  # pragma: no cover
     lines = subprocess.check_output(["git", "log", "--oneline"], text=True).splitlines()
     if match is None:
         return lines
@@ -43,7 +47,7 @@ def parse_log(lines):
     return "\n".join(output_lines)
 
 
-def main():
+def main():  # pragma: no cover
     old_changelog_lines = (root_path / "CHANGELOG.md").read_text().splitlines()
     new_changelog_lines = []
 
@@ -65,5 +69,5 @@ def main():
     (root_path / "CHANGELOG.md").write_text("\n".join(new_changelog_lines))
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     main()

@@ -1,5 +1,7 @@
 import subprocess
 import pytest
+import dp_wizard
+import re
 
 
 tests = {
@@ -12,3 +14,7 @@ tests = {
 def test_subprocess(cmd: str):
     result = subprocess.run(cmd, shell=True)
     assert result.returncode == 0, f'"{cmd}" failed'
+
+
+def test_version():
+    assert re.match(r"\d+\.\d+\.\d+", dp_wizard.__version__)
