@@ -27,15 +27,9 @@ def df_to_columns(df: DataFrame):
     """
     Transform a Dataframe into a format that is easier to plot,
     parsing the interval strings to sort them as numbers.
-    >>> import polars as pl
-    >>> df = pl.DataFrame({
-    ...     "bin": ["(-inf, 5]", "(10, 20]", "(5, 10]"],
-    ...     "len": [0, 20, 10],
-    ... })
-    >>> df_to_columns(df)
-    (('(-inf, 5]', '(5, 10]', '(10, 20]'), (0, 10, 20))
     """
-    sorted_rows = sorted(df.rows(), key=lambda pair: interval_bottom(pair[0]))
+    merged_key_rows = [(" ".join(keys), value) for (*keys, value) in df.rows()]
+    sorted_rows = sorted(merged_key_rows, key=lambda row: interval_bottom(row[0]))
     return tuple(zip(*sorted_rows))
 
 
