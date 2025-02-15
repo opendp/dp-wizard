@@ -67,22 +67,18 @@ def _clean_nb(nb_json: str):
 
 
 def convert_nb_to_html(python_nb: str):
-    notebook = nbformat.reads(python_nb, as_version=4)
-    exporter = nbconvert.HTMLExporter(
-        template_name="custom",
-        extra_template_basedirs=[
-            str((Path(__file__).parent / "nbconvert_templates").absolute())
-        ],
-    )
-    (body, _resources) = exporter.from_notebook_node(notebook)
-    return body
+    return convert_nb(python_nb, nbconvert.HTMLExporter)
 
 
 def convert_nb_to_pdf(python_nb: str):
-    notebook = nbformat.reads(python_nb, as_version=4)
     # PDFExporter uses LaTeX as an intermediate representation.
     # WebPDFExporter uses HTML.
-    exporter = nbconvert.WebPDFExporter(
+    return convert_nb(python_nb, nbconvert.WebPDFExporter)
+
+
+def convert_nb(python_nb: str, exporter_constructor):
+    notebook = nbformat.reads(python_nb, as_version=4)
+    exporter = exporter_constructor(
         template_name="custom",
         extra_template_basedirs=[
             str((Path(__file__).parent / "nbconvert_templates").absolute())
