@@ -1,4 +1,18 @@
+{#
+    I copied the "notebook_css" block from
+    .venv/share/jupyter/nbconvert/templates/classic/index.html.j2
+    and tried commenting out the "page-break-inside" rules,
+    but the PDF render still forced big code blocks to the next page.
+
+    This doesn't look great, but the text flow is better than the default.
+
+    TODO: Figure out how to keep the styling this would provide,
+    and just change the page breaks.
+#}
+
+
 {% extends 'classic/index.html.j2' %}
+
 
 {% block notebook_css %}
 {% endblock %}
