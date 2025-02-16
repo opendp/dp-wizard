@@ -53,15 +53,14 @@ def test_csv_loading(write_encoding):
         read_lf = pl.scan_csv(fp.name)
         if write_encoding == "latin1":
             with pytest.raises(pl.exceptions.ComputeError):
-                pl_testing.assert_frame_equal(write_lf, read_lf)
+                read_lf.collect()
 
         # ALSO NOT WHAT WE'RE DOING!
-        # w/ "ignore_errors=True" but w/o "utf8-lossy" it reads,
-        # but whole cell is empty if mis-encoded.
+        # w/ "ignore_errors=True" but w/o "utf8-lossy" it also fails.
         read_lf = pl.scan_csv(fp.name, ignore_errors=True)
         if write_encoding == "latin1":
-            pl_testing.assert_frame_not_equal(write_lf, read_lf)
-            assert read_lf.collect().rows()[0] == (None, 42)
+            with pytest.raises(pl.exceptions.ComputeError):
+                read_lf.collect()
 
         # THIS IS THE RIGHT PATTERN!
         # Not perfect, but "utf8-lossy" retains as much info as possible.
@@ -77,8 +76,8 @@ def test_csv_loading(write_encoding):
         # Now test how we read just the headers.
         # Keys are hashes, and won't be stable across platforms,
         # so let's just look at the values.
-        ids_labels = read_csv_ids_labels(fp.name)
+        ids_labels = read_csv_ids_labels(Path(fp.name))
         assert set(ids_labels.values()) == {"2: AGE", "1: NAME"}
 
-        ids_names = read_csv_ids_names(fp.name)
+        ids_names = read_csv_ids_names(Path(fp.name))
         assert set(ids_names.values()) == {"AGE", "NAME"}

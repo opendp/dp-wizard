@@ -4,7 +4,7 @@
 #
 #    pip-compile requirements-dev.in
 #
-anyio==4.6.2.post1
+anyio==4.8.0
     # via
     #   starlette
     #   watchfiles
@@ -14,28 +14,28 @@ appnope==0.1.4
     # via ipykernel
 asgiref==3.8.1
     # via shiny
-asttokens==2.4.1
+asttokens==3.0.0
     # via stack-data
-attrs==24.2.0
+attrs==25.1.0
     # via
     #   flake8-bugbear
     #   jsonschema
     #   referencing
-beautifulsoup4==4.12.3
+beautifulsoup4==4.13.3
     # via nbconvert
-black==24.10.0
+black==25.1.0
     # via -r requirements-dev.in
-bleach==6.2.0
+bleach[css]==6.2.0
     # via nbconvert
 build==1.2.2.post1
     # via pip-tools
-certifi==2024.8.30
+certifi==2025.1.31
     # via requests
 cfgv==3.4.0
     # via pre-commit
-charset-normalizer==3.4.0
+charset-normalizer==3.4.1
     # via requests
-click==8.1.7
+click==8.1.8
     # via
     #   black
     #   pip-tools
@@ -47,39 +47,41 @@ contourpy==1.3.0
     # via
     #   -r requirements-dev.in
     #   matplotlib
-coverage==7.6.8
+coverage==7.6.12
     # via -r requirements-dev.in
 cycler==0.12.1
     # via matplotlib
-debugpy==1.8.9
+debugpy==1.8.12
     # via ipykernel
 decorator==5.1.1
     # via ipython
 defusedxml==0.7.1
     # via nbconvert
+deprecated==1.2.18
+    # via opendp
 distlib==0.3.9
     # via virtualenv
 docutils==0.21.2
     # via flit
-executing==2.1.0
+executing==2.2.0
     # via stack-data
 faicons==0.2.2
     # via -r requirements-dev.in
-fastjsonschema==2.20.0
+fastjsonschema==2.21.1
     # via nbformat
-filelock==3.16.1
+filelock==3.17.0
     # via virtualenv
 flake8==7.1.1
     # via
     #   -r requirements-dev.in
     #   flake8-bugbear
-flake8-bugbear==24.10.31
+flake8-bugbear==24.12.12
     # via -r requirements-dev.in
 flit==3.10.1
     # via -r requirements-dev.in
 flit-core==3.10.1
     # via flit
-fonttools==4.55.0
+fonttools==4.56.0
     # via matplotlib
 greenlet==3.1.1
     # via playwright
@@ -89,7 +91,7 @@ htmltools==0.6.0
     # via
     #   faicons
     #   shiny
-identify==2.6.2
+identify==2.6.7
     # via pre-commit
 idna==3.10
     # via
@@ -99,11 +101,13 @@ iniconfig==2.0.0
     # via pytest
 ipykernel==6.29.5
     # via -r requirements-dev.in
-ipython==8.18.0
-    # via ipykernel
+ipython==8.18.1
+    # via
+    #   -r requirements-dev.in
+    #   ipykernel
 jedi==0.19.2
     # via ipython
-jinja2==3.1.4
+jinja2==3.1.5
     # via nbconvert
 joblib==1.4.2
     # via scikit-learn
@@ -125,10 +129,12 @@ jupyter-core==5.7.2
     #   nbformat
 jupyterlab-pygments==0.3.0
     # via nbconvert
-jupytext==1.16.4
+jupytext==1.16.7
     # via -r requirements-dev.in
 kiwisolver==1.4.7
-    # via matplotlib
+    # via
+    #   -r requirements-dev.in
+    #   matplotlib
 linkify-it-py==2.0.3
     # via shiny
 markdown-it-py==3.0.0
@@ -140,7 +146,7 @@ markupsafe==3.0.2
     # via
     #   jinja2
     #   nbconvert
-matplotlib==3.9.2
+matplotlib==3.9.4
     # via -r requirements-dev.in
 matplotlib-inline==0.1.7
     # via
@@ -154,15 +160,15 @@ mdit-py-plugins==0.4.2
     #   shiny
 mdurl==0.1.2
     # via markdown-it-py
-mistune==3.0.2
+mistune==3.1.1
     # via nbconvert
 mypy-extensions==1.0.0
     # via black
-narwhals==1.14.2
+narwhals==1.26.0
     # via shiny
-nbclient==0.10.0
+nbclient==0.10.2
     # via nbconvert
-nbconvert==7.16.4
+nbconvert==7.16.6
     # via -r requirements-dev.in
 nbformat==5.10.4
     # via
@@ -175,17 +181,18 @@ nodeenv==1.9.1
     # via
     #   pre-commit
     #   pyright
-numpy==1.26.4
+numpy==2.0.2
     # via
+    #   -r requirements-dev.in
     #   contourpy
     #   matplotlib
     #   opendp
     #   randomgen
     #   scikit-learn
     #   scipy
-opendp[polars]==0.11.1
+opendp[polars]==0.12.0
     # via -r requirements-dev.in
-orjson==3.10.12
+orjson==3.10.15
     # via shiny
 packaging==24.2
     # via
@@ -206,7 +213,7 @@ pathspec==0.12.1
     # via black
 pexpect==4.9.0
     # via ipython
-pillow==11.0.0
+pillow==11.1.0
     # via matplotlib
 pip-tools==7.4.1
     # via -r requirements-dev.in
@@ -215,59 +222,59 @@ platformdirs==4.3.6
     #   black
     #   jupyter-core
     #   virtualenv
-playwright==1.49.0
+playwright==1.50.0
     # via pytest-playwright
 pluggy==1.5.0
     # via pytest
-polars==1.1.0
+polars==1.12.0
     # via opendp
-pre-commit==4.0.1
+pre-commit==4.1.0
     # via -r requirements-dev.in
-prompt-toolkit==3.0.36
+prompt-toolkit==3.0.50
     # via
     #   ipython
     #   questionary
     #   shiny
-psutil==6.1.0
+psutil==7.0.0
     # via ipykernel
 ptyprocess==0.7.0
     # via pexpect
 pure-eval==0.2.3
     # via stack-data
-pyarrow==18.0.0
+pyarrow==19.0.0
     # via opendp
 pycodestyle==2.12.1
     # via flake8
-pyee==12.0.0
+pyee==12.1.1
     # via playwright
 pyflakes==3.2.0
     # via flake8
-pygments==2.18.0
+pygments==2.19.1
     # via
     #   ipython
     #   nbconvert
-pyparsing==3.2.0
+pyparsing==3.2.1
     # via matplotlib
 pyproject-hooks==1.2.0
     # via
     #   build
     #   pip-tools
-pyright==1.1.389
+pyright==1.1.394
     # via -r requirements-dev.in
-pytest==8.3.3
+pytest==8.3.4
     # via
     #   -r requirements-dev.in
     #   pytest-base-url
     #   pytest-playwright
 pytest-base-url==2.1.0
     # via pytest-playwright
-pytest-playwright==0.5.2
+pytest-playwright==0.7.0
     # via -r requirements-dev.in
 python-dateutil==2.9.0.post0
     # via
     #   jupyter-client
     #   matplotlib
-python-multipart==0.0.17
+python-multipart==0.0.20
     # via shiny
 python-slugify==8.0.4
     # via pytest-playwright
@@ -276,15 +283,15 @@ pyyaml==6.0.2
     #   -r requirements-dev.in
     #   jupytext
     #   pre-commit
-pyzmq==26.2.0
+pyzmq==26.2.1
     # via
     #   ipykernel
     #   jupyter-client
-questionary==2.0.1
+questionary==2.1.0
     # via shiny
 randomgen==2.1.1
     # via opendp
-referencing==0.35.1
+referencing==0.36.2
     # via
     #   jsonschema
     #   jsonschema-specifications
@@ -292,11 +299,11 @@ requests==2.32.3
     # via
     #   flit
     #   pytest-base-url
-rpds-py==0.21.0
+rpds-py==0.22.3
     # via
     #   jsonschema
     #   referencing
-scikit-learn==1.5.2
+scikit-learn==1.6.1
     # via opendp
 scipy==1.13.1
     # via
@@ -304,25 +311,23 @@ scipy==1.13.1
     #   scikit-learn
 shiny==1.2.1
     # via -r requirements-dev.in
-six==1.16.0
-    # via
-    #   asttokens
-    #   python-dateutil
+six==1.17.0
+    # via python-dateutil
 sniffio==1.3.1
     # via anyio
 soupsieve==2.6
     # via beautifulsoup4
 stack-data==0.6.3
     # via ipython
-starlette==0.41.3
+starlette==0.45.3
     # via shiny
 text-unidecode==1.3
     # via python-slugify
 threadpoolctl==3.5.0
     # via scikit-learn
 tinycss2==1.4.0
-    # via nbconvert
-tomli-w==1.1.0
+    # via bleach
+tomli-w==1.2.0
     # via flit
 tornado==6.4.2
     # via
@@ -341,19 +346,22 @@ traitlets==5.14.3
     #   nbformat
 typing-extensions==4.12.2
     # via
+    #   anyio
+    #   beautifulsoup4
     #   htmltools
     #   pyee
     #   pyright
+    #   referencing
     #   shiny
 uc-micro-py==1.0.3
     # via linkify-it-py
-urllib3==2.2.3
+urllib3==2.3.0
     # via requests
-uvicorn==0.32.1
+uvicorn==0.34.0
     # via shiny
-virtualenv==20.27.1
+virtualenv==20.29.2
     # via pre-commit
-watchfiles==1.0.0
+watchfiles==1.0.4
     # via shiny
 wcwidth==0.2.13
     # via prompt-toolkit
@@ -361,10 +369,12 @@ webencodings==0.5.1
     # via
     #   bleach
     #   tinycss2
-websockets==14.1
+websockets==14.2
     # via shiny
 wheel==0.45.1
     # via pip-tools
+wrapt==1.17.2
+    # via deprecated
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip
