@@ -1,3 +1,7 @@
+# +
+# %pip install pytest
+# -
+
 # Introduction
 
 print(2 + 2)

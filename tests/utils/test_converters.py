@@ -5,7 +5,7 @@ import pytest
 import json
 from dp_wizard.utils.converters import (
     convert_py_to_nb,
-    _strip_nb_coda,
+    _clean_nb,
     convert_nb_to_html,
     convert_nb_to_pdf,
 )
@@ -50,10 +50,10 @@ def test_convert_py_to_nb_execute():
     assert normed_actual_nb_str == normed_expected_nb_str
 
 
-def test_strip_nb_coda():
+def test_clean_nb():
     # Trivial test just to get 100% branch coverage.
     nb = {"cells": []}
-    assert nb == json.loads(_strip_nb_coda(json.dumps(nb)))
+    assert nb == json.loads(_clean_nb(json.dumps(nb)))
 
 
 def test_convert_py_to_nb_error():
