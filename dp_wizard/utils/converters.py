@@ -67,26 +67,29 @@ def _clean_nb(nb_json: str):
 
 
 def convert_nb_to_html(python_nb: str):
-    return convert_nb(python_nb, to_pdf=False)
+    return convert_nb(python_nb, nbconvert.HTMLExporter)
 
 
 def convert_nb_to_pdf(python_nb: str):
-    return convert_nb(python_nb, to_pdf=True)
-
-
-def convert_nb(python_nb: str, to_pdf):
-    notebook = nbformat.reads(python_nb, as_version=4)
-
     # PDFExporter uses LaTeX as an intermediate representation.
     # WebPDFExporter uses HTML.
-    exporter_constructor = (
-        nbconvert.WebPDFExporter if to_pdf else nbconvert.HTMLExporter
-    )
+    return convert_nb(python_nb, nbconvert.WebPDFExporter)
+
+
+def convert_nb(python_nb: str, exporter_constructor):
+    notebook = nbformat.reads(python_nb, as_version=4)
     exporter = exporter_constructor(
-        template_name="custom" if to_pdf else "classic",
-        extra_template_basedirs=[
-            str((Path(__file__).parent / "nbconvert_templates").absolute())
-        ],
+        template_name="lab",
+        # The "classic" template's CSS forces large code cells on to
+        # the next page rather than breaking, so use "lab" instead.
+        #
+        # If you want to tweak the CSS, enable this block and make changes
+        # in nbconvert_templates/custom:
+        #
+        # template_name="custom",
+        # extra_template_basedirs=[
+        #     str((Path(__file__).parent / "nbconvert_templates").absolute())
+        # ],
     )
     (body, _resources) = exporter.from_notebook_node(notebook)
     return body
