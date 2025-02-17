@@ -5,6 +5,8 @@ from argparse import ArgumentParser
 
 IMPORTS_BLOCK
 
+UTILS_BLOCK
+
 COLUMNS_BLOCK
 
 
