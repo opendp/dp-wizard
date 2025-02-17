@@ -53,7 +53,8 @@ class _CodeGenerator(ABC):
             )
             .finish()
         )
-        return black.format_str(code, mode=black.Mode())
+        # Line length determined by PDF rendering.
+        return black.format_str(code, mode=black.Mode(line_length=74))
 
     def _make_margins_dict(self, bin_names: Iterable[str]):
         margins = ["(): dp.polars.Margin(public_info='lengths',),"] + [

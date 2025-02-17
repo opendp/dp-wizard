@@ -1,4 +1,5 @@
-# These functions are used both in the application and in generated notebooks.
+# These functions are used both in the application
+# and in generated notebooks.
 from polars import DataFrame
 
 
