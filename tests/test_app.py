@@ -150,7 +150,39 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     expect_visible(download_results_text)
     expect_no_error()
 
-    # Text Report:
+    # Notebooks ...
+
+    # ... ipynb:
+    with page.expect_download() as notebook_download_info:
+        page.get_by_text("Download notebook").click()
+    expect_no_error()
+
+    notebook_download = notebook_download_info.value
+    notebook = notebook_download.path().read_text()
+    assert "contributions = 42" in notebook
+
+    # ... html:
+    with page.expect_download() as html_download_info:
+        page.get_by_text("Download HTML").click()
+    expect_no_error()
+
+    html_download = html_download_info.value
+    html = html_download.path().read_text()
+    assert "<!DOCTYPE html>" in html
+
+    # ... pdf:
+    with page.expect_download() as pdf_download_info:
+        page.get_by_text("Download PDF").click()
+    expect_no_error()
+
+    pdf_download = pdf_download_info.value
+    pdf = pdf_download.path().read_bytes()
+    assert b"%PDF-1.4" in pdf
+
+    # Reports ...
+
+    # ... text:
+    page.get_by_text("Reports").click()
     with page.expect_download() as text_report_download_info:
         page.get_by_text("Download report (.txt)").click()
     expect_no_error()
@@ -159,7 +191,7 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     report = report_download.path().read_text()
     assert "confidence: 0.95" in report
 
-    # CSV Report:
+    # ... csv:
     with page.expect_download() as csv_report_download_info:
         page.get_by_text("Download table (.csv)").click()
     expect_no_error()
@@ -169,6 +201,7 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     assert "outputs: grade: confidence,0.95" in report
 
     # Script:
+    page.get_by_text("Scripts").click()
     with page.expect_download() as script_download_info:
         page.get_by_text("Download script").click()
     expect_no_error()
@@ -176,15 +209,6 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     script_download = script_download_info.value
     script = script_download.path().read_text()
     assert "contributions = 42" in script
-
-    # Notebook:
-    with page.expect_download() as notebook_download_info:
-        page.get_by_text("Download notebook").click()
-    expect_no_error()
-
-    notebook_download = notebook_download_info.value
-    notebook = notebook_download.path().read_text()
-    assert "contributions = 42" in notebook
 
     # -- Feedback --
     page.get_by_text("Feedback").click()

@@ -2,7 +2,7 @@ from pathlib import Path
 
 from shiny import ui, render, reactive, Inputs, Outputs, Session
 from faicons import icon_svg
-from htmltools.tags import table, tr, td
+from htmltools.tags import p
 
 from dp_wizard.utils.code_generators import (
     NotebookGenerator,
@@ -10,25 +10,24 @@ from dp_wizard.utils.code_generators import (
     AnalysisPlan,
     AnalysisPlanColumn,
 )
-from dp_wizard.utils.converters import convert_py_to_nb, strip_nb_coda
+from dp_wizard.utils.converters import (
+    convert_py_to_nb,
+    convert_nb_to_html,
+    convert_nb_to_pdf,
+)
 
 
 wait_message = "Please wait."
 
 
-def td_button(name: str, ext: str, icon: str):
+def button(name: str, ext: str, icon: str, primary=False):
     function_name = f'download_{name.lower().replace(" ", "_")}'
-    return (
-        td(
-            ui.download_button(
-                function_name,
-                [
-                    icon_svg(icon, margin_right="0.5em"),
-                    f"Download {name} ({ext})",
-                ],
-                width="20em",
-            )
-        ),
+    return ui.download_button(
+        function_name,
+        f"Download {name} ({ext})",
+        icon=icon_svg(icon, margin_right="0.5em"),
+        width="20em",
+        class_="btn-primary" if primary else None,
     )
 
 
@@ -36,14 +35,40 @@ def results_ui():
     return ui.nav_panel(
         "Download results",
         ui.markdown("You can now make a differentially private release of your data."),
-        table(
-            tr(
-                td_button("Notebook", ".ipynb", "book"),
-                td_button("Script", ".py", "python"),
+        # Find more icons on Font Awesome: https://fontawesome.com/search?ic=free
+        ui.accordion(
+            ui.accordion_panel(
+                "Notebooks",
+                button("Notebook", ".ipynb", "book", primary=True),
+                p(
+                    "An executed Jupyter notebook which references your CSV "
+                    "and shows the result of a differentially private analysis."
+                ),
+                button("HTML", ".html", "file-code"),
+                p("The same content, but exported as HTML."),
+                button("PDF", ".pdf", "file-pdf"),
+                p("The same content, but exported as PDF."),
             ),
-            tr(
-                td_button("Report", ".txt", "file-lines"),
-                td_button("Table", ".csv", "file-csv"),
+            ui.accordion_panel(
+                "Reports",
+                button("Report", ".txt", "file-lines", primary=True),
+                p(
+                    "A report which includes your parameter choices and the results. "
+                    "Intended to be human-readable, but it does use YAML, "
+                    "so it can be parsed by other programs."
+                ),
+                button("Table", ".csv", "file-csv"),
+                p("The same information, but condensed into a two-column CSV."),
+            ),
+            ui.accordion_panel(
+                "Scripts",
+                button("Script", ".py", "python", primary=True),
+                p(
+                    "The same code as the notebook, but extracted into "
+                    "a Python script which can be run from the command line. "
+                    "The script itself does not contain any data "
+                    "or analysis results."
+                ),
             ),
         ),
         value="results_panel",
@@ -92,8 +117,15 @@ def results_server(
         # Could be slow!
         # Luckily, reactive calcs are lazy.
         notebook_py = NotebookGenerator(analysis_plan()).make_py()
-        notebook_json = convert_py_to_nb(notebook_py, execute=True)
-        return strip_nb_coda(notebook_json)
+        return convert_py_to_nb(notebook_py, execute=True)
+
+    @reactive.calc
+    def notebook_html():
+        return convert_nb_to_html(notebook_nb())
+
+    @reactive.calc
+    def notebook_pdf():
+        return convert_nb_to_pdf(notebook_nb())
 
     @render.download(
         filename="dp-wizard-script.py",
@@ -112,6 +144,24 @@ def results_server(
         with ui.Progress() as progress:
             progress.set(message=wait_message)
             yield notebook_nb()
+
+    @render.download(
+        filename="dp-wizard-notebook.html",
+        media_type="text/html",
+    )
+    async def download_html():
+        with ui.Progress() as progress:
+            progress.set(message=wait_message)
+            yield notebook_html()
+
+    @render.download(
+        filename="dp-wizard-notebook.pdf",
+        media_type="application/pdf",
+    )  # pyright: ignore
+    async def download_pdf():
+        with ui.Progress() as progress:
+            progress.set(message=wait_message)
+            yield notebook_pdf()
 
     @render.download(
         filename="dp-wizard-report.txt",

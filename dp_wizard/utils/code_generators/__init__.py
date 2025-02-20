@@ -42,9 +42,10 @@ class _CodeGenerator(ABC):
     def make_py(self):
         code = (
             Template(self.root_template)
-            .fill_expressions(DEPENDENCIES="'opendp[polars]' matplotlib pyyaml")
+            .fill_expressions(DEPENDENCIES="'opendp[polars]==0.12.0' matplotlib pyyaml")
             .fill_blocks(
-                IMPORTS_BLOCK=_make_imports(),
+                IMPORTS_BLOCK=Template("imports").finish(),
+                UTILS_BLOCK=(Path(__file__).parent.parent / "shared.py").read_text(),
                 COLUMNS_BLOCK=self._make_columns(),
                 CONTEXT_BLOCK=self._make_context(),
                 QUERIES_BLOCK=self._make_queries(),
@@ -52,7 +53,8 @@ class _CodeGenerator(ABC):
             )
             .finish()
         )
-        return black.format_str(code, mode=black.Mode())
+        # Line length determined by PDF rendering.
+        return black.format_str(code, mode=black.Mode(line_length=74))
 
     def _make_margins_dict(self, bin_names: Iterable[str]):
         margins = ["(): dp.polars.Margin(public_info='lengths',),"] + [
@@ -297,10 +299,3 @@ def _snake_case(name: str):
     if snake == "" or not re.match(r"[a-z]", snake[0]):
         snake = f"_{snake}"
     return snake
-
-
-def _make_imports():
-    return (
-        Template("imports").finish()
-        + (Path(__file__).parent.parent / "shared.py").read_text()
-    )

@@ -88,6 +88,16 @@ If Playwright fails in CI, we can still see what went wrong:
 - Inside the zipped artifact will be _another_ zip: `trace.zip`.
 - Don't unzip it! Instead, open it with [trace.playwright.dev](https://trace.playwright.dev/).
 
+### Release
+
+- Make sure you're up to date.
+- Make one last feature branch:
+  - Run `changelog.py` to update the `CHANGELOG.md`.
+  - Then bump `dp_wizard/VERSION`.
+  - Commit: The commit message should include new version number.
+  - Push to github; open PR; merge PR.
+- `flit publish`
+
 ### Conventions
 
 Branch names should be of the form `NNNN-short-description`, where `NNNN` is the issue number being addressed.
@@ -96,6 +106,7 @@ Dependencies should be pinned for development, but not pinned when the package i
 New dev dependencies can be added to `requirements-dev.in`, and then run `pip-compile requirements-dev.in` to update `requirements-dev.txt`
 
 A Github [project board](https://github.com/orgs/opendp/projects/10/views/2) provides an overview of the issues and PRs.
+When PRs are [Ready for Review](https://github.com/orgs/opendp/projects/10/views/2?filterQuery=status%3A%22Ready+for+Review%22) they should be flagged as such so reviewers can find them.
 
 ```mermaid
 graph TD
