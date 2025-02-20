@@ -36,7 +36,7 @@ def test_demo_app(page: Page, demo_app: ShinyAppProc):  # pragma: no cover
 
 def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     pick_dataset_text = "How many rows of the CSV"
-    perform_analysis_text = "Select numeric columns of interest"
+    perform_analysis_text = "Select columns to calculate statistics on"
     download_results_text = "You can now make a differentially private release"
 
     def expect_visible(text):
@@ -87,13 +87,6 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     expect_not_visible(pick_dataset_text)
     expect_visible(perform_analysis_text)
     expect_not_visible(download_results_text)
-    # Columns:
-    expect_visible("1: [blank]")  # Empty column!
-    expect_visible("2: class year")
-    expect_visible("3: class year_duplicated_0")  # Duplicated column!
-    expect_visible("4: hw number")
-    expect_visible("5: hw-number")  # Distinguished by non-word character!
-    expect_visible("6: grade")
     # Epsilon slider:
     # (Note: Slider tests failed on CI when run after column details,
     # although it worked locally. This works in either environment.
@@ -116,18 +109,18 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     # but we could have the confidence interval in the text...
     page.get_by_label("Estimated Rows").select_option("1000")
 
-    # Set column details:
-    page.get_by_label("grade").check()
-    expect_not_visible("Weight")
+    # Pick grouping:
+    page.locator(".selectize-input").nth(0).click()
+    page.get_by_text("class year").nth(0).click()
+    # Pick columns:
+    page.locator(".selectize-input").nth(1).click()
+    page.get_by_text("grade").nth(1).click()
+
     # Check that default is set correctly:
     assert page.get_by_label("Upper").input_value() == "10"
     # Reset, and confirm:
     new_value = "20"
     page.get_by_label("Upper").fill(new_value)
-    # Uncheck the column:
-    page.get_by_label("grade").uncheck()
-    # Recheck the column:
-    page.get_by_label("grade").check()
     assert page.get_by_label("Upper").input_value() == new_value
     expect_visible("The 95% confidence interval is ±794")
     page.get_by_text("Data Table").click()
