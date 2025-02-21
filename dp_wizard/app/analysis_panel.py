@@ -22,8 +22,10 @@ def analysis_ui():
             ui.card(
                 ui.card_header("Grouping"),
                 ui.markdown(
-                    "Select columns to group by, or leave empty "
-                    "to calculate statistics across the entire dataset."
+                    """
+                    Select columns to group by, or leave empty
+                    to calculate statistics across the entire dataset.
+                    """
                 ),
                 ui.input_selectize(
                     "grouping_selectize",
@@ -45,9 +47,11 @@ def analysis_ui():
             ui.card(
                 ui.card_header("Privacy Budget"),
                 ui.markdown(
-                    "What is your privacy budget for this release? "
-                    "Values above 1 will add less noise to the data, "
-                    "but have a greater risk of revealing individual data."
+                    """
+                    What is your privacy budget for this release?
+                    Values above 1 will add less noise to the data,
+                    but have a greater risk of revealing individual data.
+                    """
                 ),
                 ui.output_ui("epsilon_tooltip_ui"),
                 log_slider("log_epsilon_slider", 0.1, 10.0),
