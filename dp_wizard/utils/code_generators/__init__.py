@@ -114,6 +114,7 @@ class _CodeGenerator(ABC):
             Template("query")
             .fill_values(
                 BIN_NAME=f"{indentifier}_bin",
+                GROUP_NAMES=self.groups,
             )
             .fill_expressions(
                 QUERY_NAME=f"{indentifier}_query",

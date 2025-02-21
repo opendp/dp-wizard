@@ -33,7 +33,8 @@ def df_to_columns(df: DataFrame):
         (" ".join(str(k) for k in keys), value) for (*keys, value) in df.rows()
     ]
     sorted_rows = sorted(merged_key_rows, key=lambda row: interval_bottom(row[0]))
-    return tuple(zip(*sorted_rows))
+    transposed = tuple(zip(*sorted_rows))
+    return transposed if transposed else (tuple(), tuple())
 
 
 def plot_histogram(

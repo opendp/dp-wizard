@@ -140,13 +140,20 @@ def test_fill_blocks_extra_slot_in_template():
         template.fill_blocks(SLOT="placeholder").finish()
 
 
+def number_lines(text: str):
+    return "\n".join(
+        f"# {i}:\n{line}" if line and not i % 5 else line
+        for (i, line) in enumerate(text.splitlines())
+    )
+
+
 def test_make_notebook():
     notebook = NotebookGenerator(
         AnalysisPlan(
             csv_path=fake_csv,
             contributions=1,
             epsilon=1,
-            groups=["class_year"],
+            groups=["class year"],
             columns={
                 # For a strong test, use a column whose name
                 # doesn't work as a python identifier.
@@ -159,7 +166,7 @@ def test_make_notebook():
             },
         )
     ).make_py()
-    print(notebook)
+    print(number_lines(notebook))
     globals = {}
     exec(notebook, globals)
     assert isinstance(globals["context"], dp.Context)
@@ -171,7 +178,7 @@ def test_make_script():
             csv_path=None,
             contributions=1,
             epsilon=1,
-            groups=["class_year"],
+            groups=["class year"],
             columns={
                 "hw-number": AnalysisPlanColumn(
                     lower_bound=5,
@@ -182,7 +189,9 @@ def test_make_script():
             },
         )
     ).make_py()
-    print(script)
+
+    # If the script fails, the error message may give a line number.
+    print("\n".join(f"{i} {line}" for i, line in enumerate(script.splitlines())))
 
     # Make sure jupytext formatting doesn't bleed into the script.
     # https://jupytext.readthedocs.io/en/latest/formats-scripts.html#the-light-format
@@ -198,7 +207,7 @@ def test_make_script():
         )
         assert result.returncode == 0
         output = result.stdout.decode()
-        print(output)
+
         assert "DP counts for hw-number" in output
         assert "95% confidence interval 3.3" in output
         assert "hw_number_bin" in output
