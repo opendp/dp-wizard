@@ -97,20 +97,24 @@ class _CodeGenerator(ABC):
     def _make_queries(self):
         pre = self._make_pre()
         post = self._make_post()
+
         column_names = self.columns.keys()
-        return (
+        to_return = [
             f"{pre}confidence = {confidence} # {self._make_confidence_note()}\n{post}"
-            + "\n".join(
-                f"{pre}{self._make_query(column_name)}{post}"
-                for column_name in column_names
-            )
-        )
+        ]
+        for column_name in column_names:
+            to_return.append(self._make_query(column_name))
+
+        return "\n".join(to_return)
 
     def _make_query(self, column_name):
+        pre = self._make_pre()
+        post = self._make_post()
+
         indentifier = name_to_identifier(column_name)
         accuracy_name = f"{indentifier}_accuracy"
         histogram_name = f"{indentifier}_histogram"
-        return (
+        query = (
             Template("query")
             .fill_values(
                 BIN_NAME=f"{indentifier}_bin",
@@ -121,18 +125,10 @@ class _CodeGenerator(ABC):
                 ACCURACY_NAME=accuracy_name,
                 HISTOGRAM_NAME=histogram_name,
             )
-            .fill_blocks(
-                OUTPUT_BLOCK=self._make_output(
-                    column_name=column_name,
-                    accuracy_name=accuracy_name,
-                    histogram_name=histogram_name,
-                )
-            )
             .finish()
         )
 
-    def _make_output(self, column_name: str, accuracy_name: str, histogram_name: str):
-        return (
+        output = (
             Template(f"{self.root_template}_output")
             .fill_values(
                 COLUMN_NAME=column_name,
@@ -144,6 +140,8 @@ class _CodeGenerator(ABC):
             )
             .finish()
         )
+        # We want these in separate code cells.
+        return f"{pre}{query}{post}{pre}{output}{post}"
 
     def _make_partial_context(self):
         weights = [column.weight for column in self.columns.values()]

@@ -58,6 +58,8 @@ class Template:
         Fill in code blocks. Slot must be alone on line.
         """
         for k, v in kwargs.items():
+            if not isinstance(v, str):
+                raise Exception(f"For {k} in {self._path}, expected string, not {v}")
 
             def match_indent(match):
                 # This does what we want, but binding is confusing.
