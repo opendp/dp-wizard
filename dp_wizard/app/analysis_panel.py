@@ -122,7 +122,8 @@ def analysis_server(
     @reactive.event(input.groups_selectize)
     def _on_groups_change():
         group_ids_selected = input.groups_selectize()
-        groups.set(group_ids_selected)
+        column_ids_to_names = csv_ids_names_calc()
+        groups.set([column_ids_to_names[id] for id in group_ids_selected])
 
     @reactive.effect
     @reactive.event(input.columns_selectize)
