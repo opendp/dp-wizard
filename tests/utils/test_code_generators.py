@@ -140,6 +140,15 @@ def test_fill_blocks_extra_slot_in_template():
         template.fill_blocks(SLOT="placeholder").finish()
 
 
+def test_fill_blocks_not_string():
+    template = Template(None, template="SOMETHING")
+    with pytest.raises(
+        Exception,
+        match=r"For SOMETHING in template-instead-of-path, expected string, not 123",
+    ):
+        template.fill_blocks(SOMETHING=123).finish()
+
+
 def number_lines(text: str):
     return "\n".join(
         f"# {i}:\n{line}" if line and not i % 5 else line

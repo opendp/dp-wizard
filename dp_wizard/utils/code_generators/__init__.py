@@ -79,28 +79,21 @@ class _CodeGenerator(ABC):
             for name, col in self.columns.items()
         )
 
-    def _make_pre(self) -> str:
+    def _make_cell(self, block) -> str:
         """
-        If generating a notebook, this will open a new code paragraph.
+        For the script generator, this is just a pass through.
         """
-        return ""
-
-    def _make_post(self) -> str:
-        """
-        If generating a notebook, this will close a new code paragraph.
-        """
-        return ""
+        return block
 
     def _make_confidence_note(self):
         return f"{int(confidence * 100)}% confidence interval"
 
     def _make_queries(self):
-        pre = self._make_pre()
-        post = self._make_post()
-
         column_names = self.columns.keys()
         to_return = [
-            f"{pre}confidence = {confidence} # {self._make_confidence_note()}\n{post}"
+            self._make_cell(
+                f"confidence = {confidence} # {self._make_confidence_note()}"
+            )
         ]
         for column_name in column_names:
             to_return.append(self._make_query(column_name))
@@ -108,9 +101,6 @@ class _CodeGenerator(ABC):
         return "\n".join(to_return)
 
     def _make_query(self, column_name):
-        pre = self._make_pre()
-        post = self._make_post()
-
         indentifier = name_to_identifier(column_name)
         accuracy_name = f"{indentifier}_accuracy"
         histogram_name = f"{indentifier}_histogram"
@@ -140,8 +130,7 @@ class _CodeGenerator(ABC):
             )
             .finish()
         )
-        # We want these in separate code cells.
-        return f"{pre}{query}{post}{pre}{output}{post}"
+        return self._make_cell(query) + self._make_cell(output)
 
     def _make_partial_context(self):
         weights = [column.weight for column in self.columns.values()]
@@ -178,11 +167,8 @@ class NotebookGenerator(_CodeGenerator):
     def _make_context(self):
         return self._make_partial_context().fill_values(CSV_PATH=self.csv_path).finish()
 
-    def _make_pre(self):
-        return "# +\n"
-
-    def _make_post(self):
-        return "# -\n"
+    def _make_cell(self, block):
+        return f"\n# +\n{block}\n# -\n"
 
     def _make_extra_blocks(self):
         outputs_expression = (
