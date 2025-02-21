@@ -41,6 +41,12 @@ class _CodeGenerator(ABC):
     def _make_extra_blocks(self):
         return {}
 
+    def _make_cell(self, block) -> str:
+        """
+        For the script generator, this is just a pass through.
+        """
+        return block
+
     def make_py(self):
         code = (
             Template(self.root_template)
@@ -79,12 +85,6 @@ class _CodeGenerator(ABC):
             for name, col in self.columns.items()
         )
 
-    def _make_cell(self, block) -> str:
-        """
-        For the script generator, this is just a pass through.
-        """
-        return block
-
     def _make_confidence_note(self):
         return f"{int(confidence * 100)}% confidence interval"
 
@@ -122,6 +122,7 @@ class _CodeGenerator(ABC):
             Template(f"{self.root_template}_output")
             .fill_values(
                 COLUMN_NAME=column_name,
+                GROUP_NAMES=self.groups,
             )
             .fill_expressions(
                 ACCURACY_NAME=accuracy_name,
