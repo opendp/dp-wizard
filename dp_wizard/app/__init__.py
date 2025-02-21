@@ -38,6 +38,7 @@ def make_server_from_cli_info(cli_info: CLIInfo):
         lower_bounds = reactive.value({})
         upper_bounds = reactive.value({})
         bin_counts = reactive.value({})
+        groups = reactive.value([])
         weights = reactive.value({})
         epsilon = reactive.value(1.0)
 
@@ -61,6 +62,7 @@ def make_server_from_cli_info(cli_info: CLIInfo):
             lower_bounds=lower_bounds,
             upper_bounds=upper_bounds,
             bin_counts=bin_counts,
+            groups=groups,
             weights=weights,
             epsilon=epsilon,
         )
@@ -74,6 +76,7 @@ def make_server_from_cli_info(cli_info: CLIInfo):
             lower_bounds=lower_bounds,
             upper_bounds=upper_bounds,
             bin_counts=bin_counts,
+            groups=groups,
             weights=weights,
             epsilon=epsilon,
         )

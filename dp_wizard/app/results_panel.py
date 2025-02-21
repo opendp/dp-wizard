@@ -85,6 +85,7 @@ def results_server(
     lower_bounds: reactive.Value[dict[str, float]],
     upper_bounds: reactive.Value[dict[str, float]],
     bin_counts: reactive.Value[dict[str, int]],
+    groups: reactive.Value[list[str]],
     weights: reactive.Value[dict[str, str]],
     epsilon: reactive.Value[float],
 ):  # pragma: no cover
@@ -107,6 +108,7 @@ def results_server(
             csv_path=private_csv_path() or public_csv_path(),
             contributions=contributions(),
             epsilon=epsilon(),
+            groups=groups(),
             columns=columns,
         )
 

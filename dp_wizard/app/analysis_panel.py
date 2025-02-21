@@ -28,7 +28,7 @@ def analysis_ui():
                     """
                 ),
                 ui.input_selectize(
-                    "grouping_selectize",
+                    "groups_selectize",
                     "Group by",
                     [],
                     multiple=True,
@@ -95,6 +95,7 @@ def analysis_server(
     lower_bounds: reactive.Value[dict[str, float]],
     upper_bounds: reactive.Value[dict[str, float]],
     bin_counts: reactive.Value[dict[str, int]],
+    groups: reactive.Value[list[str]],
     weights: reactive.Value[dict[str, str]],
     epsilon: reactive.Value[float],
 ):  # pragma: no cover
@@ -107,7 +108,7 @@ def analysis_server(
     def _update_columns():
         csv_ids_labels = csv_ids_labels_calc()
         ui.update_selectize(
-            "grouping_selectize",
+            "groups_selectize",
             label=None,
             choices=csv_ids_labels,
         )
@@ -118,8 +119,14 @@ def analysis_server(
         )
 
     @reactive.effect
+    @reactive.event(input.groups_selectize)
+    def _on_groups_change():
+        group_ids_selected = input.groups_selectize()
+        groups.set(group_ids_selected)
+
+    @reactive.effect
     @reactive.event(input.columns_selectize)
-    def _on_column_set_change():
+    def _on_columns_change():
         column_ids_selected = input.columns_selectize()
         # We only clean up the weights, and everything else is left in place,
         # so if you restore a column, you see the original values.

@@ -29,7 +29,9 @@ def df_to_columns(df: DataFrame):
     Transform a Dataframe into a format that is easier to plot,
     parsing the interval strings to sort them as numbers.
     """
-    merged_key_rows = [(" ".join(keys), value) for (*keys, value) in df.rows()]
+    merged_key_rows = [
+        (" ".join(str(k) for k in keys), value) for (*keys, value) in df.rows()
+    ]
     sorted_rows = sorted(merged_key_rows, key=lambda row: interval_bottom(row[0]))
     return tuple(zip(*sorted_rows))
 

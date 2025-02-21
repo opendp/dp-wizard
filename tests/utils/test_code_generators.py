@@ -146,6 +146,7 @@ def test_make_notebook():
             csv_path=fake_csv,
             contributions=1,
             epsilon=1,
+            groups=["class_year"],
             columns={
                 # For a strong test, use a column whose name
                 # doesn't work as a python identifier.
@@ -170,6 +171,7 @@ def test_make_script():
             csv_path=None,
             contributions=1,
             epsilon=1,
+            groups=["class_year"],
             columns={
                 "hw-number": AnalysisPlanColumn(
                     lower_bound=5,

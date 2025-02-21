@@ -21,6 +21,7 @@ class AnalysisPlan(NamedTuple):
     csv_path: Optional[str]
     contributions: int
     epsilon: float
+    groups: list[str]
     columns: dict[str, AnalysisPlanColumn]
 
 
@@ -31,6 +32,7 @@ class _CodeGenerator(ABC):
         self.csv_path = analysis_plan.csv_path
         self.contributions = analysis_plan.contributions
         self.epsilon = analysis_plan.epsilon
+        self.groups = analysis_plan.groups
         self.columns = analysis_plan.columns
 
     @abstractmethod
