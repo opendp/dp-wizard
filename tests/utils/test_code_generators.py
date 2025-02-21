@@ -147,25 +147,26 @@ def number_lines(text: str):
     )
 
 
-def test_make_notebook():
-    notebook = NotebookGenerator(
-        AnalysisPlan(
-            csv_path=fake_csv,
-            contributions=1,
-            epsilon=1,
-            groups=["class year"],
-            columns={
-                # For a strong test, use a column whose name
-                # doesn't work as a python identifier.
-                "hw-number": AnalysisPlanColumn(
-                    lower_bound=5,
-                    upper_bound=15,
-                    bin_count=20,
-                    weight=4,
-                )
-            },
+plan = AnalysisPlan(
+    csv_path=fake_csv,
+    contributions=1,
+    epsilon=1,
+    groups=["class year"],
+    columns={
+        # For a strong test, use a column whose name
+        # doesn't work as a python identifier.
+        "hw-number": AnalysisPlanColumn(
+            lower_bound=5,
+            upper_bound=15,
+            bin_count=20,
+            weight=4,
         )
-    ).make_py()
+    },
+)
+
+
+def test_make_notebook():
+    notebook = NotebookGenerator(plan).make_py()
     print(number_lines(notebook))
     globals = {}
     exec(notebook, globals)
@@ -173,25 +174,7 @@ def test_make_notebook():
 
 
 def test_make_script():
-    script = ScriptGenerator(
-        AnalysisPlan(
-            csv_path=None,
-            contributions=1,
-            epsilon=1,
-            groups=["class year"],
-            columns={
-                "hw-number": AnalysisPlanColumn(
-                    lower_bound=5,
-                    upper_bound=15,
-                    bin_count=20,
-                    weight=4,
-                )
-            },
-        )
-    ).make_py()
-
-    # If the script fails, the error message may give a line number.
-    print("\n".join(f"{i} {line}" for i, line in enumerate(script.splitlines())))
+    script = ScriptGenerator(plan).make_py()
 
     # Make sure jupytext formatting doesn't bleed into the script.
     # https://jupytext.readthedocs.io/en/latest/formats-scripts.html#the-light-format
