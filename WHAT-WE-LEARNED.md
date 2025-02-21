@@ -106,3 +106,12 @@ This is simple, but I was still scratching my head for a while. While there are 
 ## Silent errors if input type doesn't match update method
 
 Multi selectize is almost a drop-in replacement for checkbox group, but they have different update methods, `update_selectize` vs `update_checkbox_group`, and if you use the wrong one it fails silently: The UI doesn't update, and there is no error.
+
+## Add CSS for selectize in cards?
+
+```
+/*
+Selectize menus should overflow the containing card.
+*/
+.card, .card-body { overflow: visible !important; }
+```
