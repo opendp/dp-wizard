@@ -34,15 +34,18 @@ def button(name: str, ext: str, icon: str, primary=False):
 def results_ui():
     return ui.nav_panel(
         "Download results",
-        ui.markdown("You can now make a differentially private release of your data."),
+        ui.h3("Download results"),
+        ui.p("You can now make a differentially private release of your data."),
         # Find more icons on Font Awesome: https://fontawesome.com/search?ic=free
         ui.accordion(
             ui.accordion_panel(
                 "Notebooks",
                 button("Notebook", ".ipynb", "book", primary=True),
                 p(
-                    "An executed Jupyter notebook which references your CSV "
-                    "and shows the result of a differentially private analysis."
+                    """
+                    An executed Jupyter notebook which references your CSV
+                    and shows the result of a differentially private analysis.
+                    """
                 ),
                 button("HTML", ".html", "file-code"),
                 p("The same content, but exported as HTML."),
@@ -53,21 +56,33 @@ def results_ui():
                 "Reports",
                 button("Report", ".txt", "file-lines", primary=True),
                 p(
-                    "A report which includes your parameter choices and the results. "
-                    "Intended to be human-readable, but it does use YAML, "
-                    "so it can be parsed by other programs."
+                    """
+                    A report which includes your parameter choices and the results.
+                    Intended to be human-readable, but it does use YAML,
+                    so it can be parsed by other programs.
+                    """
                 ),
                 button("Table", ".csv", "file-csv"),
                 p("The same information, but condensed into a two-column CSV."),
             ),
+        ),
+        ui.h3("Download code"),
+        ui.p(
+            """
+            Alternatively, you can download a script or unexecuted notebook
+            that demonstrates the steps of your analysis,
+            but does not contain any data or analysis results.
+            """
+        ),
+        ui.accordion(
             ui.accordion_panel(
                 "Scripts",
                 button("Script", ".py", "python", primary=True),
                 p(
-                    "The same code as the notebook, but extracted into "
-                    "a Python script which can be run from the command line. "
-                    "The script itself does not contain any data "
-                    "or analysis results."
+                    """
+                    The same code as the notebooks, but extracted into
+                    a Python script which can be run from the command line.
+                    """
                 ),
             ),
         ),
