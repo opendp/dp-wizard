@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 
 from shiny import ui, render, reactive, Inputs, Outputs, Session
 from faicons import icon_svg
@@ -21,7 +22,9 @@ wait_message = "Please wait."
 
 
 def button(name: str, ext: str, icon: str, primary=False):
-    function_name = f'download_{name.lower().replace(" ", "_")}'
+    clean_name = re.sub(r"\W+", " ", name).strip().replace(" ", "_").lower()
+    print("clean:", clean_name)
+    function_name = f"download_{clean_name}"
     return ui.download_button(
         function_name,
         f"Download {name} ({ext})",
@@ -75,6 +78,21 @@ def results_ui():
             """
         ),
         ui.accordion(
+            ui.accordion_panel(
+                "Unexecuted Notebooks",
+                button("Notebook (unexecuted)", ".ipynb", "book", primary=True),
+                p(
+                    """
+                    This contains the same code as Jupyter notebook above,
+                    but none of the cells are executed,
+                    so it does not contain any results.
+                    """
+                ),
+                button("HTML (unexecuted)", ".html", "file-code"),
+                p("The same content, but exported as HTML."),
+                button("PDF (unexecuted)", ".pdf", "file-pdf"),
+                p("The same content, but exported as PDF."),
+            ),
             ui.accordion_panel(
                 "Scripts",
                 button("Script", ".py", "python", primary=True),
@@ -135,12 +153,25 @@ def results_server(
         return convert_py_to_nb(notebook_py, execute=True)
 
     @reactive.calc
+    def notebook_nb_unexecuted():
+        notebook_py = NotebookGenerator(analysis_plan()).make_py()
+        return convert_py_to_nb(notebook_py, execute=False)
+
+    @reactive.calc
     def notebook_html():
         return convert_nb_to_html(notebook_nb())
 
     @reactive.calc
+    def notebook_html_unexecuted():
+        return convert_nb_to_html(notebook_nb_unexecuted())
+
+    @reactive.calc
     def notebook_pdf():
         return convert_nb_to_pdf(notebook_nb())
+
+    @reactive.calc
+    def notebook_pdf_unexecuted():
+        return convert_nb_to_pdf(notebook_nb_unexecuted())
 
     @render.download(
         filename="dp-wizard-script.py",
@@ -161,6 +192,15 @@ def results_server(
             yield notebook_nb()
 
     @render.download(
+        filename="dp-wizard-notebook-unexecuted.ipynb",
+        media_type="application/x-ipynb+json",
+    )
+    async def download_notebook_unexecuted():
+        with ui.Progress() as progress:
+            progress.set(message=wait_message)
+            yield notebook_nb_unexecuted()
+
+    @render.download(
         filename="dp-wizard-notebook.html",
         media_type="text/html",
     )
@@ -170,6 +210,15 @@ def results_server(
             yield notebook_html()
 
     @render.download(
+        filename="dp-wizard-notebook-unexecuted.html",
+        media_type="text/html",
+    )
+    async def download_html_unexecuted():
+        with ui.Progress() as progress:
+            progress.set(message=wait_message)
+            yield notebook_html_unexecuted()
+
+    @render.download(
         filename="dp-wizard-notebook.pdf",
         media_type="application/pdf",
     )  # pyright: ignore
@@ -177,6 +226,15 @@ def results_server(
         with ui.Progress() as progress:
             progress.set(message=wait_message)
             yield notebook_pdf()
+
+    @render.download(
+        filename="dp-wizard-notebook.pdf",
+        media_type="application/pdf",
+    )  # pyright: ignore
+    async def download_pdf_unexecuted():
+        with ui.Progress() as progress:
+            progress.set(message=wait_message)
+            yield notebook_pdf_unexecuted()
 
     @render.download(
         filename="dp-wizard-report.txt",

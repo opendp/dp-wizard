@@ -154,7 +154,7 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
 
     # ... ipynb:
     with page.expect_download() as notebook_download_info:
-        page.get_by_text("Download notebook").click()
+        page.get_by_text("Download notebook").first.click()
     expect_no_error()
 
     notebook_download = notebook_download_info.value
@@ -163,7 +163,7 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
 
     # ... html:
     with page.expect_download() as html_download_info:
-        page.get_by_text("Download HTML").click()
+        page.get_by_text("Download HTML").first.click()
     expect_no_error()
 
     html_download = html_download_info.value
@@ -172,7 +172,7 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
 
     # ... pdf:
     with page.expect_download() as pdf_download_info:
-        page.get_by_text("Download PDF").click()
+        page.get_by_text("Download PDF").first.click()
     expect_no_error()
 
     pdf_download = pdf_download_info.value
