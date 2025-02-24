@@ -103,6 +103,7 @@ def results_ui():
                     """
                 ),
             ),
+            open=False,
         ),
         value="results_panel",
     )
