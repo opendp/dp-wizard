@@ -25,6 +25,9 @@ def analysis_ui():
                     """
                     Select columns to group by, or leave empty
                     to calculate statistics across the entire dataset.
+
+                    Groups aren't applied to the previews on this page,
+                    but will be used in the final release.
                     """
                 ),
                 ui.input_selectize(
