@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 
 from shiny import ui, render, reactive, Inputs, Outputs, Session
 from faicons import icon_svg
@@ -21,7 +22,9 @@ wait_message = "Please wait."
 
 
 def button(name: str, ext: str, icon: str, primary=False):
-    function_name = f'download_{name.lower().replace(" ", "_")}'
+    clean_name = re.sub(r"\W+", " ", name).strip().replace(" ", "_").lower()
+    print("clean:", clean_name)
+    function_name = f"download_{clean_name}"
     return ui.download_button(
         function_name,
         f"Download {name} ({ext})",
@@ -34,15 +37,18 @@ def button(name: str, ext: str, icon: str, primary=False):
 def results_ui():
     return ui.nav_panel(
         "Download results",
-        ui.markdown("You can now make a differentially private release of your data."),
+        ui.h3("Download results"),
+        ui.p("You can now make a differentially private release of your data."),
         # Find more icons on Font Awesome: https://fontawesome.com/search?ic=free
         ui.accordion(
             ui.accordion_panel(
                 "Notebooks",
                 button("Notebook", ".ipynb", "book", primary=True),
                 p(
-                    "An executed Jupyter notebook which references your CSV "
-                    "and shows the result of a differentially private analysis."
+                    """
+                    An executed Jupyter notebook which references your CSV
+                    and shows the result of a differentially private analysis.
+                    """
                 ),
                 button("HTML", ".html", "file-code"),
                 p("The same content, but exported as HTML."),
@@ -53,23 +59,51 @@ def results_ui():
                 "Reports",
                 button("Report", ".txt", "file-lines", primary=True),
                 p(
-                    "A report which includes your parameter choices and the results. "
-                    "Intended to be human-readable, but it does use YAML, "
-                    "so it can be parsed by other programs."
+                    """
+                    A report which includes your parameter choices and the results.
+                    Intended to be human-readable, but it does use YAML,
+                    so it can be parsed by other programs.
+                    """
                 ),
                 button("Table", ".csv", "file-csv"),
                 p("The same information, but condensed into a two-column CSV."),
+            ),
+        ),
+        ui.h3("Download code"),
+        ui.p(
+            """
+            Alternatively, you can download a script or unexecuted notebook
+            that demonstrates the steps of your analysis,
+            but does not contain any data or analysis results.
+            """
+        ),
+        ui.accordion(
+            ui.accordion_panel(
+                "Unexecuted Notebooks",
+                button("Notebook (unexecuted)", ".ipynb", "book", primary=True),
+                p(
+                    """
+                    This contains the same code as Jupyter notebook above,
+                    but none of the cells are executed,
+                    so it does not contain any results.
+                    """
+                ),
+                button("HTML (unexecuted)", ".html", "file-code"),
+                p("The same content, but exported as HTML."),
+                button("PDF (unexecuted)", ".pdf", "file-pdf"),
+                p("The same content, but exported as PDF."),
             ),
             ui.accordion_panel(
                 "Scripts",
                 button("Script", ".py", "python", primary=True),
                 p(
-                    "The same code as the notebook, but extracted into "
-                    "a Python script which can be run from the command line. "
-                    "The script itself does not contain any data "
-                    "or analysis results."
+                    """
+                    The same code as the notebooks, but extracted into
+                    a Python script which can be run from the command line.
+                    """
                 ),
             ),
+            open=False,
         ),
         value="results_panel",
     )
@@ -122,12 +156,25 @@ def results_server(
         return convert_py_to_nb(notebook_py, execute=True)
 
     @reactive.calc
+    def notebook_nb_unexecuted():
+        notebook_py = NotebookGenerator(analysis_plan()).make_py()
+        return convert_py_to_nb(notebook_py, execute=False)
+
+    @reactive.calc
     def notebook_html():
         return convert_nb_to_html(notebook_nb())
 
     @reactive.calc
+    def notebook_html_unexecuted():
+        return convert_nb_to_html(notebook_nb_unexecuted())
+
+    @reactive.calc
     def notebook_pdf():
         return convert_nb_to_pdf(notebook_nb())
+
+    @reactive.calc
+    def notebook_pdf_unexecuted():
+        return convert_nb_to_pdf(notebook_nb_unexecuted())
 
     @render.download(
         filename="dp-wizard-script.py",
@@ -148,6 +195,15 @@ def results_server(
             yield notebook_nb()
 
     @render.download(
+        filename="dp-wizard-notebook-unexecuted.ipynb",
+        media_type="application/x-ipynb+json",
+    )
+    async def download_notebook_unexecuted():
+        with ui.Progress() as progress:
+            progress.set(message=wait_message)
+            yield notebook_nb_unexecuted()
+
+    @render.download(
         filename="dp-wizard-notebook.html",
         media_type="text/html",
     )
@@ -157,6 +213,15 @@ def results_server(
             yield notebook_html()
 
     @render.download(
+        filename="dp-wizard-notebook-unexecuted.html",
+        media_type="text/html",
+    )
+    async def download_html_unexecuted():
+        with ui.Progress() as progress:
+            progress.set(message=wait_message)
+            yield notebook_html_unexecuted()
+
+    @render.download(
         filename="dp-wizard-notebook.pdf",
         media_type="application/pdf",
     )  # pyright: ignore
@@ -164,6 +229,15 @@ def results_server(
         with ui.Progress() as progress:
             progress.set(message=wait_message)
             yield notebook_pdf()
+
+    @render.download(
+        filename="dp-wizard-notebook.pdf",
+        media_type="application/pdf",
+    )  # pyright: ignore
+    async def download_pdf_unexecuted():
+        with ui.Progress() as progress:
+            progress.set(message=wait_message)
+            yield notebook_pdf_unexecuted()
 
     @render.download(
         filename="dp-wizard-report.txt",
