@@ -229,7 +229,7 @@ def column_server(
         title = ", ".join(
             [
                 name if public_csv_path else f"Simulated {name}: normal distribution",
-                f"{contributions} contribution{s} / invidual",
+                f"{contributions} contribution{s} / individual",
             ]
         )
         return plot_histogram(
