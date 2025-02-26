@@ -23,7 +23,6 @@ wait_message = "Please wait."
 
 def button(name: str, ext: str, icon: str, primary=False):
     clean_name = re.sub(r"\W+", " ", name).strip().replace(" ", "_").lower()
-    print("clean:", clean_name)
     function_name = f"download_{clean_name}"
     return ui.download_button(
         function_name,

@@ -1,13 +1,10 @@
 from pathlib import Path
-import logging
 
 from shiny import App, ui, reactive, Inputs, Outputs, Session
 
 from dp_wizard.utils.argparse_helpers import get_cli_info, CLIInfo
 from dp_wizard.app import analysis_panel, dataset_panel, results_panel, feedback_panel
 
-
-logging.basicConfig(level=logging.INFO)
 
 app_ui = ui.page_bootstrap(
     ui.head_content(ui.include_css(Path(__file__).parent / "css" / "styles.css")),
