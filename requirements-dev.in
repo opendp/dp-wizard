@@ -29,7 +29,7 @@ numpy<2.0.3
 # Everything below should also be listed in pyproject.toml:
 
 # OpenDP:
-opendp[polars]==0.12.0
+opendp[polars]==0.12.1
 
 # Conversion:
 jupytext
