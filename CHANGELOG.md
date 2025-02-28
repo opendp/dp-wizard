@@ -1,5 +1,7 @@
 # CHANGELOG
 
+## 0.2.0
+
 - remove debug code [#252](https://github.com/opendp/dp-wizard/pull/252)
 - fix typos [#250](https://github.com/opendp/dp-wizard/pull/250) [#251](https://github.com/opendp/dp-wizard/pull/251)
 - Support grouping [#237](https://github.com/opendp/dp-wizard/pull/237)

@@ -93,9 +93,8 @@ If Playwright fails in CI, we can still see what went wrong:
 - Make sure you're up to date.
 - Make one last feature branch:
   - Run `changelog.py` to update the `CHANGELOG.md`.
-  - Then bump `dp_wizard/VERSION`.
-  - Commit: The commit message should include new version number.
-  - Push to github; open PR; merge PR.
+  - Then bump `dp_wizard/VERSION`, and add the new number at the top of the `CHANGELOG.md`.
+  - Push to github; open PR, with version number in name; merge PR.
 - `flit publish`
 
 ### Conventions
