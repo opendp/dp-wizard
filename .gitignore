@@ -1,3 +1,6 @@
+# Pypi credentials
+.pypirc
+
 # MacOS
 .DS_Store
 

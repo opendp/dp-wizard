@@ -90,12 +90,12 @@ If Playwright fails in CI, we can still see what went wrong:
 
 ### Release
 
-- Make sure you're up to date.
+- Make sure you're up to date, and have the git-ignored credentials file `.pypirc`.
 - Make one last feature branch:
   - Run `changelog.py` to update the `CHANGELOG.md`.
   - Then bump `dp_wizard/VERSION`, and add the new number at the top of the `CHANGELOG.md`.
   - Push to github; open PR, with version number in name; merge PR.
-- `flit publish`
+- `flit publish --pypirc .pypirc`
 
 ### Conventions
 
