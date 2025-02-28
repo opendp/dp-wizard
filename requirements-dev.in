@@ -20,7 +20,7 @@ coverage
 # Everything below should also be listed in pyproject.toml:
 
 # OpenDP:
-opendp[polars]==0.12.0
+opendp[polars]==0.12.1a20250227001
 
 # Conversion:
 jupytext

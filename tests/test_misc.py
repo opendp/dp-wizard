@@ -36,4 +36,4 @@ def test_opendp_pin(rel_path):
         line for line in (root / rel_path).read_text().splitlines() if "opendp[" in line
     ]
     assert len(opendp_lines) == 1
-    assert "opendp[polars]==0.12.0" in opendp_lines[0].strip()
+    assert "opendp[polars]==0.12.1a20250227001" in opendp_lines[0]

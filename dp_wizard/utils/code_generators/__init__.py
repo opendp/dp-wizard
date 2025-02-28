@@ -50,7 +50,9 @@ class _CodeGenerator(ABC):
     def make_py(self):
         code = (
             Template(self.root_template)
-            .fill_expressions(DEPENDENCIES="'opendp[polars]==0.12.0' matplotlib pyyaml")
+            .fill_expressions(
+                DEPENDENCIES="'opendp[polars]==0.12.1a20250227001' matplotlib pyyaml"
+            )
             .fill_blocks(
                 IMPORTS_BLOCK=Template("imports").finish(),
                 UTILS_BLOCK=(Path(__file__).parent.parent / "shared.py").read_text(),
