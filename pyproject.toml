@@ -13,7 +13,7 @@ dependencies = [
     "shiny",
     "faicons",
     "matplotlib",
-    "opendp[polars]==0.12.0",
+    "opendp[polars]==0.12.1a20250227001",
     "jupytext",
     "jupyter-client",
     "nbconvert",

@@ -202,7 +202,7 @@ def results_server(
             progress.set(message=wait_message)
             yield notebook_nb_unexecuted()
 
-    @render.download(
+    @render.download(  # pyright: ignore
         filename="dp-wizard-notebook.html",
         media_type="text/html",
     )
@@ -211,7 +211,7 @@ def results_server(
             progress.set(message=wait_message)
             yield notebook_html()
 
-    @render.download(
+    @render.download(  # pyright: ignore
         filename="dp-wizard-notebook-unexecuted.html",
         media_type="text/html",
     )

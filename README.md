@@ -46,22 +46,24 @@ so let's remember [what we learned](WHAT-WE-LEARNED.md) along the way.
 
 ### Getting Started
 
-To get started, clone the repo and install dev dependencies in a virtual environment:
+DP-Wizard will run across multiple versions, but for the fewest surprises during development, it makes sense to use the oldest supported version in a virtual environment. On MacOS:
 ```shell
 $ git clone https://github.com/opendp/dp-wizard.git
 $ cd dp-wizard
-$ python3 -m venv .venv
+$ brew install python@3.10
+$ python3.10 -m venv .venv
 $ source .venv/bin/activate
+```
+
+You can now install dependencies, and the application itself, and start a demo:
+```shell
 $ pip install -r requirements-dev.txt
 $ pre-commit install
 $ playwright install
-```
-
-Now install the application itself and run it:
-```shell
 $ pip install --editable .
 $ dp-wizard --demo
 ```
+
 Your browser should open and connect you to the application.
 
 ### Testing
@@ -90,12 +92,12 @@ If Playwright fails in CI, we can still see what went wrong:
 
 ### Release
 
-- Make sure you're up to date.
+- Make sure you're up to date, and have the git-ignored credentials file `.pypirc`.
 - Make one last feature branch:
   - Run `changelog.py` to update the `CHANGELOG.md`.
   - Then bump `dp_wizard/VERSION`, and add the new number at the top of the `CHANGELOG.md`.
   - Push to github; open PR, with version number in name; merge PR.
-- `flit publish`
+- `flit publish --pypirc .pypirc`
 
 ### Conventions
 

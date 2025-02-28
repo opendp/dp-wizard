@@ -1,3 +1,6 @@
+# Pypi credentials
+.pypirc
+
 # MacOS
 .DS_Store
 
@@ -130,6 +133,7 @@ celerybeat.pid
 # Environments
 .env
 .venv
+.venv-*
 env/
 venv/
 ENV/

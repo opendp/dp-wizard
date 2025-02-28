@@ -1,5 +1,6 @@
 # After making changes here, run:
-#    pip-compile requirements-dev.in && pip install -r requirements-dev.txt
+#    pip-compile --rebuild requirements-dev.in && pip install -r requirements-dev.txt
+
 
 # Developer tools:
 pip-tools
@@ -15,21 +16,11 @@ pytest-playwright
 pyright
 coverage
 
-# When 3.9 reaches end-of-life late in 2025
-# we can bump CI from 3.9 to 3.10, and drop these constraints.
-# https://devguide.python.org/versions/
-scipy<1.14
-contourpy<1.3.1
-ipython<8.19.0
-kiwisolver<1.4.8
-matplotlib<3.10.0
-numpy<2.0.3
-
 
 # Everything below should also be listed in pyproject.toml:
 
 # OpenDP:
-opendp[polars]==0.12.0
+opendp[polars]==0.12.1a20250227001
 
 # Conversion:
 jupytext

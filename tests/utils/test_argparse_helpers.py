@@ -43,8 +43,6 @@ def test_help():
         # argparse doesn't actually know the name of the script
         # and inserts the name of the running program instead.
         .replace("__main__.py", "dp-wizard").replace("pytest", "dp-wizard")
-        # Text is different under Python 3.9:
-        .replace("optional arguments:", "options:")
     ).strip()
 
     root_path = Path(__file__).parent.parent.parent
