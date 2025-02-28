@@ -74,12 +74,13 @@ def make_accuracy_histogram(
             delta=1e-7,  # TODO
         ),
         split_by_weights=[1],
-        margins={
-            ("bin",): dp.polars.Margin(  # type: ignore
+        margins=[
+            dp.polars.Margin(  # type: ignore
+                by=["bin"],
                 max_partition_length=row_count,
                 public_info="keys",
             ),
-        },
+        ],
     )
     query = context.query().group_by("bin").agg(pl.len().dp.noise())  # type: ignore
 

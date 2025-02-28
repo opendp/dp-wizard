@@ -66,15 +66,15 @@ class _CodeGenerator(ABC):
         # Line length determined by PDF rendering.
         return black.format_str(code, mode=black.Mode(line_length=74))
 
-    def _make_margins_dict(self, bin_names: Iterable[str], groups: Iterable[str]):
+    def _make_margins_list(self, bin_names: Iterable[str], groups: Iterable[str]):
         groups_str = ", ".join(f"'{g}'" for g in groups)
-        margins = ["(): dp.polars.Margin(public_info='lengths',),"] + [
-            f"('{bin_name}', {groups_str}): dp.polars.Margin(public_info='keys',),"
+        margins = ["dp.polars.Margin(public_info='lengths',),"] + [
+            f"dp.polars.Margin(by=['{bin_name}', {groups_str}], public_info='keys',),"
             for bin_name in bin_names
         ]
 
-        margins_dict = "{" + "".join(margins) + "\n    }"
-        return margins_dict
+        margins_list = "[" + "".join(margins) + "\n    ]"
+        return margins_list
 
     def _make_columns(self):
         return "\n".join(
@@ -143,7 +143,7 @@ class _CodeGenerator(ABC):
         privacy_unit_block = make_privacy_unit_block(self.contributions)
         privacy_loss_block = make_privacy_loss_block(self.epsilon)
 
-        margins_dict = self._make_margins_dict(
+        margins_list = self._make_margins_list(
             [f"{name}_bin" for name in column_names],
             group_names,
         )
@@ -151,7 +151,7 @@ class _CodeGenerator(ABC):
         return (
             Template("context")
             .fill_expressions(
-                MARGINS_DICT=margins_dict,
+                MARGINS_LIST=margins_list,
                 COLUMNS=columns,
             )
             .fill_values(
