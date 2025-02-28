@@ -46,22 +46,24 @@ so let's remember [what we learned](WHAT-WE-LEARNED.md) along the way.
 
 ### Getting Started
 
-To get started, clone the repo and install dev dependencies in a virtual environment:
+DP-Wizard will run across multiple versions, but for the fewest surprises during development, it makes sense to use the oldest supported version in a virtual environment. On MacOS:
 ```shell
 $ git clone https://github.com/opendp/dp-wizard.git
 $ cd dp-wizard
-$ python3 -m venv .venv
+$ brew install python@3.10
+$ python3.10 -m venv .venv
 $ source .venv/bin/activate
+```
+
+You can now install dependencies, and the application itself, and start a demo:
+```shell
 $ pip install -r requirements-dev.txt
 $ pre-commit install
 $ playwright install
-```
-
-Now install the application itself and run it:
-```shell
 $ pip install --editable .
 $ dp-wizard --demo
 ```
+
 Your browser should open and connect you to the application.
 
 ### Testing
