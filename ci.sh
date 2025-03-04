@@ -2,5 +2,4 @@
 
 set -euo pipefail
 
-coverage run -m pytest -vv --failed-first
-coverage report
+pytest -vv --failed-first --numprocesses=auto --cov=dp_wizard
