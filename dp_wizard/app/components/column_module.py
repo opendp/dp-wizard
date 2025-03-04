@@ -28,6 +28,11 @@ def column_ui():  # pragma: no cover
     }
     return ui.card(
         ui.card_header(ui.output_text("card_header")),
+        ui.input_select(
+            "select_analysis",
+            None,
+            {"histogram": "Histogram"},
+        ),
         ui.layout_columns(
             [
                 # The initial values on these inputs
@@ -135,6 +140,33 @@ def column_server(
     @render.text
     def card_header():
         return name
+
+    @render.ui
+    def analysis_config_ui():
+        return (
+            ui.layout_columns(
+                [
+                    # The initial values on these inputs
+                    # should be overridden by the reactive.effect.
+                    ui.input_numeric(
+                        "lower",
+                        ["Lower", ui.output_ui("bounds_tooltip_ui")],
+                        0,
+                        width=label_width,
+                    ),
+                    ui.input_numeric("upper", "Upper", 0, width=label_width),
+                    ui.input_numeric(
+                        "bins",
+                        ["Bins", ui.output_ui("bins_tooltip_ui")],
+                        0,
+                        width=label_width,
+                    ),
+                    ui.output_ui("optional_weight_ui"),
+                ],
+                ui.output_ui("histogram_preview_ui"),
+                col_widths=col_widths,  # type: ignore
+            ),
+        )
 
     @render.ui
     def bounds_tooltip_ui():
