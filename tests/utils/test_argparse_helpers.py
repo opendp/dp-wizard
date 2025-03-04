@@ -41,8 +41,8 @@ def test_help():
             _get_arg_parser().format_help(),
         )
         # argparse doesn't actually know the name of the script
-        # and inserts the name of the running program instead.
-        .replace("__main__.py", "dp-wizard").replace("pytest", "dp-wizard")
+        # and inserts info from the running process instead.
+        .replace("usage: -c", "usage: dp-wizard")
     ).strip()
 
     root_path = Path(__file__).parent.parent.parent
