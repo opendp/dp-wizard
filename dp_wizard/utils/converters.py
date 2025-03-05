@@ -5,7 +5,7 @@ import json
 import nbformat
 import nbconvert
 from warnings import warn
-from logging import info, debug
+from logging import debug
 
 
 def convert_py_to_nb(python_str: str, execute: bool = False):
@@ -36,7 +36,7 @@ def convert_py_to_nb(python_str: str, execute: bool = False):
                 # Error quickly instead of trying to recover.
                 raise  # pragma: no cover
             # Install kernel if missing
-            info("jupytext failed: Will install missing kernel and try again")
+            warn("jupytext failed: Will install kernel and try again.")
             debug(f'STDERR from "{cmd}":\n{e.stderr}')
             subprocess.run(
                 "python -m ipykernel install --name kernel_name --user".split(" "),
