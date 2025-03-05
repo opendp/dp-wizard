@@ -5,6 +5,7 @@ import json
 import nbformat
 import nbconvert
 from warnings import warn
+from logging import debug
 
 
 def convert_py_to_nb(python_str: str, execute: bool = False):
@@ -30,13 +31,13 @@ def convert_py_to_nb(python_str: str, execute: bool = False):
         try:
             result = subprocess.run(argv, check=True, text=True, capture_output=True)
         except subprocess.CalledProcessError as e:  # pragma: no cover
-            warn(f'STDERR from "{cmd}":\n{e.stderr}')
             if not execute:
                 # Might reach here if jupytext is not installed.
                 # Error quickly instead of trying to recover.
                 raise  # pragma: no cover
             # Install kernel if missing
-            # TODO: Is there a better way to do this?
+            warn("jupytext failed: Will install kernel and try again.")
+            debug(f'STDERR from "{cmd}":\n{e.stderr}')
             subprocess.run(
                 "python -m ipykernel install --name kernel_name --user".split(" "),
                 check=True,

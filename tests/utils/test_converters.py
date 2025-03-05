@@ -64,7 +64,7 @@ def test_convert_py_to_nb_error():
     ):
         with pytest.warns(
             UserWarning,
-            match=r'STDERR from "jupytext',
+            match=r"jupytext failed: Will install kernel and try again",
         ):
             convert_py_to_nb(python_str, execute=True)
 
