@@ -24,7 +24,10 @@ def column_ui():  # pragma: no cover
         ui.input_select(
             "select_analysis",
             None,
-            {"histogram": "Histogram"},
+            {
+                "histogram": "Histogram",
+                "mean": "Mean",
+            },
         ),
         ui.output_ui("analysis_config_ui"),
     )
@@ -112,41 +115,48 @@ def column_server(
 
     @render.ui
     def analysis_config_ui():
-        return (
-            ui.layout_columns(
-                [
-                    # The initial values on these inputs
-                    # should be overridden by the reactive.effect.
-                    ui.input_numeric(
-                        "lower",
-                        ["Lower", ui.output_ui("bounds_tooltip_ui")],
-                        lower_bounds().get(name, 0),
-                        width=label_width,
-                    ),
-                    ui.input_numeric(
-                        "upper",
-                        "Upper",
-                        upper_bounds().get(name, 10),
-                        width=label_width,
-                    ),
-                    ui.input_numeric(
-                        "bins",
-                        ["Bins", ui.output_ui("bins_tooltip_ui")],
-                        bin_counts().get(name, 10),
-                        width=label_width,
-                    ),
-                    ui.output_ui("optional_weight_ui"),
-                ],
-                ui.output_ui("histogram_preview_ui"),
-                col_widths={
-                    # Controls stay roughly a constant width;
-                    # Graph expands to fill space.
-                    "sm": [4, 8],
-                    "md": [3, 9],
-                    "lg": [2, 10],
-                },
-            ),
-        )
+        col_widths = {
+            # Controls stay roughly a constant width;
+            # Graph expands to fill space.
+            "sm": [4, 8],
+            "md": [3, 9],
+            "lg": [2, 10],
+        }
+        match input.select_analysis():
+            case "histogram":
+                return ui.layout_columns(
+                    [
+                        # The initial values on these inputs
+                        # should be overridden by the reactive.effect.
+                        ui.input_numeric(
+                            "lower",
+                            ["Lower", ui.output_ui("bounds_tooltip_ui")],
+                            lower_bounds().get(name, 0),
+                            width=label_width,
+                        ),
+                        ui.input_numeric(
+                            "upper",
+                            "Upper",
+                            upper_bounds().get(name, 10),
+                            width=label_width,
+                        ),
+                        ui.input_numeric(
+                            "bins",
+                            ["Bins", ui.output_ui("bins_tooltip_ui")],
+                            bin_counts().get(name, 10),
+                            width=label_width,
+                        ),
+                        ui.output_ui("optional_weight_ui"),
+                    ],
+                    ui.output_ui("histogram_preview_ui"),
+                    col_widths=col_widths,
+                )
+            case "mean":
+                return ui.layout_columns(
+                    ui.p("inputs placeholder"),
+                    ui.p("preview placeholder"),
+                    col_widths=col_widths,
+                )
 
     @render.ui
     def bounds_tooltip_ui():
