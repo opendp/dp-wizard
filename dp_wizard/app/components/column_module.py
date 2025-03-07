@@ -17,6 +17,11 @@ default_weight = "2"
 label_width = "10em"  # Just wide enough so the text isn't trucated.
 
 
+class Analysis:
+    HISTOGRAM = "Histogram"
+    MEAN = "Mean"
+
+
 @module.ui
 def column_ui():  # pragma: no cover
     return ui.card(
@@ -24,10 +29,8 @@ def column_ui():  # pragma: no cover
         ui.input_select(
             "select_analysis",
             None,
-            {
-                "histogram": "Histogram",
-                "mean": "Mean",
-            },
+            [Analysis.HISTOGRAM, Analysis.MEAN],
+            width=label_width,
         ),
         ui.output_ui("analysis_config_ui"),
     )
@@ -123,11 +126,9 @@ def column_server(
             "lg": [2, 10],
         }
         match input.select_analysis():
-            case "histogram":
+            case Analysis.HISTOGRAM:
                 return ui.layout_columns(
                     [
-                        # The initial values on these inputs
-                        # should be overridden by the reactive.effect.
                         ui.input_numeric(
                             "lower",
                             ["Lower", ui.output_ui("bounds_tooltip_ui")],
@@ -151,10 +152,24 @@ def column_server(
                     ui.output_ui("histogram_preview_ui"),
                     col_widths=col_widths,  # type: ignore
                 )
-            case "mean":
+            case Analysis.MEAN:
                 return ui.layout_columns(
-                    ui.p("inputs placeholder"),
-                    ui.p("preview placeholder"),
+                    [
+                        ui.input_numeric(
+                            "lower",
+                            ["Lower", ui.output_ui("bounds_tooltip_ui")],
+                            lower_bounds().get(name, 0),
+                            width=label_width,
+                        ),
+                        ui.input_numeric(
+                            "upper",
+                            "Upper",
+                            upper_bounds().get(name, 10),
+                            width=label_width,
+                        ),
+                        ui.output_ui("optional_weight_ui"),
+                    ],
+                    ui.p("mean preview placeholder"),
                     col_widths=col_widths,  # type: ignore
                 )
 
