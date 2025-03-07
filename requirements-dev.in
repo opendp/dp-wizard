@@ -14,7 +14,8 @@ pre-commit
 pytest
 pytest-playwright
 pyright
-coverage
+pytest-cov
+pytest-xdist
 
 
 # Everything below should also be listed in pyproject.toml:

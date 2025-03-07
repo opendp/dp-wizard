@@ -78,7 +78,7 @@ def _get_args():
     if "pytest" in argv[0] or ("shiny" in argv[0] and "run" == argv[1]):
         # We are running a test,
         # and ARGV is polluted, so override:
-        args = arg_parser.parse_args([])
+        args = arg_parser.parse_args([])  # pragma: no cover
     else:
         # Normal parsing:
         args = arg_parser.parse_args()  # pragma: no cover

@@ -34,16 +34,19 @@ def extract_block(md):
 
 
 def test_help():
-    help = (
-        re.sub(
-            r"\]\s+\[",
-            "] [",  # line wrapping of params varies.
-            _get_arg_parser().format_help(),
-        )
-        # argparse doesn't actually know the name of the script
-        # and inserts the name of the running program instead.
-        .replace("__main__.py", "dp-wizard").replace("pytest", "dp-wizard")
-    ).strip()
+    help = re.sub(
+        # line wrapping of params varies:
+        r"\]\s+\[",
+        "] [",
+        _get_arg_parser().format_help(),
+    )
+    help = re.sub(
+        # argparse inserts info from the running process:
+        r"usage: (-c|__main__\.py|pytest)",
+        "usage: dp-wizard",
+        help,
+    )
+    help = help.strip()
 
     root_path = Path(__file__).parent.parent.parent
 
