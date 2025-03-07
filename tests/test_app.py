@@ -117,7 +117,7 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     page.get_by_text("grade").nth(1).click()
 
     # Check that default is set correctly:
-    assert page.get_by_label("Upper").input_value() == "10"
+    assert page.get_by_label("Upper").input_value() == "10.0"
     # Reset, and confirm:
     new_value = "20"
     page.get_by_label("Upper").fill(new_value)

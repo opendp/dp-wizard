@@ -19,13 +19,6 @@ label_width = "10em"  # Just wide enough so the text isn't trucated.
 
 @module.ui
 def column_ui():  # pragma: no cover
-    col_widths = {
-        # Controls stay roughly a constant width;
-        # Graph expands to fill space.
-        "sm": [4, 8],
-        "md": [3, 9],
-        "lg": [2, 10],
-    }
     return ui.card(
         ui.card_header(ui.output_text("card_header")),
         ui.input_select(
@@ -33,28 +26,7 @@ def column_ui():  # pragma: no cover
             None,
             {"histogram": "Histogram"},
         ),
-        ui.layout_columns(
-            [
-                # The initial values on these inputs
-                # should be overridden by the reactive.effect.
-                ui.input_numeric(
-                    "lower",
-                    ["Lower", ui.output_ui("bounds_tooltip_ui")],
-                    0,
-                    width=label_width,
-                ),
-                ui.input_numeric("upper", "Upper", 0, width=label_width),
-                ui.input_numeric(
-                    "bins",
-                    ["Bins", ui.output_ui("bins_tooltip_ui")],
-                    0,
-                    width=label_width,
-                ),
-                ui.output_ui("optional_weight_ui"),
-            ],
-            ui.output_ui("histogram_preview_ui"),
-            col_widths=col_widths,  # type: ignore
-        ),
+        ui.output_ui("analysis_config_ui"),
     )
 
 
@@ -78,9 +50,6 @@ def column_server(
     @reactive.effect
     def _set_all_inputs():
         with reactive.isolate():  # Without isolate, there is an infinite loop.
-            ui.update_numeric("lower", value=lower_bounds().get(name, 0))
-            ui.update_numeric("upper", value=upper_bounds().get(name, 10))
-            ui.update_numeric("bins", value=bin_counts().get(name, 10))
             ui.update_numeric("weight", value=int(weights().get(name, default_weight)))
 
     @reactive.effect
@@ -151,20 +120,31 @@ def column_server(
                     ui.input_numeric(
                         "lower",
                         ["Lower", ui.output_ui("bounds_tooltip_ui")],
-                        0,
+                        lower_bounds().get(name, 0),
                         width=label_width,
                     ),
-                    ui.input_numeric("upper", "Upper", 0, width=label_width),
+                    ui.input_numeric(
+                        "upper",
+                        "Upper",
+                        upper_bounds().get(name, 10),
+                        width=label_width,
+                    ),
                     ui.input_numeric(
                         "bins",
                         ["Bins", ui.output_ui("bins_tooltip_ui")],
-                        0,
+                        bin_counts().get(name, 10),
                         width=label_width,
                     ),
                     ui.output_ui("optional_weight_ui"),
                 ],
                 ui.output_ui("histogram_preview_ui"),
-                col_widths=col_widths,  # type: ignore
+                col_widths={
+                    # Controls stay roughly a constant width;
+                    # Graph expands to fill space.
+                    "sm": [4, 8],
+                    "md": [3, 9],
+                    "lg": [2, 10],
+                },
             ),
         )
 
