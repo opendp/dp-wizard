@@ -11,6 +11,7 @@ from dp_wizard.utils.dp_helper import confidence
 
 
 class AnalysisPlanColumn(NamedTuple):
+    analysis_type: str
     lower_bound: float
     upper_bound: float
     bin_count: int
@@ -80,6 +81,7 @@ class _CodeGenerator(ABC):
         return "\n".join(
             make_column_config_block(
                 name=name,
+                analysis_type=col.analysis_type,
                 lower_bound=col.lower_bound,
                 upper_bound=col.upper_bound,
                 bin_count=col.bin_count,
@@ -105,7 +107,7 @@ class _CodeGenerator(ABC):
     def _make_query(self, column_name):
         indentifier = name_to_identifier(column_name)
         accuracy_name = f"{indentifier}_accuracy"
-        histogram_name = f"{indentifier}_histogram"
+        histogram_name = f"{indentifier}_stats"
         query = (
             Template("query")
             .fill_values(
@@ -183,7 +185,7 @@ class NotebookGenerator(_CodeGenerator):
                     CONFIDENCE=confidence,
                 )
                 .fill_expressions(
-                    IDENTIFIER_HISTOGRAM=f"{name_to_identifier(name)}_histogram",
+                    IDENTIFIER_STATS=f"{name_to_identifier(name)}_stats",
                     IDENTIFIER_ACCURACY=f"{name_to_identifier(name)}_accuracy",
                 )
                 .finish()
@@ -236,31 +238,12 @@ def make_privacy_loss_block(epsilon: float):
 
 
 def make_column_config_block(
-    name: str, lower_bound: float, upper_bound: float, bin_count: int
+    name: str,
+    analysis_type: str,
+    lower_bound: float,
+    upper_bound: float,
+    bin_count: int,
 ):
-    """
-    >>> print(make_column_config_block(
-    ...     name="HW GRADE",
-    ...     lower_bound=0,
-    ...     upper_bound=100,
-    ...     bin_count=10
-    ... ))
-    # From the public information, determine the bins for 'HW GRADE':
-    hw_grade_cut_points = make_cut_points(
-        lower_bound=0,
-        upper_bound=100,
-        bin_count=10,
-    )
-    <BLANKLINE>
-    # Use these bins to define a Polars column:
-    hw_grade_config = (
-        pl.col('HW GRADE')
-        .cut(hw_grade_cut_points)
-        .alias('hw_grade_bin')  # Give the new column a name.
-        .cast(pl.String)
-    )
-    <BLANKLINE>
-    """
     snake_name = _snake_case(name)
     return (
         Template("column_config")

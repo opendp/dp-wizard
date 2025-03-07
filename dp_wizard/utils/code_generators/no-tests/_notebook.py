@@ -20,8 +20,8 @@ IMPORTS_BLOCK
 UTILS_BLOCK
 # -
 
-# Based on the input you provided, for each column we'll create a set of cut points,
-# and a Polars expression that describes how we want to summarize that column.
+# Based on the input you provided, for each column we'll create a Polars expression
+# that describes how we want to summarize that column.
 
 # +
 COLUMNS_BLOCK
