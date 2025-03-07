@@ -244,30 +244,6 @@ def make_column_config_block(
     upper_bound: float,
     bin_count: int,
 ):
-    """
-    >>> print(make_column_config_block(
-    ...     name="HW GRADE",
-    ...     analysis_type="Histogram",
-    ...     lower_bound=0,
-    ...     upper_bound=100,
-    ...     bin_count=10
-    ... ))
-    # From the public information, determine the bins for 'HW GRADE':
-    hw_grade_cut_points = make_cut_points(
-        lower_bound=0,
-        upper_bound=100,
-        bin_count=10,
-    )
-    <BLANKLINE>
-    # Use these bins to define a Polars column:
-    hw_grade_config = (
-        pl.col('HW GRADE')
-        .cut(hw_grade_cut_points)
-        .alias('hw_grade_bin')  # Give the new column a name.
-        .cast(pl.String)
-    )
-    <BLANKLINE>
-    """
     snake_name = _snake_case(name)
     return (
         Template("column_config")
