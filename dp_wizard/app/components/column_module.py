@@ -149,13 +149,13 @@ def column_server(
                         ui.output_ui("optional_weight_ui"),
                     ],
                     ui.output_ui("histogram_preview_ui"),
-                    col_widths=col_widths,
+                    col_widths=col_widths,  # type: ignore
                 )
             case "mean":
                 return ui.layout_columns(
                     ui.p("inputs placeholder"),
                     ui.p("preview placeholder"),
-                    col_widths=col_widths,
+                    col_widths=col_widths,  # type: ignore
                 )
 
     @render.ui
