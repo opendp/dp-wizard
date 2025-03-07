@@ -115,6 +115,7 @@ def results_server(
     public_csv_path: reactive.Value[str],
     private_csv_path: reactive.Value[str],
     contributions: reactive.Value[int],
+    analysis_types: reactive.Value[dict[str, str]],
     lower_bounds: reactive.Value[dict[str, float]],
     upper_bounds: reactive.Value[dict[str, float]],
     bin_counts: reactive.Value[dict[str, int]],
@@ -129,6 +130,7 @@ def results_server(
         # inputs aren't lost when toggling checkboxes.
         columns = {
             col: AnalysisPlanColumn(
+                analysis_type=analysis_types()[col],
                 lower_bound=lower_bounds()[col],
                 upper_bound=upper_bounds()[col],
                 bin_count=int(bin_counts()[col]),

@@ -13,13 +13,14 @@ from dp_wizard.utils.dp_helper import confidence
 from dp_wizard.utils.mock_data import mock_data, ColumnDef
 
 
-default_weight = "2"
-label_width = "10em"  # Just wide enough so the text isn't trucated.
-
-
-class Analysis:
+class AnalysisType:
     HISTOGRAM = "Histogram"
     MEAN = "Mean"
+
+
+default_analysis_type = AnalysisType.HISTOGRAM
+default_weight = "2"
+label_width = "10em"  # Just wide enough so the text isn't trucated.
 
 
 @module.ui
@@ -27,9 +28,9 @@ def column_ui():  # pragma: no cover
     return ui.card(
         ui.card_header(ui.output_text("card_header")),
         ui.input_select(
-            "select_analysis",
+            "analysis_type",
             None,
-            [Analysis.HISTOGRAM, Analysis.MEAN],
+            [AnalysisType.HISTOGRAM, AnalysisType.MEAN],
             width=label_width,
         ),
         ui.output_ui("analysis_config_ui"),
@@ -46,6 +47,7 @@ def column_server(
     contributions: int,
     epsilon: float,
     row_count: int,
+    analysis_types: reactive.Value[dict[str, str]],
     lower_bounds: reactive.Value[dict[str, float]],
     upper_bounds: reactive.Value[dict[str, float]],
     bin_counts: reactive.Value[dict[str, int]],
@@ -54,9 +56,15 @@ def column_server(
     is_single_column: bool,
 ):  # pragma: no cover
     @reactive.effect
-    def _set_all_inputs():
+    def _set_hidden_inputs():
+        # TODO: Is isolate still needed?
         with reactive.isolate():  # Without isolate, there is an infinite loop.
             ui.update_numeric("weight", value=int(weights().get(name, default_weight)))
+
+    @reactive.effect
+    @reactive.event(input.analysis_type)
+    def _set_analysis_type():
+        analysis_types.set({**analysis_types(), name: input.analysis_type()})
 
     @reactive.effect
     @reactive.event(input.lower)
@@ -125,8 +133,8 @@ def column_server(
             "md": [3, 9],
             "lg": [2, 10],
         }
-        match input.select_analysis():
-            case Analysis.HISTOGRAM:
+        match input.analysis_type():
+            case AnalysisType.HISTOGRAM:
                 return ui.layout_columns(
                     [
                         ui.input_numeric(
@@ -152,7 +160,7 @@ def column_server(
                     ui.output_ui("histogram_preview_ui"),
                     col_widths=col_widths,  # type: ignore
                 )
-            case Analysis.MEAN:
+            case AnalysisType.MEAN:
                 return ui.layout_columns(
                     [
                         ui.input_numeric(
@@ -232,6 +240,7 @@ def column_server(
     def column_code():
         return make_column_config_block(
             name=name,
+            analysis_type=input.analysis_type(),
             lower_bound=float(input.lower()),
             upper_bound=float(input.upper()),
             bin_count=int(input.bins()),

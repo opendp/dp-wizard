@@ -11,6 +11,7 @@ from dp_wizard.utils.dp_helper import confidence
 
 
 class AnalysisPlanColumn(NamedTuple):
+    analysis_type: str
     lower_bound: float
     upper_bound: float
     bin_count: int
@@ -80,6 +81,7 @@ class _CodeGenerator(ABC):
         return "\n".join(
             make_column_config_block(
                 name=name,
+                analysis_type=col.analysis_type,
                 lower_bound=col.lower_bound,
                 upper_bound=col.upper_bound,
                 bin_count=col.bin_count,
@@ -236,11 +238,16 @@ def make_privacy_loss_block(epsilon: float):
 
 
 def make_column_config_block(
-    name: str, lower_bound: float, upper_bound: float, bin_count: int
+    name: str,
+    analysis_type: str,
+    lower_bound: float,
+    upper_bound: float,
+    bin_count: int,
 ):
     """
     >>> print(make_column_config_block(
     ...     name="HW GRADE",
+    ...     analysis_type="Histogram",
     ...     lower_bound=0,
     ...     upper_bound=100,
     ...     bin_count=10

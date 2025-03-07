@@ -32,6 +32,7 @@ def make_server_from_cli_info(cli_info: CLIInfo):
 
         contributions = reactive.value(cli_info.contributions)
 
+        analysis_types = reactive.value({})
         lower_bounds = reactive.value({})
         upper_bounds = reactive.value({})
         bin_counts = reactive.value({})
@@ -56,6 +57,7 @@ def make_server_from_cli_info(cli_info: CLIInfo):
             public_csv_path=public_csv_path,
             private_csv_path=private_csv_path,
             contributions=contributions,
+            analysis_types=analysis_types,
             lower_bounds=lower_bounds,
             upper_bounds=upper_bounds,
             bin_counts=bin_counts,
@@ -70,6 +72,7 @@ def make_server_from_cli_info(cli_info: CLIInfo):
             public_csv_path=public_csv_path,
             private_csv_path=private_csv_path,
             contributions=contributions,
+            analysis_types=analysis_types,
             lower_bounds=lower_bounds,
             upper_bounds=upper_bounds,
             bin_counts=bin_counts,

@@ -165,6 +165,7 @@ plan = AnalysisPlan(
         # For a strong test, use a column whose name
         # doesn't work as a python identifier.
         "hw-number": AnalysisPlanColumn(
+            analysis_type="Histogram",
             lower_bound=5,
             upper_bound=15,
             bin_count=20,
