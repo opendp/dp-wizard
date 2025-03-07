@@ -107,7 +107,7 @@ class _CodeGenerator(ABC):
     def _make_query(self, column_name):
         indentifier = name_to_identifier(column_name)
         accuracy_name = f"{indentifier}_accuracy"
-        histogram_name = f"{indentifier}_histogram"
+        histogram_name = f"{indentifier}_stats"
         query = (
             Template("query")
             .fill_values(
@@ -185,7 +185,7 @@ class NotebookGenerator(_CodeGenerator):
                     CONFIDENCE=confidence,
                 )
                 .fill_expressions(
-                    IDENTIFIER_HISTOGRAM=f"{name_to_identifier(name)}_histogram",
+                    IDENTIFIER_STATS=f"{name_to_identifier(name)}_stats",
                     IDENTIFIER_ACCURACY=f"{name_to_identifier(name)}_accuracy",
                 )
                 .finish()
