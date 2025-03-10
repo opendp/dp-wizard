@@ -237,7 +237,7 @@ class NotebookGenerator(_CodeGenerator):
                     )
                     .finish()
                 )
-            case AnalysisType.MEAN:
+            case AnalysisType.MEAN:  # pragma: no cover
                 return (
                     Template("mean_report_kv")
                     .fill_values(
@@ -245,7 +245,7 @@ class NotebookGenerator(_CodeGenerator):
                     )
                     .finish()
                 )
-            case _:
+            case _:  # pragma: no cover
                 raise Exception("Unrecognized analysis")
 
     def _make_extra_blocks(self):
