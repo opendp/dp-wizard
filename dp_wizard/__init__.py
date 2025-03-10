@@ -6,6 +6,11 @@ from pathlib import Path
 __version__ = (Path(__file__).parent / "VERSION").read_text().strip()
 
 
+class AnalysisType:
+    HISTOGRAM = "Histogram"
+    MEAN = "Mean"
+
+
 def main():  # pragma: no cover
     import shiny
     from dp_wizard.utils.argparse_helpers import get_cli_info

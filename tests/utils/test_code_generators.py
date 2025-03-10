@@ -3,8 +3,10 @@ import subprocess
 from pathlib import Path
 import pytest
 import opendp.prelude as dp
+
+from dp_wizard import AnalysisType
 from dp_wizard.utils.code_generators import (
-    make_histogram_config_block,
+    make_column_config_block,
     Template,
     ScriptGenerator,
     NotebookGenerator,
@@ -13,15 +15,39 @@ from dp_wizard.utils.code_generators import (
 )
 
 
-def test_make_histogram_config_block_histogram():
-    assert (
-        make_histogram_config_block(
+def test_make_column_config_block_for_unrecognized():
+    with pytest.raises(Exception, match=r"Unrecognized analysis"):
+        make_column_config_block(
             name="HW GRADE",
-            analysis_type="Histogram",
+            analysis_type="Bad AnalysisType!",
             lower_bound=0,
             upper_bound=100,
             bin_count=10,
         )
+
+
+def test_make_column_config_block_for_mean():
+    assert (
+        make_column_config_block(
+            name="HW GRADE",
+            analysis_type=AnalysisType.MEAN,
+            lower_bound=0,
+            upper_bound=100,
+            bin_count=10,
+        ).strip()
+        == "hw_grade_config = pl.col('HW GRADE')"
+    )
+
+
+def test_make_column_config_block_for_histogram():
+    assert (
+        make_column_config_block(
+            name="HW GRADE",
+            analysis_type=AnalysisType.HISTOGRAM,
+            lower_bound=0,
+            upper_bound=100,
+            bin_count=10,
+        ).strip()
         == """# From the public information, determine the bins for 'HW GRADE':
 hw_grade_cut_points = make_cut_points(
     lower_bound=0,
@@ -35,8 +61,7 @@ hw_grade_config = (
     .cut(hw_grade_cut_points)
     .alias('hw_grade_bin')  # Give the new column a name.
     .cast(pl.String)
-)
-"""
+)"""
     )
 
 

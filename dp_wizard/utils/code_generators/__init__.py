@@ -5,6 +5,7 @@ import re
 
 import black
 
+from dp_wizard import AnalysisType
 from dp_wizard.utils.csv_helper import name_to_identifier
 from dp_wizard.utils.code_generators._template import Template
 from dp_wizard.utils.dp_helper import confidence
@@ -79,7 +80,7 @@ class _CodeGenerator(ABC):
 
     def _make_columns(self):
         return "\n".join(
-            make_histogram_config_block(
+            make_column_config_block(
                 name=name,
                 analysis_type=col.analysis_type,
                 lower_bound=col.lower_bound,
@@ -237,7 +238,7 @@ def make_privacy_loss_block(epsilon: float):
     return Template("privacy_loss").fill_values(EPSILON=epsilon).finish()
 
 
-def make_histogram_config_block(
+def make_column_config_block(
     name: str,
     analysis_type: str,
     lower_bound: float,
@@ -245,21 +246,36 @@ def make_histogram_config_block(
     bin_count: int,
 ):
     snake_name = _snake_case(name)
-    return (
-        Template("histogram_config")
-        .fill_expressions(
-            CUT_LIST_NAME=f"{snake_name}_cut_points",
-            POLARS_CONFIG_NAME=f"{snake_name}_config",
-        )
-        .fill_values(
-            LOWER_BOUND=lower_bound,
-            UPPER_BOUND=upper_bound,
-            BIN_COUNT=bin_count,
-            COLUMN_NAME=name,
-            BIN_COLUMN_NAME=f"{snake_name}_bin",
-        )
-        .finish()
-    )
+    match analysis_type:
+        case AnalysisType.HISTOGRAM:
+            return (
+                Template("histogram_config")
+                .fill_expressions(
+                    CUT_LIST_NAME=f"{snake_name}_cut_points",
+                    POLARS_CONFIG_NAME=f"{snake_name}_config",
+                )
+                .fill_values(
+                    LOWER_BOUND=lower_bound,
+                    UPPER_BOUND=upper_bound,
+                    BIN_COUNT=bin_count,
+                    COLUMN_NAME=name,
+                    BIN_COLUMN_NAME=f"{snake_name}_bin",
+                )
+                .finish()
+            )
+        case AnalysisType.MEAN:
+            return (
+                Template("mean_config")
+                .fill_expressions(
+                    POLARS_CONFIG_NAME=f"{snake_name}_config",
+                )
+                .fill_values(
+                    COLUMN_NAME=name,
+                )
+                .finish()
+            )
+        case _:
+            raise Exception("Unrecognized analysis")
 
 
 # Private helper functions:
