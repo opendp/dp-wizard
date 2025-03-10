@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 import opendp.prelude as dp
 from dp_wizard.utils.code_generators import (
-    make_column_config_block,
+    make_histogram_config_block,
     Template,
     ScriptGenerator,
     NotebookGenerator,
@@ -13,9 +13,9 @@ from dp_wizard.utils.code_generators import (
 )
 
 
-def test_make_column_config_block_histogram():
+def test_make_histogram_config_block_histogram():
     assert (
-        make_column_config_block(
+        make_histogram_config_block(
             name="HW GRADE",
             analysis_type="Histogram",
             lower_bound=0,

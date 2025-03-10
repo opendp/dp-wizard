@@ -7,7 +7,7 @@ import polars as pl
 
 from dp_wizard.utils.dp_helper import make_accuracy_histogram
 from dp_wizard.utils.shared import plot_histogram
-from dp_wizard.utils.code_generators import make_column_config_block
+from dp_wizard.utils.code_generators import make_histogram_config_block
 from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip, hide_if
 from dp_wizard.utils.dp_helper import confidence
 from dp_wizard.utils.mock_data import mock_data, ColumnDef
@@ -238,7 +238,7 @@ def column_server(
 
     @render.code
     def column_code():
-        return make_column_config_block(
+        return make_histogram_config_block(
             name=name,
             analysis_type=input.analysis_type(),
             lower_bound=float(input.lower()),

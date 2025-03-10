@@ -79,7 +79,7 @@ class _CodeGenerator(ABC):
 
     def _make_columns(self):
         return "\n".join(
-            make_column_config_block(
+            make_histogram_config_block(
                 name=name,
                 analysis_type=col.analysis_type,
                 lower_bound=col.lower_bound,
@@ -237,7 +237,7 @@ def make_privacy_loss_block(epsilon: float):
     return Template("privacy_loss").fill_values(EPSILON=epsilon).finish()
 
 
-def make_column_config_block(
+def make_histogram_config_block(
     name: str,
     analysis_type: str,
     lower_bound: float,
@@ -246,7 +246,7 @@ def make_column_config_block(
 ):
     snake_name = _snake_case(name)
     return (
-        Template("column_config")
+        Template("histogram_config")
         .fill_expressions(
             CUT_LIST_NAME=f"{snake_name}_cut_points",
             POLARS_CONFIG_NAME=f"{snake_name}_config",
