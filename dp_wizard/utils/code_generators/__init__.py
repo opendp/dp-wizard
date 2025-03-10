@@ -71,12 +71,20 @@ class _CodeGenerator(ABC):
     def _make_margins_list(self, bin_names: Iterable[str], groups: Iterable[str]):
         groups_str = ", ".join(f"'{g}'" for g in groups)
         # TODO: Explain max_partition_length
-        margins = [
-            "dp.polars.Margin(public_info='lengths', max_partition_length=1000000),"
-        ] + [
-            f"dp.polars.Margin(by=['{bin_name}', {groups_str}], public_info='keys',),"
-            for bin_name in bin_names
-        ]
+        margins = (
+            [
+                """
+            # "max_partition_length" should be a loose upper bound,
+            # for example, the size of the total population being sampled.
+            # https://docs.opendp.org/en/stable/api/python/opendp.extras.polars.html#opendp.extras.polars.Margin.max_partition_length
+            dp.polars.Margin(public_info='lengths', max_partition_length=1000000,),
+            """
+            ]
+            + [
+                f"dp.polars.Margin(by=['{bin_name}', {groups_str}], public_info='keys',),"
+                for bin_name in bin_names
+            ]
+        )
 
         margins_list = "[" + "".join(margins) + "\n    ]"
         return margins_list
@@ -111,9 +119,9 @@ class _CodeGenerator(ABC):
     def _make_query(self, column_name):
         indentifier = name_to_identifier(column_name)
         accuracy_name = f"{indentifier}_accuracy"
-        histogram_name = f"{indentifier}_stats"
+        stats_name = f"{indentifier}_stats"
         query = (
-            Template("query")
+            Template("histogram_query")
             .fill_values(
                 BIN_NAME=f"{indentifier}_bin",
                 GROUP_NAMES=self.groups,
@@ -121,7 +129,7 @@ class _CodeGenerator(ABC):
             .fill_expressions(
                 QUERY_NAME=f"{indentifier}_query",
                 ACCURACY_NAME=accuracy_name,
-                HISTOGRAM_NAME=histogram_name,
+                STATS_NAME=stats_name,
             )
             .finish()
         )
@@ -134,7 +142,7 @@ class _CodeGenerator(ABC):
             )
             .fill_expressions(
                 ACCURACY_NAME=accuracy_name,
-                HISTOGRAM_NAME=histogram_name,
+                HISTOGRAM_NAME=stats_name,
                 CONFIDENCE_NOTE=self._make_confidence_note(),
             )
             .finish()

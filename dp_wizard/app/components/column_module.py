@@ -173,7 +173,12 @@ def column_server(
                         ),
                         ui.output_ui("optional_weight_ui"),
                     ],
-                    ui.p("mean preview placeholder"),
+                    ui.p(
+                        """
+                        Because the mean is just a single number,
+                        we don't have a visual preview.
+                        """
+                    ),
                     col_widths=col_widths,  # type: ignore
                 )
 
