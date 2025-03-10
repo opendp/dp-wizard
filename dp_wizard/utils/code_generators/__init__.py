@@ -70,7 +70,6 @@ class _CodeGenerator(ABC):
 
     def _make_margins_list(self, bin_names: Iterable[str], groups: Iterable[str]):
         groups_str = ", ".join(f"'{g}'" for g in groups)
-        # TODO: Explain max_partition_length
         margins = (
             [
                 """
@@ -81,7 +80,8 @@ class _CodeGenerator(ABC):
             """
             ]
             + [
-                f"dp.polars.Margin(by=['{bin_name}', {groups_str}], public_info='keys',),"
+                f"dp.polars.Margin(by=['{bin_name}', {groups_str}], "
+                "public_info='keys',),"
                 for bin_name in bin_names
             ]
         )
@@ -105,34 +105,55 @@ class _CodeGenerator(ABC):
         return f"{int(confidence * 100)}% confidence interval"
 
     def _make_queries(self):
-        column_names = self.columns.keys()
         to_return = [
             self._make_cell(
                 f"confidence = {confidence} # {self._make_confidence_note()}"
             )
         ]
-        for column_name in column_names:
+        for column_name in self.columns.keys():
             to_return.append(self._make_query(column_name))
 
         return "\n".join(to_return)
 
     def _make_query(self, column_name):
-        indentifier = name_to_identifier(column_name)
-        accuracy_name = f"{indentifier}_accuracy"
-        stats_name = f"{indentifier}_stats"
-        query = (
-            Template("histogram_query")
-            .fill_values(
-                BIN_NAME=f"{indentifier}_bin",
-                GROUP_NAMES=self.groups,
-            )
-            .fill_expressions(
-                QUERY_NAME=f"{indentifier}_query",
-                ACCURACY_NAME=accuracy_name,
-                STATS_NAME=stats_name,
-            )
-            .finish()
-        )
+        plan = self.columns[column_name]
+        identifier = name_to_identifier(column_name)
+        accuracy_name = f"{identifier}_accuracy"
+        stats_name = f"{identifier}_stats"
+
+        match plan.analysis_type:
+            case AnalysisType.HISTOGRAM:
+                query = (
+                    Template("histogram_query")
+                    .fill_values(
+                        BIN_NAME=f"{identifier}_bin",
+                        GROUP_NAMES=self.groups,
+                    )
+                    .fill_expressions(
+                        QUERY_NAME=f"{identifier}_query",
+                        ACCURACY_NAME=accuracy_name,
+                        STATS_NAME=stats_name,
+                    )
+                    .finish()
+                )
+            case AnalysisType.MEAN:  # pragma: no cover
+                query = (
+                    Template("mean_query")
+                    .fill_values(
+                        NAME=identifier,
+                        GROUP_NAMES=self.groups,
+                        LOWER_BOUND=plan.lower_bound,
+                        UPPER_BOUND=plan.upper_bound,
+                    )
+                    .fill_expressions(
+                        QUERY_NAME=f"{identifier}_query",
+                        ACCURACY_NAME=accuracy_name,
+                        STATS_NAME=stats_name,
+                    )
+                    .finish()
+                )
+            case _:  # pragma: no cover
+                raise Exception("Unrecognized analysis")
 
         output = (
             Template(f"{self.root_template}_output")
@@ -152,13 +173,18 @@ class _CodeGenerator(ABC):
     def _make_partial_context(self):
         weights = [column.weight for column in self.columns.values()]
         column_names = [name_to_identifier(name) for name in self.columns.keys()]
+        bin_column_names = [
+            name_to_identifier(name)
+            for name, plan in self.columns.items()
+            if plan.analysis_type == AnalysisType.HISTOGRAM
+        ]
         group_names = [name_to_identifier(name) for name in self.groups]
 
         privacy_unit_block = make_privacy_unit_block(self.contributions)
         privacy_loss_block = make_privacy_loss_block(self.epsilon)
 
         margins_list = self._make_margins_list(
-            [f"{name}_bin" for name in column_names],
+            [f"{name}_bin" for name in bin_column_names],
             group_names,
         )
         columns = ", ".join([f"{name}_config" for name in column_names])
