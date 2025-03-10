@@ -173,12 +173,7 @@ def column_server(
                         ),
                         ui.output_ui("optional_weight_ui"),
                     ],
-                    ui.p(
-                        """
-                        Because the mean is just a single number,
-                        we don't have a visual preview.
-                        """
-                    ),
+                    ui.output_ui("mean_preview_ui"),
                     col_widths=col_widths,  # type: ignore
                 )
 
@@ -262,6 +257,16 @@ def column_server(
                 ),
                 output_code_sample("Column Definition", "column_code"),
             ),
+        ]
+
+    @render.ui
+    def mean_preview_ui():
+        # accuracy, histogram = accuracy_histogram()
+        return [
+            ui.p(
+                "Since the mean is just a single number, there is not a preview visualization."
+            ),
+            output_code_sample("Column Definition", "column_code"),
         ]
 
     @render.data_frame

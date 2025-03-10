@@ -72,11 +72,11 @@ class _CodeGenerator(ABC):
         groups_str = ", ".join(f"'{g}'" for g in groups)
         margins = (
             [
-                """
+                f"""
             # "max_partition_length" should be a loose upper bound,
             # for example, the size of the total population being sampled.
             # https://docs.opendp.org/en/stable/api/python/opendp.extras.polars.html#opendp.extras.polars.Margin.max_partition_length
-            dp.polars.Margin(public_info='lengths', max_partition_length=1000000,),
+            dp.polars.Margin(by=[{groups_str}], public_info='lengths', max_partition_length=1000000,),
             """
             ]
             + [
@@ -140,21 +140,21 @@ class _CodeGenerator(ABC):
                 query = (
                     Template("mean_query")
                     .fill_values(
-                        NAME=identifier,
                         GROUP_NAMES=self.groups,
-                        LOWER_BOUND=plan.lower_bound,
-                        UPPER_BOUND=plan.upper_bound,
                     )
                     .fill_expressions(
                         QUERY_NAME=f"{identifier}_query",
-                        ACCURACY_NAME=accuracy_name,
                         STATS_NAME=stats_name,
+                        CONFIG_NAME=f"{identifier}_config",
                     )
                     .finish()
                 )
             case _:  # pragma: no cover
                 raise Exception("Unrecognized analysis")
 
+        print("Query? >>> ", query)
+
+        # TODO: parameterize by type
         output = (
             Template(f"{self.root_template}_output")
             .fill_values(
@@ -283,13 +283,14 @@ def make_column_config_block(
     bin_count: int,
 ):
     snake_name = _snake_case(name)
+
     match analysis_type:
         case AnalysisType.HISTOGRAM:
-            return (
+            config = (
                 Template("histogram_config")
                 .fill_expressions(
                     CUT_LIST_NAME=f"{snake_name}_cut_points",
-                    POLARS_CONFIG_NAME=f"{snake_name}_config",
+                    CONFIG_NAME=f"{snake_name}_config",
                 )
                 .fill_values(
                     LOWER_BOUND=lower_bound,
@@ -301,18 +302,23 @@ def make_column_config_block(
                 .finish()
             )
         case AnalysisType.MEAN:
-            return (
+            config = (
                 Template("mean_config")
                 .fill_expressions(
-                    POLARS_CONFIG_NAME=f"{snake_name}_config",
+                    CONFIG_NAME=f"{snake_name}_config",
                 )
                 .fill_values(
                     COLUMN_NAME=name,
+                    LOWER_BOUND=lower_bound,
+                    UPPER_BOUND=upper_bound,
                 )
                 .finish()
             )
         case _:
             raise Exception("Unrecognized analysis")
+    print("Config? >>> ", config)
+
+    return config
 
 
 # Private helper functions:
