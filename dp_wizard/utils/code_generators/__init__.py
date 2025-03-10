@@ -77,7 +77,7 @@ class _CodeGenerator(ABC):
             # for example, the size of the total population being sampled.
             # https://docs.opendp.org/en/stable/api/python/opendp.extras.polars.html#opendp.extras.polars.Margin.max_partition_length
             dp.polars.Margin(by=[{groups_str}], public_info='lengths', max_partition_length=1000000,),
-            """
+            """  # noqa: B950
             ]
             + [
                 f"dp.polars.Margin(by=['{bin_name}', {groups_str}], "
@@ -152,8 +152,6 @@ class _CodeGenerator(ABC):
             case _:  # pragma: no cover
                 raise Exception("Unrecognized analysis")
 
-        print("Query? >>> ", query)
-
         # TODO: parameterize by type
         output = (
             Template(f"{self.root_template}_output")
@@ -172,7 +170,6 @@ class _CodeGenerator(ABC):
 
     def _make_partial_context(self):
         weights = [column.weight for column in self.columns.values()]
-        column_names = [name_to_identifier(name) for name in self.columns.keys()]
         bin_column_names = [
             name_to_identifier(name)
             for name, plan in self.columns.items()
@@ -187,12 +184,18 @@ class _CodeGenerator(ABC):
             [f"{name}_bin" for name in bin_column_names],
             group_names,
         )
-        columns = ", ".join([f"{name}_config" for name in column_names])
+        extra_columns = ", ".join(
+            [
+                f"{name_to_identifier(name)}_config"
+                for name, plan in self.columns.items()
+                if plan.analysis_type == AnalysisType.HISTOGRAM
+            ]
+        )
         return (
             Template("context")
             .fill_expressions(
                 MARGINS_LIST=margins_list,
-                COLUMNS=columns,
+                EXTRA_COLUMNS=extra_columns,
             )
             .fill_values(
                 WEIGHTS=weights,
@@ -316,7 +319,6 @@ def make_column_config_block(
             )
         case _:
             raise Exception("Unrecognized analysis")
-    print("Config? >>> ", config)
 
     return config
 

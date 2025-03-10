@@ -35,8 +35,7 @@ def test_make_column_config_block_for_mean():
             upper_bound=100,
             bin_count=10,
         ).strip()
-        == """# For means, we just need to get the column.
-hw_grade_config = pl.col('HW GRADE')"""
+        == "hw_grade_config = pl.col('HW GRADE').fill_null(0).dp.mean((0, 100))"
     )
 
 

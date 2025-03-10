@@ -264,7 +264,10 @@ def column_server(
         # accuracy, histogram = accuracy_histogram()
         return [
             ui.p(
-                "Since the mean is just a single number, there is not a preview visualization."
+                """
+                Since the mean is just a single number,
+                there is not a preview visualization.
+                """
             ),
             output_code_sample("Column Definition", "column_code"),
         ]
