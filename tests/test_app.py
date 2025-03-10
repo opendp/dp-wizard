@@ -20,8 +20,6 @@ tooltip = "#choose_csv_demo_tooltip_ui svg"
 for_the_demo = "For the demo, we'll imagine"
 
 
-# TODO: Why is incomplete coverage reported here?
-# https://github.com/opendp/dp-wizard/issues/18
 def test_demo_app(page: Page, demo_app: ShinyAppProc):  # pragma: no cover
     page.goto(demo_app.url)
     expect(page).to_have_title("DP Wizard")
@@ -34,7 +32,9 @@ def test_demo_app(page: Page, demo_app: ShinyAppProc):  # pragma: no cover
     expect(page.get_by_text("This simulation will assume")).to_be_visible()
 
 
-def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
+def test_default_app_validations(
+    page: Page, default_app: ShinyAppProc
+):  # pragma: no cover
     pick_dataset_text = "How many rows of the CSV"
     perform_analysis_text = "Select columns to calculate statistics on"
     download_results_text = "You can now make a differentially private release"
@@ -138,8 +138,62 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     # https://github.com/opendp/dp-wizard/issues/116
     expect_no_error()
 
+    # -- Feedback --
+    page.get_by_text("Feedback").click()
+    iframe = page.locator("#feedback-iframe")
+    expect(iframe).to_be_visible()
+    expect(iframe.content_frame.get_by_text("DP Wizard Feedback")).to_be_visible()
+    # Text comes from iframe, so this does introduce a dependency on an outside service.
+
+    # A separate test spends less time on parameter validation
+    # and instead exercises all downloads.
+    # Splitting the end-to-end tests minimizes the total time
+    # to run tests in parallel.
+
+
+def test_default_app_downloads(
+    page: Page, default_app: ShinyAppProc
+):  # pragma: no cover
+    pick_dataset_text = "How many rows of the CSV"
+    perform_analysis_text = "Select columns to calculate statistics on"
+    download_results_text = "You can now make a differentially private release"
+
+    def expect_visible(text):
+        expect(page.get_by_text(text)).to_be_visible()
+
+    def expect_not_visible(text):
+        expect(page.get_by_text(text)).not_to_be_visible()
+
+    def expect_no_error():
+        expect(page.locator(".shiny-output-error")).not_to_be_attached()
+
+    # -- Select dataset --
+    page.goto(default_app.url)
+    page.get_by_label("Contributions").fill("42")
+    csv_path = Path(__file__).parent / "fixtures" / "fake.csv"
+    page.get_by_label("Choose Public CSV").set_input_files(csv_path.resolve())
+
+    # -- Define analysis --
+    page.get_by_role("button", name="Define analysis").click()
+
+    # Pick grouping:
+    page.locator(".selectize-input").nth(0).click()
+    page.get_by_text("class year").nth(0).click()
+    # Pick columns:
+    page.locator(".selectize-input").nth(1).click()
+    page.get_by_text("grade").nth(1).click()
+
+    # Add a second column:
+    # page.get_by_label("blank").check()
+    # TODO: Test is flaky?
+    # expect(page.get_by_text("Weight")).to_have_count(2)
+    # TODO: Setting more inputs without checking for updates
+    # causes recalculations to pile up, and these cause timeouts on CI:
+    # It is still rerendering the graph after hitting "Download results".
+    # https://github.com/opendp/dp-wizard/issues/116
+
     # -- Download results --
-    download_results_button.click()
+    page.get_by_role("button", name="Download results").click()
     expect_not_visible(pick_dataset_text)
     expect_not_visible(perform_analysis_text)
     expect_visible(download_results_text)
@@ -204,10 +258,3 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     script_download = script_download_info.value
     script = script_download.path().read_text()
     assert "contributions = 42" in script
-
-    # -- Feedback --
-    page.get_by_text("Feedback").click()
-    iframe = page.locator("#feedback-iframe")
-    expect(iframe).to_be_visible()
-    expect(iframe.content_frame.get_by_text("DP Wizard Feedback")).to_be_visible()
-    # Text comes from iframe, so this does introduce a dependency on an outside service.

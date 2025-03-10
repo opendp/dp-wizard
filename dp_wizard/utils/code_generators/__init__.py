@@ -70,7 +70,10 @@ class _CodeGenerator(ABC):
 
     def _make_margins_list(self, bin_names: Iterable[str], groups: Iterable[str]):
         groups_str = ", ".join(f"'{g}'" for g in groups)
-        margins = ["dp.polars.Margin(public_info='lengths',),"] + [
+        # TODO: Explain max_partition_length
+        margins = [
+            "dp.polars.Margin(public_info='lengths', max_partition_length=1000000),"
+        ] + [
             f"dp.polars.Margin(by=['{bin_name}', {groups_str}], public_info='keys',),"
             for bin_name in bin_names
         ]
