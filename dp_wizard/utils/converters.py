@@ -37,6 +37,7 @@ def convert_py_to_nb(python_str: str, execute: bool = False):
                 raise  # pragma: no cover
             # Install kernel if missing
             warn("jupytext failed: Will install kernel and try again.")
+            # TODO: Revisit hiding the details with "debug"
             debug(f'STDERR from "{cmd}":\n{e.stderr}')
             subprocess.run(
                 "python -m ipykernel install --name kernel_name --user".split(" "),

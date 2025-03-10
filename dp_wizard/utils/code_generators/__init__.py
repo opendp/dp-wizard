@@ -222,21 +222,38 @@ class NotebookGenerator(_CodeGenerator):
     def _make_cell(self, block):
         return f"\n# +\n{block}\n# -\n"
 
+    def _make_report_kv(self, name, analysis_type):
+        match analysis_type:
+            case AnalysisType.HISTOGRAM:
+                return (
+                    Template("histogram_report_kv")
+                    .fill_values(
+                        NAME=name,
+                        CONFIDENCE=confidence,
+                    )
+                    .fill_expressions(
+                        IDENTIFIER_STATS=f"{name_to_identifier(name)}_stats",
+                        IDENTIFIER_ACCURACY=f"{name_to_identifier(name)}_accuracy",
+                    )
+                    .finish()
+                )
+            case AnalysisType.MEAN:
+                return (
+                    Template("mean_report_kv")
+                    .fill_values(
+                        NAME=name,
+                    )
+                    .finish()
+                )
+            case _:
+                raise Exception("Unrecognized analysis")
+
     def _make_extra_blocks(self):
         outputs_expression = (
             "{"
             + ",".join(
-                Template("report_kv")
-                .fill_values(
-                    NAME=name,
-                    CONFIDENCE=confidence,
-                )
-                .fill_expressions(
-                    IDENTIFIER_STATS=f"{name_to_identifier(name)}_stats",
-                    IDENTIFIER_ACCURACY=f"{name_to_identifier(name)}_accuracy",
-                )
-                .finish()
-                for name in self.columns.keys()
+                self._make_report_kv(name, plan.analysis_type)
+                for name, plan in self.columns.items()
             )
             + "}"
         )
