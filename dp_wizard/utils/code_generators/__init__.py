@@ -77,7 +77,7 @@ class _CodeGenerator(ABC):
             # for example, the size of the total population being sampled.
             # https://docs.opendp.org/en/stable/api/python/opendp.extras.polars.html#opendp.extras.polars.Margin.max_partition_length
             dp.polars.Margin(by=[{groups_str}], public_info='lengths', max_partition_length=1000000,),
-            """  # noqa: B950
+            """  # noqa: B950 (too long!)
             ]
             + [
                 f"dp.polars.Margin(by=['{bin_name}', {groups_str}], "
@@ -152,20 +152,26 @@ class _CodeGenerator(ABC):
             case _:  # pragma: no cover
                 raise Exception("Unrecognized analysis")
 
-        # TODO: parameterize by type
-        output = (
-            Template(f"{self.root_template}_output")
-            .fill_values(
-                COLUMN_NAME=column_name,
-                GROUP_NAMES=self.groups,
-            )
-            .fill_expressions(
-                ACCURACY_NAME=accuracy_name,
-                HISTOGRAM_NAME=stats_name,
-                CONFIDENCE_NOTE=self._make_confidence_note(),
-            )
-            .finish()
-        )
+        match plan.analysis_type:
+            case AnalysisType.HISTOGRAM:
+                output = (
+                    Template(f"histogram_{self.root_template}_output")
+                    .fill_values(
+                        COLUMN_NAME=column_name,
+                        GROUP_NAMES=self.groups,
+                    )
+                    .fill_expressions(
+                        ACCURACY_NAME=accuracy_name,
+                        HISTOGRAM_NAME=stats_name,
+                        CONFIDENCE_NOTE=self._make_confidence_note(),
+                    )
+                    .finish()
+                )
+            case AnalysisType.MEAN:  # pragma: no cover
+                output = Template(f"mean_{self.root_template}_output").finish()
+            case _:  # pragma: no cover
+                raise Exception("Unrecognized analysis")
+
         return self._make_cell(query) + self._make_cell(output)
 
     def _make_partial_context(self):
