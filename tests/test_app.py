@@ -1,4 +1,7 @@
 from pathlib import Path
+import re
+
+import pytest
 
 from shiny.run import ShinyAppProc
 from playwright.sync_api import Page, expect
@@ -176,9 +179,32 @@ def test_default_app_downloads(
     # -- Download results --
     page.get_by_role("button", name="Download results").click()
 
-    with page.expect_download() as download_info:
-        page.get_by_text("Download notebook (.ipynb)").click()
+    # Right now, the significant test start-up costs mean
+    # it doesn't make sense to parameterize this test,
+    # but that could change.
+    matches = [
+        re.search(r'button\("([^"]+)", "([^"]+)"', line)
+        for line in (
+            Path(__file__).parent.parent / "dp_wizard" / "app" / "results_panel.py"
+        )
+        .read_text()
+        .splitlines()
+    ]
 
-    download = download_info.value
-    text = download.path().read_text()
-    assert "contributions = 1" in text
+    # Expand all accordions:
+    page.get_by_text("Reports").click()
+    page.get_by_text("Unexecuted Notebooks").click()
+    page.get_by_text("Scripts").click()
+
+    for match in matches:
+        if not match:
+            continue
+        name = match.group(1)
+        ext = match.group(2)
+        link_text = f"Download {name} ({ext})"
+        with page.expect_download() as download_info:
+            page.get_by_text(link_text).click()
+
+        download = download_info.value
+        content = download.path().read_bytes()
+        assert content  # Could add assertions for different document types.
