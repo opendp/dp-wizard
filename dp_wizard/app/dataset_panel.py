@@ -86,9 +86,12 @@ def dataset_server(
         # We can't set the actual value of a file input,
         # but the placeholder string is a good substitute.
         #
-        # Make sure this doesn't depend on reactive values:
-        # If it does, and they change, the inputs are redrawn,
-        # and it looks like the file input is unset.
+        # Make sure this doesn't depend on reactive values,
+        # for two reasons:
+        # - If there is a dependency, the inputs are redrawn,
+        #   and it looks like the file input is unset.
+        # - After file upload, the internal copy of the file
+        #   is renamed to something like "0.csv".
         return ui.row(
             ui.input_file(
                 "public_csv_path",
@@ -101,13 +104,13 @@ def dataset_server(
                     ),
                 ],
                 accept=[".csv"],
-                placeholder=str(cli_info.public_csv_path or ""),
+                placeholder=Path(cli_info.public_csv_path or "").name,
             ),
             ui.input_file(
                 "private_csv_path",
                 "Choose Private CSV",
                 accept=[".csv"],
-                placeholder=str(cli_info.private_csv_path or ""),
+                placeholder=Path(cli_info.private_csv_path or "").name,
             ),
         )
 
