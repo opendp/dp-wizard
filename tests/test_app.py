@@ -1,8 +1,6 @@
 from pathlib import Path
 import re
 
-import pytest
-
 from shiny.run import ShinyAppProc
 from playwright.sync_api import Page, expect
 from shiny.pytest import create_app_fixture
