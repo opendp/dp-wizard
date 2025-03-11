@@ -7,6 +7,7 @@ from dp_wizard.utils.argparse_helpers import (
     PUBLIC_TEXT,
     PRIVATE_TEXT,
     PUBLIC_PRIVATE_TEXT,
+    CLIInfo,
 )
 from dp_wizard.utils.csv_helper import get_csv_names_mismatch
 from dp_wizard.app.components.outputs import (
@@ -54,10 +55,10 @@ def dataset_server(
     input: Inputs,
     output: Outputs,
     session: Session,
+    cli_info: CLIInfo,
     public_csv_path: reactive.Value[str],
     private_csv_path: reactive.Value[str],
     contributions: reactive.Value[int],
-    is_demo: bool,
 ):  # pragma: no cover
     @reactive.effect
     @reactive.event(input.public_csv_path)
@@ -84,27 +85,29 @@ def dataset_server(
     def input_files_ui():
         # We can't set the actual value of a file input,
         # but the placeholder string is a good substitute.
-        public_csv_placeholder = Path(public_csv_path()).name
-        private_csv_placeholder = Path(private_csv_path()).name
+        #
+        # Make sure this doesn't depend on reactive values:
+        # If it does, and they change, the inputs are redrawn,
+        # and it looks like the file input is unset.
         return ui.row(
             ui.input_file(
                 "public_csv_path",
                 [
-                    "Choose Public CSV ",
+                    "Choose Public CSV ",  # Trailing space looks better.
                     demo_tooltip(
-                        is_demo,
+                        cli_info.is_demo,
                         "For the demo, we'll imagine we have the grades "
                         "on assignments for a class.",
                     ),
                 ],
                 accept=[".csv"],
-                placeholder=public_csv_placeholder,
+                placeholder=str(cli_info.public_csv_path or ""),
             ),
             ui.input_file(
                 "private_csv_path",
                 "Choose Private CSV",
                 accept=[".csv"],
-                placeholder=private_csv_placeholder,
+                placeholder=str(cli_info.private_csv_path or ""),
             ),
         )
 
@@ -132,9 +135,9 @@ def dataset_server(
             ui.input_numeric(
                 "contributions",
                 [
-                    "Contributions",
+                    "Contributions ",  # Trailing space looks better.
                     demo_tooltip(
-                        is_demo,
+                        cli_info.is_demo,
                         "For the demo, we assume that each student "
                         f"can occur at most {contributions()} times in the dataset. ",
                     ),
@@ -158,7 +161,7 @@ def dataset_server(
             input.private_csv_path() is not None and len(input.private_csv_path()) > 0
         )
         csv_path_is_set = (
-            public_csv_path_is_set or private_csv_path_is_set or is_demo
+            public_csv_path_is_set or private_csv_path_is_set or cli_info.is_demo
         ) and not csv_column_mismatch_calc()
         contributions_is_set = input.contributions() is not None
         return contributions_is_set and csv_path_is_set
@@ -178,7 +181,7 @@ def dataset_server(
     @render.ui
     def python_tooltip_ui():
         return demo_tooltip(
-            is_demo,
+            cli_info.is_demo,
             "Along the way, code samples will demonstrate "
             "how the information you provide is used in OpenDP, "
             "and at the end you can download a notebook "
