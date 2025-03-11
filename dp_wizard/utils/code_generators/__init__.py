@@ -51,7 +51,7 @@ class _CodeGenerator(ABC):
         code = (
             Template(self.root_template)
             .fill_expressions(
-                DEPENDENCIES="'opendp[polars]==0.12.1a20250227001' matplotlib pyyaml"
+                DEPENDENCIES="'opendp[polars]==0.12.1a20250227001' matplotlib"
             )
             .fill_blocks(
                 IMPORTS_BLOCK=Template("imports").finish(),
