@@ -4,7 +4,6 @@ from typing import Optional
 from shiny import ui, reactive, render, Inputs, Outputs, Session
 
 from dp_wizard.utils.argparse_helpers import (
-    get_cli_info,
     PUBLIC_TEXT,
     PRIVATE_TEXT,
     PUBLIC_PRIVATE_TEXT,
@@ -20,16 +19,6 @@ from dp_wizard.utils.code_generators import make_privacy_unit_block
 
 
 def dataset_ui():
-    cli_info = get_cli_info()
-    public_csv_placeholder = (
-        "" if cli_info.public_csv_path is None else Path(cli_info.public_csv_path).name
-    )
-    private_csv_placeholder = (
-        ""
-        if cli_info.private_csv_path is None
-        else Path(cli_info.private_csv_path).name
-    )
-
     return ui.nav_panel(
         "Select Dataset",
         ui.card(
@@ -42,22 +31,7 @@ Choose **Private CSV** {PRIVATE_TEXT}
 
 Choose both **Public CSV** and **Private CSV** {PUBLIC_PRIVATE_TEXT}"""
             ),
-            ui.row(
-                # Doesn't seem to be possible to preset the actual value,
-                # but the placeholder string is a good substitute.
-                ui.input_file(
-                    "public_csv_path",
-                    ["Choose Public CSV", ui.output_ui("choose_csv_demo_tooltip_ui")],
-                    accept=[".csv"],
-                    placeholder=public_csv_placeholder,
-                ),
-                ui.input_file(
-                    "private_csv_path",
-                    "Choose Private CSV",
-                    accept=[".csv"],
-                    placeholder=private_csv_placeholder,
-                ),
-            ),
+            ui.output_ui("input_files_ui"),
             ui.output_ui("csv_column_match_ui"),
         ),
         ui.card(
@@ -66,15 +40,8 @@ Choose both **Public CSV** and **Private CSV** {PUBLIC_PRIVATE_TEXT}"""
                 "How many rows of the CSV can one individual contribute to? "
                 'This is the "unit of privacy" which will be protected.'
             ),
-            ui.row(
-                ui.input_numeric(
-                    "contributions",
-                    ["Contributions", ui.output_ui("contributions_demo_tooltip_ui")],
-                    cli_info.contributions,
-                    min=1,
-                ),
-                ui.output_ui("contributions_validation_ui"),
-            ),
+            ui.output_ui("input_contributions_ui"),
+            ui.output_ui("contributions_validation_ui"),
             ui.output_ui("python_tooltip_ui"),
             output_code_sample("Unit of Privacy", "unit_of_privacy_python"),
         ),
@@ -114,6 +81,34 @@ def dataset_server(
                 return just_public, just_private
 
     @render.ui
+    def input_files_ui():
+        # We can't set the actual value of a file input,
+        # but the placeholder string is a good substitute.
+        public_csv_placeholder = Path(public_csv_path()).name
+        private_csv_placeholder = Path(private_csv_path()).name
+        return ui.row(
+            ui.input_file(
+                "public_csv_path",
+                [
+                    "Choose Public CSV ",
+                    demo_tooltip(
+                        is_demo,
+                        "For the demo, we'll imagine we have the grades "
+                        "on assignments for a class.",
+                    ),
+                ],
+                accept=[".csv"],
+                placeholder=public_csv_placeholder,
+            ),
+            ui.input_file(
+                "private_csv_path",
+                "Choose Private CSV",
+                accept=[".csv"],
+                placeholder=private_csv_placeholder,
+            ),
+        )
+
+    @render.ui
     def csv_column_match_ui():
         mismatch = csv_column_mismatch_calc()
         messages = []
@@ -130,6 +125,24 @@ def dataset_server(
                     + ", ".join(f"`{name}`" for name in just_private)
                 )
         return hide_if(not messages, info_box(ui.markdown("\n".join(messages))))
+
+    @render.ui
+    def input_contributions_ui():
+        return ui.row(
+            ui.input_numeric(
+                "contributions",
+                [
+                    "Contributions",
+                    demo_tooltip(
+                        is_demo,
+                        "For the demo, we assume that each student "
+                        f"can occur at most {contributions()} times in the dataset. ",
+                    ),
+                ],
+                contributions(),
+                min=1,
+            )
+        )
 
     @reactive.effect
     @reactive.event(input.contributions)
@@ -149,22 +162,6 @@ def dataset_server(
         ) and not csv_column_mismatch_calc()
         contributions_is_set = input.contributions() is not None
         return contributions_is_set and csv_path_is_set
-
-    @render.ui
-    def choose_csv_demo_tooltip_ui():
-        return demo_tooltip(
-            is_demo,
-            "For the demo, we'll imagine we have the grades "
-            "on assignments for a class.",
-        )
-
-    @render.ui
-    def contributions_demo_tooltip_ui():
-        return demo_tooltip(
-            is_demo,
-            "For the demo, we assume that each student "
-            f"can occur at most {contributions()} times in the dataset. ",
-        )
 
     @reactive.calc
     def contributions_valid():
