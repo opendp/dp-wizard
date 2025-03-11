@@ -32,51 +32,83 @@ def dataset_ui():
 
     return ui.nav_panel(
         "Select Dataset",
-        ui.card(
-            ui.card_header("Input CSVs"),
-            ui.markdown(
-                f"""
+        ui.layout_columns(
+            [
+                ui.card(
+                    ui.card_header("Input CSVs"),
+                    ui.markdown(
+                        f"""
 Choose **Public CSV** {PUBLIC_TEXT}
 
 Choose **Private CSV** {PRIVATE_TEXT}
 
 Choose both **Public CSV** and **Private CSV** {PUBLIC_PRIVATE_TEXT}"""
-            ),
-            ui.row(
-                # Doesn't seem to be possible to preset the actual value,
-                # but the placeholder string is a good substitute.
-                ui.input_file(
-                    "public_csv_path",
-                    ["Choose Public CSV", ui.output_ui("choose_csv_demo_tooltip_ui")],
-                    accept=[".csv"],
-                    placeholder=public_csv_placeholder,
+                    ),
+                    ui.row(
+                        # Doesn't seem to be possible to preset the actual value,
+                        # but the placeholder string is a good substitute.
+                        ui.input_file(
+                            "public_csv_path",
+                            [
+                                "Choose Public CSV",
+                                ui.output_ui("choose_csv_demo_tooltip_ui"),
+                            ],
+                            accept=[".csv"],
+                            placeholder=public_csv_placeholder,
+                        ),
+                        ui.input_file(
+                            "private_csv_path",
+                            "Choose Private CSV",
+                            accept=[".csv"],
+                            placeholder=private_csv_placeholder,
+                        ),
+                    ),
+                    ui.output_ui("csv_column_match_ui"),
                 ),
-                ui.input_file(
-                    "private_csv_path",
-                    "Choose Private CSV",
-                    accept=[".csv"],
-                    placeholder=private_csv_placeholder,
+                ui.card(
+                    ui.card_header("Unit of privacy"),
+                    ui.markdown(
+                        "How many rows of the CSV can one individual contribute to? "
+                        'This is the "unit of privacy" which will be protected.'
+                    ),
+                    ui.row(
+                        ui.input_numeric(
+                            "contributions",
+                            [
+                                "Contributions",
+                                ui.output_ui("contributions_demo_tooltip_ui"),
+                            ],
+                            cli_info.contributions,
+                            min=1,
+                        ),
+                        ui.output_ui("contributions_validation_ui"),
+                    ),
+                    ui.output_ui("python_tooltip_ui"),
+                    output_code_sample("Unit of Privacy", "unit_of_privacy_python"),
+                ),
+            ],
+            ui.card(
+                ui.card_header("About"),
+                ui.markdown(
+                    """
+                    DP Wizard guides the user through the application of
+                    differential privacy. After selecting a local CSV,
+                    users are prompted to describe to the anlysis they need.
+                    Output options include:
+                    - A Jupyter notebook which demonstrates how to use
+                    [OpenDP](https://docs.opendp.org/).
+                    - A plain Python script.
+                    - Text and CSV reports.
+                    """
                 ),
             ),
-            ui.output_ui("csv_column_match_ui"),
-        ),
-        ui.card(
-            ui.card_header("Unit of privacy"),
-            ui.markdown(
-                "How many rows of the CSV can one individual contribute to? "
-                'This is the "unit of privacy" which will be protected.'
-            ),
-            ui.row(
-                ui.input_numeric(
-                    "contributions",
-                    ["Contributions", ui.output_ui("contributions_demo_tooltip_ui")],
-                    cli_info.contributions,
-                    min=1,
-                ),
-                ui.output_ui("contributions_validation_ui"),
-            ),
-            ui.output_ui("python_tooltip_ui"),
-            output_code_sample("Unit of Privacy", "unit_of_privacy_python"),
+            col_widths={
+                # Blurb on the right stays approximately constant width.
+                "sm": [6, 6],
+                "md": [7, 5],
+                "lg": [8, 4],
+                "xl": [9, 3],
+            },
         ),
         ui.output_ui("define_analysis_button_ui"),
         value="dataset_panel",

@@ -175,7 +175,7 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     # Reports ...
 
     # ... text:
-    page.get_by_text("Reports").click()
+    page.get_by_role("button", name="Reports").click()
     with page.expect_download() as text_report_download_info:
         page.get_by_text("Download report (.txt)").click()
     expect_no_error()
