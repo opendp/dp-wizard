@@ -17,17 +17,28 @@ from dp_wizard.utils.mock_data import mock_data, ColumnDef
 default_analysis_type = AnalysisType.HISTOGRAM
 default_weight = "2"
 label_width = "10em"  # Just wide enough so the text isn't trucated.
+col_widths = {
+    # Controls stay roughly a constant width;
+    # Graph expands to fill space.
+    "sm": [4, 8],
+    "md": [3, 9],
+    "lg": [2, 10],
+}
 
 
 @module.ui
 def column_ui():  # pragma: no cover
     return ui.card(
         ui.card_header(ui.output_text("card_header")),
-        ui.input_select(
-            "analysis_type",
-            None,
-            [AnalysisType.HISTOGRAM, AnalysisType.MEAN],
-            width=label_width,
+        ui.layout_columns(
+            ui.input_select(
+                "analysis_type",
+                None,
+                [AnalysisType.HISTOGRAM, AnalysisType.MEAN],
+                width=label_width,
+            ),
+            ui.output_ui("analysis_info_ui"),
+            col_widths=col_widths,  # type: ignore
         ),
         ui.output_ui("analysis_config_ui"),
     )
@@ -121,14 +132,35 @@ def column_server(
         return name
 
     @render.ui
+    def analysis_info_ui():
+        match input.analysis_type():
+            case AnalysisType.HISTOGRAM:
+                return ui.markdown(
+                    """
+                    With a **histogram** you can choose a bin count
+                    that will answer your question while conserving
+                    your privacy budget.
+                    If you don't know where to set the lower and upper bounds,
+                    consider calculating a **quantile** first.
+                    If the data is centrally distributed, a **mean** may suffice.
+                    """
+                )
+            case AnalysisType.MEAN:
+                return ui.markdown(
+                    """
+                    Because it is only a single number, a **mean** is
+                    a relatively efficient use of your privacy budget.
+                    If you don't know where to set the lower and upper bounds,
+                    consider calculating a **quantile** first.
+                    If the data is skewed, or you don't know the shape
+                    of the distribution, a **histogram** may be useful.
+                    """
+                )
+            case _:
+                raise Exception("Unrecognized analysis")
+
+    @render.ui
     def analysis_config_ui():
-        col_widths = {
-            # Controls stay roughly a constant width;
-            # Graph expands to fill space.
-            "sm": [4, 8],
-            "md": [3, 9],
-            "lg": [2, 10],
-        }
         match input.analysis_type():
             case AnalysisType.HISTOGRAM:
                 return ui.layout_columns(
