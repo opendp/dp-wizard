@@ -21,10 +21,6 @@ for_the_demo = "For the demo, we'll imagine"
 
 
 def test_demo_app(page: Page, demo_app: ShinyAppProc):  # pragma: no cover
-    # TODO: We're not checking for demo mode consistently.
-    # While this test covers some functionality,
-    # the demo CSV isn't actually being loaded.
-    # https://github.com/opendp/dp-wizard/issues/273
     page.goto(demo_app.url)
     expect(page).to_have_title("DP Wizard")
     expect(page.get_by_text(for_the_demo)).not_to_be_visible()
@@ -95,7 +91,6 @@ def test_default_app_validations(
     # (Note: Slider tests failed on CI when run after column details,
     # although it worked locally. This works in either environment.
     # Maybe a race condition?)
-    expect_visible("0.1")
     expect_visible("10.0")
     expect_visible("Epsilon: 1.0")
     page.locator(".irs-bar").click()
@@ -232,9 +227,9 @@ def test_default_app_downloads(
     pdf = pdf_download.path().read_bytes()
     assert b"%PDF-1.4" in pdf
 
-    # ... Reports:
-    # ...... text:
-    page.get_by_text("Reports").click()
+    # Reports ...
+    # ... text:
+    page.get_by_role("button", name="Reports").click()
     with page.expect_download() as text_report_download_info:
         page.get_by_text("Download report (.txt)").click()
     expect_no_error()

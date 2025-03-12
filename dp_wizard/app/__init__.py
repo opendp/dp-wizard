@@ -3,16 +3,24 @@ from pathlib import Path
 from shiny import App, ui, reactive, Inputs, Outputs, Session
 
 from dp_wizard.utils.argparse_helpers import get_cli_info, CLIInfo
-from dp_wizard.app import analysis_panel, dataset_panel, results_panel, feedback_panel
+from dp_wizard.app import (
+    about_panel,
+    analysis_panel,
+    dataset_panel,
+    results_panel,
+    feedback_panel,
+)
 
 
 app_ui = ui.page_bootstrap(
     ui.head_content(ui.include_css(Path(__file__).parent / "css" / "styles.css")),
     ui.navset_tab(
+        about_panel.about_ui(),
         dataset_panel.dataset_ui(),
         analysis_panel.analysis_ui(),
         results_panel.results_ui(),
         feedback_panel.feedback_ui(),
+        selected=dataset_panel.dataset_panel_id,
         id="top_level_nav",
     ),
     title="DP Wizard",
@@ -40,6 +48,11 @@ def make_server_from_cli_info(cli_info: CLIInfo):
         weights = reactive.value({})
         epsilon = reactive.value(1.0)
 
+        about_panel.about_server(
+            input,
+            output,
+            session,
+        )
         dataset_panel.dataset_server(
             input,
             output,

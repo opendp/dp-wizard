@@ -19,6 +19,9 @@ from dp_wizard.app.components.outputs import (
 from dp_wizard.utils.code_generators import make_privacy_unit_block
 
 
+dataset_panel_id = "dataset_panel"
+
+
 def dataset_ui():
     cli_info = get_cli_info()
     public_csv_placeholder = (
