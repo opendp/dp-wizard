@@ -5,7 +5,16 @@ import json
 import nbformat
 import nbconvert
 from warnings import warn
-from logging import debug
+import jupytext
+
+
+def _is_kernel_installed() -> bool:
+    try:
+        # This method isn't well documented, so it may be fragile.
+        jupytext.kernels.kernelspec_from_language("python")  # type: ignore
+        return True
+    except ValueError:  # pragma: no cover
+        return False
 
 
 def convert_py_to_nb(python_str: str, execute: bool = False):
@@ -15,6 +24,12 @@ def convert_py_to_nb(python_str: str, execute: bool = False):
     Not ideal, but only the CLI is documented well.
     """
     with TemporaryDirectory() as temp_dir:
+        if not _is_kernel_installed():
+            subprocess.run(  # pragma: no cover
+                "python -m ipykernel install --name kernel_name --user".split(" "),
+                check=True,
+            )
+
         temp_dir_path = Path(temp_dir)
         py_path = temp_dir_path / "input.py"
         py_path.write_text(python_str)
@@ -27,28 +42,10 @@ def convert_py_to_nb(python_str: str, execute: bool = False):
             + (["--execute"] if execute else [])
             + [str(py_path.absolute())]  # Input
         )
-        cmd = " ".join(argv)  # for error reporting
-        try:
-            result = subprocess.run(argv, check=True, text=True, capture_output=True)
-        except subprocess.CalledProcessError as e:  # pragma: no cover
-            if not execute:
-                # Might reach here if jupytext is not installed.
-                # Error quickly instead of trying to recover.
-                raise  # pragma: no cover
-            # Install kernel if missing
-            warn("jupytext failed: Will install kernel and try again.")
-            # TODO: Revisit hiding the details with "debug":
-            # Hid information I needed when notebook eval failed.
-            # https://github.com/opendp/dp-wizard/issues/277
-            debug(f'STDERR from "{cmd}":\n{e.stderr}')
-            subprocess.run(
-                "python -m ipykernel install --name kernel_name --user".split(" "),
-                check=True,
-            )
-            result = subprocess.run(argv, check=True, text=True, capture_output=True)
-
-        if result.stderr:
-            warn(f'STDERR from "{cmd}":\n{result.stderr}')  # pragma: no cover
+        result = subprocess.run(argv, text=True, capture_output=True)
+        if result.returncode != 0:
+            warn(result.stderr)
+            raise Exception(f"command failed: {' '.join(argv)}")
         return _clean_nb(result.stdout.strip())
 
 
