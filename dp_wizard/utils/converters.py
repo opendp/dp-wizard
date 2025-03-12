@@ -5,14 +5,16 @@ import json
 import nbformat
 import nbconvert
 from warnings import warn
-from logging import debug
+import jupytext
 
 
 def _is_kernel_installed() -> bool:
-    argv = "jupyter kernelspec list".split(" ")
-    result = subprocess.run(argv, check=True, text=True, capture_output=True)
-    lines = result.stdout.splitlines()
-    return any(line.strip().startswith("python3") for line in lines)
+    try:
+        # This method isn't well documented, so it may be fragile.
+        jupytext.kernels.kernelspec_from_language("python")  # type: ignore
+        return True
+    except ValueError:  # pragma: no cover
+        return False
 
 
 def convert_py_to_nb(python_str: str, execute: bool = False):
@@ -23,7 +25,7 @@ def convert_py_to_nb(python_str: str, execute: bool = False):
     """
     with TemporaryDirectory() as temp_dir:
         if not _is_kernel_installed():
-            subprocess.run(
+            subprocess.run(  # pragma: no cover
                 "python -m ipykernel install --name kernel_name --user".split(" "),
                 check=True,
             )

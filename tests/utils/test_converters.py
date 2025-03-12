@@ -1,6 +1,5 @@
 import re
 from pathlib import Path
-import subprocess
 import pytest
 import json
 from dp_wizard.utils.converters import (
