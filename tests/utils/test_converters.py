@@ -59,12 +59,12 @@ def test_clean_nb():
 def test_convert_py_to_nb_error():
     python_str = "Invalid python!"
     with pytest.raises(
-        subprocess.CalledProcessError,
-        match=r"jupytext.*returned non-zero exit status",
+        Exception,
+        match=r"command failed: jupytext --from \.py --to \.ipynb",
     ):
         with pytest.warns(
             UserWarning,
-            match=r"jupytext failed: Will install kernel and try again",
+            match=r"SyntaxError.*invalid syntax",
         ):
             convert_py_to_nb(python_str, execute=True)
 
