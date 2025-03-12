@@ -1,22 +1,7 @@
+import sys
 from pathlib import Path
-from typing import Optional
 
-from shiny import ui, reactive, render, Inputs, Outputs, Session
-
-from dp_wizard.utils.argparse_helpers import (
-    get_cli_info,
-    PUBLIC_TEXT,
-    PRIVATE_TEXT,
-    PUBLIC_PRIVATE_TEXT,
-)
-from dp_wizard.utils.csv_helper import get_csv_names_mismatch
-from dp_wizard.app.components.outputs import (
-    output_code_sample,
-    demo_tooltip,
-    hide_if,
-    info_box,
-)
-from dp_wizard.utils.code_generators import make_privacy_unit_block
+from shiny import ui, reactive, Inputs, Outputs, Session
 
 
 def about_ui():
@@ -36,6 +21,10 @@ def about_ui():
                 - Text and CSV reports.
                 """
             ),
+            ui.p(
+                f"DP Wizard version {(Path(__file__).parent.parent / 'VERSION').read_text()}"
+            ),
+            ui.p(f"Python {sys.version}"),
         ),
         ui.input_action_button("go_to_dataset", "Select dataset"),
         value="about_panel",
