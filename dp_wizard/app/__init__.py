@@ -20,6 +20,7 @@ app_ui = ui.page_bootstrap(
         analysis_panel.analysis_ui(),
         results_panel.results_ui(),
         feedback_panel.feedback_ui(),
+        selected=dataset_panel.dataset_panel_id,
         id="top_level_nav",
     ),
     title="DP Wizard",
