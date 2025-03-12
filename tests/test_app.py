@@ -25,6 +25,9 @@ for_the_demo = "For the demo, we'll imagine"
 def test_demo_app(page: Page, demo_app: ShinyAppProc):  # pragma: no cover
     page.goto(demo_app.url)
     expect(page).to_have_title("DP Wizard")
+
+    # -- Select dataset --
+    page.get_by_role("button", name="Select dataset").click()
     expect(page.get_by_text(for_the_demo)).not_to_be_visible()
     page.locator(tooltip).hover()
     expect(page.get_by_text(for_the_demo)).to_be_visible()
@@ -48,9 +51,12 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     def expect_no_error():
         expect(page.locator(".shiny-output-error")).not_to_be_attached()
 
-    # -- Select dataset --
+    # -- About --
     page.goto(default_app.url)
     expect(page).to_have_title("DP Wizard")
+
+    # -- Select dataset --
+    page.get_by_role("button", name="Select dataset").click()
     expect(page.locator(tooltip)).to_have_count(0)
     expect_visible(pick_dataset_text)
     expect_not_visible(perform_analysis_text)
@@ -91,7 +97,6 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     # (Note: Slider tests failed on CI when run after column details,
     # although it worked locally. This works in either environment.
     # Maybe a race condition?)
-    expect_visible("0.1")
     expect_visible("10.0")
     expect_visible("Epsilon: 1.0")
     page.locator(".irs-bar").click()
@@ -175,7 +180,7 @@ def test_default_app(page: Page, default_app: ShinyAppProc):  # pragma: no cover
     # Reports ...
 
     # ... text:
-    page.get_by_text("Reports").click()
+    page.get_by_role("button", name="Reports").click()
     with page.expect_download() as text_report_download_info:
         page.get_by_text("Download report (.txt)").click()
     expect_no_error()

@@ -5,6 +5,7 @@ from shiny import ui, reactive, Inputs, Outputs, Session
 
 
 def about_ui():
+    version = (Path(__file__).parent.parent / "VERSION").read_text()
     return ui.nav_panel(
         "About",
         ui.card(
@@ -21,9 +22,7 @@ def about_ui():
                 - Text and CSV reports.
                 """
             ),
-            ui.p(
-                f"DP Wizard version {(Path(__file__).parent.parent / 'VERSION').read_text()}"
-            ),
+            ui.p(f"DP Wizard version {version}"),
             ui.p(f"Python {sys.version}"),
         ),
         ui.input_action_button("go_to_dataset", "Select dataset"),
