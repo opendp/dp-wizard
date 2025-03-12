@@ -59,7 +59,11 @@ def test_convert_py_to_nb_error():
     python_str = "Invalid python!"
     with pytest.raises(
         Exception,
-        match=r"command failed: jupytext --from \.py --to \.ipynb",
+        match=(
+            r"Script to notebook conversion failed: "
+            r"jupytext --from \.py --to \.ipynb "
+            r"--output - --execute /tmp/script\.py"
+        ),
     ):
         with pytest.warns(
             UserWarning,

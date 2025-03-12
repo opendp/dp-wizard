@@ -35,7 +35,11 @@ def test_make_column_config_block_for_mean():
             upper_bound=100,
             bin_count=10,
         ).strip()
-        == "hw_grade_config = pl.col('HW GRADE').fill_null(0).dp.mean((0, 100))"
+        == """hw_grade_config = (
+    pl.col('HW GRADE')
+    .cast(float).fill_nan(0).fill_null(0)
+    .dp.mean((0, 100))
+)"""
     )
 
 
