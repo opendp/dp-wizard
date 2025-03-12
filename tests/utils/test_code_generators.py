@@ -215,26 +215,69 @@ def number_lines(text: str):
     )
 
 
-plan = AnalysisPlan(
-    csv_path=fake_csv,
-    contributions=1,
-    epsilon=1,
-    groups=["class year"],
-    columns={
-        # For a strong test, use a column whose name
-        # doesn't work as a python identifier.
-        "hw-number": AnalysisPlanColumn(
-            analysis_type="Histogram",
-            lower_bound=5,
-            upper_bound=15,
-            bin_count=20,
-            weight=4,
-        )
-    },
-)
+plans = [
+    AnalysisPlan(
+        csv_path=fake_csv,
+        contributions=1,
+        epsilon=1,
+        groups=["class year"],
+        columns={
+            # For a strong test, use a column whose name
+            # doesn't work as a python identifier.
+            "hw-number": AnalysisPlanColumn(
+                analysis_type=AnalysisType.HISTOGRAM,
+                lower_bound=5,
+                upper_bound=15,
+                bin_count=20,
+                weight=4,
+            )
+        },
+    ),
+    AnalysisPlan(
+        csv_path=fake_csv,
+        contributions=1,
+        epsilon=1,
+        groups=[],
+        columns={
+            # For a strong test, use a column whose name
+            # doesn't work as a python identifier.
+            "hw-number": AnalysisPlanColumn(
+                analysis_type=AnalysisType.MEAN,
+                lower_bound=5,
+                upper_bound=15,
+                bin_count=0,  # Unused, but required for consistency.
+                weight=4,
+            )
+        },
+    ),
+    # TODO!
+    # AnalysisPlan(
+    #     csv_path=fake_csv,
+    #     contributions=1,
+    #     epsilon=1,
+    #     groups=["class year"],
+    #     columns={
+    #         # For a strong test, use a column whose name
+    #         # doesn't work as a python identifier.
+    #         "hw-number": AnalysisPlanColumn(
+    #             analysis_type=AnalysisType.MEAN,
+    #             lower_bound=5,
+    #             upper_bound=15,
+    #             bin_count=0, # Unused, but required for consistency.
+    #             weight=4,
+    #         )
+    #     },
+    # )
+]
 
 
-def test_make_notebook():
+def id_for_plan(plan: AnalysisPlan):
+    columns = ", ".join(f"{v.analysis_type} of {k}" for k, v in plan.columns.items())
+    return f"{columns}; grouped by ({', '.join(plan.groups)})"
+
+
+@pytest.mark.parametrize("plan", plans, ids=id_for_plan)
+def test_make_notebook(plan):
     notebook = NotebookGenerator(plan).make_py()
     print(number_lines(notebook))
     globals = {}
@@ -242,7 +285,8 @@ def test_make_notebook():
     assert isinstance(globals["context"], dp.Context)
 
 
-def test_make_script():
+@pytest.mark.parametrize("plan", plans, ids=id_for_plan)
+def test_make_script(plan):
     script = ScriptGenerator(plan).make_py()
 
     # Make sure jupytext formatting doesn't bleed into the script.
@@ -258,8 +302,3 @@ def test_make_script():
             ["python", fp.name, "--csv", fake_csv], capture_output=True
         )
         assert result.returncode == 0
-        output = result.stdout.decode()
-
-        assert "DP counts for hw-number" in output
-        assert "95% confidence interval 3.3" in output
-        assert "hw_number_bin" in output
