@@ -34,18 +34,22 @@ def convert_py_to_nb(python_str: str, execute: bool = False):
         py_path = temp_dir_path / "input.py"
         py_path.write_text(python_str)
 
-        # for debugging:
-        # Path("/tmp/script.py").write_text(python_str)
-
-        argv = (
-            "jupytext --from .py --to .ipynb --output -".split(" ")
-            + (["--execute"] if execute else [])
-            + [str(py_path.absolute())]  # Input
-        )
+        argv = "jupytext --from .py --to .ipynb --output -".split(" ")
+        if execute:
+            argv.append("--execute")
+        argv.append(str(py_path.absolute()))  # type: ignore
         result = subprocess.run(argv, text=True, capture_output=True)
         if result.returncode != 0:
             warn(result.stderr)
-            raise Exception(f"command failed: {' '.join(argv)}")
+            # If there is an error, we want a copy of the file that will stay around,
+            # outside the "with TemporaryDirectory()" block.
+            # The command we show in the error message isn't exactly what was run,
+            # but it should reproduce the error.
+            debug_path = Path("/tmp/script.py")
+            debug_path.write_text(python_str)
+            argv.pop()
+            argv.append(str(debug_path))  # type: ignore
+            raise Exception(f"Script to notebook conversion failed: {' '.join(argv)}")
         return _clean_nb(result.stdout.strip())
 
 
