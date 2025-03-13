@@ -11,7 +11,7 @@ from dp_wizard.utils.csv_helper import (
     read_csv_ids_names,
     get_csv_row_count,
 )
-from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip
+from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip, info_box
 from dp_wizard.utils.code_generators import make_privacy_loss_block
 
 
@@ -46,6 +46,7 @@ def analysis_ui():
                     [],
                     multiple=True,
                 ),
+                ui.output_ui("columns_warning_ui"),
             ),
             ui.card(
                 ui.card_header("Privacy Budget"),
@@ -147,6 +148,17 @@ def analysis_server(
             each column has a smaller share of the privacy budget.
             """,
         )
+
+    @render.ui
+    def columns_warning_ui():
+        columns_count = len(weights())
+        if columns_count > 5:
+            return info_box(
+                """
+                Warning: With more columns, the UI will slow down
+                and the application may become unstable.
+                """
+            )
 
     @render.ui
     def simulation_card_ui():
