@@ -235,24 +235,13 @@ kwargs = {
     "epsilon": 1,
 }
 plans = [
-    AnalysisPlan(groups=[], columns={"hw-number": histogram_plan_column}, **kwargs),
-    AnalysisPlan(groups=[], columns={"hw-number": mean_plan_column}, **kwargs),
-    AnalysisPlan(
-        groups=[],
-        columns={"hw-number": histogram_plan_column, "grade": mean_plan_column},
-        **kwargs,
-    ),
-    AnalysisPlan(
-        groups=["class year"], columns={"hw-number": histogram_plan_column}, **kwargs
-    ),
-    AnalysisPlan(
-        groups=["class year"], columns={"hw-number": mean_plan_column}, **kwargs
-    ),
-    AnalysisPlan(
-        groups=["class year"],
-        columns={"hw-number": histogram_plan_column, "grade": mean_plan_column},
-        **kwargs,
-    ),
+    AnalysisPlan(groups=groups, columns=columns, **kwargs)
+    for groups in [[], ["class year"]]
+    for columns in [
+        {"hw-number": histogram_plan_column},
+        {"hw-number": mean_plan_column},
+        {"hw-number": histogram_plan_column, "grade": mean_plan_column},
+    ]
 ]
 
 
