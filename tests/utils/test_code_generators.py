@@ -229,48 +229,29 @@ mean_plan_column = AnalysisPlanColumn(
     bin_count=0,  # Unused
     weight=4,
 )
+kwargs = {
+    "csv_path": fake_csv,
+    "contributions": 1,
+    "epsilon": 1,
+}
 plans = [
+    AnalysisPlan(groups=[], columns={"hw-number": histogram_plan_column}, **kwargs),
+    AnalysisPlan(groups=[], columns={"hw-number": mean_plan_column}, **kwargs),
     AnalysisPlan(
-        csv_path=fake_csv,
-        contributions=1,
-        epsilon=1,
-        groups=[],
-        columns={"hw-number": histogram_plan_column},
-    ),
-    AnalysisPlan(
-        csv_path=fake_csv,
-        contributions=1,
-        epsilon=1,
-        groups=[],
-        columns={"hw-number": mean_plan_column},
-    ),
-    AnalysisPlan(
-        csv_path=fake_csv,
-        contributions=1,
-        epsilon=1,
         groups=[],
         columns={"hw-number": histogram_plan_column, "grade": mean_plan_column},
+        **kwargs,
     ),
     AnalysisPlan(
-        csv_path=fake_csv,
-        contributions=1,
-        epsilon=1,
-        groups=["class year"],
-        columns={"hw-number": histogram_plan_column},
+        groups=["class year"], columns={"hw-number": histogram_plan_column}, **kwargs
     ),
     AnalysisPlan(
-        csv_path=fake_csv,
-        contributions=1,
-        epsilon=1,
-        groups=["class year"],
-        columns={"hw-number": mean_plan_column},
+        groups=["class year"], columns={"hw-number": mean_plan_column}, **kwargs
     ),
     AnalysisPlan(
-        csv_path=fake_csv,
-        contributions=1,
-        epsilon=1,
         groups=["class year"],
         columns={"hw-number": histogram_plan_column, "grade": mean_plan_column},
+        **kwargs,
     ),
 ]
 
