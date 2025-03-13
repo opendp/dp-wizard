@@ -1,7 +1,7 @@
 # DP Wizard
 
 DP Wizard guides the user through the application of differential privacy.
-After selecting a local CSV, users are prompted to describe the anlysis they need.
+After selecting a local CSV, users are prompted to describe the analysis they need.
 Output options include:
 - A Jupyter notebook which demonstrates how to use [OpenDP](https://docs.opendp.org/).
 - A plain Python script.
