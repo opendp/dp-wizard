@@ -215,59 +215,63 @@ def number_lines(text: str):
     )
 
 
+histogram_plan_column = AnalysisPlanColumn(
+    analysis_type=AnalysisType.HISTOGRAM,
+    lower_bound=5,
+    upper_bound=15,
+    bin_count=20,
+    weight=4,
+)
+mean_plan_column = AnalysisPlanColumn(
+    analysis_type=AnalysisType.MEAN,
+    lower_bound=5,
+    upper_bound=15,
+    bin_count=0,  # Unused
+    weight=4,
+)
 plans = [
     AnalysisPlan(
         csv_path=fake_csv,
         contributions=1,
         epsilon=1,
-        groups=["class year"],
-        columns={
-            # For a strong test, use a column whose name
-            # doesn't work as a python identifier.
-            "hw-number": AnalysisPlanColumn(
-                analysis_type=AnalysisType.HISTOGRAM,
-                lower_bound=5,
-                upper_bound=15,
-                bin_count=20,
-                weight=4,
-            )
-        },
+        groups=[],
+        columns={"hw-number": histogram_plan_column},
     ),
     AnalysisPlan(
         csv_path=fake_csv,
         contributions=1,
         epsilon=1,
         groups=[],
-        columns={
-            # For a strong test, use a column whose name
-            # doesn't work as a python identifier.
-            "hw-number": AnalysisPlanColumn(
-                analysis_type=AnalysisType.MEAN,
-                lower_bound=5,
-                upper_bound=15,
-                bin_count=0,  # Unused, but required for consistency.
-                weight=4,
-            )
-        },
+        columns={"hw-number": mean_plan_column},
     ),
-    # TODO!
-    # AnalysisPlan(
-    #     csv_path=fake_csv,
-    #     contributions=1,
-    #     epsilon=1,
-    #     groups=["class year"],
-    #     columns={
-    #         # For a strong test, use a column whose name
-    #         # doesn't work as a python identifier.
-    #         "hw-number": AnalysisPlanColumn(
-    #             analysis_type=AnalysisType.MEAN,
-    #             lower_bound=5,
-    #             upper_bound=15,
-    #             bin_count=0, # Unused, but required for consistency.
-    #             weight=4,
-    #         )
-    #     },
-    # )
+    AnalysisPlan(
+        csv_path=fake_csv,
+        contributions=1,
+        epsilon=1,
+        groups=[],
+        columns={"hw-number": histogram_plan_column, "grade": mean_plan_column},
+    ),
+    AnalysisPlan(
+        csv_path=fake_csv,
+        contributions=1,
+        epsilon=1,
+        groups=["class year"],
+        columns={"hw-number": histogram_plan_column},
+    ),
+    AnalysisPlan(
+        csv_path=fake_csv,
+        contributions=1,
+        epsilon=1,
+        groups=["class year"],
+        columns={"hw-number": mean_plan_column},
+    ),
+    AnalysisPlan(
+        csv_path=fake_csv,
+        contributions=1,
+        epsilon=1,
+        groups=["class year"],
+        columns={"hw-number": histogram_plan_column, "grade": mean_plan_column},
+    ),
 ]
 
 
