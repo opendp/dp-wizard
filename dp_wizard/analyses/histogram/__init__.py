@@ -1,32 +1,36 @@
-from shiny import ui
+from dp_wizard.utils.code_generators._template import Template
 
 
 name = "Histogram"
 
 
-def analysis_config_ui(lower_bounds, upper_bounds, bin_counts, label_width, col_widths):
-    return ui.layout_columns(
-        [
-            ui.input_numeric(
-                "lower",
-                ["Lower", ui.output_ui("bounds_tooltip_ui")],
-                lower_bounds().get(name, 0),
-                width=label_width,
-            ),
-            ui.input_numeric(
-                "upper",
-                "Upper",
-                upper_bounds().get(name, 10),
-                width=label_width,
-            ),
-            ui.input_numeric(
-                "bins",
-                ["Bins", ui.output_ui("bins_tooltip_ui")],
-                bin_counts().get(name, 10),
-                width=label_width,
-            ),
-            ui.output_ui("optional_weight_ui"),
-        ],
-        ui.output_ui("histogram_preview_ui"),
-        col_widths=col_widths,  # type: ignore
+def make_query(code_gen, identifier, accuracy_name, stats_name):
+    return (
+        Template("histogram_query")
+        .fill_values(
+            BIN_NAME=f"{identifier}_bin",
+            GROUP_NAMES=code_gen.groups,
+        )
+        .fill_expressions(
+            QUERY_NAME=f"{identifier}_query",
+            ACCURACY_NAME=accuracy_name,
+            STATS_NAME=stats_name,
+        )
+        .finish()
+    )
+
+
+def make_output(code_gen, column_name, accuracy_name, stats_name):
+    return (
+        Template(f"histogram_{code_gen.root_template}_output")
+        .fill_values(
+            COLUMN_NAME=column_name,
+            GROUP_NAMES=code_gen.groups,
+        )
+        .fill_expressions(
+            ACCURACY_NAME=accuracy_name,
+            HISTOGRAM_NAME=stats_name,
+            CONFIDENCE_NOTE=code_gen._make_confidence_note(),
+        )
+        .finish()
     )

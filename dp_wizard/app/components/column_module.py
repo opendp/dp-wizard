@@ -5,13 +5,13 @@ from shiny import ui, render, module, reactive, Inputs, Outputs, Session
 from shiny.types import SilentException
 import polars as pl
 
+from dp_wizard.analyses import histogram, mean
 from dp_wizard.utils.dp_helper import make_accuracy_histogram
 from dp_wizard.utils.shared import plot_histogram
 from dp_wizard.utils.code_generators import make_column_config_block
 from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip, hide_if
 from dp_wizard.utils.dp_helper import confidence
 from dp_wizard.utils.mock_data import mock_data, ColumnDef
-from dp_wizard.analyses import histogram, mean, get_analysis_by_name
 
 
 default_analysis_type = histogram.name
@@ -129,14 +129,53 @@ def column_server(
             "md": [3, 9],
             "lg": [2, 10],
         }
-
-        return get_analysis_by_name(input.analysis_type()).analysis_config_ui(
-            lower_bounds=lower_bounds,
-            upper_bounds=upper_bounds,
-            bin_counts=bin_counts,
-            label_width=label_width,
-            col_widths=col_widths,
-        )
+        match input.analysis_type():
+            case histogram.name:
+                return ui.layout_columns(
+                    [
+                        ui.input_numeric(
+                            "lower",
+                            ["Lower", ui.output_ui("bounds_tooltip_ui")],
+                            lower_bounds().get(name, 0),
+                            width=label_width,
+                        ),
+                        ui.input_numeric(
+                            "upper",
+                            "Upper",
+                            upper_bounds().get(name, 10),
+                            width=label_width,
+                        ),
+                        ui.input_numeric(
+                            "bins",
+                            ["Bins", ui.output_ui("bins_tooltip_ui")],
+                            bin_counts().get(name, 10),
+                            width=label_width,
+                        ),
+                        ui.output_ui("optional_weight_ui"),
+                    ],
+                    ui.output_ui("histogram_preview_ui"),
+                    col_widths=col_widths,  # type: ignore
+                )
+            case mean.name:
+                return ui.layout_columns(
+                    [
+                        ui.input_numeric(
+                            "lower",
+                            ["Lower", ui.output_ui("bounds_tooltip_ui")],
+                            lower_bounds().get(name, 0),
+                            width=label_width,
+                        ),
+                        ui.input_numeric(
+                            "upper",
+                            "Upper",
+                            upper_bounds().get(name, 10),
+                            width=label_width,
+                        ),
+                        ui.output_ui("optional_weight_ui"),
+                    ],
+                    ui.output_ui("mean_preview_ui"),
+                    col_widths=col_widths,  # type: ignore
+                )
 
     @render.ui
     def bounds_tooltip_ui():

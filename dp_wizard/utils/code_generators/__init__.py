@@ -5,7 +5,7 @@ import re
 
 import black
 
-from dp_wizard.analyses import histogram, mean
+from dp_wizard.analyses import histogram, mean, get_analysis_by_name
 from dp_wizard.utils.csv_helper import name_to_identifier
 from dp_wizard.utils.code_generators._template import Template
 from dp_wizard.utils.dp_helper import confidence
@@ -121,56 +121,19 @@ class _CodeGenerator(ABC):
         accuracy_name = f"{identifier}_accuracy"
         stats_name = f"{identifier}_stats"
 
-        match plan.analysis_type:
-            case histogram.name:
-                query = (
-                    Template("histogram_query")
-                    .fill_values(
-                        BIN_NAME=f"{identifier}_bin",
-                        GROUP_NAMES=self.groups,
-                    )
-                    .fill_expressions(
-                        QUERY_NAME=f"{identifier}_query",
-                        ACCURACY_NAME=accuracy_name,
-                        STATS_NAME=stats_name,
-                    )
-                    .finish()
-                )
-            case mean.name:  # pragma: no cover
-                query = (
-                    Template("mean_query")
-                    .fill_values(
-                        GROUP_NAMES=self.groups,
-                    )
-                    .fill_expressions(
-                        QUERY_NAME=f"{identifier}_query",
-                        STATS_NAME=stats_name,
-                        CONFIG_NAME=f"{identifier}_config",
-                    )
-                    .finish()
-                )
-            case _:  # pragma: no cover
-                raise Exception("Unrecognized analysis")
-
-        match plan.analysis_type:
-            case histogram.name:
-                output = (
-                    Template(f"histogram_{self.root_template}_output")
-                    .fill_values(
-                        COLUMN_NAME=column_name,
-                        GROUP_NAMES=self.groups,
-                    )
-                    .fill_expressions(
-                        ACCURACY_NAME=accuracy_name,
-                        HISTOGRAM_NAME=stats_name,
-                        CONFIDENCE_NOTE=self._make_confidence_note(),
-                    )
-                    .finish()
-                )
-            case mean.name:  # pragma: no cover
-                output = Template(f"mean_{self.root_template}_output").finish()
-            case _:  # pragma: no cover
-                raise Exception("Unrecognized analysis")
+        analysis = get_analysis_by_name(plan.analysis_type)
+        query = analysis.make_query(
+            code_gen=self,
+            identifier=identifier,
+            accuracy_name=accuracy_name,
+            stats_name=stats_name,
+        )
+        output = analysis.make_output(
+            code_gen=self,
+            column_name=column_name,
+            accuracy_name=accuracy_name,
+            stats_name=stats_name,
+        )
 
         return self._make_cell(query) + self._make_cell(output)
 

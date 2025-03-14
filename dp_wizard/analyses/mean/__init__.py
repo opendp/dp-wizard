@@ -1,26 +1,23 @@
-from shiny import ui
+from dp_wizard.utils.code_generators._template import Template
 
 
 name = "Mean"
 
 
-def analysis_config_ui(lower_bounds, upper_bounds, bin_counts, label_width, col_widths):
-    return ui.layout_columns(
-        [
-            ui.input_numeric(
-                "lower",
-                ["Lower", ui.output_ui("bounds_tooltip_ui")],
-                lower_bounds().get(name, 0),
-                width=label_width,
-            ),
-            ui.input_numeric(
-                "upper",
-                "Upper",
-                upper_bounds().get(name, 10),
-                width=label_width,
-            ),
-            ui.output_ui("optional_weight_ui"),
-        ],
-        ui.output_ui("mean_preview_ui"),
-        col_widths=col_widths,  # type: ignore
+def make_query(code_gen, identifier, accuracy_name, stats_name):
+    return (
+        Template("mean_query")
+        .fill_values(
+            GROUP_NAMES=code_gen.groups,
+        )
+        .fill_expressions(
+            QUERY_NAME=f"{identifier}_query",
+            STATS_NAME=stats_name,
+            CONFIG_NAME=f"{identifier}_config",
+        )
+        .finish()
     )
+
+
+def make_output(code_gen, column_name, accuracy_name, stats_name):
+    return Template(f"mean_{code_gen.root_template}_output").finish()
