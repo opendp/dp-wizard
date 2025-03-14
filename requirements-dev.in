@@ -1,7 +1,6 @@
 # After making changes here, run:
 #    pip-compile --rebuild requirements-dev.in && pip install -r requirements-dev.txt
 
-
 # Developer tools:
 pip-tools
 flit

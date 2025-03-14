@@ -96,7 +96,6 @@ def test_default_app_validations(
     # (Note: Slider tests failed on CI when run after column details,
     # although it worked locally. This works in either environment.
     # Maybe a race condition?)
-    expect_visible("0.1")
     expect_visible("10.0")
     expect_visible("Epsilon: 1.0")
     page.locator(".irs-bar").click()

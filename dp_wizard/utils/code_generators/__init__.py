@@ -53,7 +53,7 @@ class _CodeGenerator(ABC):
         code = (
             Template(self.root_template)
             .fill_expressions(
-                DEPENDENCIES="'opendp[polars]==0.12.1a20250227001' matplotlib pyyaml"
+                DEPENDENCIES="'opendp[polars]==0.12.1a20250227001' matplotlib"
             )
             .fill_blocks(
                 IMPORTS_BLOCK=Template("imports").finish(),
@@ -76,7 +76,7 @@ class _CodeGenerator(ABC):
             # "max_partition_length" should be a loose upper bound,
             # for example, the size of the total population being sampled.
             # https://docs.opendp.org/en/stable/api/python/opendp.extras.polars.html#opendp.extras.polars.Margin.max_partition_length
-            dp.polars.Margin(by=[{groups_str}], public_info='lengths', max_partition_length=1000000,),
+            dp.polars.Margin(by=[{groups_str}], public_info='lengths', max_partition_length=1000000, max_num_partitions=100),
             """  # noqa: B950 (too long!)
             ]
             + [
@@ -181,14 +181,13 @@ class _CodeGenerator(ABC):
             for name, plan in self.columns.items()
             if plan.analysis_type == AnalysisType.HISTOGRAM
         ]
-        group_names = [name_to_identifier(name) for name in self.groups]
 
         privacy_unit_block = make_privacy_unit_block(self.contributions)
         privacy_loss_block = make_privacy_loss_block(self.epsilon)
 
         margins_list = self._make_margins_list(
             [f"{name}_bin" for name in bin_column_names],
-            group_names,
+            self.groups,
         )
         extra_columns = ", ".join(
             [
