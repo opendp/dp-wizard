@@ -161,6 +161,13 @@ def column_server(
 
     @render.ui
     def analysis_config_ui():
+        col_widths = {
+            # Controls stay roughly a constant width;
+            # Graph expands to fill space.
+            "sm": [4, 8],
+            "md": [3, 9],
+            "lg": [2, 10],
+        }
         match input.analysis_type():
             case AnalysisType.HISTOGRAM:
                 return ui.layout_columns(

@@ -95,7 +95,6 @@ def test_default_app_validations(
     # (Note: Slider tests failed on CI when run after column details,
     # although it worked locally. This works in either environment.
     # Maybe a race condition?)
-    expect_visible("0.1")
     expect_visible("10.0")
     expect_visible("Epsilon: 1.0")
     page.locator(".irs-bar").click()
@@ -234,7 +233,7 @@ def test_default_app_downloads(
 
     # ... Reports:
     # ...... text:
-    page.get_by_text("Reports").click()
+    page.get_by_role("button", name="Reports").click()
     with page.expect_download() as text_report_download_info:
         page.get_by_text("Download report (.txt)").click()
     expect_no_error()

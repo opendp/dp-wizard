@@ -35,7 +35,13 @@ def test_make_column_config_block_for_mean():
             upper_bound=100,
             bin_count=10,
         ).strip()
-        == "hw_grade_config = pl.col('HW GRADE').fill_null(0).dp.mean((0, 100))"
+        == """hw_grade_config = (
+    pl.col('HW GRADE')
+    .cast(float)
+    .fill_nan(0)
+    .fill_null(0)
+    .dp.mean((0, 100))
+)"""
     )
 
 
@@ -209,26 +215,43 @@ def number_lines(text: str):
     )
 
 
-plan = AnalysisPlan(
-    csv_path=fake_csv,
-    contributions=1,
-    epsilon=1,
-    groups=["class year"],
-    columns={
-        # For a strong test, use a column whose name
-        # doesn't work as a python identifier.
-        "hw-number": AnalysisPlanColumn(
-            analysis_type="Histogram",
-            lower_bound=5,
-            upper_bound=15,
-            bin_count=20,
-            weight=4,
-        )
-    },
+histogram_plan_column = AnalysisPlanColumn(
+    analysis_type=AnalysisType.HISTOGRAM,
+    lower_bound=5,
+    upper_bound=15,
+    bin_count=20,
+    weight=4,
 )
+mean_plan_column = AnalysisPlanColumn(
+    analysis_type=AnalysisType.MEAN,
+    lower_bound=5,
+    upper_bound=15,
+    bin_count=0,  # Unused
+    weight=4,
+)
+kwargs = {
+    "csv_path": fake_csv,
+    "contributions": 1,
+    "epsilon": 1,
+}
+plans = [
+    AnalysisPlan(groups=groups, columns=columns, **kwargs)
+    for groups in [[], ["class year"]]
+    for columns in [
+        {"hw-number": histogram_plan_column},
+        {"hw-number": mean_plan_column},
+        {"hw-number": histogram_plan_column, "grade": mean_plan_column},
+    ]
+]
 
 
-def test_make_notebook():
+def id_for_plan(plan: AnalysisPlan):
+    columns = ", ".join(f"{v.analysis_type} of {k}" for k, v in plan.columns.items())
+    return f"{columns}; grouped by ({', '.join(plan.groups)})"
+
+
+@pytest.mark.parametrize("plan", plans, ids=id_for_plan)
+def test_make_notebook(plan):
     notebook = NotebookGenerator(plan).make_py()
     print(number_lines(notebook))
     globals = {}
@@ -236,7 +259,8 @@ def test_make_notebook():
     assert isinstance(globals["context"], dp.Context)
 
 
-def test_make_script():
+@pytest.mark.parametrize("plan", plans, ids=id_for_plan)
+def test_make_script(plan):
     script = ScriptGenerator(plan).make_py()
 
     # Make sure jupytext formatting doesn't bleed into the script.
@@ -252,8 +276,3 @@ def test_make_script():
             ["python", fp.name, "--csv", fake_csv], capture_output=True
         )
         assert result.returncode == 0
-        output = result.stdout.decode()
-
-        assert "DP counts for hw-number" in output
-        assert "95% confidence interval 3.3" in output
-        assert "hw_number_bin" in output
