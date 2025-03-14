@@ -5,7 +5,7 @@ import re
 
 import black
 
-from dp_wizard import AnalysisType
+from dp_wizard.analyses import histogram, mean
 from dp_wizard.utils.csv_helper import name_to_identifier
 from dp_wizard.utils.code_generators._template import Template
 from dp_wizard.utils.dp_helper import confidence
@@ -122,7 +122,7 @@ class _CodeGenerator(ABC):
         stats_name = f"{identifier}_stats"
 
         match plan.analysis_type:
-            case AnalysisType.HISTOGRAM:
+            case histogram.name:
                 query = (
                     Template("histogram_query")
                     .fill_values(
@@ -136,7 +136,7 @@ class _CodeGenerator(ABC):
                     )
                     .finish()
                 )
-            case AnalysisType.MEAN:  # pragma: no cover
+            case mean.name:  # pragma: no cover
                 query = (
                     Template("mean_query")
                     .fill_values(
@@ -153,7 +153,7 @@ class _CodeGenerator(ABC):
                 raise Exception("Unrecognized analysis")
 
         match plan.analysis_type:
-            case AnalysisType.HISTOGRAM:
+            case histogram.name:
                 output = (
                     Template(f"histogram_{self.root_template}_output")
                     .fill_values(
@@ -167,7 +167,7 @@ class _CodeGenerator(ABC):
                     )
                     .finish()
                 )
-            case AnalysisType.MEAN:  # pragma: no cover
+            case mean.name:  # pragma: no cover
                 output = Template(f"mean_{self.root_template}_output").finish()
             case _:  # pragma: no cover
                 raise Exception("Unrecognized analysis")
@@ -179,7 +179,7 @@ class _CodeGenerator(ABC):
         bin_column_names = [
             name_to_identifier(name)
             for name, plan in self.columns.items()
-            if plan.analysis_type == AnalysisType.HISTOGRAM
+            if plan.analysis_type == histogram.name
         ]
 
         privacy_unit_block = make_privacy_unit_block(self.contributions)
@@ -193,7 +193,7 @@ class _CodeGenerator(ABC):
             [
                 f"{name_to_identifier(name)}_config"
                 for name, plan in self.columns.items()
-                if plan.analysis_type == AnalysisType.HISTOGRAM
+                if plan.analysis_type == histogram.name
             ]
         )
         return (
@@ -223,7 +223,7 @@ class NotebookGenerator(_CodeGenerator):
 
     def _make_report_kv(self, name, analysis_type):
         match analysis_type:
-            case AnalysisType.HISTOGRAM:
+            case histogram.name:
                 return (
                     Template("histogram_report_kv")
                     .fill_values(
@@ -236,7 +236,7 @@ class NotebookGenerator(_CodeGenerator):
                     )
                     .finish()
                 )
-            case AnalysisType.MEAN:  # pragma: no cover
+            case mean.name:  # pragma: no cover
                 return (
                     Template("mean_report_kv")
                     .fill_values(
@@ -310,7 +310,7 @@ def make_column_config_block(
     snake_name = _snake_case(name)
 
     match analysis_type:
-        case AnalysisType.HISTOGRAM:
+        case histogram.name:
             config = (
                 Template("histogram_config")
                 .fill_expressions(
@@ -326,7 +326,7 @@ def make_column_config_block(
                 )
                 .finish()
             )
-        case AnalysisType.MEAN:
+        case mean.name:
             config = (
                 Template("mean_config")
                 .fill_expressions(

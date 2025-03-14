@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 import opendp.prelude as dp
 
-from dp_wizard import AnalysisType
+from dp_wizard.analyses import histogram, mean
 from dp_wizard.utils.code_generators import (
     make_column_config_block,
     Template,
@@ -30,7 +30,7 @@ def test_make_column_config_block_for_mean():
     assert (
         make_column_config_block(
             name="HW GRADE",
-            analysis_type=AnalysisType.MEAN,
+            analysis_type=mean.name,
             lower_bound=0,
             upper_bound=100,
             bin_count=10,
@@ -49,7 +49,7 @@ def test_make_column_config_block_for_histogram():
     assert (
         make_column_config_block(
             name="HW GRADE",
-            analysis_type=AnalysisType.HISTOGRAM,
+            analysis_type=histogram.name,
             lower_bound=0,
             upper_bound=100,
             bin_count=10,
@@ -216,14 +216,14 @@ def number_lines(text: str):
 
 
 histogram_plan_column = AnalysisPlanColumn(
-    analysis_type=AnalysisType.HISTOGRAM,
+    analysis_type=histogram.name,
     lower_bound=5,
     upper_bound=15,
     bin_count=20,
     weight=4,
 )
 mean_plan_column = AnalysisPlanColumn(
-    analysis_type=AnalysisType.MEAN,
+    analysis_type=mean.name,
     lower_bound=5,
     upper_bound=15,
     bin_count=0,  # Unused
