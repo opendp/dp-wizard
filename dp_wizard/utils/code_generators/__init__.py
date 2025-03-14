@@ -5,7 +5,7 @@ import re
 
 import black
 
-from dp_wizard.analyses import histogram, mean, get_analysis_by_name
+from dp_wizard.analyses import histogram, get_analysis_by_name
 from dp_wizard.utils.csv_helper import name_to_identifier
 from dp_wizard.utils.code_generators._template import Template
 from dp_wizard.utils.dp_helper import confidence
@@ -250,42 +250,12 @@ def make_column_config_block(
     upper_bound: float,
     bin_count: int,
 ):
-    snake_name = _snake_case(name)
-
-    match analysis_type:
-        case histogram.name:
-            config = (
-                Template("histogram_config")
-                .fill_expressions(
-                    CUT_LIST_NAME=f"{snake_name}_cut_points",
-                    CONFIG_NAME=f"{snake_name}_config",
-                )
-                .fill_values(
-                    LOWER_BOUND=lower_bound,
-                    UPPER_BOUND=upper_bound,
-                    BIN_COUNT=bin_count,
-                    COLUMN_NAME=name,
-                    BIN_COLUMN_NAME=f"{snake_name}_bin",
-                )
-                .finish()
-            )
-        case mean.name:
-            config = (
-                Template("mean_config")
-                .fill_expressions(
-                    CONFIG_NAME=f"{snake_name}_config",
-                )
-                .fill_values(
-                    COLUMN_NAME=name,
-                    LOWER_BOUND=lower_bound,
-                    UPPER_BOUND=upper_bound,
-                )
-                .finish()
-            )
-        case _:
-            raise Exception("Unrecognized analysis")
-
-    return config
+    return get_analysis_by_name(analysis_type).make_column_config_block(
+        column_name=name,
+        lower_bound=lower_bound,
+        upper_bound=upper_bound,
+        bin_count=bin_count,
+    )
 
 
 # Private helper functions:

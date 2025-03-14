@@ -8,4 +8,4 @@ def get_analysis_by_name(name):  # pragma: no cover
         case mean.name:
             return mean
         case _:
-            raise Exception("Unexpected analysis")
+            raise Exception("Unrecognized analysis")

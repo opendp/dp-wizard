@@ -31,3 +31,21 @@ def make_report_kv(name, confidence, identifier):
         )
         .finish()
     )
+
+
+def make_column_config_block(column_name, lower_bound, upper_bound, bin_count):
+    from dp_wizard.utils.code_generators import _snake_case
+
+    snake_name = _snake_case(column_name)
+    return (
+        Template("mean_config")
+        .fill_expressions(
+            CONFIG_NAME=f"{snake_name}_config",
+        )
+        .fill_values(
+            COLUMN_NAME=column_name,
+            LOWER_BOUND=lower_bound,
+            UPPER_BOUND=upper_bound,
+        )
+        .finish()
+    )
