@@ -7,7 +7,7 @@ has_bins = False
 
 def make_query(code_gen, identifier, accuracy_name, stats_name):
     return (
-        Template("mean_query")
+        Template("mean_query", __file__)
         .fill_values(
             GROUP_NAMES=code_gen.groups,
         )
@@ -21,12 +21,12 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
 
 
 def make_output(code_gen, column_name, accuracy_name, stats_name):
-    return Template(f"mean_{code_gen.root_template}_output").finish()
+    return Template(f"mean_{code_gen.root_template}_output", __file__).finish()
 
 
 def make_report_kv(name, confidence, identifier):
     return (
-        Template("mean_report_kv")
+        Template("mean_report_kv", __file__)
         .fill_values(
             NAME=name,
         )
@@ -39,7 +39,7 @@ def make_column_config_block(column_name, lower_bound, upper_bound, bin_count):
 
     snake_name = _snake_case(column_name)
     return (
-        Template("mean_config")
+        Template("mean_config", __file__)
         .fill_expressions(
             CONFIG_NAME=f"{snake_name}_config",
         )
