@@ -5,7 +5,7 @@ import re
 
 import black
 
-from dp_wizard import AnalysisType
+from dp_wizard.analyses import get_analysis_by_name
 from dp_wizard.utils.csv_helper import name_to_identifier
 from dp_wizard.utils.code_generators._template import Template
 from dp_wizard.utils.dp_helper import confidence
@@ -121,56 +121,19 @@ class _CodeGenerator(ABC):
         accuracy_name = f"{identifier}_accuracy"
         stats_name = f"{identifier}_stats"
 
-        match plan.analysis_type:
-            case AnalysisType.HISTOGRAM:
-                query = (
-                    Template("histogram_query")
-                    .fill_values(
-                        BIN_NAME=f"{identifier}_bin",
-                        GROUP_NAMES=self.groups,
-                    )
-                    .fill_expressions(
-                        QUERY_NAME=f"{identifier}_query",
-                        ACCURACY_NAME=accuracy_name,
-                        STATS_NAME=stats_name,
-                    )
-                    .finish()
-                )
-            case AnalysisType.MEAN:  # pragma: no cover
-                query = (
-                    Template("mean_query")
-                    .fill_values(
-                        GROUP_NAMES=self.groups,
-                    )
-                    .fill_expressions(
-                        QUERY_NAME=f"{identifier}_query",
-                        STATS_NAME=stats_name,
-                        CONFIG_NAME=f"{identifier}_config",
-                    )
-                    .finish()
-                )
-            case _:  # pragma: no cover
-                raise Exception("Unrecognized analysis")
-
-        match plan.analysis_type:
-            case AnalysisType.HISTOGRAM:
-                output = (
-                    Template(f"histogram_{self.root_template}_output")
-                    .fill_values(
-                        COLUMN_NAME=column_name,
-                        GROUP_NAMES=self.groups,
-                    )
-                    .fill_expressions(
-                        ACCURACY_NAME=accuracy_name,
-                        HISTOGRAM_NAME=stats_name,
-                        CONFIDENCE_NOTE=self._make_confidence_note(),
-                    )
-                    .finish()
-                )
-            case AnalysisType.MEAN:  # pragma: no cover
-                output = Template(f"mean_{self.root_template}_output").finish()
-            case _:  # pragma: no cover
-                raise Exception("Unrecognized analysis")
+        analysis = get_analysis_by_name(plan.analysis_type)
+        query = analysis.make_query(
+            code_gen=self,
+            identifier=identifier,
+            accuracy_name=accuracy_name,
+            stats_name=stats_name,
+        )
+        output = analysis.make_output(
+            code_gen=self,
+            column_name=column_name,
+            accuracy_name=accuracy_name,
+            stats_name=stats_name,
+        )
 
         return self._make_cell(query) + self._make_cell(output)
 
@@ -179,7 +142,7 @@ class _CodeGenerator(ABC):
         bin_column_names = [
             name_to_identifier(name)
             for name, plan in self.columns.items()
-            if plan.analysis_type == AnalysisType.HISTOGRAM
+            if get_analysis_by_name(plan.analysis_type).has_bins
         ]
 
         privacy_unit_block = make_privacy_unit_block(self.contributions)
@@ -193,7 +156,7 @@ class _CodeGenerator(ABC):
             [
                 f"{name_to_identifier(name)}_config"
                 for name, plan in self.columns.items()
-                if plan.analysis_type == AnalysisType.HISTOGRAM
+                if get_analysis_by_name(plan.analysis_type).has_bins
             ]
         )
         return (
@@ -222,30 +185,10 @@ class NotebookGenerator(_CodeGenerator):
         return f"\n# +\n{block}\n# -\n"
 
     def _make_report_kv(self, name, analysis_type):
-        match analysis_type:
-            case AnalysisType.HISTOGRAM:
-                return (
-                    Template("histogram_report_kv")
-                    .fill_values(
-                        NAME=name,
-                        CONFIDENCE=confidence,
-                    )
-                    .fill_expressions(
-                        IDENTIFIER_STATS=f"{name_to_identifier(name)}_stats",
-                        IDENTIFIER_ACCURACY=f"{name_to_identifier(name)}_accuracy",
-                    )
-                    .finish()
-                )
-            case AnalysisType.MEAN:  # pragma: no cover
-                return (
-                    Template("mean_report_kv")
-                    .fill_values(
-                        NAME=name,
-                    )
-                    .finish()
-                )
-            case _:  # pragma: no cover
-                raise Exception("Unrecognized analysis")
+        analysis = get_analysis_by_name(analysis_type)
+        return analysis.make_report_kv(
+            name=name, confidence=confidence, identifier=name_to_identifier(name)
+        )
 
     def _make_extra_blocks(self):
         outputs_expression = (
@@ -307,42 +250,12 @@ def make_column_config_block(
     upper_bound: float,
     bin_count: int,
 ):
-    snake_name = _snake_case(name)
-
-    match analysis_type:
-        case AnalysisType.HISTOGRAM:
-            config = (
-                Template("histogram_config")
-                .fill_expressions(
-                    CUT_LIST_NAME=f"{snake_name}_cut_points",
-                    CONFIG_NAME=f"{snake_name}_config",
-                )
-                .fill_values(
-                    LOWER_BOUND=lower_bound,
-                    UPPER_BOUND=upper_bound,
-                    BIN_COUNT=bin_count,
-                    COLUMN_NAME=name,
-                    BIN_COLUMN_NAME=f"{snake_name}_bin",
-                )
-                .finish()
-            )
-        case AnalysisType.MEAN:
-            config = (
-                Template("mean_config")
-                .fill_expressions(
-                    CONFIG_NAME=f"{snake_name}_config",
-                )
-                .fill_values(
-                    COLUMN_NAME=name,
-                    LOWER_BOUND=lower_bound,
-                    UPPER_BOUND=upper_bound,
-                )
-                .finish()
-            )
-        case _:
-            raise Exception("Unrecognized analysis")
-
-    return config
+    return get_analysis_by_name(analysis_type).make_column_config_block(
+        column_name=name,
+        lower_bound=lower_bound,
+        upper_bound=upper_bound,
+        bin_count=bin_count,
+    )
 
 
 # Private helper functions:

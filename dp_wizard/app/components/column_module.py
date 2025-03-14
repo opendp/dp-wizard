@@ -5,7 +5,7 @@ from shiny import ui, render, module, reactive, Inputs, Outputs, Session
 from shiny.types import SilentException
 import polars as pl
 
-from dp_wizard import AnalysisType
+from dp_wizard.analyses import histogram, mean
 from dp_wizard.utils.dp_helper import make_accuracy_histogram
 from dp_wizard.utils.shared import plot_histogram
 from dp_wizard.utils.code_generators import make_column_config_block
@@ -14,7 +14,7 @@ from dp_wizard.utils.dp_helper import confidence
 from dp_wizard.utils.mock_data import mock_data, ColumnDef
 
 
-default_analysis_type = AnalysisType.HISTOGRAM
+default_analysis_type = histogram.name
 default_weight = "2"
 label_width = "10em"  # Just wide enough so the text isn't trucated.
 
@@ -26,7 +26,7 @@ def column_ui():  # pragma: no cover
         ui.input_select(
             "analysis_type",
             None,
-            [AnalysisType.HISTOGRAM, AnalysisType.MEAN],
+            [histogram.name, mean.name],
             width=label_width,
         ),
         ui.output_ui("analysis_config_ui"),
@@ -130,7 +130,7 @@ def column_server(
             "lg": [2, 10],
         }
         match input.analysis_type():
-            case AnalysisType.HISTOGRAM:
+            case histogram.name:
                 return ui.layout_columns(
                     [
                         ui.input_numeric(
@@ -156,7 +156,7 @@ def column_server(
                     ui.output_ui("histogram_preview_ui"),
                     col_widths=col_widths,  # type: ignore
                 )
-            case AnalysisType.MEAN:
+            case mean.name:
                 return ui.layout_columns(
                     [
                         ui.input_numeric(
