@@ -16,7 +16,7 @@ if bp in Path(__file__).read_text():
 
 demo_app = create_app_fixture(Path(__file__).parent / "fixtures/demo_app.py")
 default_app = create_app_fixture(Path(__file__).parent / "fixtures/default_app.py")
-tooltip = "#choose_csv_demo_tooltip_ui svg"
+tooltip = "#public_csv_path-label svg"
 for_the_demo = "For the demo, we'll imagine"
 
 
