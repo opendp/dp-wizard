@@ -185,9 +185,9 @@ def test_default_app_downloads(
     ]
 
     # Expand all accordions:
-    page.get_by_text("Reports").click()
-    page.get_by_text("Unexecuted Notebooks").click()
-    page.get_by_text("Scripts").click()
+    page.get_by_text("Reports", exact=True).click()
+    page.get_by_text("Unexecuted Notebooks", exact=True).click()
+    page.get_by_text("Scripts", exact=True).click()
 
     for match in matches:
         if not match:
