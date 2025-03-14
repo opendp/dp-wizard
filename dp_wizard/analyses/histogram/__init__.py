@@ -2,6 +2,7 @@ from dp_wizard.utils.code_generators._template import Template
 
 
 name = "Histogram"
+has_bins = True
 
 
 def make_query(code_gen, identifier, accuracy_name, stats_name):

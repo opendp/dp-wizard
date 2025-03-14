@@ -5,7 +5,7 @@ import re
 
 import black
 
-from dp_wizard.analyses import histogram, get_analysis_by_name
+from dp_wizard.analyses import get_analysis_by_name
 from dp_wizard.utils.csv_helper import name_to_identifier
 from dp_wizard.utils.code_generators._template import Template
 from dp_wizard.utils.dp_helper import confidence
@@ -142,7 +142,7 @@ class _CodeGenerator(ABC):
         bin_column_names = [
             name_to_identifier(name)
             for name, plan in self.columns.items()
-            if plan.analysis_type == histogram.name
+            if get_analysis_by_name(plan.analysis_type).has_bins
         ]
 
         privacy_unit_block = make_privacy_unit_block(self.contributions)
@@ -156,7 +156,7 @@ class _CodeGenerator(ABC):
             [
                 f"{name_to_identifier(name)}_config"
                 for name, plan in self.columns.items()
-                if plan.analysis_type == histogram.name
+                if get_analysis_by_name(plan.analysis_type).has_bins
             ]
         )
         return (
