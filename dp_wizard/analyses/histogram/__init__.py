@@ -34,3 +34,18 @@ def make_output(code_gen, column_name, accuracy_name, stats_name):
         )
         .finish()
     )
+
+
+def make_report_kv(name, confidence, identifier):
+    return (
+        Template("histogram_report_kv")
+        .fill_values(
+            NAME=name,
+            CONFIDENCE=confidence,
+        )
+        .fill_expressions(
+            IDENTIFIER_STATS=f"{identifier}_stats",
+            IDENTIFIER_ACCURACY=f"{identifier}_accuracy",
+        )
+        .finish()
+    )

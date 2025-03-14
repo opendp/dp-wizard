@@ -185,30 +185,10 @@ class NotebookGenerator(_CodeGenerator):
         return f"\n# +\n{block}\n# -\n"
 
     def _make_report_kv(self, name, analysis_type):
-        match analysis_type:
-            case histogram.name:
-                return (
-                    Template("histogram_report_kv")
-                    .fill_values(
-                        NAME=name,
-                        CONFIDENCE=confidence,
-                    )
-                    .fill_expressions(
-                        IDENTIFIER_STATS=f"{name_to_identifier(name)}_stats",
-                        IDENTIFIER_ACCURACY=f"{name_to_identifier(name)}_accuracy",
-                    )
-                    .finish()
-                )
-            case mean.name:  # pragma: no cover
-                return (
-                    Template("mean_report_kv")
-                    .fill_values(
-                        NAME=name,
-                    )
-                    .finish()
-                )
-            case _:  # pragma: no cover
-                raise Exception("Unrecognized analysis")
+        analysis = get_analysis_by_name(analysis_type)
+        return analysis.make_report_kv(
+            name=name, confidence=confidence, identifier=name_to_identifier(name)
+        )
 
     def _make_extra_blocks(self):
         outputs_expression = (
