@@ -1,16 +1,12 @@
 from shiny import ui, render, module, reactive, Inputs, Outputs, Session
 from dp_wizard.app.components.outputs import demo_tooltip, hide_if, output_code_sample
-
-
-default_weight = "2"
-label_width = "10em"  # Just wide enough so the text isn't trucated.
-col_widths = {
-    # Controls stay roughly a constant width;
-    # Graph expands to fill space.
-    "sm": [4, 8],
-    "md": [3, 9],
-    "lg": [2, 10],
-}
+from dp_wizard.analyses.common import (
+    default_weight,
+    label_width,
+    col_widths,
+    weight_choices,
+    bounds_tooltip_text,
+)
 
 
 @module.ui
@@ -53,7 +49,6 @@ def mean_server(
 
     @render.ui
     def mean_preview_ui():
-        # accuracy, histogram = accuracy_histogram()
         return [
             ui.p(
                 """
@@ -68,14 +63,7 @@ def mean_server(
     def bounds_tooltip_ui():
         return demo_tooltip(
             is_demo,
-            """
-            DP requires that we limit the sensitivity to the contributions
-            of any individual. To do this, we need an estimate of the lower
-            and upper bounds for each variable. We should not look at the
-            data when estimating the bounds! In this case, we could imagine
-            that "class year" would vary between 1 and 4, and we could limit
-            "grade" to values between 50 and 100.
-            """,
+            bounds_tooltip_text,
         )
 
     @render.ui
@@ -85,11 +73,7 @@ def mean_server(
             ui.input_select(
                 "weight",
                 ["Weight", ui.output_ui("weight_tooltip_ui")],
-                choices={
-                    "1": "Less accurate",
-                    default_weight: "Default",
-                    "4": "More accurate",
-                },
+                choices=weight_choices,
                 selected=default_weight,
                 width=label_width,
             ),
