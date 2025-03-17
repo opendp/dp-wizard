@@ -51,6 +51,15 @@ def column_server(
     is_demo: bool,
     is_single_column: bool,
 ):  # pragma: no cover
+    mean.shiny.mean_server(
+        name,
+        name=name,
+        lower_bounds=lower_bounds,
+        upper_bounds=upper_bounds,
+        is_single_column=is_single_column,
+        is_demo=is_demo,
+    )
+
     @reactive.effect
     def _set_hidden_inputs():
         # TODO: Is isolate still needed?
@@ -157,25 +166,7 @@ def column_server(
                     col_widths=col_widths,  # type: ignore
                 )
             case mean.name:
-                return ui.layout_columns(
-                    [
-                        ui.input_numeric(
-                            "lower",
-                            ["Lower", ui.output_ui("bounds_tooltip_ui")],
-                            lower_bounds().get(name, 0),
-                            width=label_width,
-                        ),
-                        ui.input_numeric(
-                            "upper",
-                            "Upper",
-                            upper_bounds().get(name, 10),
-                            width=label_width,
-                        ),
-                        ui.output_ui("optional_weight_ui"),
-                    ],
-                    ui.output_ui("mean_preview_ui"),
-                    col_widths=col_widths,  # type: ignore
-                )
+                return mean.shiny.mean_ui(name)
 
     @render.ui
     def bounds_tooltip_ui():
@@ -257,19 +248,6 @@ def column_server(
                 ),
                 output_code_sample("Column Definition", "column_code"),
             ),
-        ]
-
-    @render.ui
-    def mean_preview_ui():
-        # accuracy, histogram = accuracy_histogram()
-        return [
-            ui.p(
-                """
-                Since the mean is just a single number,
-                there is not a preview visualization.
-                """
-            ),
-            output_code_sample("Column Definition", "column_code"),
         ]
 
     @render.data_frame
