@@ -4,6 +4,10 @@ from dp_wizard.utils.code_generators import CodeGenerator
 
 
 class Analysis(Protocol):  # pragma: no cover
+    # There should also be a "name".
+    # @property can't be combined with @staticmethod,
+    # so we can't make that explicit here.
+
     @staticmethod
     def has_bins() -> bool: ...
 
