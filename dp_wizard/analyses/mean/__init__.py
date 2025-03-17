@@ -2,7 +2,10 @@ from dp_wizard.utils.code_generators._template import Template
 
 
 name = "Mean"
-has_bins = False
+
+
+def has_bins():
+    return False
 
 
 def make_query(code_gen, identifier, accuracy_name, stats_name):

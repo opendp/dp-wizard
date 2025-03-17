@@ -5,7 +5,6 @@ import re
 
 import black
 
-from dp_wizard.analyses import get_analysis_by_name
 from dp_wizard.utils.csv_helper import name_to_identifier
 from dp_wizard.utils.code_generators._template import Template
 from dp_wizard.utils.dp_helper import confidence
@@ -27,7 +26,7 @@ class AnalysisPlan(NamedTuple):
     columns: dict[str, AnalysisPlanColumn]
 
 
-class _CodeGenerator(ABC):
+class CodeGenerator(ABC):
     root_template = "placeholder"
 
     def __init__(self, analysis_plan: AnalysisPlan):
@@ -121,6 +120,8 @@ class _CodeGenerator(ABC):
         accuracy_name = f"{identifier}_accuracy"
         stats_name = f"{identifier}_stats"
 
+        from dp_wizard.analyses import get_analysis_by_name
+
         analysis = get_analysis_by_name(plan.analysis_type)
         query = analysis.make_query(
             code_gen=self,
@@ -139,10 +140,13 @@ class _CodeGenerator(ABC):
 
     def _make_partial_context(self):
         weights = [column.weight for column in self.columns.values()]
+
+        from dp_wizard.analyses import get_analysis_by_name
+
         bin_column_names = [
             name_to_identifier(name)
             for name, plan in self.columns.items()
-            if get_analysis_by_name(plan.analysis_type).has_bins
+            if get_analysis_by_name(plan.analysis_type).has_bins()
         ]
 
         privacy_unit_block = make_privacy_unit_block(self.contributions)
@@ -156,7 +160,7 @@ class _CodeGenerator(ABC):
             [
                 f"{name_to_identifier(name)}_config"
                 for name, plan in self.columns.items()
-                if get_analysis_by_name(plan.analysis_type).has_bins
+                if get_analysis_by_name(plan.analysis_type).has_bins()
             ]
         )
         return (
@@ -175,7 +179,7 @@ class _CodeGenerator(ABC):
         )
 
 
-class NotebookGenerator(_CodeGenerator):
+class NotebookGenerator(CodeGenerator):
     root_template = "notebook"
 
     def _make_context(self):
@@ -185,6 +189,8 @@ class NotebookGenerator(_CodeGenerator):
         return f"\n# +\n{block}\n# -\n"
 
     def _make_report_kv(self, name, analysis_type):
+        from dp_wizard.analyses import get_analysis_by_name
+
         analysis = get_analysis_by_name(analysis_type)
         return analysis.make_report_kv(
             name=name, confidence=confidence, identifier=name_to_identifier(name)
@@ -217,7 +223,7 @@ class NotebookGenerator(_CodeGenerator):
         return {"REPORTS_BLOCK": reports_block}
 
 
-class ScriptGenerator(_CodeGenerator):
+class ScriptGenerator(CodeGenerator):
     root_template = "script"
 
     def _make_context(self):
@@ -250,6 +256,8 @@ def make_column_config_block(
     upper_bound: float,
     bin_count: int,
 ):
+    from dp_wizard.analyses import get_analysis_by_name
+
     return get_analysis_by_name(analysis_type).make_column_config_block(
         column_name=name,
         lower_bound=lower_bound,
