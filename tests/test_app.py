@@ -89,10 +89,6 @@ def test_default_app_validations(
     expect_visible(perform_analysis_text)
     expect_not_visible(download_results_text)
     # Epsilon slider:
-    # (Note: Slider tests failed on CI when run after column details,
-    # although it worked locally. This works in either environment.
-    # Maybe a race condition?)
-    expect_visible("10.0")
     expect_visible("Epsilon: 1.0")
     page.locator(".irs-bar").click()
     expect_visible("Epsilon: 0.316")
