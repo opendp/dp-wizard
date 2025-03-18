@@ -40,6 +40,9 @@ def make_report_kv(name, confidence, identifier):
         .fill_values(
             NAME=name,
         )
+        .fill_expressions(
+            IDENTIFIER_STATS=f"{identifier}_stats",
+        )
         .finish()
     )
 
