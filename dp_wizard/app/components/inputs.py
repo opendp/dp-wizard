@@ -3,27 +3,39 @@ from shiny import ui
 
 
 def log_slider(id: str, lower: float, upper: float):
-    # Rather than engineer a new widget, hide the numbers we don't want.
+    # Rather than engineer a new widget, hide the numbers we don't want,
+    # and insert the log values via CSS.
+    # "display" and "visibility" were also hiding the content provided via CSS,
+    # but "font-size" seems to work.
+    #
     # The rendered widget doesn't have a unique ID, but the following
     # element does, so we can use some fancy CSS to get the preceding element.
     # Long term solution is just to make our own widget.
-    return (
-        ui.tags.table(
-            ui.HTML(
-                f"""
+    return [
+        ui.HTML(
+            f"""
 <style>
-.irs:has(+ #{id}) .irs-min, .irs-max, .irs-single {{
-    display: none;
+.irs:has(+ #{id}) .irs-single {{
+    visibility: hidden;
+}}
+
+.irs:has(+ #{id}) .irs-min {{
+    font-size: 0;
+}}
+.irs:has(+ #{id}) .irs-min::before {{
+    content: "{lower}";
+    font-size: 12px;
+}}
+
+.irs:has(+ #{id}) .irs-max {{
+    font-size: 0;
+}}
+.irs:has(+ #{id}) .irs-max::after {{
+    content: "{upper}";
+    font-size: 12px;
 }}
 </style>
 """
-            ),
-            ui.tags.tr(
-                ui.tags.td(lower),
-                ui.tags.td(
-                    ui.input_slider(id, None, log10(lower), log10(upper), 0, step=0.1),
-                ),
-                ui.tags.td(upper),
-            ),
         ),
-    )
+        ui.input_slider(id, None, log10(lower), log10(upper), 0, step=0.1),
+    ]
