@@ -206,8 +206,14 @@ def analysis_server(
                 new_column_ids = list(set(column_ids) - {column_id})
                 print(f"new columns: {new_column_ids}")
 
-                # TODO: This doesn't seem to work inside the shiny module:
+                # TODO: Trying to follow the pattern from
+                #   https://shiny.posit.co/py/docs/module-communication.html
+                #   #passing-callbacks-to-modules
+                # This doesn't seem to work inside the shiny module:
                 # The UI does not update.
+                # Shiny doesn't error when there is an ID mismatch
+                # (major annoyance!) so maybe it is being namespaced?
+                # The example only involves reactive values.
                 ui.update_selectize(
                     "columns_selectize",
                     label=None,
