@@ -63,9 +63,9 @@ def column_server(
         analysis_types.set({**analysis_types(), name: input.analysis_type()})
 
     @reactive.effect
-    @reactive.event(input.lower)
-    def _set_lower():
-        lower_bounds.set({**lower_bounds(), name: float(input.lower())})
+    @reactive.event(input.lower_bound)
+    def _set_lower_bound():
+        lower_bounds.set({**lower_bounds(), name: float(input.lower_bound())})
 
     @reactive.effect
     @reactive.event(input.upper)
@@ -84,7 +84,7 @@ def column_server(
 
     @reactive.calc()
     def accuracy_histogram():
-        lower_x = float(input.lower())
+        lower_x = float(input.lower_bound())
         upper_x = float(input.upper())
         bin_count = int(input.bins())
         weight = float(input.weight())
@@ -109,7 +109,7 @@ def column_server(
             lf=lf,
             column_name=name,
             row_count=row_count,
-            lower=lower_x,
+            lower_bound=lower_x,
             upper=upper_x,
             bin_count=bin_count,
             contributions=contributions,
@@ -134,7 +134,7 @@ def column_server(
                 return ui.layout_columns(
                     [
                         ui.input_numeric(
-                            "lower",
+                            "lower_bound",
                             ["Lower", ui.output_ui("bounds_tooltip_ui")],
                             lower_bounds().get(name, 0),
                             width=label_width,
@@ -160,7 +160,7 @@ def column_server(
                 return ui.layout_columns(
                     [
                         ui.input_numeric(
-                            "lower",
+                            "lower_bound",
                             ["Lower", ui.output_ui("bounds_tooltip_ui")],
                             lower_bounds().get(name, 0),
                             width=label_width,
@@ -237,7 +237,7 @@ def column_server(
         return make_column_config_block(
             name=name,
             analysis_type=input.analysis_type(),
-            lower_bound=float(input.lower()),
+            lower_bound=float(input.lower_bound()),
             upper_bound=float(input.upper()),
             bin_count=int(input.bins()),
         )
