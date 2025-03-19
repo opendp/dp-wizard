@@ -72,7 +72,7 @@ class CodeGenerator(ABC):
         margins = (
             [
                 f"""
-            # "max_partition_length" should be a loose upper bound,
+            # "max_partition_length" should be a loose upper_bound bound,
             # for example, the size of the total population being sampled.
             # https://docs.opendp.org/en/stable/api/python/opendp.extras.polars.html#opendp.extras.polars.Margin.max_partition_length
             dp.polars.Margin(by=[{groups_str}], public_info='lengths', max_partition_length=1000000, max_num_partitions=100),

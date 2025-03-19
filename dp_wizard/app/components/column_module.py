@@ -63,14 +63,14 @@ def column_server(
         analysis_types.set({**analysis_types(), name: input.analysis_type()})
 
     @reactive.effect
-    @reactive.event(input.lower)
-    def _set_lower():
-        lower_bounds.set({**lower_bounds(), name: float(input.lower())})
+    @reactive.event(input.lower_bound)
+    def _set_lower_bound():
+        lower_bounds.set({**lower_bounds(), name: float(input.lower_bound())})
 
     @reactive.effect
-    @reactive.event(input.upper)
-    def _set_upper():
-        upper_bounds.set({**upper_bounds(), name: float(input.upper())})
+    @reactive.event(input.upper_bound)
+    def _set_upper_bound():
+        upper_bounds.set({**upper_bounds(), name: float(input.upper_bound())})
 
     @reactive.effect
     @reactive.event(input.bins)
@@ -84,8 +84,8 @@ def column_server(
 
     @reactive.calc()
     def accuracy_histogram():
-        lower_x = float(input.lower())
-        upper_x = float(input.upper())
+        lower_x = float(input.lower_bound())
+        upper_x = float(input.upper_bound())
         bin_count = int(input.bins())
         weight = float(input.weight())
         weights_sum = sum(float(weight) for weight in weights().values())
@@ -109,8 +109,8 @@ def column_server(
             lf=lf,
             column_name=name,
             row_count=row_count,
-            lower=lower_x,
-            upper=upper_x,
+            lower_bound=lower_x,
+            upper_bound=upper_x,
             bin_count=bin_count,
             contributions=contributions,
             weighted_epsilon=epsilon * weight / weights_sum,
@@ -134,20 +134,20 @@ def column_server(
                 return ui.layout_columns(
                     [
                         ui.input_numeric(
-                            "lower",
-                            ["Lower", ui.output_ui("bounds_tooltip_ui")],
+                            "lower_bound",
+                            ["Lower Bound", ui.output_ui("bounds_tooltip_ui")],
                             lower_bounds().get(name, 0),
                             width=label_width,
                         ),
                         ui.input_numeric(
-                            "upper",
-                            "Upper",
+                            "upper_bound",
+                            "Upper Bound",
                             upper_bounds().get(name, 10),
                             width=label_width,
                         ),
                         ui.input_numeric(
                             "bins",
-                            ["Bins", ui.output_ui("bins_tooltip_ui")],
+                            ["Bin Count", ui.output_ui("bins_tooltip_ui")],
                             bin_counts().get(name, 10),
                             width=label_width,
                         ),
@@ -160,13 +160,13 @@ def column_server(
                 return ui.layout_columns(
                     [
                         ui.input_numeric(
-                            "lower",
+                            "lower_bound",
                             ["Lower", ui.output_ui("bounds_tooltip_ui")],
                             lower_bounds().get(name, 0),
                             width=label_width,
                         ),
                         ui.input_numeric(
-                            "upper",
+                            "upper_bound",
                             "Upper",
                             upper_bounds().get(name, 10),
                             width=label_width,
@@ -237,8 +237,8 @@ def column_server(
         return make_column_config_block(
             name=name,
             analysis_type=input.analysis_type(),
-            lower_bound=float(input.lower()),
-            upper_bound=float(input.upper()),
+            lower_bound=float(input.lower_bound()),
+            upper_bound=float(input.upper_bound()),
             bin_count=int(input.bins()),
         )
 

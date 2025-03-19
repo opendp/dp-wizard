@@ -97,7 +97,7 @@ def _get_args():
     return args
 
 
-def _clip(n: float, lower: float, upper: float) -> float:
+def _clip(n: float, lower_bound: float, upper_bound: float) -> float:
     """
     >>> _clip(-5, 0, 10)
     0
@@ -106,7 +106,7 @@ def _clip(n: float, lower: float, upper: float) -> float:
     >>> _clip(15, 0, 10)
     10
     """
-    return max(min(n, upper), lower)
+    return max(min(n, upper_bound), lower_bound)
 
 
 class CLIInfo(NamedTuple):

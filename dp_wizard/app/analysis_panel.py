@@ -258,7 +258,7 @@ def analysis_server(
     @render.ui
     def download_results_button_ui():
         button = ui.input_action_button(
-            "go_to_results", "Download results", disabled=not button_enabled()
+            "go_to_results", "Download Results", disabled=not button_enabled()
         )
 
         if button_enabled():
