@@ -1,4 +1,5 @@
 from logging import info
+from collections.abc import Callable
 
 from htmltools.tags import details, summary
 from shiny import ui, render, module, reactive, Inputs, Outputs, Session
@@ -22,7 +23,12 @@ label_width = "10em"  # Just wide enough so the text isn't trucated.
 @module.ui
 def column_ui():  # pragma: no cover
     return ui.card(
-        ui.card_header(ui.output_text("card_header")),
+        ui.card_header(
+            [
+                ui.output_text("card_header"),
+                ui.input_action_button("close", "Close"),
+            ]
+        ),
         ui.input_select(
             "analysis_type",
             None,
@@ -38,6 +44,7 @@ def column_server(
     input: Inputs,
     output: Outputs,
     session: Session,
+    remove_column: Callable[[], None],
     public_csv_path: str,
     name: str,
     contributions: int,
@@ -51,6 +58,11 @@ def column_server(
     is_demo: bool,
     is_single_column: bool,
 ):  # pragma: no cover
+    @reactive.effect
+    @reactive.event(input.close)
+    def close():
+        remove_column()
+
     @reactive.effect
     def _set_hidden_inputs():
         # TODO: Is isolate still needed?
