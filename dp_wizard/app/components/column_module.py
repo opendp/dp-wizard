@@ -135,19 +135,19 @@ def column_server(
                     [
                         ui.input_numeric(
                             "lower_bound",
-                            ["Lower", ui.output_ui("bounds_tooltip_ui")],
+                            ["Lower Bound", ui.output_ui("bounds_tooltip_ui")],
                             lower_bounds().get(name, 0),
                             width=label_width,
                         ),
                         ui.input_numeric(
                             "upper_bound",
-                            "Upper",
+                            "Upper Bound",
                             upper_bounds().get(name, 10),
                             width=label_width,
                         ),
                         ui.input_numeric(
                             "bins",
-                            ["Bins", ui.output_ui("bins_tooltip_ui")],
+                            ["Bin Count", ui.output_ui("bins_tooltip_ui")],
                             bin_counts().get(name, 10),
                             width=label_width,
                         ),
