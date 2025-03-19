@@ -199,8 +199,25 @@ def analysis_server(
         column_ids = input.columns_selectize()
         column_ids_to_names = csv_ids_names_calc()
         for column_id in column_ids:
+
+            def remove_column():
+                column_ids = input.columns_selectize()
+                print(f"old columns: {column_ids}")
+                new_column_ids = list(set(column_ids) - {column_id})
+                print(f"new columns: {new_column_ids}")
+
+                # TODO: This doesn't seem to work inside the shiny module:
+                # The UI does not update.
+                ui.update_selectize(
+                    "columns_selectize",
+                    label=None,
+                    choices=csv_ids_labels_calc(),
+                    selected=new_column_ids,
+                )
+
             column_server(
                 column_id,
+                remove_column=remove_column,
                 public_csv_path=public_csv_path(),
                 name=column_ids_to_names[column_id],
                 contributions=contributions(),
@@ -214,7 +231,23 @@ def analysis_server(
                 is_demo=is_demo,
                 is_single_column=len(column_ids) == 1,
             )
-        return [column_ui(column_id) for column_id in column_ids]
+        return [
+            # TODO: Remove the action button here,
+            # unless we can parameterize it?
+            [ui.input_action_button("close", "Close"), column_ui(column_id)]
+            for column_id in column_ids
+        ]
+
+    @reactive.effect
+    @reactive.event(input.close)
+    def close():
+        # TODO: Somehow parameterize this to just remove one?
+        ui.update_selectize(
+            "columns_selectize",
+            label=None,
+            choices=csv_ids_labels_calc(),
+            selected=[],
+        )
 
     @reactive.calc
     def csv_ids_names_calc():
