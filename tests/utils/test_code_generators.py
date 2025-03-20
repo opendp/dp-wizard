@@ -270,7 +270,7 @@ plans = [
         # Single:
         {"hw-number": histogram_plan_column},
         {"hw-number": mean_plan_column},
-        # {"hw-number": median_plan_column},
+        {"hw-number": median_plan_column},
         # Multiple (might be expanded):
         {"hw-number": histogram_plan_column, "grade": mean_plan_column},
     ]
