@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from dp_wizard.utils.code_generators import CodeGenerator
+from dp_wizard.utils.code_generators.abc import CodeGenerator
 
 
 class Analysis(Protocol):  # pragma: no cover

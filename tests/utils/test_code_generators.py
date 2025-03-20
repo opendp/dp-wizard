@@ -7,11 +7,11 @@ import opendp.prelude as dp
 from dp_wizard.analyses import histogram, mean
 from dp_wizard.utils.code_generators import (
     make_column_config_block,
-    ScriptGenerator,
-    NotebookGenerator,
     AnalysisPlan,
     AnalysisPlanColumn,
 )
+from dp_wizard.utils.code_generators.notebook import NotebookGenerator
+from dp_wizard.utils.code_generators.script import ScriptGenerator
 
 
 def test_make_column_config_block_for_unrecognized():
