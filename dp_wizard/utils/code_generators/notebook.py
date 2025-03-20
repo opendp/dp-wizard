@@ -17,7 +17,7 @@ class NotebookGenerator(CodeGenerator):
         return f"\n# +\n{block}\n# -\n"
 
     def _make_report_kv(self, name, analysis_type):
-        from dp_wizard.analyses import get_analysis_by_name
+        from dp_wizard.utils.code_generators.analyses import get_analysis_by_name
 
         analysis = get_analysis_by_name(analysis_type)
         return analysis.make_report_kv(

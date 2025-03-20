@@ -44,7 +44,7 @@ def make_column_config_block(
     upper_bound: float,
     bin_count: int,
 ):
-    from dp_wizard.analyses import get_analysis_by_name
+    from dp_wizard.utils.code_generators.analyses import get_analysis_by_name
 
     return get_analysis_by_name(analysis_type).make_column_config_block(
         column_name=name,

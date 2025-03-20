@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 import opendp.prelude as dp
 
-from dp_wizard.analyses import histogram, mean
+from dp_wizard.utils.code_generators.analyses import histogram, mean
 from dp_wizard.utils.code_generators import (
     make_column_config_block,
     AnalysisPlan,

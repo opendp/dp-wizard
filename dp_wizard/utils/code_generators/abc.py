@@ -111,7 +111,7 @@ class CodeGenerator(ABC):
         accuracy_name = f"{identifier}_accuracy"
         stats_name = f"{identifier}_stats"
 
-        from dp_wizard.analyses import get_analysis_by_name
+        from dp_wizard.utils.code_generators.analyses import get_analysis_by_name
 
         analysis = get_analysis_by_name(plan.analysis_type)
         query = analysis.make_query(
@@ -132,7 +132,7 @@ class CodeGenerator(ABC):
     def _make_partial_context(self):
         weights = [column.weight for column in self.columns.values()]
 
-        from dp_wizard.analyses import get_analysis_by_name
+        from dp_wizard.utils.code_generators.analyses import get_analysis_by_name
 
         bin_column_names = [
             name_to_identifier(name)
