@@ -6,7 +6,7 @@ import re
 import black
 
 from dp_wizard.utils.csv_helper import name_to_identifier
-from dp_wizard.utils.code_generators._template import Template
+from dp_wizard.utils.code_template import Template
 from dp_wizard.utils.dp_helper import confidence
 
 
@@ -50,12 +50,12 @@ class CodeGenerator(ABC):
 
     def make_py(self):
         code = (
-            Template(self.root_template)
+            Template(self.root_template, __file__)
             .fill_expressions(
                 DEPENDENCIES="'opendp[polars]==0.12.1a20250227001' matplotlib"
             )
             .fill_blocks(
-                IMPORTS_BLOCK=Template("imports").finish(),
+                IMPORTS_BLOCK=Template("imports", __file__).finish(),
                 UTILS_BLOCK=(Path(__file__).parent.parent / "shared.py").read_text(),
                 COLUMNS_BLOCK=self._make_columns(),
                 CONTEXT_BLOCK=self._make_context(),
@@ -164,7 +164,7 @@ class CodeGenerator(ABC):
             ]
         )
         return (
-            Template("context")
+            Template("context", __file__)
             .fill_expressions(
                 MARGINS_LIST=margins_list,
                 EXTRA_COLUMNS=extra_columns,
@@ -207,7 +207,7 @@ class NotebookGenerator(CodeGenerator):
         )
         tmp_path = Path(__file__).parent.parent.parent / "tmp"
         reports_block = (
-            Template("reports")
+            Template("reports", __file__)
             .fill_expressions(
                 OUTPUTS=outputs_expression,
                 COLUMNS={k: v._asdict() for k, v in self.columns.items()},
@@ -242,11 +242,15 @@ class ScriptGenerator(CodeGenerator):
 
 
 def make_privacy_unit_block(contributions: int):
-    return Template("privacy_unit").fill_values(CONTRIBUTIONS=contributions).finish()
+    return (
+        Template("privacy_unit", __file__)
+        .fill_values(CONTRIBUTIONS=contributions)
+        .finish()
+    )
 
 
 def make_privacy_loss_block(epsilon: float):
-    return Template("privacy_loss").fill_values(EPSILON=epsilon).finish()
+    return Template("privacy_loss", __file__).fill_values(EPSILON=epsilon).finish()
 
 
 def make_column_config_block(

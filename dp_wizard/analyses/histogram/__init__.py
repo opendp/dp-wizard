@@ -1,4 +1,4 @@
-from dp_wizard.utils.code_generators._template import Template
+from dp_wizard.utils.code_template import Template
 
 
 name = "Histogram"
