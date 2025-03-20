@@ -1,4 +1,4 @@
-from dp_wizard.utils.code_generators._template import Template
+from dp_wizard.utils.code_template import Template
 
 
 name = "Histogram"
@@ -56,9 +56,9 @@ def make_report_kv(name, confidence, identifier):
 
 
 def make_column_config_block(column_name, lower_bound, upper_bound, bin_count):
-    from dp_wizard.utils.code_generators import _snake_case
+    from dp_wizard.utils.code_generators import snake_case
 
-    snake_name = _snake_case(column_name)
+    snake_name = snake_case(column_name)
     return (
         Template("histogram_config", __file__)
         .fill_expressions(
