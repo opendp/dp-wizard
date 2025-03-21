@@ -11,7 +11,8 @@ def get_statements(func):
     indent = re.search(r"^\s*", body_lines[0])
     assert indent is not None  # it might be zero length, but there will be a match.
     unindented_lines = [line.replace(indent.group(0), "", 1) for line in body_lines]
-    return "\n".join(unindented_lines)
+    unindented_body = "\n".join(unindented_lines)
+    return re.sub(r"\s*# type: ignore", "", unindented_body)
 
 
 class Template:
@@ -25,7 +26,7 @@ class Template:
                 raise Exception('"path" and "template" are mutually exclusive')
             self._path = "template-instead-of-path"
             if callable(template):
-                self._template = get_statements(template)
+                self._template = get_statements(template)  # pragma: no cover
             else:
                 self._template = template
         # We want a list of the initial slots, because substitutions
