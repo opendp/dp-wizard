@@ -2,6 +2,7 @@ from math import pow
 from typing import Iterable, Any
 from pathlib import Path
 
+from htmltools import tags
 from shiny import ui, reactive, render, req, Inputs, Outputs, Session
 
 from dp_wizard.app.components.inputs import log_slider
@@ -56,9 +57,8 @@ def analysis_ui():
                     but have a greater risk of revealing individual data.
                     """
                 ),
-                ui.output_ui("epsilon_tooltip_ui"),
                 log_slider("log_epsilon_slider", 0.1, 10.0),
-                ui.output_text("epsilon_text"),
+                ui.output_ui("epsilon_ui"),
                 output_code_sample("Privacy Loss", "privacy_loss_python"),
             ),
             ui.card(
@@ -242,9 +242,12 @@ def analysis_server(
     def _set_epsilon():
         epsilon.set(pow(10, input.log_epsilon_slider()))
 
-    @render.text
-    def epsilon_text():
-        return f"Epsilon: {epsilon():0.3}"
+    @render.ui
+    def epsilon_ui():
+        return tags.label(
+            f"Epsilon: {epsilon():0.3} ",
+            ui.output_ui("epsilon_tooltip_ui"),
+        )
 
     @render.code
     def privacy_loss_python():
