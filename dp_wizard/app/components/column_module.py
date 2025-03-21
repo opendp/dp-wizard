@@ -21,28 +21,29 @@ label_width = "10em"  # Just wide enough so the text isn't trucated.
 
 def get_float_error(number_str):
     """
-    >>> get_error('0')
-    >>> get_error('')
+    >>> get_float_error('0')
+    >>> get_float_error('')
     'is required'
-    >>> get_error('1.1')
-    >>> get_error('nan')
+    >>> get_float_error('1.1')
+    >>> get_float_error('nan')
     'should be a number'
-    >>> get_error('inf')
+    >>> get_float_error('inf')
     'should be a number'
     """
     if number_str == "":
         return "is required"
     else:
         try:
-            number = int(float(number_str))
+            int(float(number_str))
         except (TypeError, ValueError, OverflowError):
             return "should be a number"
     return None
 
 
-def error_md_ui(markdown):
+def error_md_ui(markdown):  # pragma: no cover
     return div(ui.markdown(markdown)).add_class(
-        "p-3 text-primary-emphasis bg-primary-subtle border border-primary-subtle rounded-3"
+        "p-3 text-primary-emphasis bg-primary-subtle "
+        "border border-primary-subtle rounded-3"
     )
 
 
