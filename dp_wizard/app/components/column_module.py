@@ -1,6 +1,6 @@
 from logging import info
 
-from htmltools.tags import details, summary, div
+from htmltools.tags import details, summary
 from shiny import ui, render, module, reactive, Inputs, Outputs, Session
 from shiny.types import SilentException
 import polars as pl
@@ -9,7 +9,12 @@ from dp_wizard.analyses import histogram, mean
 from dp_wizard.utils.dp_helper import make_accuracy_histogram
 from dp_wizard.utils.shared import plot_histogram
 from dp_wizard.utils.code_generators import make_column_config_block
-from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip, hide_if
+from dp_wizard.app.components.outputs import (
+    output_code_sample,
+    demo_tooltip,
+    info_md_box,
+    hide_if,
+)
 from dp_wizard.utils.dp_helper import confidence
 from dp_wizard.utils.mock_data import mock_data, ColumnDef
 
@@ -41,10 +46,7 @@ def get_float_error(number_str):
 
 
 def error_md_ui(markdown):  # pragma: no cover
-    return div(ui.markdown(markdown)).add_class(
-        "p-3 text-primary-emphasis bg-primary-subtle "
-        "border border-primary-subtle rounded-3"
-    )
+    return info_md_box(markdown)
 
 
 @module.ui

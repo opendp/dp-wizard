@@ -24,5 +24,5 @@ def hide_if(condition: bool, el):  # pragma: no cover
     return ui.div(el, style=f"display: {display};")
 
 
-def info_box(content):  # pragma: no cover
-    return ui.div(content, class_="alert alert-info", role="alert")
+def info_md_box(markdown):  # pragma: no cover
+    return ui.div(ui.markdown(markdown), class_="alert alert-info", role="alert")
