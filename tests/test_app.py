@@ -57,7 +57,7 @@ def test_default_app_validations(
     expect_not_visible(perform_analysis_text)
     expect_not_visible(download_results_text)
     page.get_by_label("Contributions").fill("42")
-    page.get_by_text("Code sample: Unit of Privacy").click()
+    page.get_by_text("Code sample").click()
     expect_visible("contributions = 42")
     expect_no_error()
 

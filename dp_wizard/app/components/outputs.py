@@ -1,21 +1,21 @@
-from htmltools.tags import details, summary, span, table, tr, td
+from htmltools import tags
 from shiny import ui
 from faicons import icon_svg
 
 
 def output_code_sample(title, name_of_render_function: str):
-    return table(
-        tr(
-            td(title).add_style(
+    return tags.table(
+        tags.tr(
+            tags.td(title).add_style(
                 """
                 width: 0;
                 white-space: nowrap;
                 padding-right: 1em;
                 vertical-align: top;"""
             ),
-            td(
-                details(
-                    summary(f"Code sample"),
+            tags.td(
+                tags.details(
+                    tags.summary("Code sample"),
                     ui.output_code(name_of_render_function),
                 )
             ),

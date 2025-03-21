@@ -251,11 +251,11 @@ def column_server(
                 ui.markdown(
                     f"The {confidence:.0%} confidence interval is ±{accuracy:.3g}."
                 ),
+                output_code_sample("Column Definition", "column_code"),
                 details(
                     summary("Data Table"),
                     ui.output_data_frame("data_frame"),
                 ),
-                output_code_sample("Column Definition", "column_code"),
             ),
         ]
 
