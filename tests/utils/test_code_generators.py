@@ -2,6 +2,7 @@ from tempfile import NamedTemporaryFile
 import subprocess
 from pathlib import Path
 import pytest
+import re
 import opendp.prelude as dp
 
 from dp_wizard.analyses import histogram, mean, median
@@ -279,7 +280,8 @@ plans = [
 
 def id_for_plan(plan: AnalysisPlan):
     columns = ", ".join(f"{v.analysis_type} of {k}" for k, v in plan.columns.items())
-    return f"{columns}; grouped by ({', '.join(plan.groups)})"
+    description = f"{columns}; grouped by ({', '.join(plan.groups) or 'nothing'})"
+    return re.sub(r"\W+", "_", description)  # For selection with "pytest -k substring"
 
 
 @pytest.mark.parametrize("plan", plans, ids=id_for_plan)
