@@ -2,7 +2,7 @@ import re
 from pathlib import Path
 
 
-def get_statements(func):
+def get_body(func):
     import inspect
     import re
 
@@ -26,7 +26,7 @@ class Template:
                 raise Exception('"path" and "template" are mutually exclusive')
             self._path = "template-instead-of-path"
             if callable(template):
-                self._template = get_statements(template)  # pragma: no cover
+                self._template = get_body(template)  # pragma: no cover
             else:
                 self._template = template
         # We want a list of the initial slots, because substitutions

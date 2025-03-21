@@ -15,17 +15,17 @@ from dp_wizard.utils.code_generators import (
 )
 
 
-def test_get_statements():
-    from dp_wizard.utils.code_generators._template import get_statements
+def test_get_body():
+    from dp_wizard.utils.code_generators._template import get_body
 
-    def fake(do_something, done, BLOCK):
+    def template(do_something, done, BLOCK):
         for i in range(10):
             do_something(i)
             BLOCK  # type: ignore
         done()
 
     assert (
-        get_statements(fake)
+        get_body(template)
         == """for i in range(10):
     do_something(i)
     BLOCK
