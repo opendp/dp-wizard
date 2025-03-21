@@ -226,17 +226,6 @@ def analysis_server(
     def csv_ids_labels_calc():
         return read_csv_ids_labels(Path(req(public_csv_path() or private_csv_path())))
 
-    @render.ui
-    def epsilon_tooltip_ui():
-        return demo_tooltip(
-            is_demo,
-            """
-            If you set epsilon above one, you'll see that the distribution
-            becomes less noisy, and the confidence intervals become smaller...
-            but increased accuracy risks revealing personal information.
-            """,
-        )
-
     @reactive.effect
     @reactive.event(input.log_epsilon_slider)
     def _set_epsilon():
@@ -246,7 +235,14 @@ def analysis_server(
     def epsilon_ui():
         return tags.label(
             f"Epsilon: {epsilon():0.3} ",
-            ui.output_ui("epsilon_tooltip_ui"),
+            demo_tooltip(
+                is_demo,
+                """
+                If you set epsilon above one, you'll see that the distribution
+                becomes less noisy, and the confidence intervals become smaller...
+                but increased accuracy risks revealing personal information.
+                """,
+            ),
         )
 
     @render.code
