@@ -2,9 +2,10 @@ from tempfile import NamedTemporaryFile
 import subprocess
 from pathlib import Path
 import pytest
+import re
 import opendp.prelude as dp
 
-from dp_wizard.analyses import histogram, mean
+from dp_wizard.analyses import histogram, mean, median
 from dp_wizard.utils.code_generators import (
     make_column_config_block,
     Template,
@@ -41,6 +42,28 @@ def test_make_column_config_block_for_mean():
     .fill_nan(0)
     .fill_null(0)
     .dp.mean((0, 100))
+)"""
+    )
+
+
+def test_make_column_config_block_for_median():
+    assert (
+        make_column_config_block(
+            name="HW GRADE",
+            analysis_type=median.name,
+            lower_bound=0,
+            upper_bound=100,
+            bin_count=10,
+        ).strip()
+        == """hw_grade_config = (
+    pl.col('HW GRADE')
+    .cast(float)
+    .fill_nan(0)
+    .fill_null(0)
+    .dp.quantile(0.5, make_cut_points(0, 100, bin_count=100))
+    # todo: Get the bin count from the user?
+    # or get nice round numbers?
+    # See: https://github.com/opendp/opendp/issues/1706
 )"""
     )
 
@@ -229,17 +252,29 @@ mean_plan_column = AnalysisPlanColumn(
     bin_count=0,  # Unused
     weight=4,
 )
+median_plan_column = AnalysisPlanColumn(
+    analysis_type=median.name,
+    lower_bound=5,
+    upper_bound=15,
+    bin_count=0,  # Unused
+    weight=4,
+)
 kwargs = {
     "csv_path": fake_csv,
-    "contributions": 1,
+    # TODO: Breaks for median if contributions=1
+    # https://github.com/opendp/opendp/issues/2331
+    "contributions": 2,
     "epsilon": 1,
 }
 plans = [
     AnalysisPlan(groups=groups, columns=columns, **kwargs)
     for groups in [[], ["class year"]]
     for columns in [
+        # Single:
         {"hw-number": histogram_plan_column},
         {"hw-number": mean_plan_column},
+        {"hw-number": median_plan_column},
+        # Multiple (might be expanded):
         {"hw-number": histogram_plan_column, "grade": mean_plan_column},
     ]
 ]
@@ -247,7 +282,8 @@ plans = [
 
 def id_for_plan(plan: AnalysisPlan):
     columns = ", ".join(f"{v.analysis_type} of {k}" for k, v in plan.columns.items())
-    return f"{columns}; grouped by ({', '.join(plan.groups)})"
+    description = f"{columns}; grouped by ({', '.join(plan.groups) or 'nothing'})"
+    return re.sub(r"\W+", "_", description)  # For selection with "pytest -k substring"
 
 
 @pytest.mark.parametrize("plan", plans, ids=id_for_plan)

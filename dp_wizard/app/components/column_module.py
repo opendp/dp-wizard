@@ -5,7 +5,7 @@ from shiny import ui, render, module, reactive, Inputs, Outputs, Session
 from shiny.types import SilentException
 import polars as pl
 
-from dp_wizard.analyses import histogram, mean
+from dp_wizard.analyses import histogram, mean, median
 from dp_wizard.utils.dp_helper import make_accuracy_histogram
 from dp_wizard.utils.shared import plot_histogram
 from dp_wizard.utils.code_generators import make_column_config_block
@@ -26,7 +26,7 @@ def column_ui():  # pragma: no cover
         ui.input_select(
             "analysis_type",
             None,
-            [histogram.name, mean.name],
+            [histogram.name, mean.name, median.name],
             width=label_width,
         ),
         ui.output_ui("analysis_config_ui"),
@@ -176,6 +176,26 @@ def column_server(
                     ui.output_ui("mean_preview_ui"),
                     col_widths=col_widths,  # type: ignore
                 )
+            case median.name:
+                return ui.layout_columns(
+                    [
+                        ui.input_numeric(
+                            "lower",
+                            ["Lower", ui.output_ui("bounds_tooltip_ui")],
+                            lower_bounds().get(name, 0),
+                            width=label_width,
+                        ),
+                        ui.input_numeric(
+                            "upper",
+                            "Upper",
+                            upper_bounds().get(name, 10),
+                            width=label_width,
+                        ),
+                        ui.output_ui("optional_weight_ui"),
+                    ],
+                    ui.output_ui("median_preview_ui"),
+                    col_widths=col_widths,  # type: ignore
+                )
 
     @render.ui
     def bounds_tooltip_ui():
@@ -261,11 +281,22 @@ def column_server(
 
     @render.ui
     def mean_preview_ui():
-        # accuracy, histogram = accuracy_histogram()
         return [
             ui.p(
                 """
                 Since the mean is just a single number,
+                there is not a preview visualization.
+                """
+            ),
+            output_code_sample("Column Definition", "column_code"),
+        ]
+
+    @render.ui
+    def median_preview_ui():
+        return [
+            ui.p(
+                """
+                Since the median is just a single number,
                 there is not a preview visualization.
                 """
             ),
