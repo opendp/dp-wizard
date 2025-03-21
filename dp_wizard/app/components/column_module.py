@@ -1,6 +1,6 @@
 from logging import info
 
-from htmltools.tags import details, summary
+from htmltools.tags import details, summary, div
 from shiny import ui, render, module, reactive, Inputs, Outputs, Session
 from shiny.types import SilentException
 import polars as pl
@@ -17,6 +17,33 @@ from dp_wizard.utils.mock_data import mock_data, ColumnDef
 default_analysis_type = histogram.name
 default_weight = "2"
 label_width = "10em"  # Just wide enough so the text isn't trucated.
+
+
+def get_float_error(number_str):
+    """
+    >>> get_error('0')
+    >>> get_error('')
+    'is required'
+    >>> get_error('1.1')
+    >>> get_error('nan')
+    'should be a number'
+    >>> get_error('inf')
+    'should be a number'
+    """
+    if number_str == "":
+        return "is required"
+    else:
+        try:
+            number = int(float(number_str))
+        except (TypeError, ValueError, OverflowError):
+            return "should be a number"
+    return None
+
+
+def error_md_ui(markdown):
+    return div(ui.markdown(markdown)).add_class(
+        "p-3 text-primary-emphasis bg-primary-subtle border border-primary-subtle rounded-3"
+    )
 
 
 @module.ui
@@ -232,6 +259,18 @@ def column_server(
             """,
         )
 
+    @reactive.calc
+    def error_md_calc():
+        messages = []
+        if error := get_float_error(input.lower()):
+            messages.append(f"Lower bound {error}.")
+        if error := get_float_error(input.upper()):
+            messages.append(f"Upper bound {error}.")
+        if not messages:
+            if not (input.lower() < input.upper()):
+                messages.append("Lower bound should be less than upper bound.")
+        return "\n".join(f"- {m}" for m in messages)
+
     @render.code
     def column_code():
         return make_column_config_block(
@@ -244,33 +283,39 @@ def column_server(
 
     @render.ui
     def histogram_preview_ui():
-        accuracy, histogram = accuracy_histogram()
-        return [
-            ui.output_plot("histogram_preview_plot", height="300px"),
-            ui.layout_columns(
-                ui.markdown(
-                    f"The {confidence:.0%} confidence interval is ±{accuracy:.3g}."
+        if error_md := error_md_calc():
+            return error_md_ui(error_md)
+        else:
+            accuracy, histogram = accuracy_histogram()
+            return [
+                ui.output_plot("histogram_preview_plot", height="300px"),
+                ui.layout_columns(
+                    ui.markdown(
+                        f"The {confidence:.0%} confidence interval is ±{accuracy:.3g}."
+                    ),
+                    details(
+                        summary("Data Table"),
+                        ui.output_data_frame("data_frame"),
+                    ),
+                    output_code_sample("Column Definition", "column_code"),
                 ),
-                details(
-                    summary("Data Table"),
-                    ui.output_data_frame("data_frame"),
-                ),
-                output_code_sample("Column Definition", "column_code"),
-            ),
-        ]
+            ]
 
     @render.ui
     def mean_preview_ui():
         # accuracy, histogram = accuracy_histogram()
-        return [
-            ui.p(
-                """
-                Since the mean is just a single number,
-                there is not a preview visualization.
-                """
-            ),
-            output_code_sample("Column Definition", "column_code"),
-        ]
+        if error_md := error_md_calc():
+            return error_md_ui(error_md)
+        else:
+            return [
+                ui.p(
+                    """
+                    Since the mean is just a single number,
+                    there is not a preview visualization.
+                    """
+                ),
+                output_code_sample("Column Definition", "column_code"),
+            ]
 
     @render.data_frame
     def data_frame():
