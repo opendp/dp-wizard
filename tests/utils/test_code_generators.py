@@ -261,7 +261,9 @@ median_plan_column = AnalysisPlanColumn(
 )
 kwargs = {
     "csv_path": fake_csv,
-    "contributions": 1,
+    # TODO: Breaks for median if contributions=1
+    # https://github.com/opendp/opendp/issues/2331
+    "contributions": 2,
     "epsilon": 1,
 }
 plans = [
