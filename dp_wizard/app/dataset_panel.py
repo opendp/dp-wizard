@@ -39,7 +39,7 @@ Choose both **Public CSV** and **Private CSV** {PUBLIC_PRIVATE_TEXT}"""
             ui.output_ui("csv_column_match_ui"),
         ),
         ui.card(
-            ui.card_header("Unit of privacy"),
+            ui.card_header("Unit of Privacy"),
             ui.markdown(
                 "How many rows of the CSV can one individual contribute to? "
                 'This is the "unit of privacy" which will be protected.'
