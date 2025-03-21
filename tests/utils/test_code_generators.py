@@ -15,6 +15,22 @@ from dp_wizard.utils.code_generators import (
 )
 
 
+def test_get_statements():
+    from dp_wizard.utils.code_generators._template import get_statements
+
+    def fake(do_something, done):
+        for i in range(10):
+            do_something(i)
+        done()
+
+    assert (
+        get_statements(fake)
+        == """for i in range(10):
+    do_something(i)
+done()"""
+    )
+
+
 def test_make_column_config_block_for_unrecognized():
     with pytest.raises(Exception, match=r"Unrecognized analysis"):
         make_column_config_block(

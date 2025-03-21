@@ -2,6 +2,18 @@ import re
 from pathlib import Path
 
 
+def get_statements(func):
+    import inspect
+    import re
+
+    # assumes the def is one line, but simpler than parsing and unparsing with AST.
+    body_lines = inspect.getsource(func).splitlines()[1:]
+    indent = re.search(r"^\s*", body_lines[0])
+    assert indent is not None  # it might be zero length, but there will be a match.
+    unindented_lines = [line.replace(indent.group(0), "", 1) for line in body_lines]
+    return "\n".join(unindented_lines)
+
+
 class Template:
     def __init__(self, path, root=__file__, template=None):
         if path is not None:
@@ -12,7 +24,10 @@ class Template:
             if path is not None:
                 raise Exception('"path" and "template" are mutually exclusive')
             self._path = "template-instead-of-path"
-            self._template = template
+            if callable(template):
+                self._template = get_statements(template)
+            else:
+                self._template = template
         # We want a list of the initial slots, because substitutions
         # can produce sequences of upper case letters that could be mistaken for slots.
         self._initial_slots = self._find_slots()
