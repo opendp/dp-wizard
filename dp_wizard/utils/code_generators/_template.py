@@ -2,7 +2,7 @@ import re
 from pathlib import Path
 
 
-def get_body(func):
+def _get_body(func):
     import inspect
     import re
 
@@ -16,17 +16,17 @@ def get_body(func):
 
 
 class Template:
-    def __init__(self, path, root=__file__, template=None):
-        if path is not None:
-            self._path = f"_{path}.py"
+    def __init__(self, template, root=__file__):
+        try:
+            # TODO: Check if template is a Path, eventually.
+            # Don't want to introduce a lot of changes right now.
+            self._path = f"_{template}.py"
             template_path = Path(root).parent / "no-tests" / self._path
             self._template = template_path.read_text()
-        if template is not None:
-            if path is not None:
-                raise Exception('"path" and "template" are mutually exclusive')
+        except FileNotFoundError:
             self._path = "template-instead-of-path"
             if callable(template):
-                self._template = get_body(template)  # pragma: no cover
+                self._template = _get_body(template)  # pragma: no cover
             else:
                 self._template = template
         # We want a list of the initial slots, because substitutions
