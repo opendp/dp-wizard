@@ -12,3 +12,5 @@ branch = True
 show_missing = True
 skip_covered = True
 fail_under = 100
+exclude_also =
+    def template

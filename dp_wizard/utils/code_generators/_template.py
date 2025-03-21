@@ -2,17 +2,33 @@ import re
 from pathlib import Path
 
 
+def _get_body(func):
+    import inspect
+    import re
+
+    # assumes the def is one line, but simpler than parsing and unparsing with AST.
+    body_lines = inspect.getsource(func).splitlines()[1:]
+    indent = re.search(r"^\s*", body_lines[0])
+    assert indent is not None  # it might be zero length, but there will be a match.
+    unindented_lines = [line.replace(indent.group(0), "", 1) for line in body_lines]
+    unindented_body = "\n".join(unindented_lines)
+    return re.sub(r"\s*# type: ignore", "", unindented_body)
+
+
 class Template:
-    def __init__(self, path, root=__file__, template=None):
-        if path is not None:
-            self._path = f"_{path}.py"
+    def __init__(self, template, root=__file__):
+        try:
+            # TODO: Check if template is a Path, eventually.
+            # Don't want to introduce a lot of changes right now.
+            self._path = f"_{template}.py"
             template_path = Path(root).parent / "no-tests" / self._path
             self._template = template_path.read_text()
-        if template is not None:
-            if path is not None:
-                raise Exception('"path" and "template" are mutually exclusive')
+        except FileNotFoundError:
             self._path = "template-instead-of-path"
-            self._template = template
+            if callable(template):
+                self._template = _get_body(template)  # pragma: no cover
+            else:
+                self._template = template
         # We want a list of the initial slots, because substitutions
         # can produce sequences of upper case letters that could be mistaken for slots.
         self._initial_slots = self._find_slots()
