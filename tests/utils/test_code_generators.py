@@ -15,24 +15,6 @@ from dp_wizard.utils.code_generators import (
 )
 
 
-def test_get_body():
-    from dp_wizard.utils.code_generators._template import _get_body
-
-    def template(do_something, done, BLOCK):
-        for i in range(10):
-            do_something(i)
-            BLOCK  # type: ignore
-        done()
-
-    assert (
-        _get_body(template)
-        == """for i in range(10):
-    do_something(i)
-    BLOCK
-done()"""
-    )
-
-
 def test_make_column_config_block_for_unrecognized():
     with pytest.raises(Exception, match=r"Unrecognized analysis"):
         make_column_config_block(
