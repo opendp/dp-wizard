@@ -93,6 +93,27 @@ fixtures_path = Path(__file__).parent.parent / "fixtures"
 fake_csv = "tests/fixtures/fake.csv"
 
 
+def test_def_too_long():
+    def template(
+        BEGIN,
+        END,
+    ):
+        print(BEGIN, END)
+
+    with pytest.raises(Exception, match=r"def and parameters should fit on one line"):
+        Template(template)
+
+
+def test_def_template():
+    def template(BEGIN, END):
+        print(BEGIN, END)
+
+    assert (
+        Template(template).fill_values(BEGIN="abc", END="xyz").finish()
+        == "print('abc', 'xyz')"
+    )
+
+
 def test_fill_expressions():
     template = Template("No one VERB the ADJ NOUN!")
     filled = template.fill_expressions(

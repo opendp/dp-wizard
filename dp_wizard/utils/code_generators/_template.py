@@ -6,13 +6,17 @@ def _get_body(func):
     import inspect
     import re
 
-    # assumes the def is one line, but simpler than parsing and unparsing with AST.
-    body_lines = inspect.getsource(func).splitlines()[1:]
-    indent = re.search(r"^\s*", body_lines[0])
-    assert indent is not None  # it might be zero length, but there will be a match.
-    unindented_lines = [line.replace(indent.group(0), "", 1) for line in body_lines]
-    unindented_body = "\n".join(unindented_lines)
-    return re.sub(r"\s*# type: ignore", "", unindented_body)
+    source_lines = inspect.getsource(func).splitlines()
+    first_line = source_lines[0]
+    if not re.match(r"def \w+\(\w+(, \w+)+\):", first_line.strip()):
+        # Parsing to AST and unparsing is a more robust option,
+        # but more complicated.
+        raise Exception(f"def and parameters should fit on one line: {first_line}")
+    return re.sub(
+        r"\s*#\s+type:\s+ignore\s*",
+        "\n",
+        inspect.cleandoc("\n".join(source_lines[1:])),
+    )
 
 
 class Template:
@@ -26,7 +30,7 @@ class Template:
         except FileNotFoundError:
             self._path = "template-instead-of-path"
             if callable(template):
-                self._template = _get_body(template)  # pragma: no cover
+                self._template = _get_body(template)
             else:
                 self._template = template
         # We want a list of the initial slots, because substitutions
