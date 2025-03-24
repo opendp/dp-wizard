@@ -21,13 +21,13 @@ def _get_body(func):
 
 class Template:
     def __init__(self, template, root=__file__):
-        try:
-            # TODO: Check if template is a Path, eventually.
-            # Don't want to introduce a lot of changes right now.
-            self._path = f"_{template}.py"
-            template_path = Path(root).parent / "no-tests" / self._path
+        # TODO: Check if template is a Path, eventually.
+        # Don't want to introduce a lot of changes right now.
+        self._path = f"_{template}.py"
+        template_path = Path(root).parent / "no-tests" / self._path
+        if template_path.exists():
             self._template = template_path.read_text()
-        except FileNotFoundError:
+        else:
             self._path = "template-instead-of-path"
             if callable(template):
                 self._template = _get_body(template)
