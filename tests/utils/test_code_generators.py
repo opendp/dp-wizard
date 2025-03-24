@@ -236,7 +236,7 @@ def test_fill_blocks_not_string():
     template = Template("SOMETHING")
     with pytest.raises(
         Exception,
-        match=r"For SOMETHING in template-instead-of-path, expected string, not 123",
+        match=r"For SOMETHING in string template, expected string, not 123",
     ):
         template.fill_blocks(SOMETHING=123).finish()
 
