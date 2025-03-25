@@ -6,11 +6,11 @@ from faicons import icon_svg
 from htmltools.tags import p
 
 from dp_wizard.utils.code_generators import (
-    NotebookGenerator,
-    ScriptGenerator,
     AnalysisPlan,
     AnalysisPlanColumn,
 )
+from dp_wizard.utils.code_generators.notebook_generator import NotebookGenerator
+from dp_wizard.utils.code_generators.script_generator import ScriptGenerator
 from dp_wizard.utils.converters import (
     convert_py_to_nb,
     convert_nb_to_html,

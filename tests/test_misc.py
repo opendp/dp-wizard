@@ -27,7 +27,7 @@ def test_version():
         "pyproject.toml",
         "requirements-dev.in",
         "requirements-dev.txt",
-        "dp_wizard/utils/code_generators/__init__.py",
+        "dp_wizard/utils/code_generators/abstract_generator.py",
     ],
 )
 def test_opendp_pin(rel_path):
