@@ -23,6 +23,8 @@ def interval_bottom(interval: str):
     >>> interval_bottom("-10")
     -10.0
     """
+    # Intervals from Polars are always open on the left,
+    # so that's the only case we cover with replace().
     return float(interval.split(",")[0].replace("(", ""))
 
 
