@@ -1,4 +1,4 @@
-from dp_wizard.utils.code_generators.abc import CodeGenerator
+from dp_wizard.utils.code_generators.abstract_generator import AbstractGenerator
 from dp_wizard.utils.code_template import Template
 from dp_wizard.utils.csv_helper import name_to_identifier
 from dp_wizard.utils.dp_helper import confidence
@@ -7,7 +7,7 @@ from dp_wizard.utils.dp_helper import confidence
 from pathlib import Path
 
 
-class NotebookGenerator(CodeGenerator):
+class NotebookGenerator(AbstractGenerator):
     root_template = "notebook"
 
     def _make_context(self):

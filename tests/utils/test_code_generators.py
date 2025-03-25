@@ -10,8 +10,8 @@ from dp_wizard.utils.code_generators import (
     AnalysisPlan,
     AnalysisPlanColumn,
 )
-from dp_wizard.utils.code_generators.notebook import NotebookGenerator
-from dp_wizard.utils.code_generators.script import ScriptGenerator
+from dp_wizard.utils.code_generators.notebook_generator import NotebookGenerator
+from dp_wizard.utils.code_generators.script_generator import ScriptGenerator
 
 
 def test_make_column_config_block_for_unrecognized():

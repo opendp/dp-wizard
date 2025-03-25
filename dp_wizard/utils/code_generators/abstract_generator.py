@@ -17,7 +17,7 @@ from pathlib import Path
 from typing import Iterable
 
 
-class CodeGenerator(ABC):
+class AbstractGenerator(ABC):
     root_template = "placeholder"
 
     def __init__(self, analysis_plan: AnalysisPlan):

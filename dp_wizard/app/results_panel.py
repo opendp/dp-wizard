@@ -9,8 +9,8 @@ from dp_wizard.utils.code_generators import (
     AnalysisPlan,
     AnalysisPlanColumn,
 )
-from dp_wizard.utils.code_generators.notebook import NotebookGenerator
-from dp_wizard.utils.code_generators.script import ScriptGenerator
+from dp_wizard.utils.code_generators.notebook_generator import NotebookGenerator
+from dp_wizard.utils.code_generators.script_generator import ScriptGenerator
 from dp_wizard.utils.converters import (
     convert_py_to_nb,
     convert_nb_to_html,

@@ -1,7 +1,7 @@
-from dp_wizard.utils.code_generators.abc import CodeGenerator
+from dp_wizard.utils.code_generators.abstract_generator import AbstractGenerator
 
 
-class ScriptGenerator(CodeGenerator):
+class ScriptGenerator(AbstractGenerator):
     root_template = "script"
 
     def _make_context(self):
