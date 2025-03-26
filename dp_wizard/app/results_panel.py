@@ -246,23 +246,19 @@ def results_server(
         media_type="text/plain",
     )
     async def download_report():
-        with ui.Progress() as progress:
-            progress.set(message=wait_message)
+        def make_report():
             notebook_nb()  # Evaluate just for the side effect of creating report.
-            report_txt = (
-                Path(__file__).parent.parent / "tmp" / "report.txt"
-            ).read_text()
-            yield report_txt
+            return (Path(__file__).parent.parent / "tmp" / "report.txt").read_text()
+
+        yield make_download_or_modal_error(make_report)
 
     @render.download(
         filename="dp-wizard-report.csv",
         media_type="text/plain",
     )
     async def download_table():
-        with ui.Progress() as progress:
-            progress.set(message=wait_message)
+        def make_table():
             notebook_nb()  # Evaluate just for the side effect of creating report.
-            report_csv = (
-                Path(__file__).parent.parent / "tmp" / "report.csv"
-            ).read_text()
-            yield report_csv
+            return (Path(__file__).parent.parent / "tmp" / "report.csv").read_text()
+
+        yield make_download_or_modal_error(make_table)
