@@ -133,23 +133,26 @@ def column_server(
             case histogram.name:
                 return ui.layout_columns(
                     [
-                        ui.input_numeric(
+                        ui.input_text(
                             "lower_bound",
                             ["Lower Bound", ui.output_ui("bounds_tooltip_ui")],
-                            lower_bounds().get(name, 0),
+                            str(lower_bounds().get(name, 0)),
                             width=label_width,
+                            update_on="blur",
                         ),
-                        ui.input_numeric(
+                        ui.input_text(
                             "upper_bound",
                             "Upper Bound",
-                            upper_bounds().get(name, 10),
+                            str(upper_bounds().get(name, 10)),
                             width=label_width,
+                            update_on="blur",
                         ),
-                        ui.input_numeric(
+                        ui.input_text(
                             "bins",
                             ["Bin Count", ui.output_ui("bins_tooltip_ui")],
-                            bin_counts().get(name, 10),
+                            str(bin_counts().get(name, 10)),
                             width=label_width,
+                            update_on="blur",
                         ),
                         ui.output_ui("optional_weight_ui"),
                     ],
@@ -159,17 +162,19 @@ def column_server(
             case mean.name:
                 return ui.layout_columns(
                     [
-                        ui.input_numeric(
+                        ui.input_text(
                             "lower_bound",
                             ["Lower", ui.output_ui("bounds_tooltip_ui")],
-                            lower_bounds().get(name, 0),
+                            str(lower_bounds().get(name, 0)),
                             width=label_width,
+                            update_on="blur",
                         ),
-                        ui.input_numeric(
+                        ui.input_text(
                             "upper_bound",
                             "Upper",
-                            upper_bounds().get(name, 10),
+                            str(upper_bounds().get(name, 10)),
                             width=label_width,
+                            update_on="blur",
                         ),
                         ui.output_ui("optional_weight_ui"),
                     ],
