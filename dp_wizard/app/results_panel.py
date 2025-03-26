@@ -1,7 +1,7 @@
 from pathlib import Path
 import re
 
-from shiny import ui, render, reactive, Inputs, Outputs, Session
+from shiny import ui, render, reactive, Inputs, Outputs, Session, types
 from faicons import icon_svg
 from htmltools.tags import p
 
@@ -108,6 +108,21 @@ def results_ui():
     )
 
 
+def generate_code_or_modal_error(download_generator) -> str:
+    try:
+        with ui.Progress() as progress:
+            progress.set(message=wait_message)
+            return download_generator()
+    except Exception as e:
+        modal = ui.modal(
+            ui.pre(str(e)),
+            title="Error generating code",
+            size="xl",
+        )
+        ui.modal_show(modal)
+        raise types.SilentException("code generation")
+
+
 def results_server(
     input: Inputs,
     output: Outputs,
@@ -186,18 +201,12 @@ def results_server(
             progress.set(message=wait_message)
             yield ScriptGenerator(analysis_plan()).make_py()
 
+    @render.download(
+        filename="dp-wizard-notebook.ipynb",
+        media_type="application/x-ipynb+json",
+    )
     async def download_notebook():
-        try:
-            with ui.Progress() as progress:
-                progress.set(message=wait_message)
-                yield notebook_nb()
-        except Exception as e:
-            modal = ui.modal(
-                ui.pre(str(e)),
-                title="Error generating code",
-                easy_close=True,
-            )
-            ui.modal_show(modal)
+        yield generate_code_or_modal_error(notebook_nb)
 
     @render.download(
         filename="dp-wizard-notebook-unexecuted.ipynb",
