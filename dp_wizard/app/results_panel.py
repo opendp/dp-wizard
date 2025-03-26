@@ -186,14 +186,18 @@ def results_server(
             progress.set(message=wait_message)
             yield ScriptGenerator(analysis_plan()).make_py()
 
-    @render.download(
-        filename="dp-wizard-notebook.ipynb",
-        media_type="application/x-ipynb+json",
-    )
     async def download_notebook():
-        with ui.Progress() as progress:
-            progress.set(message=wait_message)
-            yield notebook_nb()
+        try:
+            with ui.Progress() as progress:
+                progress.set(message=wait_message)
+                yield notebook_nb()
+        except Exception as e:
+            modal = ui.modal(
+                ui.pre(str(e)),
+                title="Error generating code",
+                easy_close=True,
+            )
+            ui.modal_show(modal)
 
     @render.download(
         filename="dp-wizard-notebook-unexecuted.ipynb",
