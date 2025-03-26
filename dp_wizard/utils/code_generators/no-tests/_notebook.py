@@ -11,8 +11,6 @@
 # -
 
 # +
-1 / 0
-
 IMPORTS_BLOCK
 # -
 

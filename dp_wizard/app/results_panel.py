@@ -108,7 +108,7 @@ def results_ui():
     )
 
 
-def generate_code_or_modal_error(download_generator) -> str:
+def make_download_or_modal_error(download_generator) -> str:  # pragma: no cover
     try:
         with ui.Progress() as progress:
             progress.set(message=wait_message)
@@ -197,61 +197,49 @@ def results_server(
         media_type="text/x-python",
     )
     async def download_script():
-        with ui.Progress() as progress:
-            progress.set(message=wait_message)
-            yield ScriptGenerator(analysis_plan()).make_py()
+        yield make_download_or_modal_error(ScriptGenerator(analysis_plan()).make_py)
 
     @render.download(
         filename="dp-wizard-notebook.ipynb",
         media_type="application/x-ipynb+json",
     )
     async def download_notebook():
-        yield generate_code_or_modal_error(notebook_nb)
+        yield make_download_or_modal_error(notebook_nb)
 
     @render.download(
         filename="dp-wizard-notebook-unexecuted.ipynb",
         media_type="application/x-ipynb+json",
     )
     async def download_notebook_unexecuted():
-        with ui.Progress() as progress:
-            progress.set(message=wait_message)
-            yield notebook_nb_unexecuted()
+        yield make_download_or_modal_error(notebook_nb_unexecuted)
 
     @render.download(  # pyright: ignore
         filename="dp-wizard-notebook.html",
         media_type="text/html",
     )
     async def download_html():
-        with ui.Progress() as progress:
-            progress.set(message=wait_message)
-            yield notebook_html()
+        yield make_download_or_modal_error(notebook_html)
 
     @render.download(  # pyright: ignore
         filename="dp-wizard-notebook-unexecuted.html",
         media_type="text/html",
     )
     async def download_html_unexecuted():
-        with ui.Progress() as progress:
-            progress.set(message=wait_message)
-            yield notebook_html_unexecuted()
+        yield make_download_or_modal_error(notebook_html_unexecuted)
 
     @render.download(
         filename="dp-wizard-notebook.pdf",
         media_type="application/pdf",
     )  # pyright: ignore
     async def download_pdf():
-        with ui.Progress() as progress:
-            progress.set(message=wait_message)
-            yield notebook_pdf()
+        yield make_download_or_modal_error(notebook_pdf)
 
     @render.download(
         filename="dp-wizard-notebook.pdf",
         media_type="application/pdf",
     )  # pyright: ignore
     async def download_pdf_unexecuted():
-        with ui.Progress() as progress:
-            progress.set(message=wait_message)
-            yield notebook_pdf_unexecuted()
+        yield make_download_or_modal_error(notebook_pdf_unexecuted)
 
     @render.download(
         filename="dp-wizard-report.txt",

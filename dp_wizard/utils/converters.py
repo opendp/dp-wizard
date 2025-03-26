@@ -5,7 +5,6 @@ import subprocess
 import json
 import nbformat
 import nbconvert
-from warnings import warn
 import jupytext
 
 
