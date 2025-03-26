@@ -7,6 +7,7 @@ from dp_wizard.utils.converters import (
     _clean_nb,
     convert_nb_to_html,
     convert_nb_to_pdf,
+    ConversionException,
 )
 
 
@@ -58,18 +59,12 @@ def test_clean_nb():
 def test_convert_py_to_nb_error():
     python_str = "Invalid python!"
     with pytest.raises(
-        Exception,
-        match=(
-            r"Script to notebook conversion failed: "
-            r"jupytext --from \.py --to \.ipynb "
-            r"--output - --execute /tmp/script\.py"
-        ),
+        ConversionException,
+        # There's more, but what's most important is that
+        # the line with the error shows up in the message.
+        match=(r"Invalid python!"),
     ):
-        with pytest.warns(
-            UserWarning,
-            match=r"SyntaxError.*invalid syntax",
-        ):
-            convert_py_to_nb(python_str, execute=True)
+        convert_py_to_nb(python_str, execute=True)
 
 
 def test_convert_nb_to_html():

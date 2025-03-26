@@ -1,10 +1,10 @@
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from dataclasses import dataclass
 import subprocess
 import json
 import nbformat
 import nbconvert
-from warnings import warn
 import jupytext
 
 
@@ -15,6 +15,15 @@ def _is_kernel_installed() -> bool:
         return True
     except ValueError:  # pragma: no cover
         return False
+
+
+@dataclass(frozen=True)
+class ConversionException(Exception):
+    command: str
+    stderr: str
+
+    def __str__(self):
+        return f"Script to notebook conversion failed: {self.command}\n{self.stderr})"
 
 
 def convert_py_to_nb(python_str: str, execute: bool = False):
@@ -40,7 +49,6 @@ def convert_py_to_nb(python_str: str, execute: bool = False):
         argv.append(str(py_path.absolute()))  # type: ignore
         result = subprocess.run(argv, text=True, capture_output=True)
         if result.returncode != 0:
-            warn(result.stderr)
             # If there is an error, we want a copy of the file that will stay around,
             # outside the "with TemporaryDirectory()" block.
             # The command we show in the error message isn't exactly what was run,
@@ -49,7 +57,7 @@ def convert_py_to_nb(python_str: str, execute: bool = False):
             debug_path.write_text(python_str)
             argv.pop()
             argv.append(str(debug_path))  # type: ignore
-            raise Exception(f"Script to notebook conversion failed: {' '.join(argv)}")
+            raise ConversionException(command=" ".join(argv), stderr=result.stderr)
         return _clean_nb(result.stdout.strip())
 
 
