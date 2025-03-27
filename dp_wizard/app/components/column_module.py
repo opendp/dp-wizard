@@ -218,13 +218,13 @@ def column_server(
                     [
                         ui.input_numeric(
                             "lower_bound",
-                            ["Lower", ui.output_ui("bounds_tooltip_ui")],
+                            ["Lower Bound", ui.output_ui("bounds_tooltip_ui")],
                             lower_bounds().get(name, 0),
                             width=label_width,
                         ),
                         ui.input_numeric(
                             "upper_bound",
-                            "Upper",
+                            "Upper Bound",
                             upper_bounds().get(name, 10),
                             width=label_width,
                         ),
@@ -237,14 +237,14 @@ def column_server(
                 return ui.layout_columns(
                     [
                         ui.input_numeric(
-                            "lower",
-                            ["Lower", ui.output_ui("bounds_tooltip_ui")],
+                            "lower_bound",
+                            ["Lower Bound", ui.output_ui("bounds_tooltip_ui")],
                             lower_bounds().get(name, 0),
                             width=label_width,
                         ),
                         ui.input_numeric(
-                            "upper",
-                            "Upper",
+                            "upper_bound",
+                            "Upper Bound",
                             upper_bounds().get(name, 10),
                             width=label_width,
                         ),
