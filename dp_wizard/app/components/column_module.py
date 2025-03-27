@@ -186,28 +186,38 @@ def column_server(
             "md": [3, 9],
             "lg": [2, 10],
         }
+
+        def lower_bound_input():
+            return ui.input_numeric(
+                "lower_bound",
+                ["Lower Bound", ui.output_ui("bounds_tooltip_ui")],
+                lower_bounds().get(name, 0),
+                width=label_width,
+            )
+
+        def upper_bound_input():
+            return ui.input_numeric(
+                "upper_bound",
+                "Upper Bound",
+                upper_bounds().get(name, 10),
+                width=label_width,
+            )
+
+        def bin_count_input():
+            return ui.input_numeric(
+                "bins",
+                ["Bin Count", ui.output_ui("bins_tooltip_ui")],
+                bin_counts().get(name, 10),
+                width=label_width,
+            )
+
         match input.analysis_type():
             case histogram.name:
                 return ui.layout_columns(
                     [
-                        ui.input_numeric(
-                            "lower_bound",
-                            ["Lower Bound", ui.output_ui("bounds_tooltip_ui")],
-                            lower_bounds().get(name, 0),
-                            width=label_width,
-                        ),
-                        ui.input_numeric(
-                            "upper_bound",
-                            "Upper Bound",
-                            upper_bounds().get(name, 10),
-                            width=label_width,
-                        ),
-                        ui.input_numeric(
-                            "bins",
-                            ["Bin Count", ui.output_ui("bins_tooltip_ui")],
-                            bin_counts().get(name, 10),
-                            width=label_width,
-                        ),
+                        lower_bound_input(),
+                        upper_bound_input(),
+                        bin_count_input(),
                         ui.output_ui("optional_weight_ui"),
                     ],
                     ui.output_ui("histogram_preview_ui"),
@@ -216,18 +226,8 @@ def column_server(
             case mean.name:
                 return ui.layout_columns(
                     [
-                        ui.input_numeric(
-                            "lower_bound",
-                            ["Lower Bound", ui.output_ui("bounds_tooltip_ui")],
-                            lower_bounds().get(name, 0),
-                            width=label_width,
-                        ),
-                        ui.input_numeric(
-                            "upper_bound",
-                            "Upper Bound",
-                            upper_bounds().get(name, 10),
-                            width=label_width,
-                        ),
+                        lower_bound_input(),
+                        upper_bound_input(),
                         ui.output_ui("optional_weight_ui"),
                     ],
                     ui.output_ui("mean_preview_ui"),
@@ -236,18 +236,8 @@ def column_server(
             case median.name:
                 return ui.layout_columns(
                     [
-                        ui.input_numeric(
-                            "lower_bound",
-                            ["Lower Bound", ui.output_ui("bounds_tooltip_ui")],
-                            lower_bounds().get(name, 0),
-                            width=label_width,
-                        ),
-                        ui.input_numeric(
-                            "upper_bound",
-                            "Upper Bound",
-                            upper_bounds().get(name, 10),
-                            width=label_width,
-                        ),
+                        lower_bound_input(),
+                        upper_bound_input(),
                         ui.output_ui("optional_weight_ui"),
                     ],
                     ui.output_ui("median_preview_ui"),
