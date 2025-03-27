@@ -6,9 +6,13 @@ Even if it seems obvious in retrospect, what have we learned about Python Shiny 
 
 I can mark a button as disabled, but it doesn't seem that a `ui.input_select` can be disabled.
 
-## No warning if ID mismatch / type mismatch
+## No warning if ID mismatch
 
 Unless I'm missing something, there doesn't seem to be any warning when there isn't a matching function name in the server for an ID in the UI. Either from typos, or fumbling some more complicated display logic, there have been times where this could have been helpful.
+
+For example, in one branch had renamed `input.upper()` to `input.upper_bound()`, but in another branch a new function had also introduced a reference to `input.upper()`. Differ parts of the code, so no merge conflict, but when it tries to get the old input value it fails silently: No error on screen, and nothing in the log.
+
+## No warning if type mismatch
 
 Related: I had
 ```
