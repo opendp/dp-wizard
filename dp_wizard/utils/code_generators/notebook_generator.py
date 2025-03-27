@@ -19,7 +19,7 @@ class NotebookGenerator(AbstractGenerator):
     def _make_columns(self):
         column_config_dict = self._make_column_config_dict()
         return "\n".join(
-            f"# ### Configuration for `{name}`\n{self._make_cell(block)}"
+            f"# ### Expression for `{name}`\n{self._make_cell(block)}"
             for name, block in column_config_dict.items()
         )
 

@@ -7,11 +7,7 @@ class ScriptGenerator(AbstractGenerator):
     def _make_columns(self):
         column_config_dict = self._make_column_config_dict()
         return "\n".join(
-            f"""
-# Configuration for `{name}`
-
-{block}
-"""
+            f"# Expression for `{name}`\n{block}"
             for name, block in column_config_dict.items()
         )
 
