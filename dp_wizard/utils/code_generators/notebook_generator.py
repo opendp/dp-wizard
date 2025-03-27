@@ -16,6 +16,13 @@ class NotebookGenerator(AbstractGenerator):
     def _make_cell(self, block):
         return f"\n# +\n{block}\n# -\n"
 
+    def _make_columns(self):
+        column_config_dict = self._make_column_config_dict()
+        return "\n".join(
+            f"# ### Configuration for `{name}`\n{self._make_cell(block)}"
+            for name, block in column_config_dict.items()
+        )
+
     def _make_report_kv(self, name, analysis_type):
         from dp_wizard.utils.code_generators.analyses import get_analysis_by_name
 

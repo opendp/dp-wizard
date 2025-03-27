@@ -79,9 +79,12 @@ class AbstractGenerator(ABC):
         margins_list = "[" + "".join(margins) + "\n    ]"
         return margins_list
 
-    def _make_columns(self):
-        return "\n".join(
-            make_column_config_block(
+    @abstractmethod
+    def _make_columns(self) -> str: ...  # pragma: no cover
+
+    def _make_column_config_dict(self):
+        return {
+            name: make_column_config_block(
                 name=name,
                 analysis_type=col.analysis_type,
                 lower_bound=col.lower_bound,
@@ -89,7 +92,7 @@ class AbstractGenerator(ABC):
                 bin_count=col.bin_count,
             )
             for name, col in self.columns.items()
-        )
+        }
 
     def _make_confidence_note(self):
         return f"{int(confidence * 100)}% confidence interval"

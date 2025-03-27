@@ -76,14 +76,14 @@ def test_make_column_config_block_for_histogram():
             upper_bound=100,
             bin_count=10,
         ).strip()
-        == """# From the public information, determine the bins for 'HW GRADE':
+        == """# Use the public information to make cut points for 'HW GRADE':
 hw_grade_cut_points = make_cut_points(
     lower_bound=0,
     upper_bound=100,
     bin_count=10,
 )
 
-# Use these bins to define a Polars column:
+# Use these cut points to add a new binned column to the table:
 hw_grade_config = (
     pl.col('HW GRADE')
     .cut(hw_grade_cut_points)
