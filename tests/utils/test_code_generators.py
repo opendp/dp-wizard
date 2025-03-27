@@ -125,23 +125,35 @@ median_plan_column = AnalysisPlanColumn(
     bin_count=0,  # Unused
     weight=4,
 )
-kwargs = {
-    "csv_path": fake_csv,
-    # TODO: Breaks for median if contributions=1
-    # https://github.com/opendp/opendp/issues/2331
-    "contributions": 2,
-    "epsilon": 1,
-}
 plans = [
-    AnalysisPlan(groups=groups, columns=columns, **kwargs)
+    pytest.param(
+        AnalysisPlan(
+            groups=groups,
+            columns=columns,
+            contributions=contributions,
+            csv_path=fake_csv,
+            epsilon=1,
+        ),
+        marks=(
+            # TODO: Need to drop lengths, but currently that causes other errors.
+            pytest.mark.xfail
+            if contributions == 1 and median_plan_column in columns.values()
+            else set()
+        ),
+    )
+    for contributions in [1, 10]
     for groups in [[], ["class year"]]
     for columns in [
         # Single:
         {"hw-number": histogram_plan_column},
         {"hw-number": mean_plan_column},
         {"hw-number": median_plan_column},
-        # Multiple (might be expanded):
-        {"hw-number": histogram_plan_column, "grade": mean_plan_column},
+        # Multiple:
+        {
+            "hw-number": histogram_plan_column,
+            "hw-number": mean_plan_column,
+            "hw-number": median_plan_column,
+        },
     ]
 ]
 
