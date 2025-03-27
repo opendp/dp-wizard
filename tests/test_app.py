@@ -98,7 +98,7 @@ def test_default_app_validations(
     expect_visible("Because you've provided a public CSV")
 
     # Button disabled until column selected:
-    download_results_button = page.get_by_role("button", name="Download results")
+    download_results_button = page.get_by_role("button", name="Download Results")
     assert download_results_button.is_disabled()
 
     # Currently the only change when the estimated rows changes is the plot,
@@ -130,7 +130,7 @@ def test_default_app_validations(
     # expect(page.get_by_text("Weight")).to_have_count(2)
     # TODO: Setting more inputs without checking for updates
     # causes recalculations to pile up, and these cause timeouts on CI:
-    # It is still rerendering the graph after hitting "Download results".
+    # It is still rerendering the graph after hitting "Download Results".
     # https://github.com/opendp/dp-wizard/issues/116
     expect_no_error()
 
@@ -165,8 +165,8 @@ def test_default_app_downloads(
     page.locator(".selectize-input").nth(1).click()
     page.get_by_text("grade").nth(1).click()
 
-    # -- Download results --
-    page.get_by_role("button", name="Download results").click()
+    # -- Download Results --
+    page.get_by_role("button", name="Download Results").click()
 
     # Right now, the significant test start-up costs mean
     # it doesn't make sense to parameterize this test,

@@ -46,8 +46,10 @@ Choose both **Public CSV** and **Private CSV** {PUBLIC_PRIVATE_TEXT}"""
             ),
             ui.output_ui("input_contributions_ui"),
             ui.output_ui("contributions_validation_ui"),
-            ui.output_ui("python_tooltip_ui"),
-            output_code_sample("Unit of Privacy", "unit_of_privacy_python"),
+            output_code_sample(
+                ["Unit of Privacy", ui.output_ui("python_tooltip_ui")],
+                "unit_of_privacy_python",
+            ),
         ),
         ui.output_ui("define_analysis_button_ui"),
         value="dataset_panel",

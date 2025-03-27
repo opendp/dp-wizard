@@ -6,11 +6,11 @@ from faicons import icon_svg
 from htmltools.tags import p
 
 from dp_wizard.utils.code_generators import (
-    NotebookGenerator,
-    ScriptGenerator,
     AnalysisPlan,
     AnalysisPlanColumn,
 )
+from dp_wizard.utils.code_generators.notebook_generator import NotebookGenerator
+from dp_wizard.utils.code_generators.script_generator import ScriptGenerator
 from dp_wizard.utils.converters import (
     convert_py_to_nb,
     convert_nb_to_html,
@@ -35,8 +35,8 @@ def button(name: str, ext: str, icon: str, primary=False):
 
 def results_ui():
     return ui.nav_panel(
-        "Download results",
-        ui.h3("Download results"),
+        "Download Results",
+        ui.h3("Download Results"),
         ui.p("You can now make a differentially private release of your data."),
         # Find more icons on Font Awesome: https://fontawesome.com/search?ic=free
         ui.accordion(
