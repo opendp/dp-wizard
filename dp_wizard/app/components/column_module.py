@@ -265,12 +265,12 @@ def column_server(
     @reactive.calc
     def error_md_calc():
         messages = []
-        if error := get_float_error(input.lower()):
+        if error := get_float_error(input.lower_bound()):
             messages.append(f"Lower bound {error}.")
-        if error := get_float_error(input.upper()):
+        if error := get_float_error(input.lower_bound()):
             messages.append(f"Upper bound {error}.")
         if not messages:
-            if not (input.lower() < input.upper()):
+            if not (input.lower_bound() < input.upper_bound()):
                 messages.append("Lower bound should be less than upper bound.")
         return "\n".join(f"- {m}" for m in messages)
 

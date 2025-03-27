@@ -119,7 +119,7 @@ def test_default_app_validations(
     # Reset, and confirm:
     new_value = "20"
     page.get_by_label("Upper").fill(new_value)
-    assert page.get_by_label("Upper").input_value() == new_value
+    assert float(page.get_by_label("Upper").input_value()) == float(new_value)
     expect_visible("The 95% confidence interval is ±794")
     page.get_by_text("Data Table").click()
     expect_visible(f"({new_value}, inf]")  # Because values are well above the bins.
