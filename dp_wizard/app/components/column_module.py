@@ -26,7 +26,12 @@ label_width = "10em"  # Just wide enough so the text isn't trucated.
 
 def get_float_error(number_str):
     """
+    If the inputs are numeric, I think shiny converts
+    any strings that can't be parsed to numbers into None,
+    so the "should be a number" errors may not be seen in practice.
     >>> get_float_error('0')
+    >>> get_float_error(None)
+    'is required'
     >>> get_float_error('')
     'is required'
     >>> get_float_error('1.1')
@@ -35,7 +40,7 @@ def get_float_error(number_str):
     >>> get_float_error('inf')
     'should be a number'
     """
-    if number_str == "":
+    if number_str is None or number_str == "":
         return "is required"
     else:
         try:
@@ -43,6 +48,28 @@ def get_float_error(number_str):
         except (TypeError, ValueError, OverflowError):
             return "should be a number"
     return None
+
+
+def get_bound_error(lower_bound, upper_bound):
+    """
+    >>> get_bound_error(1, 2)
+    ''
+    >>> get_bound_error('abc', 'xyz')
+    '- Lower bound should be a number.\\n- Upper bound should be a number.'
+    >>> get_bound_error(1, None)
+    '- Upper bound is required.'
+    >>> get_bound_error(1, 0)
+    '- Lower bound should be less than upper bound.'
+    """
+    messages = []
+    if error := get_float_error(lower_bound):
+        messages.append(f"Lower bound {error}.")
+    if error := get_float_error(upper_bound):
+        messages.append(f"Upper bound {error}.")
+    if not messages:
+        if not (float(lower_bound) < float(upper_bound)):
+            messages.append("Lower bound should be less than upper bound.")
+    return "\n".join(f"- {m}" for m in messages)
 
 
 def error_md_ui(markdown):  # pragma: no cover
@@ -264,15 +291,7 @@ def column_server(
 
     @reactive.calc
     def error_md_calc():
-        messages = []
-        if error := get_float_error(input.lower_bound()):
-            messages.append(f"Lower bound {error}.")
-        if error := get_float_error(input.lower_bound()):
-            messages.append(f"Upper bound {error}.")
-        if not messages:
-            if not (input.lower_bound() < input.upper_bound()):
-                messages.append("Lower bound should be less than upper bound.")
-        return "\n".join(f"- {m}" for m in messages)
+        return get_bound_error(input.lower_bound(), input.upper_bound())
 
     @render.code
     def column_code():
