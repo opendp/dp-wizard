@@ -13,8 +13,8 @@ def make_accuracy_histogram(
     lf: pl.LazyFrame,
     column_name: str,
     row_count: int,
-    lower: float,
-    upper: float,
+    lower_bound: float,
+    upper_bound: float,
     bin_count: int,
     contributions: int,
     weighted_epsilon: float,
@@ -23,15 +23,18 @@ def make_accuracy_histogram(
     Given a LazyFrame and column, and calculate a DP histogram.
 
     >>> from dp_wizard.utils.mock_data import mock_data, ColumnDef
-    >>> lower, upper = 0, 10
+    >>> lower_bound, upper_bound = 0, 10
     >>> row_count = 100
     >>> column_name = "value"
-    >>> df = mock_data({column_name: ColumnDef(lower, upper)}, row_count=row_count)
+    >>> df = mock_data(
+    ...     {column_name: ColumnDef(lower_bound, upper_bound)},
+    ...     row_count=row_count
+    ... )
     >>> accuracy, histogram = make_accuracy_histogram(
     ...     lf=pl.LazyFrame(df),
     ...     column_name=column_name,
     ...     row_count=100,
-    ...     lower=0, upper=10,
+    ...     lower_bound=0, upper_bound=10,
     ...     bin_count=5,
     ...     contributions=1,
     ...     weighted_epsilon=1
@@ -56,7 +59,7 @@ def make_accuracy_histogram(
     # When this is stable, merge it to templates, so we can be
     # sure that we're using the same code in the preview that we
     # use in the generated notebook.
-    cut_points = make_cut_points(lower, upper, bin_count)
+    cut_points = make_cut_points(lower_bound, upper_bound, bin_count)
     context = dp.Context.compositor(
         data=lf.with_columns(
             # The cut() method returns a Polars categorical type.
