@@ -13,13 +13,13 @@ class NotebookGenerator(AbstractGenerator):
     def _make_context(self):
         return self._make_partial_context().fill_values(CSV_PATH=self.csv_path).finish()
 
-    def _make_cell(self, block):
+    def _make_python_cell(self, block):
         return f"\n# +\n{block}\n# -\n"
 
     def _make_columns(self):
         column_config_dict = self._make_column_config_dict()
         return "\n".join(
-            f"# ### Expression for `{name}`\n{self._make_cell(block)}"
+            f"# ### Expression for `{name}`\n{self._make_python_cell(block)}"
             for name, block in column_config_dict.items()
         )
 

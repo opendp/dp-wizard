@@ -101,6 +101,13 @@ def results_ui():
                     a Python script which can be run from the command line.
                     """
                 ),
+                button("Notebook Source", ".py", "python"),
+                p(
+                    """
+                    Python source code converted by jupytext into notebook.
+                    Primarily of interest to DP Wizard developers.
+                    """
+                ),
             ),
             open=False,
         ),
@@ -185,6 +192,15 @@ def results_server(
         with ui.Progress() as progress:
             progress.set(message=wait_message)
             yield ScriptGenerator(analysis_plan()).make_py()
+
+    @render.download(
+        filename="dp-wizard-notebook.py",
+        media_type="text/x-python",
+    )
+    async def download_notebook_source():
+        with ui.Progress() as progress:
+            progress.set(message=wait_message)
+            yield NotebookGenerator(analysis_plan()).make_py()
 
     @render.download(
         filename="dp-wizard-notebook.ipynb",

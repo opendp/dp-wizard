@@ -33,11 +33,14 @@ class AbstractGenerator(ABC):
     def _make_extra_blocks(self):
         return {}
 
-    def _make_cell(self, block) -> str:
+    def _make_python_cell(self, block) -> str:
         """
-        For the script generator, this is just a pass through.
+        Default to just pass through.
         """
         return block
+
+    def _make_comment_cell(self, comment: str) -> str:
+        return "".join(f"# {line}\n" for line in comment.splitlines())
 
     def make_py(self):
         code = (
@@ -99,7 +102,7 @@ class AbstractGenerator(ABC):
 
     def _make_queries(self):
         to_return = [
-            self._make_cell(
+            self._make_python_cell(
                 f"confidence = {confidence} # {self._make_confidence_note()}"
             )
         ]
@@ -130,7 +133,11 @@ class AbstractGenerator(ABC):
             stats_name=stats_name,
         )
 
-        return self._make_cell(query) + self._make_cell(output)
+        return (
+            self._make_comment_cell(f"### Query for `{column_name}`:")
+            + self._make_python_cell(query)
+            + self._make_python_cell(output)
+        )
 
     def _make_partial_context(self):
         weights = [column.weight for column in self.columns.values()]
