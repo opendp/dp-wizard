@@ -143,13 +143,13 @@ plans = [
             epsilon=1,
         ),
         marks=(
-            # TODO: Need to drop lengths, but currently that causes other errors.
+            # Could xfail a subset of tests?
             pytest.mark.xfail
-            if (id_for_plan(plan) in {})
+            if (id_for_plan(plan) in set())
             else set()
         ),
     )
-    for contributions in [1, 10]
+    for contributions in [2, 10]
     for groups in [[], ["class year"]]
     for columns in [
         # Single:
