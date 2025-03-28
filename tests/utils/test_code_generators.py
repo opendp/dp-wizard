@@ -125,9 +125,17 @@ median_plan_column = AnalysisPlanColumn(
     bin_count=0,  # Unused
     weight=4,
 )
+
+
+def id_for_plan(plan: AnalysisPlan):
+    columns = ", ".join(f"{v.analysis_type} of {k}" for k, v in plan.columns.items())
+    description = f"{columns}; grouped by ({', '.join(plan.groups) or 'nothing'})"
+    return re.sub(r"\W+", "_", description)  # For selection with "pytest -k substring"
+
+
 plans = [
     pytest.param(
-        AnalysisPlan(
+        plan := AnalysisPlan(
             groups=groups,
             columns=columns,
             contributions=contributions,
@@ -137,7 +145,7 @@ plans = [
         marks=(
             # TODO: Need to drop lengths, but currently that causes other errors.
             pytest.mark.xfail
-            if contributions == 1 and median_plan_column in columns.values()
+            if (id_for_plan(plan) in {})
             else set()
         ),
     )
@@ -151,17 +159,11 @@ plans = [
         # Multiple:
         {
             "hw-number": histogram_plan_column,
-            "hw-number": mean_plan_column,
-            "hw-number": median_plan_column,
+            "hw number": mean_plan_column,
+            "class year": median_plan_column,
         },
     ]
 ]
-
-
-def id_for_plan(plan: AnalysisPlan):
-    columns = ", ".join(f"{v.analysis_type} of {k}" for k, v in plan.columns.items())
-    description = f"{columns}; grouped by ({', '.join(plan.groups) or 'nothing'})"
-    return re.sub(r"\W+", "_", description)  # For selection with "pytest -k substring"
 
 
 @pytest.mark.parametrize("plan", plans, ids=id_for_plan)
