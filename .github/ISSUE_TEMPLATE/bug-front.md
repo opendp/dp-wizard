@@ -1,8 +1,10 @@
 ---
-name: bug
-about: Something isn't working
+name: Bug, front-end
+about: The interface isn't working correctly, before downloading results.
 title: ''
-labels: bug
+labels:
+    - bug
+    - 'req: Python Shiny'
 assignees: ''
 
 ---

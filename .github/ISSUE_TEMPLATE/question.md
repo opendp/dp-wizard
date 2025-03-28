@@ -1,6 +1,6 @@
 ---
 name: question
-about: After a question is answered, may file a new issue
+about: Ask about intended behavior, our development roadmap, or anything.
 title: ''
 labels: 'question'
 assignees: ''
