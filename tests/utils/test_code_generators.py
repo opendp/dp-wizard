@@ -84,7 +84,7 @@ hw_grade_cut_points = make_cut_points(
 )
 
 # Use these cut points to add a new binned column to the table:
-hw_grade_config = (
+hw_grade_bin_config = (
     pl.col('HW GRADE')
     .cut(hw_grade_cut_points)
     .alias('hw_grade_bin')  # Give the new column a name.
@@ -93,13 +93,12 @@ hw_grade_config = (
     )
 
 
-fixtures_path = Path(__file__).parent.parent / "fixtures"
-fake_csv = "tests/fixtures/fake.csv"
+abc_csv = "tests/fixtures/abc.csv"
 
 
 def number_lines(text: str):
     return "\n".join(
-        f"# {i}:\n{line}" if line and not i % 5 else line
+        f"# {i}:\n{line}" if line and not i % 10 else line
         for (i, line) in enumerate(text.splitlines())
     )
 
@@ -139,7 +138,7 @@ plans = [
             groups=groups,
             columns=columns,
             contributions=contributions,
-            csv_path=fake_csv,
+            csv_path=abc_csv,
             epsilon=1,
         ),
         marks=(
@@ -150,17 +149,17 @@ plans = [
         ),
     )
     for contributions in [2, 10]
-    for groups in [[], ["class year"]]
+    for groups in [[], ["A"]]
     for columns in [
         # Single:
-        {"hw-number": histogram_plan_column},
-        {"hw-number": mean_plan_column},
-        {"hw-number": median_plan_column},
+        {"B": histogram_plan_column},
+        {"B": mean_plan_column},
+        {"B": median_plan_column},
         # Multiple:
         {
-            "hw-number": histogram_plan_column,
-            "hw number": mean_plan_column,
-            "class year": median_plan_column,
+            "B": histogram_plan_column,
+            "C": mean_plan_column,
+            "D": median_plan_column,
         },
     ]
 ]
@@ -189,6 +188,6 @@ def test_make_script(plan):
         fp.flush()
 
         result = subprocess.run(
-            ["python", fp.name, "--csv", fake_csv], capture_output=True
+            ["python", fp.name, "--csv", abc_csv], capture_output=True
         )
         assert result.returncode == 0
