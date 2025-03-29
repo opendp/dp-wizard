@@ -132,20 +132,12 @@ def id_for_plan(plan: AnalysisPlan):
 
 
 plans = [
-    pytest.param(
-        plan := AnalysisPlan(
-            groups=groups,
-            columns=columns,
-            contributions=contributions,
-            csv_path=abc_csv,
-            epsilon=1,
-        ),
-        marks=(
-            # Could xfail a subset of tests?
-            pytest.mark.xfail
-            if (id_for_plan(plan) in set())
-            else set()
-        ),
+    AnalysisPlan(
+        groups=groups,
+        columns=columns,
+        contributions=contributions,
+        csv_path=abc_csv,
+        epsilon=1,
     )
     for contributions in [2, 10]
     for groups in [[], ["A"]]
