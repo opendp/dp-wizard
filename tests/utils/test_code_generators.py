@@ -1,6 +1,5 @@
 from tempfile import NamedTemporaryFile
 import subprocess
-from pathlib import Path
 import pytest
 import re
 import opendp.prelude as dp
