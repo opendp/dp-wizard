@@ -63,7 +63,7 @@ def make_column_config_block(column_name, lower_bound, upper_bound, bin_count):
         Template("histogram_config", __file__)
         .fill_expressions(
             CUT_LIST_NAME=f"{snake_name}_cut_points",
-            CONFIG_NAME=f"{snake_name}_config",
+            BIN_CONFIG_NAME=f"{snake_name}_bin_config",
         )
         .fill_values(
             LOWER_BOUND=lower_bound,

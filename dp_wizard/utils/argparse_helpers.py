@@ -119,21 +119,24 @@ class CLIInfo(NamedTuple):
 def _make_fake_data(path: Path, contributions):
     random.seed(0)  # So the mock data will be stable across runs.
     with path.open("w", newline="") as demo_handle:
-        fields = ["student_id", "class_year", "hw_number", "grade"]
+        fields = ["student_id", "class_year", "hw_number", "grade", "self_assessment"]
         writer = csv.DictWriter(demo_handle, fieldnames=fields)
         writer.writeheader()
         for student_id in range(1, 101):
             class_year = int(_clip(random.gauss(2, 1), 1, 4))
-            # Older students do slightly better in the class:
-            mean_grade = random.gauss(80, 5) + class_year * 2
             for hw_number in range(1, contributions + 1):
+                # Older students do slightly better in the class,
+                # but each assignment gets harder.
+                mean_grade = random.gauss(90, 5) + class_year * 2 - hw_number
                 grade = int(_clip(random.gauss(mean_grade, 5), 0, 100))
+                self_assessment = 1 if grade > 90 and random.random() > 0.1 else 0
                 writer.writerow(
                     {
                         "student_id": student_id,
                         "class_year": class_year,
                         "hw_number": hw_number,
                         "grade": grade,
+                        "self_assessment": self_assessment,
                     }
                 )
 
@@ -145,11 +148,11 @@ def _get_demo_cli_info() -> CLIInfo:
     ...     reader = csv.DictReader(csv_handle)
     ...     reader.fieldnames
     ...     rows = list(reader)
-    ...     rows[0]
-    ...     rows[-1]
-    ['student_id', 'class_year', 'hw_number', 'grade']
-    {'student_id': '1', 'class_year': '2', 'hw_number': '1', 'grade': '73'}
-    {'student_id': '100', 'class_year': '1', 'hw_number': '10', 'grade': '78'}
+    ...     rows[0].values()
+    ...     rows[-1].values()
+    ['student_id', 'class_year', 'hw_number', 'grade', 'self_assessment']
+    dict_values(['1', '2', '1', '82', '0'])
+    dict_values(['100', '2', '10', '78', '0'])
     """
     private_csv_path = Path(__file__).parent.parent / "tmp" / "demo.csv"
     contributions = 10

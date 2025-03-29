@@ -20,6 +20,7 @@ from dp_wizard.utils.code_generators import make_privacy_unit_block
 
 
 dataset_panel_id = "dataset_panel"
+min_contributions = 2
 
 
 def dataset_ui():
@@ -151,7 +152,7 @@ def dataset_server(
                     ),
                 ],
                 contributions(),
-                min=1,
+                min=min_contributions,
             )
         )
 
@@ -177,13 +178,13 @@ def dataset_server(
     @reactive.calc
     def contributions_valid():
         contributions = input.contributions()
-        return isinstance(contributions, int) and contributions >= 1
+        return isinstance(contributions, int) and contributions >= min_contributions
 
     @render.ui
     def contributions_validation_ui():
         return hide_if(
             contributions_valid(),
-            info_md_box("Contributions must be 1 or greater."),
+            info_md_box(f"Contributions must be {min_contributions} or greater."),
         )
 
     @render.ui

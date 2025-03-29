@@ -5,7 +5,7 @@ from shiny import ui, render, module, reactive, Inputs, Outputs, Session
 from shiny.types import SilentException
 import polars as pl
 
-from dp_wizard.utils.code_generators.analyses import histogram, mean
+from dp_wizard.utils.code_generators.analyses import histogram, mean, median
 from dp_wizard.utils.dp_helper import make_accuracy_histogram
 from dp_wizard.utils.shared import plot_bars
 from dp_wizard.utils.code_generators import make_column_config_block
@@ -83,7 +83,7 @@ def column_ui():  # pragma: no cover
         ui.input_select(
             "analysis_type",
             None,
-            [histogram.name, mean.name],
+            [histogram.name, mean.name, median.name],
             width=label_width,
         ),
         ui.output_ui("analysis_config_ui"),
@@ -186,28 +186,38 @@ def column_server(
             "md": [3, 9],
             "lg": [2, 10],
         }
+
+        def lower_bound_input():
+            return ui.input_numeric(
+                "lower_bound",
+                ["Lower Bound", ui.output_ui("bounds_tooltip_ui")],
+                lower_bounds().get(name, 0),
+                width=label_width,
+            )
+
+        def upper_bound_input():
+            return ui.input_numeric(
+                "upper_bound",
+                "Upper Bound",
+                upper_bounds().get(name, 10),
+                width=label_width,
+            )
+
+        def bin_count_input():
+            return ui.input_numeric(
+                "bins",
+                ["Bin Count", ui.output_ui("bins_tooltip_ui")],
+                bin_counts().get(name, 10),
+                width=label_width,
+            )
+
         match input.analysis_type():
             case histogram.name:
                 return ui.layout_columns(
                     [
-                        ui.input_numeric(
-                            "lower_bound",
-                            ["Lower Bound", ui.output_ui("bounds_tooltip_ui")],
-                            lower_bounds().get(name, 0),
-                            width=label_width,
-                        ),
-                        ui.input_numeric(
-                            "upper_bound",
-                            "Upper Bound",
-                            upper_bounds().get(name, 10),
-                            width=label_width,
-                        ),
-                        ui.input_numeric(
-                            "bins",
-                            ["Bin Count", ui.output_ui("bins_tooltip_ui")],
-                            bin_counts().get(name, 10),
-                            width=label_width,
-                        ),
+                        lower_bound_input(),
+                        upper_bound_input(),
+                        bin_count_input(),
                         ui.output_ui("optional_weight_ui"),
                     ],
                     ui.output_ui("histogram_preview_ui"),
@@ -216,21 +226,21 @@ def column_server(
             case mean.name:
                 return ui.layout_columns(
                     [
-                        ui.input_numeric(
-                            "lower_bound",
-                            ["Lower", ui.output_ui("bounds_tooltip_ui")],
-                            lower_bounds().get(name, 0),
-                            width=label_width,
-                        ),
-                        ui.input_numeric(
-                            "upper_bound",
-                            "Upper",
-                            upper_bounds().get(name, 10),
-                            width=label_width,
-                        ),
+                        lower_bound_input(),
+                        upper_bound_input(),
                         ui.output_ui("optional_weight_ui"),
                     ],
                     ui.output_ui("mean_preview_ui"),
+                    col_widths=col_widths,  # type: ignore
+                )
+            case median.name:
+                return ui.layout_columns(
+                    [
+                        lower_bound_input(),
+                        upper_bound_input(),
+                        ui.output_ui("optional_weight_ui"),
+                    ],
+                    ui.output_ui("median_preview_ui"),
                     col_widths=col_widths,  # type: ignore
                 )
 
@@ -338,6 +348,18 @@ def column_server(
                 ),
                 output_code_sample("Column Definition", "column_code"),
             ]
+
+    @render.ui
+    def median_preview_ui():
+        return [
+            ui.p(
+                """
+                Since the median is just a single number,
+                there is not a preview visualization.
+                """
+            ),
+            output_code_sample("Column Definition", "column_code"),
+        ]
 
     @render.data_frame
     def data_frame():
