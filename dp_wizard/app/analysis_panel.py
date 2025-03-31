@@ -62,8 +62,8 @@ def analysis_ui():
                 output_code_sample("Privacy Loss", "privacy_loss_python"),
             ),
             ui.card(
-                ui.card_header("Simulation"),
-                ui.output_ui("simulation_card_ui"),
+                ui.card_header("Size"),
+                ui.output_ui("size_card_ui"),
             ),
             col_widths={
                 "sm": [12, 12, 12, 12],  # 4 rows
@@ -150,7 +150,7 @@ def analysis_server(
         )
 
     @render.ui
-    def simulation_card_ui():
+    def size_card_ui():
         if public_csv_path():
             row_count = get_csv_row_count(Path(public_csv_path()))
             return [
@@ -176,21 +176,71 @@ def analysis_server(
             return [
                 ui.markdown(
                     """
-                    This simulation will assume a normal distribution
-                    between the specified lower and upper bounds.
                     Until you make a release, your CSV will not be
-                    read except to determine the columns.
-
-                    What is the approximate number of rows in the dataset?
-                    This number is only used for the simulation
-                    and not the final calculation.
+                    read except to determine the columns,
+                    but estimates of the size of the dataset are needed.
                     """
                 ),
-                ui.input_select(
-                    "row_count",
-                    "Estimated Rows",
-                    choices=["100", "1000", "10000"],
-                    selected="100",
+                tags.table(
+                    tags.tr(
+                        tags.td(
+                            ui.input_select(
+                                "row_count_upper_bound",
+                                None,
+                                choices=["100", "1000", "10000"],
+                                selected="100",
+                                width="8em",
+                            ),
+                        ),
+                        tags.td(
+                            ui.markdown(
+                                """
+                                A loose **row count upper bound**
+                                is used to account for the accumulated
+                                error in operations with floating point numbers.
+                            """
+                            )
+                        ),
+                    ),
+                    tags.tr(
+                        tags.td(
+                            ui.input_select(
+                                "row_count",
+                                None,
+                                choices=["100", "1000", "10000"],
+                                selected="100",
+                                width="8em",
+                            ),
+                        ),
+                        tags.td(
+                            ui.markdown(
+                                """
+                                An **Estimated row count** is used for the histogram
+                                simulation, but not in the final calculation.
+                            """
+                            )
+                        ),
+                    ),
+                    tags.tr(
+                        tags.td(
+                            ui.input_select(
+                                "row_count_lower_bound",
+                                None,
+                                choices=["100", "1000", "10000"],
+                                selected="100",
+                                width="8em",
+                            ),
+                        ),
+                        tags.td(
+                            ui.markdown(
+                                """
+                                A loose **row count lower bound**
+                                is used to account for the chance of
+                                one row being released in the clear.
+                            """
+                            )
+                        ),
+                    ),
                 ),
             ]
 
