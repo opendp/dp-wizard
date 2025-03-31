@@ -139,7 +139,7 @@ plans = [
         csv_path=abc_csv,
         epsilon=1,
     )
-    for contributions in [2, 10]
+    for contributions in [1, 10]
     for groups in [[], ["A"]]
     for columns in [
         # Single:

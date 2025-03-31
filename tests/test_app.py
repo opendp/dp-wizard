@@ -74,11 +74,11 @@ def test_default_app_validations(
     # "assert define_analysis_button.is_enabled()" has spurious errors.
     # https://github.com/opendp/dp-wizard/issues/221
     page.get_by_label("Contributions").fill("0")
-    expect_visible("Contributions must be 2 or greater")
+    expect_visible("Contributions must be 1 or greater")
     expect_visible("Choose CSV and Contributions before proceeding")
 
     page.get_by_label("Contributions").fill("42")
-    expect_not_visible("Contributions must be 2 or greater")
+    expect_not_visible("Contributions must be 1 or greater")
     expect_not_visible("Choose CSV and Contributions before proceeding")
 
     expect_no_error()
