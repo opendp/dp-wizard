@@ -37,3 +37,11 @@ so any of these might be applied.
 Selectize menus should overflow the containing card.
 */
 .card, .card-body { overflow: visible !important; }
+
+/*
+Plain HTML tables still need to padding between cells.
+*/
+td {
+    padding-right: 1em;
+    vertical-align: top;
+}

@@ -94,7 +94,7 @@ def test_default_app_validations(
     expect_visible("Epsilon: 0.316")
     page.locator(".irs-bar").click()
     expect_visible("Epsilon: 0.158")
-    # Simulation
+    # Size
     expect_visible("Because you've provided a public CSV")
 
     # Button disabled until column selected:
