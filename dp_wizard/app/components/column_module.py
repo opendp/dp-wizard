@@ -194,23 +194,29 @@ def column_server(
             case histogram.name:
                 return ui.markdown(
                     """
-                    With a **histogram** you can choose a bin count
-                    that will answer your question while conserving
-                    your privacy budget.
-                    If you don't know where to set the lower and upper bounds,
-                    consider calculating a **quantile** first.
-                    If the data is centrally distributed, a **mean** may suffice.
+                    With a **histogram** you can choose a bin count that will
+                    answer your question while conserving your privacy budget.
+                    If the data is centrally distributed, a **mean** may suffice,
+                    but if that's not the case, a **median** may be better.
                     """
                 )
             case mean.name:
                 return ui.markdown(
                     """
-                    Because it is only a single number, a **mean** is
-                    a relatively efficient use of your privacy budget.
-                    If you don't know where to set the lower and upper bounds,
-                    consider calculating a **quantile** first.
-                    If the data is skewed, or you don't know the shape
-                    of the distribution, a **histogram** may be useful.
+                    Calculating a differentially private **mean**
+                    requires that you specify lower and upper bounds
+                    so that information outliers is not revealed.
+                    If you don't know how the data is distrubuted
+                    a **histogram** or **median** may be better.
+                    """
+                )
+            case median.name:
+                return ui.markdown(
+                    """
+                    Under the hood, a differentially private **median**
+                    relies a set of candidate values. DP Wizard uses an
+                    evenly spaced set, but the generated Jupyter notebook
+                    can be customized.
                     """
                 )
             case _:
