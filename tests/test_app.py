@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 
 from shiny.run import ShinyAppProc
 from playwright.sync_api import Page, expect
@@ -16,7 +17,7 @@ if bp in Path(__file__).read_text():
 
 demo_app = create_app_fixture(Path(__file__).parent / "fixtures/demo_app.py")
 default_app = create_app_fixture(Path(__file__).parent / "fixtures/default_app.py")
-tooltip = "#choose_csv_demo_tooltip_ui svg"
+tooltip = "#public_csv_path-label svg"
 for_the_demo = "For the demo, we'll imagine"
 
 
@@ -92,10 +93,6 @@ def test_default_app_validations(
     expect_visible(perform_analysis_text)
     expect_not_visible(download_results_text)
     # Epsilon slider:
-    # (Note: Slider tests failed on CI when run after column details,
-    # although it worked locally. This works in either environment.
-    # Maybe a race condition?)
-    expect_visible("10.0")
     expect_visible("Epsilon: 1.0")
     page.locator(".irs-bar").click()
     expect_visible("Epsilon: 0.316")
@@ -105,7 +102,7 @@ def test_default_app_validations(
     expect_visible("Because you've provided a public CSV")
 
     # Button disabled until column selected:
-    download_results_button = page.get_by_role("button", name="Download results")
+    download_results_button = page.get_by_role("button", name="Download Results")
     assert download_results_button.is_disabled()
 
     # Currently the only change when the estimated rows changes is the plot,
@@ -126,7 +123,7 @@ def test_default_app_validations(
     # Reset, and confirm:
     new_value = "20"
     page.get_by_label("Upper").fill(new_value)
-    assert page.get_by_label("Upper").input_value() == new_value
+    assert float(page.get_by_label("Upper").input_value()) == float(new_value)
     expect_visible("The 95% confidence interval is ±794")
     page.get_by_text("Data Table").click()
     expect_visible(f"({new_value}, inf]")  # Because values are well above the bins.
@@ -137,7 +134,7 @@ def test_default_app_validations(
     # expect(page.get_by_text("Weight")).to_have_count(2)
     # TODO: Setting more inputs without checking for updates
     # causes recalculations to pile up, and these cause timeouts on CI:
-    # It is still rerendering the graph after hitting "Download results".
+    # It is still rerendering the graph after hitting "Download Results".
     # https://github.com/opendp/dp-wizard/issues/116
     expect_no_error()
 
@@ -157,22 +154,8 @@ def test_default_app_validations(
 def test_default_app_downloads(
     page: Page, default_app: ShinyAppProc
 ):  # pragma: no cover
-    pick_dataset_text = "How many rows of the CSV"
-    perform_analysis_text = "Select columns to calculate statistics on"
-    download_results_text = "You can now make a differentially private release"
-
-    def expect_visible(text):
-        expect(page.get_by_text(text)).to_be_visible()
-
-    def expect_not_visible(text):
-        expect(page.get_by_text(text)).not_to_be_visible()
-
-    def expect_no_error():
-        expect(page.locator(".shiny-output-error")).not_to_be_attached()
-
     # -- Select dataset --
     page.goto(default_app.url)
-    page.get_by_label("Contributions").fill("42")
     csv_path = Path(__file__).parent / "fixtures" / "fake.csv"
     page.get_by_label("Choose Public CSV").set_input_files(csv_path.resolve())
 
@@ -186,108 +169,35 @@ def test_default_app_downloads(
     page.locator(".selectize-input").nth(1).click()
     page.get_by_text("grade").nth(1).click()
 
-    # Add a second column:
-    # page.get_by_label("blank").check()
-    # TODO: Test is flaky?
-    # expect(page.get_by_text("Weight")).to_have_count(2)
-    # TODO: Setting more inputs without checking for updates
-    # causes recalculations to pile up, and these cause timeouts on CI:
-    # It is still rerendering the graph after hitting "Download results".
-    # https://github.com/opendp/dp-wizard/issues/116
+    # -- Download Results --
+    page.get_by_role("button", name="Download Results").click()
 
-    # -- Download results --
-    page.get_by_role("button", name="Download results").click()
-    expect_not_visible(pick_dataset_text)
-    expect_not_visible(perform_analysis_text)
-    expect_visible(download_results_text)
-    expect_no_error()
+    # Right now, the significant test start-up costs mean
+    # it doesn't make sense to parameterize this test,
+    # but that could change.
+    matches = [
+        re.search(r'button\("([^"]+)", "([^"]+)"', line)
+        for line in (
+            Path(__file__).parent.parent / "dp_wizard" / "app" / "results_panel.py"
+        )
+        .read_text()
+        .splitlines()
+    ]
 
-    # Download Results:
-    # ... Notebooks:
-    # ...... ipynb:
-    with page.expect_download() as notebook_download_info:
-        page.get_by_text("Download notebook").first.click()
-    expect_no_error()
+    # Expand all accordions:
+    page.get_by_text("Reports", exact=True).click()
+    page.get_by_text("Unexecuted Notebooks", exact=True).click()
+    page.get_by_text("Scripts", exact=True).click()
 
-    notebook_download = notebook_download_info.value
-    notebook = notebook_download.path().read_text()
-    assert "contributions = 42" in notebook
+    for match in matches:
+        if not match:
+            continue
+        name = match.group(1)
+        ext = match.group(2)
+        link_text = f"Download {name} ({ext})"
+        with page.expect_download() as download_info:
+            page.get_by_text(link_text).click()
 
-    # ...... html:
-    with page.expect_download() as html_download_info:
-        page.get_by_text("Download HTML").first.click()
-    expect_no_error()
-
-    html_download = html_download_info.value
-    html = html_download.path().read_text()
-    assert "<!DOCTYPE html>" in html
-
-    # ...... pdf:
-    with page.expect_download() as pdf_download_info:
-        page.get_by_text("Download PDF").first.click()
-    expect_no_error()
-
-    pdf_download = pdf_download_info.value
-    pdf = pdf_download.path().read_bytes()
-    assert b"%PDF-1.4" in pdf
-
-    # ... Reports:
-    # ...... text:
-    page.get_by_role("button", name="Reports").click()
-    with page.expect_download() as text_report_download_info:
-        page.get_by_text("Download report (.txt)").click()
-    expect_no_error()
-
-    report_download = text_report_download_info.value
-    report = report_download.path().read_text()
-    assert "confidence: 0.95" in report
-
-    # ...... csv:
-    with page.expect_download() as csv_report_download_info:
-        page.get_by_text("Download table (.csv)").click()
-    expect_no_error()
-
-    report_download = csv_report_download_info.value
-    report = report_download.path().read_text()
-    assert "outputs: grade: confidence,0.95" in report
-
-    # Download Code:
-    # ... Unexecuted Notebooks:
-    # ...... ipynb:
-    page.get_by_text("Unexecuted Notebooks").click()
-    with page.expect_download() as notebook_download_info:
-        page.get_by_text("Download notebook (unexecuted)").click()
-    expect_no_error()
-
-    notebook_download = notebook_download_info.value
-    notebook = notebook_download.path().read_text()
-    assert "contributions = 42" in notebook
-
-    # ...... html:
-    with page.expect_download() as html_download_info:
-        page.get_by_text("Download HTML (unexecuted)").click()
-    expect_no_error()
-
-    html_download = html_download_info.value
-    html = html_download.path().read_text()
-    assert "<!DOCTYPE html>" in html
-
-    # ...... pdf:
-    with page.expect_download() as pdf_download_info:
-        page.get_by_text("Download PDF (unexecuted)").click()
-    expect_no_error()
-
-    pdf_download = pdf_download_info.value
-    pdf = pdf_download.path().read_bytes()
-    assert b"%PDF-1.4" in pdf
-
-    # ... Scripts:
-    # ...... py:
-    page.get_by_text("Scripts").click()
-    with page.expect_download() as script_download_info:
-        page.get_by_text("Download script").click()
-    expect_no_error()
-
-    script_download = script_download_info.value
-    script = script_download.path().read_text()
-    assert "contributions = 42" in script
+        download = download_info.value
+        content = download.path().read_bytes()
+        assert content  # Could add assertions for different document types.

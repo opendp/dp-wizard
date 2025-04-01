@@ -2,17 +2,39 @@ import re
 from pathlib import Path
 
 
+def _get_body(func):
+    import inspect
+    import re
+
+    source_lines = inspect.getsource(func).splitlines()
+    first_line = source_lines[0]
+    if not re.match(r"def \w+\(\w+(, \w+)+\):", first_line.strip()):
+        # Parsing to AST and unparsing is a more robust option,
+        # but more complicated.
+        raise Exception(f"def and parameters should fit on one line: {first_line}")
+    return re.sub(
+        r"\s*#\s+type:\s+ignore\s*",
+        "\n",
+        inspect.cleandoc("\n".join(source_lines[1:])),
+    )
+
+
 class Template:
-    def __init__(self, path, template=None):
-        if path is not None:
-            self._path = f"_{path}.py"
-            template_path = Path(__file__).parent / "no-tests" / self._path
+    def __init__(self, template, root=__file__):
+        # TODO: Check if template is a Path, eventually.
+        # Don't want to introduce a lot of changes right now.
+        template_name = f"_{template}.py"
+        template_path = Path(root).parent / "no-tests" / template_name
+        if template_path.exists():
+            self._source = f"'{template_name}'"
             self._template = template_path.read_text()
-        if template is not None:
-            if path is not None:
-                raise Exception('"path" and "template" are mutually exclusive')
-            self._path = "template-instead-of-path"
-            self._template = template
+        else:
+            if callable(template):
+                self._source = "function template"
+                self._template = _get_body(template)
+            else:
+                self._source = "string template"
+                self._template = template
         # We want a list of the initial slots, because substitutions
         # can produce sequences of upper case letters that could be mistaken for slots.
         self._initial_slots = self._find_slots()
@@ -35,7 +57,7 @@ class Template:
             if count == 0:
                 raise Exception(
                     f"No '{k}' slot to fill with '{v}' in "
-                    f"'{self._path}':\n\n{self._template}"
+                    f"{self._source}:\n\n{self._template}"
                 )
         return self
 
@@ -49,7 +71,7 @@ class Template:
             if count == 0:
                 raise Exception(
                     f"No '{k}' slot to fill with '{v}' in "
-                    f"'{self._path}':\n\n{self._template}"
+                    f"{self._source}:\n\n{self._template}"
                 )
         return self
 
@@ -59,7 +81,7 @@ class Template:
         """
         for k, v in kwargs.items():
             if not isinstance(v, str):
-                raise Exception(f"For {k} in {self._path}, expected string, not {v}")
+                raise Exception(f"For {k} in {self._source}, expected string, not {v}")
 
             def match_indent(match):
                 # This does what we want, but binding is confusing.
@@ -77,7 +99,7 @@ class Template:
             if count == 0:
                 base_message = (
                     f"No '{k}' slot to fill with '{v}' in "
-                    f"'{self._path}':\n\n{self._template}"
+                    f"{self._source}:\n\n{self._template}"
                 )
                 if k in self._template:
                     raise Exception(
@@ -92,6 +114,7 @@ class Template:
         if unfilled_slots:
             slots_str = ", ".join(sorted(f"'{slot}'" for slot in unfilled_slots))
             raise Exception(
-                f"{slots_str} slot not filled in '{self._path}':\n\n{self._template}"
+                f"{slots_str} slot not filled "
+                f"in {self._source}:\n\n{self._template}"
             )
         return self._template
