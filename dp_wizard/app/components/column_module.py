@@ -5,11 +5,16 @@ from shiny import ui, render, module, reactive, Inputs, Outputs, Session
 from shiny.types import SilentException
 import polars as pl
 
-from dp_wizard.utils.code_generators.analyses import histogram, mean
+from dp_wizard.utils.code_generators.analyses import histogram, mean, median
 from dp_wizard.utils.dp_helper import make_accuracy_histogram
-from dp_wizard.utils.shared import plot_histogram
+from dp_wizard.utils.shared import plot_bars
 from dp_wizard.utils.code_generators import make_column_config_block
-from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip, hide_if
+from dp_wizard.app.components.outputs import (
+    output_code_sample,
+    demo_tooltip,
+    info_md_box,
+    hide_if,
+)
 from dp_wizard.utils.dp_helper import confidence
 from dp_wizard.utils.mock_data import mock_data, ColumnDef
 
@@ -19,6 +24,58 @@ default_weight = "2"
 label_width = "10em"  # Just wide enough so the text isn't trucated.
 
 
+def get_float_error(number_str):
+    """
+    If the inputs are numeric, I think shiny converts
+    any strings that can't be parsed to numbers into None,
+    so the "should be a number" errors may not be seen in practice.
+    >>> get_float_error('0')
+    >>> get_float_error(None)
+    'is required'
+    >>> get_float_error('')
+    'is required'
+    >>> get_float_error('1.1')
+    >>> get_float_error('nan')
+    'should be a number'
+    >>> get_float_error('inf')
+    'should be a number'
+    """
+    if number_str is None or number_str == "":
+        return "is required"
+    else:
+        try:
+            int(float(number_str))
+        except (TypeError, ValueError, OverflowError):
+            return "should be a number"
+    return None
+
+
+def get_bound_error(lower_bound, upper_bound):
+    """
+    >>> get_bound_error(1, 2)
+    ''
+    >>> get_bound_error('abc', 'xyz')
+    '- Lower bound should be a number.\\n- Upper bound should be a number.'
+    >>> get_bound_error(1, None)
+    '- Upper bound is required.'
+    >>> get_bound_error(1, 0)
+    '- Lower bound should be less than upper bound.'
+    """
+    messages = []
+    if error := get_float_error(lower_bound):
+        messages.append(f"Lower bound {error}.")
+    if error := get_float_error(upper_bound):
+        messages.append(f"Upper bound {error}.")
+    if not messages:
+        if not (float(lower_bound) < float(upper_bound)):
+            messages.append("Lower bound should be less than upper bound.")
+    return "\n".join(f"- {m}" for m in messages)
+
+
+def error_md_ui(markdown):  # pragma: no cover
+    return info_md_box(markdown)
+
+
 @module.ui
 def column_ui():  # pragma: no cover
     return ui.card(
@@ -26,7 +83,7 @@ def column_ui():  # pragma: no cover
         ui.input_select(
             "analysis_type",
             None,
-            [histogram.name, mean.name],
+            [histogram.name, mean.name, median.name],
             width=label_width,
         ),
         ui.output_ui("analysis_config_ui"),
@@ -129,29 +186,39 @@ def column_server(
             "md": [3, 9],
             "lg": [2, 10],
         }
+
+        def lower_bound_input():
+            return ui.input_numeric(
+                "lower_bound",
+                ["Lower Bound", ui.output_ui("bounds_tooltip_ui")],
+                lower_bounds().get(name, 0),
+                width=label_width,
+            )
+
+        def upper_bound_input():
+            return ui.input_numeric(
+                "upper_bound",
+                "Upper Bound",
+                upper_bounds().get(name, 10),
+                width=label_width,
+            )
+
+        def bin_count_input():
+            return ui.input_numeric(
+                "bins",
+                ["Bin Count", ui.output_ui("bins_tooltip_ui")],
+                bin_counts().get(name, 10),
+                width=label_width,
+            )
+
         match input.analysis_type():
             case histogram.name:
                 with reactive.isolate():
                     return ui.layout_columns(
                         [
-                            ui.input_numeric(
-                                "lower_bound",
-                                ["Lower Bound", ui.output_ui("bounds_tooltip_ui")],
-                                lower_bounds().get(name, 0),
-                                width=label_width,
-                            ),
-                            ui.input_numeric(
-                                "upper_bound",
-                                "Upper Bound",
-                                upper_bounds().get(name, 10),
-                                width=label_width,
-                            ),
-                            ui.input_numeric(
-                                "bins",
-                                ["Bin Count", ui.output_ui("bins_tooltip_ui")],
-                                bin_counts().get(name, 10),
-                                width=label_width,
-                            ),
+                            lower_bound_input(),
+                            upper_bound_input(),
+                            bin_count_input(),
                             ui.output_ui("optional_weight_ui"),
                         ],
                         ui.output_ui("histogram_preview_ui"),
@@ -161,21 +228,22 @@ def column_server(
                 with reactive.isolate():
                     return ui.layout_columns(
                         [
-                            ui.input_numeric(
-                                "lower_bound",
-                                ["Lower", ui.output_ui("bounds_tooltip_ui")],
-                                lower_bounds().get(name, 0),
-                                width=label_width,
-                            ),
-                            ui.input_numeric(
-                                "upper_bound",
-                                "Upper",
-                                upper_bounds().get(name, 10),
-                                width=label_width,
-                            ),
+                            lower_bound_input(),
+                            upper_bound_input(),
                             ui.output_ui("optional_weight_ui"),
                         ],
                         ui.output_ui("mean_preview_ui"),
+                        col_widths=col_widths,  # type: ignore
+                    )
+            case median.name:
+                with reactive.isolate():
+                    return ui.layout_columns(
+                        [
+                            lower_bound_input(),
+                            upper_bound_input(),
+                            ui.output_ui("optional_weight_ui"),
+                        ],
+                        ui.output_ui("median_preview_ui"),
                         col_widths=col_widths,  # type: ignore
                     )
 
@@ -234,6 +302,10 @@ def column_server(
             """,
         )
 
+    @reactive.calc
+    def error_md_calc():
+        return get_bound_error(input.lower_bound(), input.upper_bound())
+
     @render.code
     def column_code():
         return make_column_config_block(
@@ -246,28 +318,46 @@ def column_server(
 
     @render.ui
     def histogram_preview_ui():
-        accuracy, histogram = accuracy_histogram()
-        return [
-            ui.output_plot("histogram_preview_plot", height="300px"),
-            ui.layout_columns(
-                ui.markdown(
-                    f"The {confidence:.0%} confidence interval is ±{accuracy:.3g}."
+        if error_md := error_md_calc():
+            return error_md_ui(error_md)
+        else:
+            accuracy, histogram = accuracy_histogram()
+            return [
+                ui.output_plot("histogram_preview_plot", height="300px"),
+                ui.layout_columns(
+                    ui.markdown(
+                        f"The {confidence:.0%} confidence interval is ±{accuracy:.3g}."
+                    ),
+                    details(
+                        summary("Data Table"),
+                        ui.output_data_frame("data_frame"),
+                    ),
+                    output_code_sample("Column Definition", "column_code"),
                 ),
-                details(
-                    summary("Data Table"),
-                    ui.output_data_frame("data_frame"),
-                ),
-                output_code_sample("Column Definition", "column_code"),
-            ),
-        ]
+            ]
 
     @render.ui
     def mean_preview_ui():
         # accuracy, histogram = accuracy_histogram()
+        if error_md := error_md_calc():
+            return error_md_ui(error_md)
+        else:
+            return [
+                ui.p(
+                    """
+                    Since the mean is just a single number,
+                    there is not a preview visualization.
+                    """
+                ),
+                output_code_sample("Column Definition", "column_code"),
+            ]
+
+    @render.ui
+    def median_preview_ui():
         return [
             ui.p(
                 """
-                Since the mean is just a single number,
+                Since the median is just a single number,
                 there is not a preview visualization.
                 """
             ),
@@ -289,7 +379,7 @@ def column_server(
                 f"{contributions} contribution{s} / individual",
             ]
         )
-        return plot_histogram(
+        return plot_bars(
             histogram,
             error=accuracy,
             cutoff=0,  # TODO

@@ -1,16 +1,16 @@
 from dp_wizard.utils.code_template import Template
 
 
-name = "Mean"
+name = "Median"
 
 
 def has_bins():
-    return False
+    return False  # pragma: no cover
 
 
 def make_query(code_gen, identifier, accuracy_name, stats_name):
-    return (
-        Template("mean_query", __file__)
+    return (  # pragma: no cover
+        Template("median_query", __file__)
         .fill_values(
             GROUP_NAMES=code_gen.groups,
         )
@@ -24,27 +24,19 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
 
 
 def make_output(code_gen, column_name, accuracy_name, stats_name):
-    return (
-        Template(f"mean_{code_gen.root_template}_output", __file__)
-        .fill_expressions(
-            COLUMN_NAME=column_name,
-            STATS_NAME=stats_name,
-        )
-        .finish()
-    )
+    return Template(
+        f"median_{code_gen.root_template}_output", __file__
+    ).finish()  # pragma: no cover
 
 
 def make_report_kv(name, confidence, identifier):
     return (
-        Template("mean_report_kv", __file__)
+        Template("median_report_kv", __file__)
         .fill_values(
             NAME=name,
         )
-        .fill_expressions(
-            IDENTIFIER_STATS=f"{identifier}_stats",
-        )
         .finish()
-    )
+    )  # pragma: no cover
 
 
 def make_column_config_block(column_name, lower_bound, upper_bound, bin_count):
@@ -52,7 +44,7 @@ def make_column_config_block(column_name, lower_bound, upper_bound, bin_count):
 
     snake_name = snake_case(column_name)
     return (
-        Template("mean_config", __file__)
+        Template("median_config", __file__)
         .fill_expressions(
             CONFIG_NAME=f"{snake_name}_config",
         )
@@ -62,4 +54,4 @@ def make_column_config_block(column_name, lower_bound, upper_bound, bin_count):
             UPPER_BOUND=upper_bound,
         )
         .finish()
-    )
+    )  # pragma: no cover

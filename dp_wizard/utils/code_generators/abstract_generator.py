@@ -33,11 +33,14 @@ class AbstractGenerator(ABC):
     def _make_extra_blocks(self):
         return {}
 
-    def _make_cell(self, block) -> str:
+    def _make_python_cell(self, block) -> str:
         """
-        For the script generator, this is just a pass through.
+        Default to just pass through.
         """
         return block
+
+    def _make_comment_cell(self, comment: str) -> str:
+        return "".join(f"# {line}\n" for line in comment.splitlines())
 
     def make_py(self):
         code = (
@@ -66,7 +69,7 @@ class AbstractGenerator(ABC):
             # "max_partition_length" should be a loose upper bound,
             # for example, the size of the total population being sampled.
             # https://docs.opendp.org/en/stable/api/python/opendp.extras.polars.html#opendp.extras.polars.Margin.max_partition_length
-            dp.polars.Margin(by=[{groups_str}], public_info='lengths', max_partition_length=1000000, max_num_partitions=100),
+            dp.polars.Margin(by=[{groups_str}], public_info='keys', max_partition_length=1000000, max_num_partitions=100),
             """  # noqa: B950 (too long!)
             ]
             + [
@@ -79,9 +82,12 @@ class AbstractGenerator(ABC):
         margins_list = "[" + "".join(margins) + "\n    ]"
         return margins_list
 
-    def _make_columns(self):
-        return "\n".join(
-            make_column_config_block(
+    @abstractmethod
+    def _make_columns(self) -> str: ...  # pragma: no cover
+
+    def _make_column_config_dict(self):
+        return {
+            name: make_column_config_block(
                 name=name,
                 analysis_type=col.analysis_type,
                 lower_bound=col.lower_bound,
@@ -89,14 +95,14 @@ class AbstractGenerator(ABC):
                 bin_count=col.bin_count,
             )
             for name, col in self.columns.items()
-        )
+        }
 
     def _make_confidence_note(self):
         return f"{int(confidence * 100)}% confidence interval"
 
     def _make_queries(self):
         to_return = [
-            self._make_cell(
+            self._make_python_cell(
                 f"confidence = {confidence} # {self._make_confidence_note()}"
             )
         ]
@@ -127,7 +133,11 @@ class AbstractGenerator(ABC):
             stats_name=stats_name,
         )
 
-        return self._make_cell(query) + self._make_cell(output)
+        return (
+            self._make_comment_cell(f"### Query for `{column_name}`:")
+            + self._make_python_cell(query)
+            + self._make_python_cell(output)
+        )
 
     def _make_partial_context(self):
         weights = [column.weight for column in self.columns.values()]
@@ -149,7 +159,7 @@ class AbstractGenerator(ABC):
         )
         extra_columns = ", ".join(
             [
-                f"{name_to_identifier(name)}_config"
+                f"{name_to_identifier(name)}_bin_config"
                 for name, plan in self.columns.items()
                 if get_analysis_by_name(plan.analysis_type).has_bins()
             ]

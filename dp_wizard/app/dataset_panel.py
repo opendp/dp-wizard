@@ -14,7 +14,7 @@ from dp_wizard.app.components.outputs import (
     output_code_sample,
     demo_tooltip,
     hide_if,
-    info_box,
+    info_md_box,
 )
 from dp_wizard.utils.code_generators import make_privacy_unit_block
 
@@ -135,7 +135,7 @@ def dataset_server(
                     "- Only the private CSV contains: "
                     + ", ".join(f"`{name}`" for name in just_private)
                 )
-        return hide_if(not messages, info_box(ui.markdown("\n".join(messages))))
+        return hide_if(not messages, info_md_box("\n".join(messages)))
 
     @render.ui
     def input_contributions_ui():
@@ -183,7 +183,7 @@ def dataset_server(
     def contributions_validation_ui():
         return hide_if(
             contributions_valid(),
-            info_box(ui.markdown("Contributions must be 1 or greater.")),
+            info_md_box("Contributions must be 1 or greater."),
         )
 
     @render.ui

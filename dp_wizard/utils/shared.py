@@ -20,8 +20,12 @@ def interval_bottom(interval: str):
     """
     >>> interval_bottom("(10, 20]")
     10.0
+    >>> interval_bottom("-10")
+    -10.0
     """
-    return float(interval.split(",")[0][1:])
+    # Intervals from Polars are always open on the left,
+    # so that's the only case we cover with replace().
+    return float(interval.split(",")[0].replace("(", ""))
 
 
 def df_to_columns(df: DataFrame):
@@ -37,17 +41,18 @@ def df_to_columns(df: DataFrame):
     return transposed if transposed else (tuple(), tuple())
 
 
-def plot_histogram(
-    histogram_df: DataFrame, error: float, cutoff: float, title: str
+def plot_bars(
+    df: DataFrame, error: float, cutoff: float, title: str
 ):  # pragma: no cover
     """
-    Given a Dataframe for a histogram, plot the data.
+    Given a Dataframe, make a bar plot of the data in the last column,
+    with labels from the prior columns.
     """
     import matplotlib.pyplot as plt
 
     plt.rcParams["figure.figsize"] = (12, 4)
 
-    bins, values = df_to_columns(histogram_df)
+    bins, values = df_to_columns(df)
     _figure, axes = plt.subplots()
     bar_colors = ["blue" if v > cutoff else "lightblue" for v in values]
     axes.bar(bins, values, color=bar_colors, yerr=error)

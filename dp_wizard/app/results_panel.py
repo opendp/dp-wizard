@@ -1,7 +1,7 @@
 from pathlib import Path
 import re
 
-from shiny import ui, render, reactive, Inputs, Outputs, Session
+from shiny import ui, render, reactive, Inputs, Outputs, Session, types
 from faicons import icon_svg
 from htmltools.tags import p
 
@@ -101,11 +101,33 @@ def results_ui():
                     a Python script which can be run from the command line.
                     """
                 ),
+                button("Notebook Source", ".py", "python"),
+                p(
+                    """
+                    Python source code converted by jupytext into notebook.
+                    Primarily of interest to DP Wizard developers.
+                    """
+                ),
             ),
             open=False,
         ),
         value="results_panel",
     )
+
+
+def make_download_or_modal_error(download_generator) -> str:  # pragma: no cover
+    try:
+        with ui.Progress() as progress:
+            progress.set(message=wait_message)
+            return download_generator()
+    except Exception as e:
+        modal = ui.modal(
+            ui.pre(str(e)),
+            title="Error generating code",
+            size="xl",
+        )
+        ui.modal_show(modal)
+        raise types.SilentException("code generation")
 
 
 def results_server(
@@ -182,86 +204,77 @@ def results_server(
         media_type="text/x-python",
     )
     async def download_script():
+        yield make_download_or_modal_error(ScriptGenerator(analysis_plan()).make_py)
+
+    @render.download(
+        filename="dp-wizard-notebook.py",
+        media_type="text/x-python",
+    )
+    async def download_notebook_source():
         with ui.Progress() as progress:
             progress.set(message=wait_message)
-            yield ScriptGenerator(analysis_plan()).make_py()
+            yield NotebookGenerator(analysis_plan()).make_py()
 
     @render.download(
         filename="dp-wizard-notebook.ipynb",
         media_type="application/x-ipynb+json",
     )
     async def download_notebook():
-        with ui.Progress() as progress:
-            progress.set(message=wait_message)
-            yield notebook_nb()
+        yield make_download_or_modal_error(notebook_nb)
 
     @render.download(
         filename="dp-wizard-notebook-unexecuted.ipynb",
         media_type="application/x-ipynb+json",
     )
     async def download_notebook_unexecuted():
-        with ui.Progress() as progress:
-            progress.set(message=wait_message)
-            yield notebook_nb_unexecuted()
+        yield make_download_or_modal_error(notebook_nb_unexecuted)
 
     @render.download(  # pyright: ignore
         filename="dp-wizard-notebook.html",
         media_type="text/html",
     )
     async def download_html():
-        with ui.Progress() as progress:
-            progress.set(message=wait_message)
-            yield notebook_html()
+        yield make_download_or_modal_error(notebook_html)
 
     @render.download(  # pyright: ignore
         filename="dp-wizard-notebook-unexecuted.html",
         media_type="text/html",
     )
     async def download_html_unexecuted():
-        with ui.Progress() as progress:
-            progress.set(message=wait_message)
-            yield notebook_html_unexecuted()
+        yield make_download_or_modal_error(notebook_html_unexecuted)
 
     @render.download(
         filename="dp-wizard-notebook.pdf",
         media_type="application/pdf",
     )  # pyright: ignore
     async def download_pdf():
-        with ui.Progress() as progress:
-            progress.set(message=wait_message)
-            yield notebook_pdf()
+        yield make_download_or_modal_error(notebook_pdf)
 
     @render.download(
         filename="dp-wizard-notebook.pdf",
         media_type="application/pdf",
     )  # pyright: ignore
     async def download_pdf_unexecuted():
-        with ui.Progress() as progress:
-            progress.set(message=wait_message)
-            yield notebook_pdf_unexecuted()
+        yield make_download_or_modal_error(notebook_pdf_unexecuted)
 
     @render.download(
         filename="dp-wizard-report.txt",
         media_type="text/plain",
     )
     async def download_report():
-        with ui.Progress() as progress:
-            progress.set(message=wait_message)
+        def make_report():
             notebook_nb()  # Evaluate just for the side effect of creating report.
-            report_txt = (
-                Path(__file__).parent.parent / "tmp" / "report.txt"
-            ).read_text()
-            yield report_txt
+            return (Path(__file__).parent.parent / "tmp" / "report.txt").read_text()
+
+        yield make_download_or_modal_error(make_report)
 
     @render.download(
         filename="dp-wizard-report.csv",
         media_type="text/plain",
     )
     async def download_table():
-        with ui.Progress() as progress:
-            progress.set(message=wait_message)
+        def make_table():
             notebook_nb()  # Evaluate just for the side effect of creating report.
-            report_csv = (
-                Path(__file__).parent.parent / "tmp" / "report.csv"
-            ).read_text()
-            yield report_csv
+            return (Path(__file__).parent.parent / "tmp" / "report.csv").read_text()
+
+        yield make_download_or_modal_error(make_table)
