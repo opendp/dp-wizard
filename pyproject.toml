@@ -23,7 +23,10 @@ dependencies = [
 ]
 
 [project.scripts]
+# Prefer dash in name where allowed (repo named and executable)
+# but provide alias to minimize frustration.
 dp-wizard = "dp_wizard:main"
+dp_wizard = "dp_wizard:main"
 
 [project.urls]
 Home = "https://github.com/opendp/dp-wizard"
