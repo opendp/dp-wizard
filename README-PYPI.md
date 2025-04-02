@@ -34,3 +34,7 @@ with the same structure. Perhaps the public CSV is older and no longer
 sensitive. Preview visualizations will be made with the public data,
 but the release will be made with private data.
 ```
+
+## Contributions
+
+We welcome contributions from the community. More info is on the [main project page](https://github.com/opendp/dp-wizard?tab=readme-ov-file#contributions).
