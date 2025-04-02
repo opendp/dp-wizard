@@ -10,7 +10,19 @@ Building on what we've learned from [DP Creator](https://github.com/opendp/dpcre
 - Interactive visualization of privacy budget choices
 - UI development in Python with [Shiny](https://shiny.posit.co/py/)
 
+DP Wizard guides the user through the application of differential privacy.
+After selecting a local CSV, users are prompted to describe the analysis they need.
+Output options include:
+
+- A Jupyter notebook which demonstrates how to use [OpenDP](https://docs.opendp.org/).
+- A plain Python script.
+- Text and CSV reports.
+
 ## Usage
+
+DP Wizard requires Python 3.10 or later.
+You can check your current version with `python --version`.
+The exact upgrade process will depend on your environment and operating system.
 
 ```
 usage: dp-wizard [-h] [--public_csv CSV] [--private_csv CSV] [--contrib CONTRIB] [--demo]
@@ -57,7 +69,7 @@ so let's remember [what we learned](WHAT-WE-LEARNED.md) along the way.
 
 ### Getting Started
 
-DP-Wizard will run across multiple versions, but for the fewest surprises during development, it makes sense to use the oldest supported version in a virtual environment. On MacOS:
+DP-Wizard will run across multiple Python versions, but for the fewest surprises during development, it makes sense to use the oldest supported version in a virtual environment. On MacOS:
 ```shell
 $ git clone https://github.com/opendp/dp-wizard.git
 $ cd dp-wizard

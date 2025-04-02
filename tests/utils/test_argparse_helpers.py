@@ -10,29 +10,6 @@ from dp_wizard.utils.argparse_helpers import _get_arg_parser, _existing_csv_type
 fixtures_path = Path(__file__).parent.parent / "fixtures"
 
 
-def extract_block(md):
-    '''
-    >>> fake_md = """
-    ... header
-    ... ```
-    ... block
-    ... ```
-    ... footer
-    ... """
-    >>> extract_block(fake_md)
-    'block'
-
-    >>> extract_block('sorry')
-    Traceback (most recent call last):
-    ...
-    Exception: no match for block
-    '''
-    match = re.search(r"```\n(.*?)\n```", md, flags=re.DOTALL)
-    if match:
-        return match.group(1)
-    raise Exception("no match for block")
-
-
 def test_help():
     help = re.sub(
         # line wrapping of params varies:
@@ -50,11 +27,11 @@ def test_help():
 
     root_path = Path(__file__).parent.parent.parent
 
-    readme_md = (root_path / "README.md").read_text()
-    assert help == extract_block(readme_md)
-
     readme_pypi_md = (root_path / "README-PYPI.md").read_text()
-    assert help == extract_block(readme_pypi_md)
+    assert help in readme_pypi_md
+
+    readme_md = (root_path / "README.md").read_text()
+    assert readme_pypi_md in readme_md
 
 
 def test_arg_validation_no_file():
