@@ -116,7 +116,15 @@ def test_default_app_validations(
     # (Explicit "float()" because sometimes returns "10", sometimes "10.0".
     #  Weird, but not something to spend time on.)
     assert float(page.get_by_label("Upper").input_value()) == 10.0
-    # Reset, and confirm:
+
+    # Input validation:
+    page.get_by_label("Upper").fill("")
+    expect_visible("Upper bound is required")
+    page.get_by_label("Upper").fill("nan")
+    expect_visible("Upper bound should be a number")
+    page.get_by_label("Upper").fill("-1")
+    expect_visible("Lower bound should be less than upper bound")
+
     new_value = "20"
     page.get_by_label("Upper").fill(new_value)
     assert float(page.get_by_label("Upper").input_value()) == float(new_value)
