@@ -22,6 +22,13 @@ from dp_wizard.utils.mock_data import mock_data, ColumnDef
 default_analysis_type = histogram.name
 default_weight = "2"
 label_width = "10em"  # Just wide enough so the text isn't trucated.
+col_widths = {
+    # Controls stay roughly a constant width;
+    # Graph expands to fill space.
+    "sm": [4, 8],
+    "md": [3, 9],
+    "lg": [2, 10],
+}
 
 
 def get_float_error(number_str):
@@ -80,11 +87,15 @@ def error_md_ui(markdown):  # pragma: no cover
 def column_ui():  # pragma: no cover
     return ui.card(
         ui.card_header(ui.output_text("card_header")),
-        ui.input_select(
-            "analysis_type",
-            None,
-            [histogram.name, mean.name, median.name],
-            width=label_width,
+        ui.layout_columns(
+            ui.input_select(
+                "analysis_type",
+                None,
+                [histogram.name, mean.name, median.name],
+                width=label_width,
+            ),
+            ui.output_ui("analysis_info_ui"),
+            col_widths=col_widths,  # type: ignore
         ),
         ui.output_ui("analysis_config_ui"),
     )
@@ -176,6 +187,40 @@ def column_server(
     @render.text
     def card_header():
         return name
+
+    @render.ui
+    def analysis_info_ui():
+        match input.analysis_type():
+            case histogram.name:
+                return ui.markdown(
+                    """
+                    With a **histogram** you can choose a bin count that will
+                    answer your question while conserving your privacy budget.
+                    If the data is centrally distributed, a **mean** may suffice,
+                    but if that's not the case, a **median** may be better.
+                    """
+                )
+            case mean.name:
+                return ui.markdown(
+                    """
+                    Calculating a differentially private **mean**
+                    requires that you specify lower and upper bounds
+                    so that information outliers is not revealed.
+                    If you don't know how the data is distrubuted
+                    a **histogram** or **median** may be better.
+                    """
+                )
+            case median.name:
+                return ui.markdown(
+                    """
+                    Under the hood, a differentially private **median**
+                    relies a set of candidate values. DP Wizard uses an
+                    evenly spaced set, but the generated Jupyter notebook
+                    can be customized.
+                    """
+                )
+            case _:
+                raise Exception("Unrecognized analysis")
 
     @render.ui
     def analysis_config_ui():
