@@ -1,7 +1,6 @@
 import sys
 from pathlib import Path
 import subprocess
-import urllib
 import urllib.parse
 
 from htmltools import tags
@@ -9,6 +8,10 @@ from shiny import ui, reactive, Inputs, Outputs, Session
 
 
 def _run(cmd):
+    """
+    >>> _run("echo hello")
+    '    hello'
+    """
     # Do not check exit status:
     # If there is a problem, we don't want to worry about it.
     return "\n".join(
@@ -35,6 +38,17 @@ pip freeze:
 
 
 def _make_issue_url(info):
+    """
+    >>> info = 'A B C'
+    >>> print(urllib.parse.unquote_plus(_make_issue_url(info)[-70:]))
+    <details>
+    <BLANKLINE>
+    ```
+    A B C
+    ```
+    <BLANKLINE>
+    </details>
+    """
     markdown = f"""Please describe the problem.
 
 <details>
