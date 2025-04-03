@@ -1,11 +1,57 @@
 import sys
 from pathlib import Path
+import subprocess
+import urllib
+import urllib.parse
 
+from htmltools import tags
 from shiny import ui, reactive, Inputs, Outputs, Session
 
 
+def _run(cmd):
+    # Do not check exit status:
+    # If there is a problem, we don't want to worry about it.
+    return "\n".join(
+        f"    {line}"
+        for line in subprocess.run(cmd.split(" "), capture_output=True)
+        .stdout.decode()
+        .splitlines()
+    )
+
+
+def _get_info():
+    version = (Path(__file__).parent.parent / "VERSION").read_text().strip()
+    git_status = _run("git status")
+    pip_freeze = _run("pip freeze")
+    return f"""
+DP Wizard v{version}
+python: {sys.version}
+arguments: {' '.join(sys.argv[1:])}
+git status:
+{git_status}
+pip freeze:
+{pip_freeze}
+    """
+
+
+def _make_issue_url(info):
+    markdown = f"""Please describe the problem.
+
+<details>
+
+```
+{info}
+```
+
+</details>"""
+    encoded = urllib.parse.quote_plus(markdown)
+    return f"https://github.com/opendp/dp-wizard/issues/new?body={encoded}"
+
+
 def about_ui():
-    version = (Path(__file__).parent.parent / "VERSION").read_text()
+    info = _get_info()
+    issue_url = _make_issue_url(info)
+
     return ui.nav_panel(
         "About",
         ui.card(
@@ -22,8 +68,10 @@ def about_ui():
                 - Text and CSV reports.
                 """
             ),
-            ui.p(f"DP Wizard version {version}"),
-            ui.p(f"Python {sys.version}"),
+            tags.textarea(
+                info, readonly=True, rows=10, style="font-family: monospace;"
+            ),
+            ui.a("File issue", href=issue_url, target="_blank"),
         ),
         ui.input_action_button("go_to_dataset", "Select dataset"),
         value="about_panel",
