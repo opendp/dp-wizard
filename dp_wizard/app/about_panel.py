@@ -83,9 +83,18 @@ def about_ui():
                 """
             ),
             tags.textarea(
-                info, readonly=True, rows=10, style="font-family: monospace;"
+                info,
+                readonly=True,
+                rows=10,
+                style="font-family: monospace;",
             ),
-            ui.a("File issue", href=issue_url, target="_blank"),
+            ui.a(
+                "File issue",
+                href=issue_url,
+                target="_blank",
+                class_="btn btn-default action-button",
+                style="width: 10em;",
+            ),
         ),
         ui.input_action_button("go_to_dataset", "Select dataset"),
         value="about_panel",
