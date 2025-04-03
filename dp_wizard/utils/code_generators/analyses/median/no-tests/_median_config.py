@@ -1,3 +1,6 @@
+# See the OpenDP docs for more on making private medians and quantiles:
+# https://docs.opendp.org/en/stable/getting-started/tabular-data/essential-statistics.html#Median
+
 CONFIG_NAME = (
     pl.col(COLUMN_NAME)
     .cast(float)
