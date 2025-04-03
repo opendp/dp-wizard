@@ -1,3 +1,6 @@
+# See the OpenDP docs for more on making private histograms:
+# https://docs.opendp.org/en/stable/getting-started/examples/histograms.html
+
 # Use the public information to make cut points for COLUMN_NAME:
 CUT_LIST_NAME = make_cut_points(
     lower_bound=LOWER_BOUND,

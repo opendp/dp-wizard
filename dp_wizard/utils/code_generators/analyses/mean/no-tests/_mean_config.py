@@ -1,3 +1,6 @@
+# See the OpenDP docs for more on making private means:
+# https://docs.opendp.org/en/stable/getting-started/tabular-data/essential-statistics.html#Mean
+
 CONFIG_NAME = (
     pl.col(COLUMN_NAME)
     .cast(float)
