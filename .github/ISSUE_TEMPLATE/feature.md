@@ -2,8 +2,8 @@
 name: Feature
 about: New functionality
 title: ''
-labels:
-    - feature
+types:
+    - 'Feature'
 assignees: ''
 
 ---
