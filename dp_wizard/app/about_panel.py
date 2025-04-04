@@ -37,8 +37,19 @@ pip freeze:
     """
 
 
-def _make_issue_body(info):
-    return f"""Please describe the problem.
+def _make_issue_url(info):
+    """
+    >>> info = 'A B C'
+    >>> print(urllib.parse.unquote_plus(_make_issue_url(info)[-70:]))
+    <details>
+    <BLANKLINE>
+    ```
+    A B C
+    ```
+    <BLANKLINE>
+    </details>
+    """
+    markdown = f"""Please describe the problem.
 
 <details>
 
@@ -47,10 +58,13 @@ def _make_issue_body(info):
 ```
 
 </details>"""
+    encoded = urllib.parse.quote_plus(markdown)
+    return f"https://github.com/opendp/dp-wizard/issues/new?body={encoded}"
 
 
 def about_ui():
     info = _get_info()
+    issue_url = _make_issue_url(info)
 
     return ui.nav_panel(
         "About",
@@ -68,42 +82,21 @@ def about_ui():
                 - Text and CSV reports.
                 """
             ),
-            # Textarea just for display: Not actually part of form.
             tags.textarea(
                 info,
                 readonly=True,
                 rows=10,
                 style="font-family: monospace;",
             ),
-            tags.form(
-                # Hidden input with markdown wrapping the same info:
-                tags.input(
-                    name="body",
-                    value=_make_issue_body(info),
-                    type="hidden",
-                ),
-                tags.input(
-                    value="Report Issue",
-                    type="submit",
-                    class_="btn btn-default action-button",
-                    id="issue-submit",
-                ),
-                method="get",
-                action="https://github.com/opendp/dp-wizard/issues/new",
+            ui.a(
+                "File issue",
+                href=issue_url,
                 target="_blank",
-                id="issue-form",
-            ),
-            # Shiny captures form events by default.
-            # JS suggested by https://github.com/posit-dev/py-shiny/issues/1770
-            tags.script(
-                """
-                document.getElementById('issue-submit').addEventListener('click', function(event) {
-                    document.getElementById('issue-form').submit();
-                });
-            """
+                class_="btn btn-default action-button",
+                style="width: 10em;",
             ),
         ),
-        ui.input_action_button("go_to_dataset", "Select Dataset"),
+        ui.input_action_button("go_to_dataset", "Select dataset"),
         value="about_panel",
     )
 
