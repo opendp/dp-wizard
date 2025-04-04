@@ -1,6 +1,7 @@
 """DP Wizard makes it easier to get started with Differential Privacy."""
 
 from pathlib import Path
+from logging import info
 
 
 __version__ = (Path(__file__).parent / "VERSION").read_text().strip()
@@ -13,6 +14,13 @@ def main():  # pragma: no cover
     # We only call this here so "--help" is handled,
     # and to validate inputs before starting the server.
     get_cli_info()
+
+    not_first_run_path = Path(__file__).parent / "tmp/not-first-run.txt"
+    if not not_first_run_path.exists():
+        info(
+            "First startup of DP Wizard may take a minute; successive runs will be faster."
+        )
+        not_first_run_path.touch()
 
     shiny.run_app(
         app="dp_wizard.app",
