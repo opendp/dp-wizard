@@ -16,7 +16,7 @@ dependencies = [
     "opendp[polars]==0.12.1a20250227001",
     "jupytext",
     "jupyter-client",
-    "nbconvert",
+    "nbconvert[webpdf]",
     "ipykernel",
     "black",
     "pyyaml",
