@@ -17,9 +17,7 @@ def main():  # pragma: no cover
 
     not_first_run_path = Path(__file__).parent / "tmp/not-first-run.txt"
     if not not_first_run_path.exists():
-        info(
-            "First startup of DP Wizard may take a minute; successive runs will be faster."
-        )
+        info("First startup may take a minute; successive runs will be faster.")
         not_first_run_path.touch()
 
     shiny.run_app(
