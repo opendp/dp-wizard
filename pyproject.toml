@@ -20,6 +20,9 @@ dependencies = [
     "ipykernel",
     "black",
     "pyyaml",
+
+    # Pin minimum versions if we've had problems.
+    "pyarrow>=16.0.0",
 ]
 
 [project.scripts]
