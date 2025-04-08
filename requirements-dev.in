@@ -4,17 +4,18 @@
 # Developer tools:
 pip-tools
 flit
-black
-flake8
-flake8-bugbear
 pre-commit
 
 # Testing:
 pytest
 pytest-playwright
-pyright
 pytest-cov
 pytest-xdist
+
+# Linting and type checking:
+pyright
+flake8
+flake8-bugbear
 
 
 # Everything below should also be listed in pyproject.toml:
@@ -23,6 +24,7 @@ pytest-xdist
 opendp[polars]==0.12.1a20250227001
 
 # Conversion:
+black
 jupytext
 jupyter-client
 pyyaml
