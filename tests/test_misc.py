@@ -5,6 +5,9 @@ import re
 import dp_wizard
 
 
+root_path = Path(__file__).parent.parent
+
+
 tests = {
     "flake8 linting": "flake8 . --count --show-source --statistics",
     "pyright type checking": "pyright",
@@ -31,9 +34,10 @@ def test_version():
     ],
 )
 def test_opendp_pin(rel_path):
-    root = Path(__file__).parent.parent
     opendp_lines = [
-        line for line in (root / rel_path).read_text().splitlines() if "opendp[" in line
+        line
+        for line in (root_path / rel_path).read_text().splitlines()
+        if "opendp[" in line
     ]
     assert len(opendp_lines) == 1
     assert "opendp[polars]==0.12.1a20250227001" in opendp_lines[0]
@@ -48,9 +52,23 @@ def test_opendp_pin(rel_path):
     ],
 )
 def test_python_min_version(rel_path):
-    root = Path(__file__).parent.parent
-    text = (root / rel_path).read_text()
+    text = (root_path / rel_path).read_text()
     assert "3.10" in text
     if "README" in rel_path:
         # Make sure we haven't upgraded one reference by mistake.
         assert not re.search(r"3.1[^0]", text)
+
+
+def test_dependency_lower_bounds():
+    pyproject = set(
+        line.replace('"', "").replace(",", "").strip()
+        for line in (root_path / "pyproject.toml").read_text().splitlines()
+        if ">=" in line and "flit_core" not in line
+    )
+    requirements = set(
+        line
+        for line in (root_path / "requirements-dev.in").read_text().splitlines()
+        if ">=" in line
+    )
+    assert len(requirements) > 0
+    assert pyproject == requirements

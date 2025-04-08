@@ -19,23 +19,25 @@ flake8-bugbear
 
 
 # Everything below should also be listed in pyproject.toml:
+# (It may be possible to lower these bounds,
+# but for now take the versions specified in requirements-dev.txt)
 
 # OpenDP:
 opendp[polars]==0.12.1a20250227001
 
 # Conversion:
-black
-jupytext
-jupyter-client
-pyyaml
-nbconvert
-ipykernel
+black>=25.1.0
+jupytext>=1.16.7
+jupyter-client>=8.6.3
+pyyaml>=6.0.2
+nbconvert[webpdf]>=7.16.6
+ipykernel>=6.29.5
 # May also require:
 # python -m ipykernel install --name kernel_name --user
 
 # Shiny:
-shiny
-faicons
+shiny>=1.2.1
+faicons>=0.2.2
 
 # Visualization:
-matplotlib
+matplotlib>=3.10.1

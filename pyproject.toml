@@ -10,16 +10,16 @@ license = {file = "LICENSE"}
 classifiers = ["License :: OSI Approved :: MIT License"]
 dynamic = ["version", "description"]
 dependencies = [
-    "shiny",
-    "faicons",
-    "matplotlib",
+    "shiny>=1.2.1",
+    "faicons>=0.2.2",
+    "matplotlib>=3.10.1",
     "opendp[polars]==0.12.1a20250227001",
-    "jupytext",
-    "jupyter-client",
-    "nbconvert[webpdf]",
-    "ipykernel",
-    "black",
-    "pyyaml",
+    "jupytext>=1.16.7",
+    "jupyter-client>=8.6.3",
+    "nbconvert[webpdf]>=7.16.6",
+    "ipykernel>=6.29.5",
+    "black>=25.1.0",
+    "pyyaml>=6.0.2",
 ]
 
 [project.scripts]
