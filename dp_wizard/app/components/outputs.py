@@ -26,3 +26,12 @@ def hide_if(condition: bool, el):  # pragma: no cover
 
 def info_md_box(markdown):  # pragma: no cover
     return ui.div(ui.markdown(markdown), class_="alert alert-info", role="alert")
+
+
+def nav_button(id, label, disabled=False):
+    return ui.input_action_button(
+        id,
+        [ui.tags.span(label, style="padding-right: 1em;"), icon_svg("play")],
+        disabled=disabled,
+        class_="float-end",
+    )
