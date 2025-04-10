@@ -3,6 +3,8 @@ from pathlib import Path
 
 from shiny import ui, reactive, Inputs, Outputs, Session
 
+from dp_wizard.app.components.outputs import nav_button
+
 
 def about_ui():
     version = (Path(__file__).parent.parent / "VERSION").read_text()
@@ -25,7 +27,7 @@ def about_ui():
             ui.p(f"DP Wizard version {version}"),
             ui.p(f"Python {sys.version}"),
         ),
-        ui.input_action_button("go_to_dataset", "Select dataset"),
+        nav_button("go_to_dataset", "Select dataset"),
         value="about_panel",
     )
 

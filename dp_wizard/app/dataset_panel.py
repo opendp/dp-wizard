@@ -15,6 +15,7 @@ from dp_wizard.app.components.outputs import (
     demo_tooltip,
     hide_if,
     info_md_box,
+    nav_button,
 )
 from dp_wizard.utils.code_generators import make_privacy_unit_block
 
@@ -198,7 +199,7 @@ def dataset_server(
 
     @render.ui
     def define_analysis_button_ui():
-        button = ui.input_action_button(
+        button = nav_button(
             "go_to_analysis", "Define analysis", disabled=not button_enabled()
         )
         if button_enabled() and contributions_valid():
