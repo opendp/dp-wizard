@@ -34,7 +34,7 @@ def test_make_column_config_block_for_mean():
             upper_bound=100,
             bin_count=10,
         ).strip()
-        == """hw_grade_config = (
+        == """hw_grade_expr = (
     pl.col('HW GRADE')
     .cast(float)
     .fill_nan(0)
@@ -53,7 +53,7 @@ def test_make_column_config_block_for_median():
             upper_bound=100,
             bin_count=10,
         ).strip()
-        == """hw_grade_config = (
+        == """hw_grade_expr = (
     pl.col('HW GRADE')
     .cast(float)
     .fill_nan(0)
@@ -83,7 +83,7 @@ hw_grade_cut_points = make_cut_points(
 )
 
 # Use these cut points to add a new binned column to the table:
-hw_grade_bin_config = (
+hw_grade_bin_expr = (
     pl.col('HW GRADE')
     .cut(hw_grade_cut_points)
     .alias('hw_grade_bin')  # Give the new column a name.

@@ -1,4 +1,4 @@
-CONFIG_NAME = (
+EXPR_NAME = (
     pl.col(COLUMN_NAME)
     .cast(float)
     .fill_nan(0)
