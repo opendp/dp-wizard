@@ -4,6 +4,8 @@
 # a differentially private release. To learn more about what's
 # going on here, see the documentation for OpenDP: https://docs.opendp.org/
 #
+# ## Prerequisites
+#
 # First install and import the required dependencies:
 
 # +
@@ -20,13 +22,15 @@ IMPORTS_BLOCK
 UTILS_BLOCK
 # -
 
+# ## Analysis
+#
 # Based on the input you provided, for each column we'll create a Polars expression
 # that describes how we want to summarize that column.
 
-# +
 COLUMNS_BLOCK
-# -
 
+# ### Context
+#
 # Next, we'll define our Context. This is where we set the privacy budget,
 # and set the weight for each query under that overall budget.
 
@@ -40,6 +44,8 @@ CONTEXT_BLOCK
 # much information as possible, and any unrecognized characters will be replaced
 # by "�". If this is not sufficient, you will need to preprocess your data to
 # reencode it as UTF8.
+#
+# ## Results
 #
 # Finally, we run the queries and plot the results.
 

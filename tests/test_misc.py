@@ -37,3 +37,20 @@ def test_opendp_pin(rel_path):
     ]
     assert len(opendp_lines) == 1
     assert "opendp[polars]==0.12.1a20250227001" in opendp_lines[0]
+
+
+@pytest.mark.parametrize(
+    "rel_path",
+    [
+        "README.md",
+        "README-PYPI.md",
+        ".github/workflows/test.yml",
+    ],
+)
+def test_python_min_version(rel_path):
+    root = Path(__file__).parent.parent
+    text = (root / rel_path).read_text()
+    assert "3.10" in text
+    if "README" in rel_path:
+        # Make sure we haven't upgraded one reference by mistake.
+        assert not re.search(r"3.1[^0]", text)

@@ -10,7 +10,19 @@ Building on what we've learned from [DP Creator](https://github.com/opendp/dpcre
 - Interactive visualization of privacy budget choices
 - UI development in Python with [Shiny](https://shiny.posit.co/py/)
 
+DP Wizard guides the user through the application of differential privacy.
+After selecting a local CSV, users are prompted to describe the analysis they need.
+Output options include:
+
+- A Jupyter notebook which demonstrates how to use [OpenDP](https://docs.opendp.org/).
+- A plain Python script.
+- Text and CSV reports.
+
 ## Usage
+
+DP Wizard requires Python 3.10 or later.
+You can check your current version with `python --version`.
+The exact upgrade process will depend on your environment and operating system.
 
 ```
 usage: dp-wizard [-h] [--public_csv CSV] [--private_csv CSV] [--contrib CONTRIB] [--demo]
@@ -39,6 +51,17 @@ but the release will be made with private data.
 ```
 
 
+## Contributions
+
+There are several ways to contribute. First, if you find DP Wizard useful, please [let us know](https://docs.google.com/forms/d/e/1FAIpQLScaGdKS-vj-RrM7SCV_lAwZmxQ2bOqFrAkyDp4djxTqkTkinA/viewform) and we'll spend more time on this project. If DP Wizard doesn't work for you, we also want to know that! Please [file an issue](https://github.com/opendp/dp-wizard/issues/new/choose) and we'll look into it.
+
+We also welcome PRs, but if you have an idea for a new feature, it may be helpful to get in touch before you begin, to make sure your idea is in line with our vision:
+- The DP Wizard codebase shouldn't actually contain any differential privacy algorithms. This project is a thin wrapper around the [OpenDP library](https://github.com/opendp/opendp/), and that's where new algorithms should be added.
+- DP Wizard isn't trying to do everything: The OpenDP library is rich, and DP Wizard exposes only a fraction of that functionality so the user isn't overwhelmed by details.
+- DP Wizard tries to model the correct application of differential privacy. For example, while comparing DP results and unnoised statistics can be useful for education, that's not something this application will offer.
+
+With those caveats in mind, feel free to [file a feature request](https://github.com/opendp/dp-wizard/issues/new/choose), or chat with us at our [online office hour](https://harvard.zoom.us/j/98058847683), usually Tuesdays and Thursdays at 11am Eastern.
+
 ## Development
 
 This is the first project we've developed with Python Shiny,
@@ -46,7 +69,7 @@ so let's remember [what we learned](WHAT-WE-LEARNED.md) along the way.
 
 ### Getting Started
 
-DP-Wizard will run across multiple versions, but for the fewest surprises during development, it makes sense to use the oldest supported version in a virtual environment. On MacOS:
+DP-Wizard will run across multiple Python versions, but for the fewest surprises during development, it makes sense to use the oldest supported version in a virtual environment. On MacOS:
 ```shell
 $ git clone https://github.com/opendp/dp-wizard.git
 $ cd dp-wizard

@@ -1,10 +1,10 @@
 from tempfile import NamedTemporaryFile
 import subprocess
-from pathlib import Path
 import pytest
+import re
 import opendp.prelude as dp
 
-from dp_wizard.utils.code_generators.analyses import histogram, mean
+from dp_wizard.utils.code_generators.analyses import histogram, mean, median
 from dp_wizard.utils.code_generators import (
     make_column_config_block,
     AnalysisPlan,
@@ -44,6 +44,28 @@ def test_make_column_config_block_for_mean():
     )
 
 
+def test_make_column_config_block_for_median():
+    assert (
+        make_column_config_block(
+            name="HW GRADE",
+            analysis_type=median.name,
+            lower_bound=0,
+            upper_bound=100,
+            bin_count=10,
+        ).strip()
+        == """hw_grade_config = (
+    pl.col('HW GRADE')
+    .cast(float)
+    .fill_nan(0)
+    .fill_null(0)
+    .dp.quantile(0.5, make_cut_points(0, 100, bin_count=100))
+    # todo: Get the bin count from the user?
+    # or get nice round numbers?
+    # See: https://github.com/opendp/opendp/issues/1706
+)"""
+    )
+
+
 def test_make_column_config_block_for_histogram():
     assert (
         make_column_config_block(
@@ -53,15 +75,15 @@ def test_make_column_config_block_for_histogram():
             upper_bound=100,
             bin_count=10,
         ).strip()
-        == """# From the public information, determine the bins for 'HW GRADE':
+        == """# Use the public information to make cut points for 'HW GRADE':
 hw_grade_cut_points = make_cut_points(
     lower_bound=0,
     upper_bound=100,
     bin_count=10,
 )
 
-# Use these bins to define a Polars column:
-hw_grade_config = (
+# Use these cut points to add a new binned column to the table:
+hw_grade_bin_config = (
     pl.col('HW GRADE')
     .cut(hw_grade_cut_points)
     .alias('hw_grade_bin')  # Give the new column a name.
@@ -70,13 +92,12 @@ hw_grade_config = (
     )
 
 
-fixtures_path = Path(__file__).parent.parent / "fixtures"
-fake_csv = "tests/fixtures/fake.csv"
+abc_csv = "tests/fixtures/abc.csv"
 
 
 def number_lines(text: str):
     return "\n".join(
-        f"# {i}:\n{line}" if line and not i % 5 else line
+        f"# {i}:\n{line}" if line and not i % 10 else line
         for (i, line) in enumerate(text.splitlines())
     )
 
@@ -95,25 +116,44 @@ mean_plan_column = AnalysisPlanColumn(
     bin_count=0,  # Unused
     weight=4,
 )
-kwargs = {
-    "csv_path": fake_csv,
-    "contributions": 1,
-    "epsilon": 1,
-}
-plans = [
-    AnalysisPlan(groups=groups, columns=columns, **kwargs)
-    for groups in [[], ["class year"]]
-    for columns in [
-        {"hw-number": histogram_plan_column},
-        {"hw-number": mean_plan_column},
-        {"hw-number": histogram_plan_column, "grade": mean_plan_column},
-    ]
-]
+median_plan_column = AnalysisPlanColumn(
+    analysis_type=median.name,
+    lower_bound=5,
+    upper_bound=15,
+    bin_count=0,  # Unused
+    weight=4,
+)
 
 
 def id_for_plan(plan: AnalysisPlan):
     columns = ", ".join(f"{v.analysis_type} of {k}" for k, v in plan.columns.items())
-    return f"{columns}; grouped by ({', '.join(plan.groups)})"
+    description = f"{columns}; grouped by ({', '.join(plan.groups) or 'nothing'})"
+    return re.sub(r"\W+", "_", description)  # For selection with "pytest -k substring"
+
+
+plans = [
+    AnalysisPlan(
+        groups=groups,
+        columns=columns,
+        contributions=contributions,
+        csv_path=abc_csv,
+        epsilon=1,
+    )
+    for contributions in [1, 10]
+    for groups in [[], ["A"]]
+    for columns in [
+        # Single:
+        {"B": histogram_plan_column},
+        {"B": mean_plan_column},
+        {"B": median_plan_column},
+        # Multiple:
+        {
+            "B": histogram_plan_column,
+            "C": mean_plan_column,
+            "D": median_plan_column,
+        },
+    ]
+]
 
 
 @pytest.mark.parametrize("plan", plans, ids=id_for_plan)
@@ -139,6 +179,6 @@ def test_make_script(plan):
         fp.flush()
 
         result = subprocess.run(
-            ["python", fp.name, "--csv", fake_csv], capture_output=True
+            ["python", fp.name, "--csv", abc_csv], capture_output=True
         )
         assert result.returncode == 0
