@@ -194,29 +194,29 @@ def column_server(
             case histogram.name:
                 return ui.markdown(
                     """
-                    With a **histogram** you can choose a bin count that will
-                    answer your question while conserving your privacy budget.
-                    If the data is centrally distributed, a **mean** may suffice,
-                    but if that's not the case, a **median** may be better.
+                    Choosing a smaller bin count will conserve your
+                    privacy budget and give you more accurate counts.
+                    While the bins are evenly spaced in DP Wizard,
+                    the OpenDP library lets you pick arbitrary cut points.
                     """
                 )
             case mean.name:
                 return ui.markdown(
                     """
-                    Calculating a differentially private **mean**
-                    requires that you specify lower and upper bounds
-                    so that information outliers is not revealed.
-                    If you don't know how the data is distrubuted
-                    a **histogram** or **median** may be better.
+                    Choosing tighter bounds will mean less noise added
+                    to the statistics, but if you pick bounds that
+                    are too tight, you'll miss the contributions of
+                    outliers.
                     """
                 )
             case median.name:
                 return ui.markdown(
                     """
-                    Under the hood, a differentially private **median**
-                    relies a set of candidate values. DP Wizard uses an
-                    evenly spaced set, but the generated Jupyter notebook
-                    can be customized.
+                    In DP Wizard the median is picked from evenly spaced
+                    candidates, but the OpenDP library is more flexible.
+                    Because the median isn't based on the addition of noise,
+                    we can't estimate the error as we do with the other
+                    statistics.
                     """
                 )
             case _:
