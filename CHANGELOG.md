@@ -1,7 +1,35 @@
 # CHANGELOG
 
+## 0.3.0
+
+- provide command line alias [#337](https://github.com/opendp/dp-wizard/pull/337)
+- Specify the minimum python version in readme [#338](https://github.com/opendp/dp-wizard/pull/338)
+- reactive isolate fixes infinite loop [#311](https://github.com/opendp/dp-wizard/pull/311)
+- No silent errors for code gen [#312](https://github.com/opendp/dp-wizard/pull/312)
+- Support median [#299](https://github.com/opendp/dp-wizard/pull/299)
+- Issue templates and an invitation to contribute [#322](https://github.com/opendp/dp-wizard/pull/322)
+- Fill in codegen gaps for means [#293](https://github.com/opendp/dp-wizard/pull/293)
+- A little bit of input validation [#303](https://github.com/opendp/dp-wizard/pull/303)
+- Use functions as templates [#301](https://github.com/opendp/dp-wizard/pull/301)
+- Distinguish generic `code_template` from specific `code_generator` [#298](https://github.com/opendp/dp-wizard/pull/298)
+- Fix tool tips that have been floating to the right [#302](https://github.com/opendp/dp-wizard/pull/302)
+- Add "bounds" to variable and UI labels [#294](https://github.com/opendp/dp-wizard/pull/294)
+- Hacky CSS for a better epsilon slider [#292](https://github.com/opendp/dp-wizard/pull/292)
+- Only access CLIInfo from server [#284](https://github.com/opendp/dp-wizard/pull/284)
+- Exercise all downloads [#280](https://github.com/opendp/dp-wizard/pull/280)
+- Make Analysis templates OO [#290](https://github.com/opendp/dp-wizard/pull/290)
+- Support means [#264](https://github.com/opendp/dp-wizard/pull/264)
+- upgrade jinja; not sure why other compiled deps changed [#279](https://github.com/opendp/dp-wizard/pull/279)
+- typo [#288](https://github.com/opendp/dp-wizard/pull/288)
+- pyyaml does not need to be installed in notebook [#283](https://github.com/opendp/dp-wizard/pull/283)
+- Add "about" tab [#287](https://github.com/opendp/dp-wizard/pull/287)
+- Use xdist for parallel tests [#266](https://github.com/opendp/dp-wizard/pull/266)
+- lower the logging level if kernel needs install [#265](https://github.com/opendp/dp-wizard/pull/265)
+- Bump dependency versions and drop 3.9 support [#260](https://github.com/opendp/dp-wizard/pull/260)
+
 ## 0.2.0
 
+- Release v0.2.0 [#258](https://github.com/opendp/dp-wizard/pull/258)
 - remove debug code [#252](https://github.com/opendp/dp-wizard/pull/252)
 - fix typos [#250](https://github.com/opendp/dp-wizard/pull/250) [#251](https://github.com/opendp/dp-wizard/pull/251)
 - Support grouping [#237](https://github.com/opendp/dp-wizard/pull/237)
