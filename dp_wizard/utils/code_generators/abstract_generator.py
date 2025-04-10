@@ -69,6 +69,9 @@ class AbstractGenerator(ABC):
             # "max_partition_length" should be a loose upper bound,
             # for example, the size of the total population being sampled.
             # https://docs.opendp.org/en/stable/api/python/opendp.extras.polars.html#opendp.extras.polars.Margin.max_partition_length
+            #
+            # In production, "max_num_partitions" should be set by considering the number
+            # of possible values for each grouping column, and taking their product.
             dp.polars.Margin(by=[{groups_str}], public_info='keys', max_partition_length=1000000, max_num_partitions=100),
             """  # noqa: B950 (too long!)
             ]
