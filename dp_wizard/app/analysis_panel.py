@@ -55,6 +55,9 @@ def analysis_ui():
                     What is your privacy budget for this release?
                     Values above 1 will add less noise to the data,
                     but have a greater risk of revealing individual data.
+                    Consider how your budget compares to that of
+                    <a href="https://registry.oblivious.com/#public-dp"
+                       target="_blank">other projects</a>.
                     """
                 ),
                 log_slider("log_epsilon_slider", 0.1, 10.0),
