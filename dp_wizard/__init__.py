@@ -17,7 +17,10 @@ def main():  # pragma: no cover
 
     not_first_run_path = Path(__file__).parent / "tmp/not-first-run.txt"
     if not not_first_run_path.exists():
-        warning("First startup may take a minute; successive runs will be faster.")
+        warning("┌──────────────────────────────────┐")
+        warning("│ First startup may take a minute! │")
+        warning("│ Successive runs will be faster.  │")
+        warning("└──────────────────────────────────┘")
         not_first_run_path.touch()
 
     shiny.run_app(
