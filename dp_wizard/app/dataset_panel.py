@@ -100,20 +100,20 @@ def dataset_server(
         return ui.row(
             ui.input_file(
                 "public_csv_path",
+                "Choose Public CSV",
+                accept=[".csv"],
+                placeholder=Path(cli_info.public_csv_path or "").name,
+            ),
+            ui.input_file(
+                "private_csv_path",
                 [
-                    "Choose Public CSV ",  # Trailing space looks better.
+                    "Choose Private CSV ",  # Trailing space looks better.
                     demo_tooltip(
                         cli_info.is_demo,
                         "For the demo, we'll imagine we have the grades "
                         "on assignments for a class.",
                     ),
                 ],
-                accept=[".csv"],
-                placeholder=Path(cli_info.public_csv_path or "").name,
-            ),
-            ui.input_file(
-                "private_csv_path",
-                "Choose Private CSV",
                 accept=[".csv"],
                 placeholder=Path(cli_info.private_csv_path or "").name,
             ),
