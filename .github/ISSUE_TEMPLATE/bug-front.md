@@ -3,8 +3,9 @@ name: Bug, front-end
 about: The interface isn't working correctly, before downloading results.
 title: ''
 labels:
-    - bug
     - 'req: Python Shiny'
+types:
+    - 'Bug'
 assignees: ''
 
 ---
