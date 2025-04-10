@@ -6,7 +6,7 @@ CUT_LIST_NAME = make_cut_points(
 )
 
 # Use these cut points to add a new binned column to the table:
-BIN_CONFIG_NAME = (
+BIN_EXPR_NAME = (
     pl.col(COLUMN_NAME)
     .cut(CUT_LIST_NAME)
     .alias(BIN_COLUMN_NAME)  # Give the new column a name.

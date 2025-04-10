@@ -159,7 +159,7 @@ class AbstractGenerator(ABC):
         )
         extra_columns = ", ".join(
             [
-                f"{name_to_identifier(name)}_bin_config"
+                f"{name_to_identifier(name)}_bin_expr"
                 for name, plan in self.columns.items()
                 if get_analysis_by_name(plan.analysis_type).has_bins()
             ]
