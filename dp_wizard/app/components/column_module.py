@@ -122,17 +122,29 @@ def column_server(
     @reactive.effect
     @reactive.event(input.lower_bound)
     def _set_lower_bound():
-        lower_bounds.set({**lower_bounds(), name: float(input.lower_bound())})
+        try:
+            value = float(input.lower_bound())
+        except ValueError:
+            raise SilentException()
+        lower_bounds.set({**lower_bounds(), name: value})
 
     @reactive.effect
     @reactive.event(input.upper_bound)
     def _set_upper_bound():
-        upper_bounds.set({**upper_bounds(), name: float(input.upper_bound())})
+        try:
+            value = float(input.upper_bound())
+        except ValueError:
+            raise SilentException()
+        upper_bounds.set({**upper_bounds(), name: value})
 
     @reactive.effect
     @reactive.event(input.bins)
     def _set_bins():
-        bin_counts.set({**bin_counts(), name: int(input.bins())})
+        try:
+            value = int(input.bins())
+        except ValueError:
+            raise SilentException()
+        bin_counts.set({**bin_counts(), name: value})
 
     @reactive.effect
     @reactive.event(input.weight)
@@ -188,18 +200,18 @@ def column_server(
         }
 
         def lower_bound_input():
-            return ui.input_numeric(
+            return ui.input_text(
                 "lower_bound",
                 ["Lower Bound", ui.output_ui("bounds_tooltip_ui")],
-                lower_bounds().get(name, 0),
+                str(lower_bounds().get(name, 0)),
                 width=label_width,
             )
 
         def upper_bound_input():
-            return ui.input_numeric(
+            return ui.input_text(
                 "upper_bound",
                 "Upper Bound",
-                upper_bounds().get(name, 10),
+                str(upper_bounds().get(name, 10)),
                 width=label_width,
             )
 
