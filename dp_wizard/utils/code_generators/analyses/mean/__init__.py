@@ -17,7 +17,7 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
         .fill_expressions(
             QUERY_NAME=f"{identifier}_query",
             STATS_NAME=stats_name,
-            CONFIG_NAME=f"{identifier}_config",
+            EXPR_NAME=f"{identifier}_expr",
         )
         .finish()
     )
@@ -52,9 +52,9 @@ def make_column_config_block(column_name, lower_bound, upper_bound, bin_count):
 
     snake_name = snake_case(column_name)
     return (
-        Template("mean_config", __file__)
+        Template("mean_expr", __file__)
         .fill_expressions(
-            CONFIG_NAME=f"{snake_name}_config",
+            EXPR_NAME=f"{snake_name}_expr",
         )
         .fill_values(
             COLUMN_NAME=column_name,

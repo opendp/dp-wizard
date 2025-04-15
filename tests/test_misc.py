@@ -45,6 +45,7 @@ def test_opendp_pin(rel_path):
         "README.md",
         "README-PYPI.md",
         ".github/workflows/test.yml",
+        "pyproject.toml",
     ],
 )
 def test_python_min_version(rel_path):
