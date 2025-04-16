@@ -21,7 +21,10 @@ def pip_compile_install(file_name):
     echo_check_call(f"pip-compile --rebuild {file_name}")
     txt_file_name = file_name.replace(".in", ".txt")
     echo_check_call(f"pip install -r {txt_file_name}")
-    echo_check_call(f"sed -i -e 's:/.*/dp-wizard/:.../dp-wizard/:' {txt_file_name}")
+    # Abbreviate the path so it's not showing developer-specific details.
+    # sed doesn't have exactly the same options on all platforms,
+    # but this is good enough for now.
+    echo_check_call(f"sed -i '' 's:/.*/dp-wizard/:.../dp-wizard/:' {txt_file_name}")
 
 
 def parse_requirements(file_name):
