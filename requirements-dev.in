@@ -1,5 +1,4 @@
-# After making changes here, run:
-#    pip-compile --rebuild requirements-dev.in && pip install -r requirements-dev.txt
+# After making changes here, run dependencies.py.
 
 # Developer tools:
 pip-tools

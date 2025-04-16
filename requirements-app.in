@@ -1,5 +1,4 @@
-# After making changes here, run:
-#    pip-compile --rebuild requirements-app.in && pip install -r requirements-app.txt
+# After making changes here, run dependencies.py.
 
 # OpenDP:
 opendp[polars]==0.12.1a20250227001
