@@ -24,9 +24,6 @@ dependencies = [
     "ipykernel",
     "black",
     "pyyaml",
-
-    # Pin minimum versions if we've had problems.
-    "pyarrow>=16.0.0",
 ]
 
 [options]
@@ -44,3 +41,8 @@ Home = "https://github.com/opendp/dp-wizard"
 [tool.pyright]
 include = ["dp_wizard"]
 ignore = ["**/no-tests/"]
+
+[project.optional-dependencies]
+app = [
+
+]

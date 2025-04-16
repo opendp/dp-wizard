@@ -16,24 +16,5 @@ pyright
 pytest-cov
 pytest-xdist
 
-
-# Everything below should also be listed in pyproject.toml:
-
-# OpenDP:
-opendp[polars]==0.12.1a20250227001
-
-# Conversion:
-jupytext
-jupyter-client
-pyyaml
-nbconvert
-ipykernel
-# May also require:
-# python -m ipykernel install --name kernel_name --user
-
-# Shiny:
-shiny
-faicons
-
-# Visualization:
-matplotlib
+# App dependencies:
+-r requirements-app.txt
