@@ -40,6 +40,7 @@ def test_opendp_pin(rel_path):
 @pytest.mark.parametrize(
     "rel_path",
     [
+        "dp_wizard/__init__.py",
         "README.md",
         "README-PYPI.md",
         ".github/workflows/test.yml",
