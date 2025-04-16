@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # This is probably reinventing the wheel.
 # I'm happy with flit and pip-compile separately,
 # but by design they are both simple tools that do one job.
@@ -9,9 +10,18 @@ from subprocess import check_call
 from tomlkit import dumps, parse
 
 
+def echo_check_call(cmd):
+    print(f"Running: {cmd}")
+    # Usually avoid "shell=True",
+    # but using it here so we can quote the sed expression.
+    check_call(cmd, shell=True)
+
+
 def pip_compile_install(file_name):
-    check_call(["pip-compile", "--rebuild", file_name])
-    check_call(["pip", "install", "-r", file_name.replace(".in", ".txt")])
+    echo_check_call(f"pip-compile --rebuild {file_name}")
+    txt_file_name = file_name.replace(".in", ".txt")
+    echo_check_call(f"pip install -r {txt_file_name}")
+    echo_check_call(f"sed -i -e 's:/.*/dp-wizard/:.../dp-wizard/:' {txt_file_name}")
 
 
 def parse_requirements(file_name):
