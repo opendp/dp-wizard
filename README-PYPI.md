@@ -4,7 +4,7 @@
 
 Building on what we've learned from [DP Creator](https://github.com/opendp/dpcreator), DP Wizard offers:
 
-- Easy installation with `pip install dp_wizard`
+- Easy installation with `pip install dp_wizard[app]`
 - Simplified single-user application design
 - Streamlined workflow that doesn't assume familiarity with differential privacy
 - Interactive visualization of privacy budget choices

@@ -4,7 +4,7 @@
 
 Building on what we've learned from [DP Creator](https://github.com/opendp/dpcreator), DP Wizard offers:
 
-- Easy installation with `pip install dp_wizard`
+- Easy installation with `pip install dp_wizard[app]`
 - Simplified single-user application design
 - Streamlined workflow that doesn't assume familiarity with differential privacy
 - Interactive visualization of privacy budget choices
@@ -121,6 +121,10 @@ If Playwright fails in CI, we can still see what went wrong:
   - Then bump `dp_wizard/VERSION`, and add the new number at the top of the `CHANGELOG.md`.
   - Push to github; open PR, with version number in name; merge PR.
 - `flit publish --pypirc .pypirc`
+
+This project is configured so there are two different install possibilities from pypi:
+- `pip install dp_wizard` does not aggressively pin dependency versions. It is preferred if you're using `dp_wizard` as a library.
+- `pip install dp_wizard[app]` pins all dependencies, and will work more reliably for application users.
 
 ### Conventions
 
