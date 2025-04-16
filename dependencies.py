@@ -1,5 +1,12 @@
 from pathlib import Path
-from tomlkit import dumps, parse, items
+from subprocess import check_call
+
+from tomlkit import dumps, parse
+
+
+def pip_compile_install(file_name):
+    check_call(["pip-compile", "--rebuild", file_name])
+    check_call(["pip", "install", "-r", file_name.replace(".in", ".txt")])
 
 
 def parse_requirements(file_name):
@@ -23,6 +30,8 @@ def rewrite_pyproject_toml():
 
 
 def main():
+    pip_compile_install("requirements-app.in")
+    pip_compile_install("requirements-dev.in")
     rewrite_pyproject_toml()
 
 
