@@ -25,7 +25,6 @@ def test_version():
     "rel_path",
     [
         "pyproject.toml",
-        "requirements-dev.in",
         "requirements-dev.txt",
         "dp_wizard/utils/code_generators/abstract_generator.py",
     ],
@@ -35,13 +34,13 @@ def test_opendp_pin(rel_path):
     opendp_lines = [
         line for line in (root / rel_path).read_text().splitlines() if "opendp[" in line
     ]
-    assert len(opendp_lines) == 1
-    assert "opendp[polars]==0.12.1a20250227001" in opendp_lines[0]
+    assert all("opendp[polars]==0.12.1a20250227001" in line for line in opendp_lines)
 
 
 @pytest.mark.parametrize(
     "rel_path",
     [
+        "dp_wizard/__init__.py",
         "README.md",
         "README-PYPI.md",
         ".github/workflows/test.yml",

@@ -1,5 +1,4 @@
-# After making changes here, run:
-#    pip-compile --rebuild requirements-dev.in && pip install -r requirements-dev.txt
+# After making changes here, run dependencies.py.
 
 # Developer tools:
 pip-tools
@@ -8,6 +7,7 @@ black
 flake8
 flake8-bugbear
 pre-commit
+tomlkit
 
 # Testing:
 pytest
@@ -16,24 +16,5 @@ pyright
 pytest-cov
 pytest-xdist
 
-
-# Everything below should also be listed in pyproject.toml:
-
-# OpenDP:
-opendp[polars]==0.12.1a20250227001
-
-# Conversion:
-jupytext
-jupyter-client
-pyyaml
-nbconvert
-ipykernel
-# May also require:
-# python -m ipykernel install --name kernel_name --user
-
-# Shiny:
-shiny
-faicons
-
-# Visualization:
-matplotlib
+# App dependencies:
+-r requirements-app.in
