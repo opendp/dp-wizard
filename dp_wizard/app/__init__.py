@@ -3,6 +3,7 @@ from pathlib import Path
 from shiny import App, ui, reactive, Inputs, Outputs, Session
 
 from dp_wizard.utils.argparse_helpers import get_cli_info, CLIInfo
+from dp_wizard.utils.csv_helper import read_csv_names
 from dp_wizard.app import (
     about_panel,
     analysis_panel,
@@ -39,7 +40,17 @@ def make_server_from_cli_info(cli_info: CLIInfo):
         initial_private_csv_path = cli_info.private_csv_path or ""
         private_csv_path = reactive.value(initial_private_csv_path)
 
-        column_names = reactive.value([])
+        if initial_private_csv_path:
+            column_names = reactive.value(
+                read_csv_names(Path(initial_private_csv_path))
+            )
+        elif initial_public_csv_path:
+            column_names = reactive.value(
+                read_csv_names(Path(initial_private_csv_path))
+            )
+        else:
+            column_names = reactive.value([])
+
         contributions = reactive.value(cli_info.contributions)
 
         analysis_types = reactive.value({})
