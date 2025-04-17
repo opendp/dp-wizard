@@ -61,7 +61,10 @@ def dataset_server(
     input: Inputs,
     output: Outputs,
     session: Session,
-    cli_info: CLIInfo,
+    is_demo: bool,
+    no_uploads: bool,
+    initial_public_csv_path: str,
+    initial_private_csv_path: str,
     public_csv_path: reactive.Value[str],
     private_csv_path: reactive.Value[str],
     contributions: reactive.Value[int],
@@ -103,20 +106,20 @@ def dataset_server(
                 "public_csv_path",
                 "Choose Public CSV",
                 accept=[".csv"],
-                placeholder=Path(cli_info.public_csv_path or "").name,
+                placeholder=Path(initial_public_csv_path).name,
             ),
             ui.input_file(
                 "private_csv_path",
                 [
                     "Choose Private CSV ",  # Trailing space looks better.
                     demo_tooltip(
-                        cli_info.is_demo,
+                        is_demo,
                         "For the demo, we'll imagine we have the grades "
                         "on assignments for a class.",
                     ),
                 ],
                 accept=[".csv"],
-                placeholder=Path(cli_info.private_csv_path or "").name,
+                placeholder=Path(initial_private_csv_path).name,
             ),
         )
 
@@ -146,7 +149,7 @@ def dataset_server(
                 [
                     "Contributions ",  # Trailing space looks better.
                     demo_tooltip(
-                        cli_info.is_demo,
+                        is_demo,
                         "For the demo, we assume that each student "
                         f"can occur at most {contributions()} times in the dataset. ",
                     ),
@@ -170,7 +173,7 @@ def dataset_server(
             input.private_csv_path() is not None and len(input.private_csv_path()) > 0
         )
         csv_path_is_set = (
-            public_csv_path_is_set or private_csv_path_is_set or cli_info.is_demo
+            public_csv_path_is_set or private_csv_path_is_set or is_demo
         ) and not csv_column_mismatch_calc()
         contributions_is_set = input.contributions() is not None
         return contributions_is_set and csv_path_is_set
@@ -190,7 +193,7 @@ def dataset_server(
     @render.ui
     def python_tooltip_ui():
         return demo_tooltip(
-            cli_info.is_demo,
+            is_demo,
             "Along the way, code samples will demonstrate "
             "how the information you provide is used in OpenDP, "
             "and at the end you can download a notebook "

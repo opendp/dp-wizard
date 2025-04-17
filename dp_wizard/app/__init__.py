@@ -33,8 +33,11 @@ def ctrl_c_reminder():  # pragma: no cover
 
 def make_server_from_cli_info(cli_info: CLIInfo):
     def server(input: Inputs, output: Outputs, session: Session):  # pragma: no cover
-        public_csv_path = reactive.value(cli_info.public_csv_path or "")
-        private_csv_path = reactive.value(cli_info.private_csv_path or "")
+        initial_public_csv_path = cli_info.public_csv_path or ""
+        public_csv_path = reactive.value(initial_public_csv_path)
+
+        initial_private_csv_path = cli_info.private_csv_path or ""
+        private_csv_path = reactive.value(initial_private_csv_path)
 
         contributions = reactive.value(cli_info.contributions)
 
@@ -55,7 +58,10 @@ def make_server_from_cli_info(cli_info: CLIInfo):
             input,
             output,
             session,
-            cli_info=cli_info,
+            is_demo=cli_info.is_demo,
+            no_uploads=cli_info.no_uploads,
+            initial_public_csv_path=initial_public_csv_path,
+            initial_private_csv_path=initial_private_csv_path,
             public_csv_path=public_csv_path,
             private_csv_path=private_csv_path,
             contributions=contributions,
