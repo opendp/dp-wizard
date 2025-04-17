@@ -12,6 +12,7 @@ app = App(
             private_csv_path=None,
             contributions=1,
             is_demo=True,
+            no_uploads=False,
         )
     ),
 )

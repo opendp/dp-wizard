@@ -25,7 +25,7 @@ You can check your current version with `python --version`.
 The exact upgrade process will depend on your environment and operating system.
 
 ```
-usage: dp-wizard [-h] [--public_csv CSV] [--private_csv CSV] [--contrib CONTRIB] [--demo]
+usage: dp-wizard [-h] [--public_csv CSV] [--private_csv CSV] [--contrib CONTRIB] [--demo] [--no_uploads]
 
 DP Wizard makes it easier to get started with Differential Privacy.
 
@@ -35,6 +35,7 @@ options:
   --private_csv CSV  Path to private CSV
   --contrib CONTRIB  How many rows can an individual contribute?
   --demo             Use generated fake CSV for a quick demo
+  --no_uploads       Prompt for column names instead of CSV upload
 
 Use "--public_csv" if you have a public data set, and are curious how
 DP can be applied: The preview visualizations will use your public data.

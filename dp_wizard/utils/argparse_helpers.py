@@ -63,7 +63,14 @@ Use "--public_csv" and "--private_csv" together {PUBLIC_PRIVATE_TEXT}
         help="How many rows can an individual contribute?",
     )
     parser.add_argument(
-        "--demo", action="store_true", help="Use generated fake CSV for a quick demo"
+        "--demo",
+        action="store_true",
+        help="Use generated fake CSV for a quick demo",
+    )
+    parser.add_argument(
+        "--no_uploads",
+        action="store_true",
+        help="Prompt for column names instead of CSV upload",
     )
     return parser
 
@@ -71,8 +78,8 @@ Use "--public_csv" and "--private_csv" together {PUBLIC_PRIVATE_TEXT}
 def _get_args():
     """
     >>> _get_args()
-    Namespace(public_csv_path=None, private_csv_path=None, contributions=1, demo=False)
-    """
+    Namespace(public_csv_path=None, private_csv_path=None, contributions=1, demo=False, no_uploads=False)
+    """  # noqa: B950 (too long!)
     arg_parser = _get_arg_parser()
 
     if "pytest" in argv[0] or ("shiny" in argv[0] and "run" == argv[1]):
@@ -87,6 +94,7 @@ def _get_args():
         other_args = {arg for arg in dir(args) if not arg.startswith("_")} - {
             "demo",
             "contributions",
+            "no_uploads",
         }
         set_args = [k for k in other_args if getattr(args, k) is not None]
         if set_args:
@@ -114,6 +122,7 @@ class CLIInfo(NamedTuple):
     private_csv_path: Optional[str]
     contributions: int
     is_demo: bool
+    no_uploads: bool
 
 
 def _make_fake_data(path: Path, contributions):
@@ -163,6 +172,7 @@ def _get_demo_cli_info() -> CLIInfo:
         private_csv_path=str(private_csv_path),
         contributions=contributions,
         is_demo=True,
+        no_uploads=False,
     )
 
 
@@ -175,4 +185,5 @@ def get_cli_info() -> CLIInfo:  # pragma: no cover
         private_csv_path=args.private_csv_path,
         contributions=args.contributions,
         is_demo=False,
+        no_uploads=args.no_uploads,
     )
