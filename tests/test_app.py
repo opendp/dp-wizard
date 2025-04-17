@@ -75,11 +75,11 @@ def test_default_app_validations(
     # https://github.com/opendp/dp-wizard/issues/221
     page.get_by_label("Contributions").fill("0")
     expect_visible("Contributions must be 1 or greater")
-    expect_visible("Choose CSV and Contributions before proceeding")
+    expect_visible("Specify CSV and the unit of privacy before proceeding")
 
     page.get_by_label("Contributions").fill("42")
     expect_not_visible("Contributions must be 1 or greater")
-    expect_not_visible("Choose CSV and Contributions before proceeding")
+    expect_not_visible("Specify CSV and the unit of privacy before proceeding")
 
     expect_no_error()
 
