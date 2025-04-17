@@ -87,7 +87,7 @@ def dataset_server(
                     """
                     When run locally, DP Wizard allows you to specify a private CSV,
                     but for the safety of your data, in the cloud DP Wizard only
-                    accepts column names. After specifying your analysis,
+                    accepts column names. After defining your analysis,
                     you'll download a notebook which you can run locally.
                     """
                 ),

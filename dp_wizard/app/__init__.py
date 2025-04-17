@@ -86,6 +86,7 @@ def make_server_from_cli_info(cli_info: CLIInfo):
             input,
             output,
             session,
+            no_uploads=cli_info.no_uploads,
             public_csv_path=public_csv_path,
             private_csv_path=private_csv_path,
             contributions=contributions,

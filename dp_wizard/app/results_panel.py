@@ -33,89 +33,7 @@ def button(name: str, ext: str, icon: str, primary=False):
     )
 
 
-def results_ui():
-    return ui.nav_panel(
-        "Download Results",
-        ui.h3("Download Results"),
-        ui.p("You can now make a differentially private release of your data."),
-        # Find more icons on Font Awesome: https://fontawesome.com/search?ic=free
-        ui.accordion(
-            ui.accordion_panel(
-                "Notebooks",
-                button("Notebook", ".ipynb", "book", primary=True),
-                p(
-                    """
-                    An executed Jupyter notebook which references your CSV
-                    and shows the result of a differentially private analysis.
-                    """
-                ),
-                button("HTML", ".html", "file-code"),
-                p("The same content, but exported as HTML."),
-                button("PDF", ".pdf", "file-pdf"),
-                p("The same content, but exported as PDF."),
-            ),
-            ui.accordion_panel(
-                "Reports",
-                button("Report", ".txt", "file-lines", primary=True),
-                p(
-                    """
-                    A report which includes your parameter choices and the results.
-                    Intended to be human-readable, but it does use YAML,
-                    so it can be parsed by other programs.
-                    """
-                ),
-                button("Table", ".csv", "file-csv"),
-                p("The same information, but condensed into a two-column CSV."),
-            ),
-        ),
-        ui.h3("Download code"),
-        ui.p(
-            """
-            Alternatively, you can download a script or unexecuted notebook
-            that demonstrates the steps of your analysis,
-            but does not contain any data or analysis results.
-            """
-        ),
-        ui.accordion(
-            ui.accordion_panel(
-                "Unexecuted Notebooks",
-                button("Notebook (unexecuted)", ".ipynb", "book", primary=True),
-                p(
-                    """
-                    This contains the same code as Jupyter notebook above,
-                    but none of the cells are executed,
-                    so it does not contain any results.
-                    """
-                ),
-                button("HTML (unexecuted)", ".html", "file-code"),
-                p("The same content, but exported as HTML."),
-                button("PDF (unexecuted)", ".pdf", "file-pdf"),
-                p("The same content, but exported as PDF."),
-            ),
-            ui.accordion_panel(
-                "Scripts",
-                button("Script", ".py", "python", primary=True),
-                p(
-                    """
-                    The same code as the notebooks, but extracted into
-                    a Python script which can be run from the command line.
-                    """
-                ),
-                button("Notebook Source", ".py", "python"),
-                p(
-                    """
-                    Python source code converted by jupytext into notebook.
-                    Primarily of interest to DP Wizard developers.
-                    """
-                ),
-            ),
-            open=False,
-        ),
-        value="results_panel",
-    )
-
-
-def make_download_or_modal_error(download_generator) -> str:  # pragma: no cover
+def make_download_or_modal_error(download_generator):
     try:
         with ui.Progress() as progress:
             progress.set(message=wait_message)
@@ -131,10 +49,22 @@ def make_download_or_modal_error(download_generator) -> str:  # pragma: no cover
         raise types.SilentException("code generation")
 
 
+def results_ui():
+    return ui.nav_panel(
+        "Download Results",
+        ui.h3("Download Results"),
+        ui.output_ui("download_results_ui"),
+        ui.h3("Download code"),
+        ui.output_ui("download_code_ui"),
+        value="results_panel",
+    )
+
+
 def results_server(
     input: Inputs,
     output: Outputs,
     session: Session,
+    no_uploads: bool,
     public_csv_path: reactive.Value[str],
     private_csv_path: reactive.Value[str],
     contributions: reactive.Value[int],
@@ -146,6 +76,89 @@ def results_server(
     weights: reactive.Value[dict[str, str]],
     epsilon: reactive.Value[float],
 ):  # pragma: no cover
+    @render.ui
+    def download_results_ui():
+        return [
+            ui.p("You can now make a differentially private release of your data."),
+            # Find more icons on Font Awesome: https://fontawesome.com/search?ic=free
+            ui.accordion(
+                ui.accordion_panel(
+                    "Notebooks",
+                    button("Notebook", ".ipynb", "book", primary=True),
+                    p(
+                        """
+                        An executed Jupyter notebook which references your CSV
+                        and shows the result of a differentially private analysis.
+                        """
+                    ),
+                    button("HTML", ".html", "file-code"),
+                    p("The same content, but exported as HTML."),
+                    button("PDF", ".pdf", "file-pdf"),
+                    p("The same content, but exported as PDF."),
+                ),
+                ui.accordion_panel(
+                    "Reports",
+                    button("Report", ".txt", "file-lines", primary=True),
+                    p(
+                        """
+                        A report which includes your parameter choices and the results.
+                        Intended to be human-readable, but it does use YAML,
+                        so it can be parsed by other programs.
+                        """
+                    ),
+                    button("Table", ".csv", "file-csv"),
+                    p("The same information, but condensed into a two-column CSV."),
+                ),
+            ),
+        ]
+
+    @render.ui
+    def download_code_ui():
+        return [
+            ui.p(
+                """
+                Alternatively, you can download a script or unexecuted notebook
+                that demonstrates the steps of your analysis,
+                but does not contain any data or analysis results.
+                """
+            ),
+            ui.accordion(
+                ui.accordion_panel(
+                    "Unexecuted Notebooks",
+                    button("Notebook (unexecuted)", ".ipynb", "book", primary=True),
+                    p(
+                        """
+                        This contains the same code as Jupyter notebook above,
+                        but none of the cells are executed,
+                        so it does not contain any results.
+                        """
+                    ),
+                    button("HTML (unexecuted)", ".html", "file-code"),
+                    p("The same content, but exported as HTML."),
+                    button("PDF (unexecuted)", ".pdf", "file-pdf"),
+                    p("The same content, but exported as PDF."),
+                ),
+                ui.accordion_panel(
+                    "Scripts",
+                    button("Script", ".py", "python", primary=True),
+                    p(
+                        """
+                        The same code as the notebooks, but extracted into
+                        a Python script which can be run from the command line.
+                        """
+                    ),
+                    button("Notebook Source", ".py", "python"),
+                    p(
+                        """
+                        Python source code converted by jupytext into notebook.
+                        Primarily of interest to DP Wizard developers.
+                        """
+                    ),
+                ),
+                open=False,
+            ),
+        ]
+
     @reactive.calc
     def analysis_plan() -> AnalysisPlan:
         # weights().keys() will reflect the desired columns:
