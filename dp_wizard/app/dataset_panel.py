@@ -26,19 +26,7 @@ dataset_panel_id = "dataset_panel"
 def dataset_ui():
     return ui.nav_panel(
         "Select Dataset",
-        ui.card(
-            ui.card_header("Input CSVs"),
-            ui.markdown(
-                f"""
-Choose **Public CSV** {PUBLIC_TEXT}
-
-Choose **Private CSV** {PRIVATE_TEXT}
-
-Choose both **Public CSV** and **Private CSV** {PUBLIC_PRIVATE_TEXT}"""
-            ),
-            ui.output_ui("input_files_ui"),
-            ui.output_ui("csv_column_match_ui"),
-        ),
+        ui.output_ui("csv_or_columns_ui"),
         ui.card(
             ui.card_header("Unit of privacy"),
             ui.markdown(
@@ -89,6 +77,36 @@ def dataset_server(
             )
             if just_public or just_private:
                 return just_public, just_private
+
+    @render.ui
+    def csv_or_columns_ui():
+        if no_uploads:
+            return ui.card(
+                ui.card_header("CSV columns"),
+                ui.markdown(
+                    """
+                    When run locally, DP Wizard allows you to specify a private CSV,
+                    but for the safety of your data, in the cloud DP Wizard only
+                    accepts column names. After specifying your analysis,
+                    you'll download a notebook which you can run locally.
+                    """
+                ),
+            )
+        return (
+            ui.card(
+                ui.card_header("Input CSVs"),
+                ui.markdown(
+                    f"""
+Choose **Public CSV** {PUBLIC_TEXT}
+
+Choose **Private CSV** {PRIVATE_TEXT}
+
+Choose both **Public CSV** and **Private CSV** {PUBLIC_PRIVATE_TEXT}"""
+                ),
+                ui.output_ui("input_files_ui"),
+                ui.output_ui("csv_column_match_ui"),
+            ),
+        )
 
     @render.ui
     def input_files_ui():
