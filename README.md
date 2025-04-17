@@ -25,30 +25,29 @@ You can check your current version with `python --version`.
 The exact upgrade process will depend on your environment and operating system.
 
 ```
-usage: dp-wizard [-h] [--public_csv CSV] [--private_csv CSV] [--contrib CONTRIB] [--demo] [--no_uploads]
+usage: dp_wizard [-h] [--demo] [--no_uploads]
 
 DP Wizard makes it easier to get started with Differential Privacy.
 
 options:
-  -h, --help         show this help message and exit
-  --public_csv CSV   Path to public CSV
-  --private_csv CSV  Path to private CSV
-  --contrib CONTRIB  How many rows can an individual contribute?
-  --demo             Use generated fake CSV for a quick demo
-  --no_uploads       Prompt for column names instead of CSV upload
+  -h, --help    show this help message and exit
+  --demo        Use generated fake CSV for a quick demo
+  --no_uploads  Prompt for column names instead of CSV upload
 
-Use "--public_csv" if you have a public data set, and are curious how
+Unless you have set "--demo" or "--no_uploads", you will specify a CSV inside the application.
+
+Provide a "Public CSV" if you have a public data set, and are curious how
 DP can be applied: The preview visualizations will use your public data.
 
-Use "--private_csv" if you only have a private data set, and want to
+Provide a "Private CSV" if you only have a private data set, and want to
 make a release from it: The preview visualizations will only use
 simulated data, and apart from the headers, the private CSV is not
 read until the release.
 
-Use "--public_csv" and "--private_csv" together if you have two CSVs
-with the same structure. Perhaps the public CSV is older and no longer
-sensitive. Preview visualizations will be made with the public data,
-but the release will be made with private data.
+Provide both if you have two CSVs with the same structure.
+Perhaps the public CSV is older and no longer sensitive. Preview
+visualizations will be made with the public data, but the release will
+be made with private data.
 ```
 
 
