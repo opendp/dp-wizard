@@ -7,7 +7,6 @@ from dp_wizard.utils.argparse_helpers import (
     PUBLIC_TEXT,
     PRIVATE_TEXT,
     PUBLIC_PRIVATE_TEXT,
-    CLIInfo,
 )
 from dp_wizard.utils.csv_helper import get_csv_names_mismatch
 from dp_wizard.app.components.outputs import (
