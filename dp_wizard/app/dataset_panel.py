@@ -17,6 +17,7 @@ from dp_wizard.app.components.outputs import (
     nav_button,
 )
 from dp_wizard.utils.code_generators import make_privacy_unit_block
+from dp_wizard.utils.csv_helper import read_csv_names
 
 
 dataset_panel_id = "dataset_panel"
@@ -54,17 +55,33 @@ def dataset_server(
     initial_private_csv_path: str,
     public_csv_path: reactive.Value[str],
     private_csv_path: reactive.Value[str],
+    column_names: reactive.Value[list[str]],
     contributions: reactive.Value[int],
 ):  # pragma: no cover
     @reactive.effect
     @reactive.event(input.public_csv_path)
     def _on_public_csv_path_change():
-        public_csv_path.set(input.public_csv_path()[0]["datapath"])
+        path = input.public_csv_path()[0]["datapath"]
+        public_csv_path.set(path)
+        column_names.set(read_csv_names(Path(path)))
 
     @reactive.effect
     @reactive.event(input.private_csv_path)
     def _on_private_csv_path_change():
-        private_csv_path.set(input.private_csv_path()[0]["datapath"])
+        path = input.private_csv_path()[0]["datapath"]
+        private_csv_path.set(path)
+        column_names.set(read_csv_names(Path(path)))
+
+    @reactive.effect
+    @reactive.event(input.column_names)
+    def _on_column_names_change():
+        column_names.set(
+            [
+                clean
+                for line in input.column_names().splitlines()
+                if (clean := line.strip())
+            ]
+        )
 
     @reactive.calc
     def csv_column_mismatch_calc() -> Optional[tuple[set, set]]:
@@ -81,14 +98,17 @@ def dataset_server(
     def csv_or_columns_ui():
         if no_uploads:
             return ui.card(
-                ui.card_header("CSV columns"),
+                ui.card_header("CSV Columns"),
                 ui.markdown(
                     """
                     When run locally, DP Wizard allows you to specify a private CSV,
                     but for the safety of your data, in the cloud DP Wizard only
                     accepts column names. After defining your analysis,
-                    you'll download a notebook which you can run locally.
+                    you can download a notebook to run locally.
                     """
+                ),
+                ui.input_text_area(
+                    "column_names", "CSV Column Names (one per line)", rows=5
                 ),
             )
         return (
@@ -183,17 +203,11 @@ Choose both **Public CSV** and **Private CSV** {PUBLIC_PRIVATE_TEXT}"""
 
     @reactive.calc
     def button_enabled():
-        public_csv_path_is_set = (
-            input.public_csv_path() is not None and len(input.public_csv_path()) > 0
+        return (
+            contributions_valid()
+            and len(column_names()) > 0
+            and (no_uploads or not csv_column_mismatch_calc())
         )
-        private_csv_path_is_set = (
-            input.private_csv_path() is not None and len(input.private_csv_path()) > 0
-        )
-        csv_path_is_set = (
-            public_csv_path_is_set or private_csv_path_is_set or is_demo
-        ) and not csv_column_mismatch_calc()
-        contributions_is_set = input.contributions() is not None
-        return contributions_is_set and csv_path_is_set
 
     @reactive.calc
     def contributions_valid():
@@ -219,14 +233,17 @@ Choose both **Public CSV** and **Private CSV** {PUBLIC_PRIVATE_TEXT}"""
 
     @render.ui
     def define_analysis_button_ui():
-        button = nav_button(
-            "go_to_analysis", "Define analysis", disabled=not button_enabled()
-        )
-        if button_enabled() and contributions_valid():
+        enabled = button_enabled()
+        button = nav_button("go_to_analysis", "Define analysis", disabled=not enabled)
+        if enabled:
             return button
         return [
             button,
-            "Choose CSV and Contributions before proceeding.",
+            (
+                "Specify columns and the unit of privacy before proceeding."
+                if no_uploads
+                else "Specify CSV and the unit of privacy before proceeding."
+            ),
         ]
 
     @render.code

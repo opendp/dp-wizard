@@ -39,6 +39,7 @@ def make_server_from_cli_info(cli_info: CLIInfo):
         initial_private_csv_path = cli_info.private_csv_path or ""
         private_csv_path = reactive.value(initial_private_csv_path)
 
+        column_names = reactive.value([])
         contributions = reactive.value(cli_info.contributions)
 
         analysis_types = reactive.value({})
@@ -64,6 +65,7 @@ def make_server_from_cli_info(cli_info: CLIInfo):
             initial_private_csv_path=initial_private_csv_path,
             public_csv_path=public_csv_path,
             private_csv_path=private_csv_path,
+            column_names=column_names,
             contributions=contributions,
         )
         analysis_panel.analysis_server(
