@@ -42,8 +42,14 @@ def read_csv_ids_labels(csv_path: Path):
     }
 
 
-def read_csv_ids_names(csv_path: Path):
-    return {name_to_id(name): name for name in read_csv_names(csv_path)}
+def id_labels_dict_from_names(names: list[str]):
+    return {
+        name_to_id(name): f"{i+1}: {name or '[blank]'}" for i, name in enumerate(names)
+    }
+
+
+def id_names_dict_from_names(names: list[str]):
+    return {name_to_id(name): name for name in names}
 
 
 def name_to_id(name: str):

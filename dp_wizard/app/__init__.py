@@ -136,7 +136,7 @@ def make_server_from_cli_info(cli_info: CLIInfo):
             session,
             is_demo=cli_info.is_demo,
             public_csv_path=public_csv_path,
-            private_csv_path=private_csv_path,
+            column_names=column_names,
             contributions=contributions,
             analysis_types=analysis_types,
             lower_bounds=lower_bounds,
