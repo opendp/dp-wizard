@@ -164,10 +164,11 @@ def results_server(
                         """
                     ),
                 ),
-                # If running locally, we need to avoid distractions and do not want it open by default.
+                # If running locally, we do not want it open by default.
                 # https://shiny.posit.co/py/api/core/ui.accordion.html#shiny.ui.accordion
                 # > The default value of None will open the first accordion_panel.
-                # > Use a value of True to open all (or False to open none) of the items.
+                # > Use a value of True to open all (or False to open none)
+                # > of the items.
                 open=None if no_uploads else False,
             ),
         ]
