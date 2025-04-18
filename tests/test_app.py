@@ -15,10 +15,18 @@ if bp in Path(__file__).read_text():
     )
 
 
-demo_app = create_app_fixture(Path(__file__).parent / "fixtures/demo_app.py")
-default_app = create_app_fixture(Path(__file__).parent / "fixtures/default_app.py")
+demo_app = create_app_fixture(Path(__file__).parent / "fixtures/apps/demo_app.py")
+cloud_app = create_app_fixture(Path(__file__).parent / "fixtures/apps/cloud_app.py")
+default_app = create_app_fixture(Path(__file__).parent / "fixtures/apps/default_app.py")
 tooltip = "#private_csv_path-label svg"
 for_the_demo = "For the demo, we'll imagine"
+
+
+def test_cloud_app(page: Page, cloud_app: ShinyAppProc):  # pragma: no cover
+    page.goto(cloud_app.url)
+    expect(page).to_have_title("DP Wizard")
+    expect(page.get_by_text("Choose Public CSV")).not_to_be_visible()
+    expect(page.get_by_text("CSV Column Names")).to_be_visible()
 
 
 def test_demo_app(page: Page, demo_app: ShinyAppProc):  # pragma: no cover
