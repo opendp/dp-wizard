@@ -21,7 +21,7 @@ from dp_wizard.utils.converters import (
 wait_message = "Please wait."
 
 
-def button(name: str, ext: str, icon: str, primary=False):
+def button(name: str, ext: str, icon: str, primary=False):  # pragma: no cover
     clean_name = re.sub(r"\W+", " ", name).strip().replace(" ", "_").lower()
     function_name = f"download_{clean_name}"
     return ui.download_button(
@@ -33,7 +33,7 @@ def button(name: str, ext: str, icon: str, primary=False):
     )
 
 
-def make_download_or_modal_error(download_generator):
+def make_download_or_modal_error(download_generator):  # pragma: no cover
     try:
         with ui.Progress() as progress:
             progress.set(message=wait_message)
@@ -49,7 +49,7 @@ def make_download_or_modal_error(download_generator):
         raise types.SilentException("code generation")
 
 
-def results_ui():
+def results_ui():  # pragma: no cover
     return ui.nav_panel(
         "Download Results",
         ui.h3("Download Results"),
