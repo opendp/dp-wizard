@@ -35,6 +35,22 @@ def ctrl_c_reminder():  # pragma: no cover
 
 
 def _make_demo_csv(path: Path, contributions):
+    """
+    >>> import tempfile
+    >>> from pathlib import Path
+    >>> import csv
+    >>> with tempfile.NamedTemporaryFile() as temp:
+    ...     _make_demo_csv(Path(temp.name), 10)
+    ...     with open(temp.name, newline="") as csv_handle:
+    ...         reader = csv.DictReader(csv_handle)
+    ...         reader.fieldnames
+    ...         rows = list(reader)
+    ...         rows[0].values()
+    ...         rows[-1].values()
+    ['student_id', 'class_year', 'hw_number', 'grade', 'self_assessment']
+    dict_values(['1', '2', '1', '82', '0'])
+    dict_values(['100', '2', '10', '78', '0'])
+    """
     random.seed(0)  # So the mock data will be stable across runs.
     with path.open("w", newline="") as demo_handle:
         fields = ["student_id", "class_year", "hw_number", "grade", "self_assessment"]
