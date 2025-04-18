@@ -31,8 +31,8 @@ def _get_arg_parser():
         description="DP Wizard makes it easier to get started with "
         "Differential Privacy.",
         epilog=f"""
-Unless you have set "--demo" or "--no_uploads",
-you will specify a CSV inside the application.
+Unless you have set "--demo" or "--no_uploads", you will specify a CSV
+inside the application.
 
 Provide a "Public CSV" {PUBLIC_TEXT}
 

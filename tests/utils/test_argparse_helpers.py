@@ -27,12 +27,11 @@ def test_help():
 
     root_path = Path(__file__).parent.parent.parent
 
-    # TODO!
-    # readme_pypi_md = (root_path / "README-PYPI.md").read_text()
-    # assert help in readme_pypi_md, '--help content not in README-PYPI.md'
+    readme_pypi_md = (root_path / "README-PYPI.md").read_text()
+    assert help in readme_pypi_md, "--help content not in README-PYPI.md"
 
-    # readme_md = (root_path / "README.md").read_text()
-    # assert readme_pypi_md in readme_md, '--help content not in README.md'
+    readme_md = (root_path / "README.md").read_text()
+    assert readme_pypi_md in readme_md, "--help content not in README.md"
 
 
 def test_arg_validation_no_file():
