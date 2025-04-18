@@ -52,9 +52,7 @@ def make_download_or_modal_error(download_generator):  # pragma: no cover
 def results_ui():  # pragma: no cover
     return ui.nav_panel(
         "Download Results",
-        ui.h3("Download Results"),
         ui.output_ui("download_results_ui"),
-        ui.h3("Download code"),
         ui.output_ui("download_code_ui"),
         value="results_panel",
     )
@@ -78,7 +76,10 @@ def results_server(
 ):  # pragma: no cover
     @render.ui
     def download_results_ui():
+        if no_uploads:
+            return None
         return [
+            ui.h3("Download Results"),
             ui.p("You can now make a differentially private release of your data."),
             # Find more icons on Font Awesome: https://fontawesome.com/search?ic=free
             ui.accordion(
@@ -115,8 +116,16 @@ def results_server(
     @render.ui
     def download_code_ui():
         return [
-            ui.p(
+            ui.h3("Download Code"),
+            ui.markdown(
                 """
+                When run locally, there are more download options because DP Wizard
+                can read your private CSV and release differentially private statistics.
+
+                In the cloud, DP Wizard only provides unexecuted notebooks and scripts.
+                """
+                if no_uploads
+                else """
                 Alternatively, you can download a script or unexecuted notebook
                 that demonstrates the steps of your analysis,
                 but does not contain any data or analysis results.
@@ -155,7 +164,11 @@ def results_server(
                         """
                     ),
                 ),
-                open=False,
+                # If running locally, we need to avoid distractions and do not want it open by default.
+                # https://shiny.posit.co/py/api/core/ui.accordion.html#shiny.ui.accordion
+                # > The default value of None will open the first accordion_panel.
+                # > Use a value of True to open all (or False to open none) of the items.
+                open=None if no_uploads else False,
             ),
         ]
 
