@@ -7,8 +7,6 @@ import pytest
 from pathlib import Path
 
 from dp_wizard.utils.csv_helper import (
-    read_csv_ids_labels,
-    read_csv_ids_names,
     get_csv_names_mismatch,
     get_csv_row_count,
 )
@@ -75,13 +73,3 @@ def test_csv_loading(write_encoding):
             assert read_lf.collect().rows()[0] == ("Andr�", 42)
         else:
             pl_testing.assert_frame_equal(write_lf, read_lf)
-
-        # Preceding lines are reading the whole DF via Polars:
-        # Now test how we read just the headers.
-        # Keys are hashes, and won't be stable across platforms,
-        # so let's just look at the values.
-        ids_labels = read_csv_ids_labels(Path(fp.name))
-        assert set(ids_labels.values()) == {"2: AGE", "1: NAME"}
-
-        ids_names = read_csv_ids_names(Path(fp.name))
-        assert set(ids_names.values()) == {"AGE", "NAME"}

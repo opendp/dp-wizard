@@ -35,22 +35,37 @@ def get_csv_row_count(csv_path: Path):
     return lf.select(pl.len()).collect().item()
 
 
-def read_csv_ids_labels(csv_path: Path):
+def id_labels_dict_from_names(names: list[str]):
+    """
+    >>> id_labels_dict_from_names(["abc"])
+    {'...': '1: abc'}
+    """
     return {
-        name_to_id(name): f"{i+1}: {name or '[blank]'}"
-        for i, name in enumerate(read_csv_names(csv_path))
+        name_to_id(name): f"{i+1}: {name or '[blank]'}" for i, name in enumerate(names)
     }
 
 
-def read_csv_ids_names(csv_path: Path):
-    return {name_to_id(name): name for name in read_csv_names(csv_path)}
+def id_names_dict_from_names(names: list[str]):
+    """
+    >>> id_names_dict_from_names(["abc"])
+    {'...': 'abc'}
+    """
+    return {name_to_id(name): name for name in names}
 
 
 def name_to_id(name: str):
+    """
+    >>> import re
+    >>> assert re.match(r'^[_0-9]+$', name_to_id('xyz'))
+    """
     # Shiny is fussy about module IDs,
     # but we don't need them to be human readable.
     return str(hash(name)).replace("-", "_")
 
 
 def name_to_identifier(name: str):
+    """
+    >>> name_to_identifier("Does this work?!")
+    'does_this_work_'
+    """
     return re.sub(r"\W+", "_", name).lower()
