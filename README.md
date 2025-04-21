@@ -25,7 +25,7 @@ You can check your current version with `python --version`.
 The exact upgrade process will depend on your environment and operating system.
 
 ```
-usage: dp-wizard [-h] [--demo] [--no_uploads]
+usage: dp-wizard [-h] [--demo | --no_uploads]
 
 DP Wizard makes it easier to get started with Differential Privacy.
 

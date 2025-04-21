@@ -41,12 +41,13 @@ Provide a "Private CSV" {PRIVATE_TEXT}
 Provide both {PUBLIC_PRIVATE_TEXT}
 """,
     )
-    parser.add_argument(
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument(
         "--demo",
         action="store_true",
         help="Use generated fake CSV for a quick demo",
     )
-    parser.add_argument(
+    group.add_argument(
         "--no_uploads",
         action="store_true",
         help="Prompt for column names instead of CSV upload",
