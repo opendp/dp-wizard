@@ -12,7 +12,11 @@ from dp_wizard.utils.csv_helper import (
     read_csv_ids_names,
     get_csv_row_count,
 )
-from dp_wizard.app.components.outputs import output_code_sample, demo_tooltip
+from dp_wizard.app.components.outputs import (
+    output_code_sample,
+    demo_tooltip,
+    nav_button,
+)
 from dp_wizard.utils.code_generators import make_privacy_loss_block
 
 
@@ -256,7 +260,7 @@ def analysis_server(
 
     @render.ui
     def download_results_button_ui():
-        button = ui.input_action_button(
+        button = nav_button(
             "go_to_results", "Download Results", disabled=not button_enabled()
         )
 

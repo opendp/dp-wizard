@@ -34,7 +34,10 @@ def test_make_column_config_block_for_mean():
             upper_bound=100,
             bin_count=10,
         ).strip()
-        == """hw_grade_config = (
+        == """# See the OpenDP docs for more on making private means:
+# https://docs.opendp.org/en/stable/getting-started/tabular-data/essential-statistics.html#Mean
+
+hw_grade_expr = (
     pl.col('HW GRADE')
     .cast(float)
     .fill_nan(0)
@@ -53,7 +56,10 @@ def test_make_column_config_block_for_median():
             upper_bound=100,
             bin_count=10,
         ).strip()
-        == """hw_grade_config = (
+        == """# See the OpenDP docs for more on making private medians and quantiles:
+# https://docs.opendp.org/en/stable/getting-started/tabular-data/essential-statistics.html#Median
+
+hw_grade_expr = (
     pl.col('HW GRADE')
     .cast(float)
     .fill_nan(0)
@@ -75,7 +81,10 @@ def test_make_column_config_block_for_histogram():
             upper_bound=100,
             bin_count=10,
         ).strip()
-        == """# Use the public information to make cut points for 'HW GRADE':
+        == """# See the OpenDP docs for more on making private histograms:
+# https://docs.opendp.org/en/stable/getting-started/examples/histograms.html
+
+# Use the public information to make cut points for 'HW GRADE':
 hw_grade_cut_points = make_cut_points(
     lower_bound=0,
     upper_bound=100,
@@ -83,7 +92,7 @@ hw_grade_cut_points = make_cut_points(
 )
 
 # Use these cut points to add a new binned column to the table:
-hw_grade_bin_config = (
+hw_grade_bin_expr = (
     pl.col('HW GRADE')
     .cut(hw_grade_cut_points)
     .alias('hw_grade_bin')  # Give the new column a name.

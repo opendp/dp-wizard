@@ -6,6 +6,8 @@ import urllib.parse
 from htmltools import tags
 from shiny import ui, reactive, Inputs, Outputs, Session
 
+from dp_wizard.app.components.outputs import nav_button
+
 
 def _run(cmd):
     """
@@ -72,9 +74,9 @@ def about_ui():
             ui.card_header("About DP Wizard"),
             ui.markdown(
                 """
-                DP Wizard guides the user through the application of
+                DP Wizard guides you through the application of
                 differential privacy. After selecting a local CSV,
-                users are prompted to describe the analysis they need.
+                you'll be prompted to describe the analysis you need.
                 Output options include:
                 - A Jupyter notebook which demonstrates how to use
                 [OpenDP](https://docs.opendp.org/).
@@ -96,7 +98,7 @@ def about_ui():
                 style="width: 10em;",
             ),
         ),
-        ui.input_action_button("go_to_dataset", "Select dataset"),
+        nav_button("go_to_dataset", "Select dataset"),
         value="about_panel",
     )
 
