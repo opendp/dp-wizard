@@ -42,8 +42,11 @@ pip freeze:
 def _make_issue_url(info):
     """
     >>> info = 'A B C'
-    >>> print(urllib.parse.unquote_plus(_make_issue_url(info)[-70:]))
+    >>> print(urllib.parse.unquote_plus(urllib.parse.urlparse(_make_issue_url(info)).query))
+    body=Please describe the problem.
+    <BLANKLINE>
     <details>
+    The information below will help us reproduce the issue.
     <BLANKLINE>
     ```
     A B C
@@ -54,6 +57,7 @@ def _make_issue_url(info):
     markdown = f"""Please describe the problem.
 
 <details>
+The information below will help us reproduce the issue.
 
 ```
 {info}
