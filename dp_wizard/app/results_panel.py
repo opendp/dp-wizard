@@ -161,9 +161,14 @@ def results_server(
             )
             for col in weights().keys()
         }
+
+        # Prefer private CSV, if available.
+        # Input validation in UI should make sure
+        # at least one is filled.
+        preferred_path = private_csv_path() or public_csv_path()
+
         return AnalysisPlan(
-            # Prefer private CSV, if available:
-            csv_path=private_csv_path() or public_csv_path(),
+            csv_path=Path(preferred_path),
             contributions=contributions(),
             epsilon=epsilon(),
             groups=groups(),

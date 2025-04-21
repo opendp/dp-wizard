@@ -1,4 +1,5 @@
-from typing import NamedTuple, Optional
+from typing import NamedTuple
+from pathlib import Path
 import re
 
 
@@ -14,7 +15,7 @@ class AnalysisPlanColumn(NamedTuple):
 
 
 class AnalysisPlan(NamedTuple):
-    csv_path: Optional[str]
+    csv_path: Path
     contributions: int
     epsilon: float
     groups: list[str]
