@@ -15,6 +15,7 @@ from dp_wizard.app.components.outputs import (
     demo_tooltip,
     hide_if,
     info_md_box,
+    nav_button,
 )
 from dp_wizard.utils.code_generators import make_privacy_unit_block
 
@@ -100,20 +101,20 @@ def dataset_server(
         return ui.row(
             ui.input_file(
                 "public_csv_path",
+                "Choose Public CSV",
+                accept=[".csv"],
+                placeholder=Path(cli_info.public_csv_path or "").name,
+            ),
+            ui.input_file(
+                "private_csv_path",
                 [
-                    "Choose Public CSV ",  # Trailing space looks better.
+                    "Choose Private CSV ",  # Trailing space looks better.
                     demo_tooltip(
                         cli_info.is_demo,
                         "For the demo, we'll imagine we have the grades "
                         "on assignments for a class.",
                     ),
                 ],
-                accept=[".csv"],
-                placeholder=Path(cli_info.public_csv_path or "").name,
-            ),
-            ui.input_file(
-                "private_csv_path",
-                "Choose Private CSV",
                 accept=[".csv"],
                 placeholder=Path(cli_info.private_csv_path or "").name,
             ),
@@ -198,7 +199,7 @@ def dataset_server(
 
     @render.ui
     def define_analysis_button_ui():
-        button = ui.input_action_button(
+        button = nav_button(
             "go_to_analysis", "Define analysis", disabled=not button_enabled()
         )
         if button_enabled() and contributions_valid():

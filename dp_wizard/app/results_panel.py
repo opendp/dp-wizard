@@ -125,6 +125,7 @@ def make_download_or_modal_error(download_generator) -> str:  # pragma: no cover
             ui.pre(str(e)),
             title="Error generating code",
             size="xl",
+            easy_close=True,
         )
         ui.modal_show(modal)
         raise types.SilentException("code generation")

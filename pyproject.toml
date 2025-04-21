@@ -4,10 +4,14 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "dp_wizard"
-authors = [{name = "Chuck McCallum", email = "mccallucc@gmail.com"}]
+authors = [{name = "The OpenDP Project", email = "info@opendp.org"}]
 readme = "README-PYPI.md"
 license = {file = "LICENSE"}
-classifiers = ["License :: OSI Approved :: MIT License"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+]
+keywords = ["differential privacy"]
 dynamic = ["version", "description"]
 dependencies = [
     "shiny",
@@ -24,6 +28,9 @@ dependencies = [
     # Pin minimum versions if we've had problems.
     "pyarrow>=16.0.0",
 ]
+
+[options]
+python_requires = ">=3.10"
 
 [project.scripts]
 # Prefer dash in name where allowed (repo named and executable)

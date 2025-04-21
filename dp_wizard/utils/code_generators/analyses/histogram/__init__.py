@@ -60,10 +60,10 @@ def make_column_config_block(column_name, lower_bound, upper_bound, bin_count):
 
     snake_name = snake_case(column_name)
     return (
-        Template("histogram_config", __file__)
+        Template("histogram_expr", __file__)
         .fill_expressions(
             CUT_LIST_NAME=f"{snake_name}_cut_points",
-            BIN_CONFIG_NAME=f"{snake_name}_bin_config",
+            BIN_EXPR_NAME=f"{snake_name}_bin_expr",
         )
         .fill_values(
             LOWER_BOUND=lower_bound,
