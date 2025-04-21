@@ -42,7 +42,8 @@ pip freeze:
 def _make_issue_url(info):
     """
     >>> info = 'A B C'
-    >>> print(urllib.parse.unquote_plus(urllib.parse.urlparse(_make_issue_url(info)).query))
+    >>> query = urllib.parse.urlparse(_make_issue_url(info)).query
+    >>> print(urllib.parse.unquote_plus(query))
     body=Please describe the problem.
     <BLANKLINE>
     <details>
