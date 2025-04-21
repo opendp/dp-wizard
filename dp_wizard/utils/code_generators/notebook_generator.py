@@ -44,7 +44,7 @@ class NotebookGenerator(AbstractGenerator):
             )
             + "}"
         )
-        match os.name:
+        match os.name:  # pragma: no cover
             case "nt":
                 pure_path = PureWindowsPath
             case "posix":
