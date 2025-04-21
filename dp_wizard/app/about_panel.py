@@ -94,7 +94,7 @@ def about_ui():
                 "File issue",
                 href=issue_url,
                 target="_blank",
-                class_="btn btn-default action-button",
+                class_="btn btn-default",
                 style="width: 10em;",
             ),
         ),
