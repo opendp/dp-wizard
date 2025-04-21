@@ -11,7 +11,11 @@ class NotebookGenerator(AbstractGenerator):
     root_template = "notebook"
 
     def _make_context(self):
-        return self._make_partial_context().fill_values(CSV_PATH=self.csv_path).finish()
+        return (
+            self._make_partial_context()
+            .fill_values(CSV_PATH=str(self.csv_path))
+            .finish()
+        )
 
     def _make_python_cell(self, block):
         return f"\n# +\n{block}\n# -\n"
