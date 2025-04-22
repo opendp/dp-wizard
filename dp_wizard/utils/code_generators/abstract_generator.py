@@ -46,7 +46,7 @@ class AbstractGenerator(ABC):
         code = (
             Template(self.root_template, __file__)
             .fill_expressions(
-                DEPENDENCIES="'opendp[polars]==0.12.1a20250227001' matplotlib"
+                DEPENDENCIES="'opendp[polars]==0.13.0' matplotlib",
             )
             .fill_blocks(
                 IMPORTS_BLOCK=Template("imports", __file__).finish(),
