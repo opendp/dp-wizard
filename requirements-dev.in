@@ -20,7 +20,7 @@ pytest-xdist
 # Everything below should also be listed in pyproject.toml:
 
 # OpenDP:
-opendp[polars]==0.12.1a20250227001
+opendp[polars]==0.13.0
 
 # Conversion:
 jupytext
