@@ -105,11 +105,12 @@ def dataset_server(
                     but for the safety of your data, in the cloud DP Wizard only
                     accepts column names. After defining your analysis,
                     you can download a notebook to run locally.
+
+                    Provide the names of columns you'll use in your analysis,
+                    one per line, with no extra punctuation.
                     """
                 ),
-                ui.input_text_area(
-                    "column_names", "CSV Column Names (one per line)", rows=5
-                ),
+                ui.input_text_area("column_names", "CSV Column Names", rows=5),
             )
         return (
             ui.card(
