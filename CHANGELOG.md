@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 0.3.1
+
+- upgrade to opendp 0.13 [#398](https://github.com/opendp/dp-wizard/pull/398)
+- Add a warning on the first run [#355](https://github.com/opendp/dp-wizard/pull/355)
+- minimum version on pyarrow [#358](https://github.com/opendp/dp-wizard/pull/358)
+- add webpdf extra and it works for me [#360](https://github.com/opendp/dp-wizard/pull/360)
+
 ## 0.3.0
 
 - provide command line alias [#337](https://github.com/opendp/dp-wizard/pull/337)
