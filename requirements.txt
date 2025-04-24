@@ -14,6 +14,7 @@ jupyter-client
 pyyaml
 nbconvert
 ipykernel
+black
 # May also require:
 # python -m ipykernel install --name kernel_name --user
 
