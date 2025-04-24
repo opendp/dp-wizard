@@ -33,14 +33,27 @@ def button(name: str, ext: str, icon: str, primary=False):  # pragma: no cover
     )
 
 
+def _strip_ansi(e):
+    """
+    >>> e = Exception('\x1B[0;31mValueError\x1B[0m: ...')
+    >>> _strip_ansi(e)
+    'ValueError: ...'
+    """
+    # From https://stackoverflow.com/a/14693789
+    import re
+
+    return re.sub(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])", "", str(e))
+
+
 def make_download_or_modal_error(download_generator):  # pragma: no cover
     try:
         with ui.Progress() as progress:
             progress.set(message=wait_message)
             return download_generator()
     except Exception as e:
+        message = _strip_ansi(e)
         modal = ui.modal(
-            ui.pre(str(e)),
+            ui.pre(message),
             title="Error generating code",
             size="xl",
             easy_close=True,
