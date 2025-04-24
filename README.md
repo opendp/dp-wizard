@@ -11,7 +11,7 @@ Building on what we've learned from [DP Creator](https://github.com/opendp/dpcre
 - UI development in Python with [Shiny](https://shiny.posit.co/py/)
 
 You can run DP Wizard locally and upload your own CSV,
-or use the [cloud deployment](https://01966942-7eab-da99-0887-a7c483756aa8.share.connect.posit.cloud/) and only provide column names to protect your private data.
+or use the [cloud deployment](https://mccalluc-dp-wizard.share.connect.posit.cloud/) and only provide column names to protect your private data.
 In either case, you'll be prompted to describe the analysis you need, and then be able to download outputs including:
 
 - A Jupyter notebook which demonstrates how to use [OpenDP](https://docs.opendp.org/).
@@ -122,6 +122,8 @@ If Playwright fails in CI, we can still see what went wrong:
   - Then bump `dp_wizard/VERSION`, and add the new number at the top of the `CHANGELOG.md`.
   - Push to github; open PR, with version number in name; merge PR.
 - `flit publish --pypirc .pypirc`
+
+The cloud deployment is [configured](https://connect.posit.cloud/mccalluc/content/01966942-7eab-da99-0887-a7c483756aa8/edit) to update on pushes to the `cloud-deployment` branch. For now, this is manual.
 
 ### Conventions
 
