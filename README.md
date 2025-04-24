@@ -10,9 +10,9 @@ Building on what we've learned from [DP Creator](https://github.com/opendp/dpcre
 - Interactive visualization of privacy budget choices
 - UI development in Python with [Shiny](https://shiny.posit.co/py/)
 
-DP Wizard guides the user through the application of differential privacy.
-After selecting a local CSV, users are prompted to describe the analysis they need.
-Output options include:
+You can run DP Wizard locally and upload your own CSV,
+or use the [cloud deployment](https://01966942-7eab-da99-0887-a7c483756aa8.share.connect.posit.cloud/) and only provide column names to protect your private data.
+In either case, you'll be prompted to describe the analysis you need, and then be able to download outputs including:
 
 - A Jupyter notebook which demonstrates how to use [OpenDP](https://docs.opendp.org/).
 - A plain Python script.
