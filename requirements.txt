@@ -1,0 +1,25 @@
+# Posit Cloud Connect requires a requirements.txt file, with that exact name.
+# See: https://docs.posit.co/connect-cloud/how-to/python/dependencies.html
+
+# This content is copied from "requirements-app.in" in https://github.com/opendp/dp-wizard/pull/386.
+# When that PR is merged, rename both "requirements-app.*" files to plain "requirements.*",
+# and clobber this, so deployments to the cloud will get pinned dependencies.
+
+# OpenDP:
+opendp[polars]==0.13.0
+
+# Conversion:
+jupytext
+jupyter-client
+pyyaml
+nbconvert
+ipykernel
+# May also require:
+# python -m ipykernel install --name kernel_name --user
+
+# Shiny:
+shiny
+faicons
+
+# Visualization:
+matplotlib
