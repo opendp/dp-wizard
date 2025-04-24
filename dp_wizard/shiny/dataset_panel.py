@@ -9,7 +9,7 @@ from dp_wizard.utils.argparse_helpers import (
     PUBLIC_PRIVATE_TEXT,
 )
 from dp_wizard.utils.csv_helper import get_csv_names_mismatch
-from dp_wizard.app.components.outputs import (
+from dp_wizard.shiny.components.outputs import (
     output_code_sample,
     demo_tooltip,
     hide_if,

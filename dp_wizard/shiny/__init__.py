@@ -6,7 +6,7 @@ from shiny import App, ui, reactive, Inputs, Outputs, Session
 
 from dp_wizard.utils.argparse_helpers import get_cli_info, CLIInfo
 from dp_wizard.utils.csv_helper import read_csv_names
-from dp_wizard.app import (
+from dp_wizard.shiny import (
     about_panel,
     analysis_panel,
     dataset_panel,
@@ -170,6 +170,3 @@ def make_server_from_cli_info(cli_info: CLIInfo):
         session.on_ended(ctrl_c_reminder)
 
     return server
-
-
-app = App(app_ui, make_server_from_cli_info(get_cli_info()))
