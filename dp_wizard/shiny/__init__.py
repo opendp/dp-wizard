@@ -4,7 +4,7 @@ import random
 
 from shiny import ui, reactive, Inputs, Outputs, Session
 
-from dp_wizard.utils.argparse_helpers import get_cli_info, CLIInfo
+from dp_wizard.utils.argparse_helpers import CLIInfo
 from dp_wizard.utils.csv_helper import read_csv_names
 from dp_wizard.shiny import (
     about_panel,
