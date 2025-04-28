@@ -169,7 +169,7 @@ narwhals==1.35.0
     # via shiny
 nbclient==0.10.2
     # via nbconvert
-nbconvert==7.16.6
+nbconvert[webpdf]==7.16.6
     # via -r .../dp-wizard/requirements.in
 nbformat==5.10.4
     # via
@@ -223,7 +223,9 @@ platformdirs==4.3.7
     #   jupyter-core
     #   virtualenv
 playwright==1.51.0
-    # via pytest-playwright
+    # via
+    #   nbconvert
+    #   pytest-playwright
 pluggy==1.5.0
     # via pytest
 polars==1.12.0

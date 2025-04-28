@@ -54,6 +54,8 @@ fastjsonschema==2.21.1
     # via nbformat
 fonttools==4.57.0
     # via matplotlib
+greenlet==3.2.1
+    # via playwright
 h11==0.14.0
     # via uvicorn
 htmltools==0.6.0
@@ -123,7 +125,7 @@ narwhals==1.35.0
     # via shiny
 nbclient==0.10.2
     # via nbconvert
-nbconvert==7.16.6
+nbconvert[webpdf]==7.16.6
     # via -r requirements.in
 nbformat==5.10.4
     # via
@@ -162,6 +164,8 @@ pillow==11.2.1
     # via matplotlib
 platformdirs==4.3.7
     # via jupyter-core
+playwright==1.51.0
+    # via nbconvert
 polars==1.12.0
     # via opendp
 prompt-toolkit==3.0.51
@@ -177,6 +181,8 @@ pure-eval==0.2.3
     # via stack-data
 pyarrow==19.0.1
     # via opendp
+pyee==12.1.1
+    # via playwright
 pygments==2.19.1
     # via
     #   ipython
@@ -254,6 +260,7 @@ typing-extensions==4.13.2
     #   htmltools
     #   ipython
     #   mistune
+    #   pyee
     #   referencing
     #   shiny
     #   uvicorn

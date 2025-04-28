@@ -7,7 +7,7 @@ opendp[polars]==0.13.0
 jupytext
 jupyter-client
 pyyaml
-nbconvert
+nbconvert[webpdf]
 ipykernel
 # May also require:
 # python -m ipykernel install --name kernel_name --user
