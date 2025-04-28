@@ -131,7 +131,7 @@ This project is configured so there are two different install possibilities from
 
 Branch names should be of the form `NNNN-short-description`, where `NNNN` is the issue number being addressed.
 
-Add developer-only dependencies in `requirements-dev.in`; Add other dependencies in `requirements-app.in`. After an edit to either file run `dependencies.py` to install the new dependency locally and update `pyproject.toml`.
+Add developer-only dependencies in `requirements-dev.in`; Add other dependencies in `requirements.in`. After an edit to either file run `dependencies.py` to install the new dependency locally and update `pyproject.toml`.
 
 A Github [project board](https://github.com/orgs/opendp/projects/10/views/2) provides an overview of the issues and PRs.
 When PRs are [Ready for Review](https://github.com/orgs/opendp/projects/10/views/2?filterQuery=status%3A%22Ready+for+Review%22) they should be flagged as such so reviewers can find them.

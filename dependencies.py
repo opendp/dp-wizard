@@ -39,16 +39,16 @@ def rewrite_pyproject_toml():  # pragma: no cover
     # TODO: Can we split it to have one dependency per line?
     # https://tomlkit.readthedocs.io/en/latest/api/#tomlkit.items.Array
     pyproject["project"]["dependencies"] = parse_requirements(
-        "requirements-app.in",
+        "requirements.in",
     )
     pyproject["project"]["optional-dependencies"]["app"] = parse_requirements(
-        "requirements-app.txt",
+        "requirements.txt",
     )
     pyproject_path.write_text(dumps(pyproject))
 
 
 def main():  # pragma: no cover
-    pip_compile_install("requirements-app.in")
+    pip_compile_install("requirements.in")
     pip_compile_install("requirements-dev.in")
     rewrite_pyproject_toml()
 

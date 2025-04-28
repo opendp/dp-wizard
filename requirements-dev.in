@@ -17,4 +17,4 @@ pytest-cov
 pytest-xdist
 
 # App dependencies:
--r requirements-app.in
+-r requirements.in
