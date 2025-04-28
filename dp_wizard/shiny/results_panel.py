@@ -115,6 +115,23 @@ def results_server(
 
     @render.ui
     def download_code_ui():
+        nb_download_ui = [
+            button("Notebook (unexecuted)", ".ipynb", "book", primary=True),
+            p(
+                """
+                This contains the same code as Jupyter notebook above,
+                but none of the cells are executed,
+                so it does not contain any results.
+                """
+            ),
+            button("HTML (unexecuted)", ".html", "file-code"),
+            p("The same content, but exported as HTML."),
+        ]
+        if not no_uploads:
+            nb_download_ui += [
+                button("PDF (unexecuted)", ".pdf", "file-pdf"),
+                p("The same content, but exported as PDF."),
+            ]
         return [
             ui.h3("Download Code"),
             ui.markdown(
@@ -132,21 +149,7 @@ def results_server(
                 """
             ),
             ui.accordion(
-                ui.accordion_panel(
-                    "Unexecuted Notebooks",
-                    button("Notebook (unexecuted)", ".ipynb", "book", primary=True),
-                    p(
-                        """
-                        This contains the same code as Jupyter notebook above,
-                        but none of the cells are executed,
-                        so it does not contain any results.
-                        """
-                    ),
-                    button("HTML (unexecuted)", ".html", "file-code"),
-                    p("The same content, but exported as HTML."),
-                    button("PDF (unexecuted)", ".pdf", "file-pdf"),
-                    p("The same content, but exported as PDF."),
-                ),
+                ui.accordion_panel("Unexecuted Notebooks", *nb_download_ui),
                 ui.accordion_panel(
                     "Scripts",
                     button("Script", ".py", "python", primary=True),

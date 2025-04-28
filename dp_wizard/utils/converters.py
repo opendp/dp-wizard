@@ -92,7 +92,6 @@ def convert_nb_to_pdf(python_nb: str):
 def convert_nb(python_nb: str, exporter_constructor):
     notebook = nbformat.reads(python_nb, as_version=4)
     exporter = exporter_constructor(
-        config={"WebPDFExporter": {"allow_chromium_download": True}},
         template_name="lab",
         # The "classic" template's CSS forces large code cells on to
         # the next page rather than breaking, so use "lab" instead.
