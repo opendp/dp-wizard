@@ -9,6 +9,7 @@ jupyter-client
 pyyaml
 nbconvert[webpdf]
 ipykernel
+black
 # May also require:
 # python -m ipykernel install --name kernel_name --user
 

@@ -3,7 +3,6 @@
 # Developer tools:
 pip-tools
 flit
-black
 flake8
 flake8-bugbear
 pre-commit
