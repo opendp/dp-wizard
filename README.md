@@ -4,7 +4,7 @@
 
 Building on what we've learned from [DP Creator](https://github.com/opendp/dpcreator), DP Wizard offers:
 
-- Easy installation with `pip install dp_wizard`
+- Easy installation with `pip install dp_wizard[app]`
 - Simplified single-user application design
 - Streamlined workflow that doesn't assume familiarity with differential privacy
 - Interactive visualization of privacy budget choices
@@ -123,14 +123,17 @@ If Playwright fails in CI, we can still see what went wrong:
   - Push to github; open PR, with version number in name; merge PR.
 - `flit publish --pypirc .pypirc`
 
+This project is configured so there are two different install possibilities from pypi:
+- `pip install dp_wizard` does not aggressively pin dependency versions. It is preferred if you're using `dp_wizard` as a library.
+- `pip install dp_wizard[app]` pins all dependencies, and will work more reliably for application users.
+
 The cloud deployment is [configured](https://connect.posit.cloud/mccalluc/content/01966942-7eab-da99-0887-a7c483756aa8/edit) to update on pushes to the `cloud-deployment` branch. For now, this is manual.
 
 ### Conventions
 
 Branch names should be of the form `NNNN-short-description`, where `NNNN` is the issue number being addressed.
 
-Dependencies should be pinned for development, but not pinned when the package is installed.
-New dev dependencies can be added to `requirements-dev.in`, and then run `pip-compile requirements-dev.in` to update `requirements-dev.txt`
+Add developer-only dependencies in `requirements-dev.in`; Add other dependencies in `requirements.in`. After an edit to either file run `dependencies.py` to install the new dependency locally and update `pyproject.toml`.
 
 A Github [project board](https://github.com/orgs/opendp/projects/10/views/2) provides an overview of the issues and PRs.
 When PRs are [Ready for Review](https://github.com/orgs/opendp/projects/10/views/2?filterQuery=status%3A%22Ready+for+Review%22) they should be flagged as such so reviewers can find them.

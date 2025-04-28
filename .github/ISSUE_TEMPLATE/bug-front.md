@@ -4,8 +4,7 @@ about: The interface isn't working correctly, before downloading results.
 title: ''
 labels:
     - 'req: Python Shiny'
-types:
-    - 'Bug'
+type: 'Bug'
 assignees: ''
 
 ---
