@@ -4,8 +4,7 @@ about: There's an error downloading the results, or the results are incorrect.
 title: ''
 labels:
     - 'req: OpenDP API'
-types:
-    - 'Bug'
+type: 'Bug'
 assignees: ''
 
 ---

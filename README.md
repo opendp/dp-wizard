@@ -4,7 +4,7 @@
 
 Building on what we've learned from [DP Creator](https://github.com/opendp/dpcreator), DP Wizard offers:
 
-- Easy installation with `pip install dp_wizard`
+- Easy installation with `pip install dp_wizard[app]`
 - Simplified single-user application design
 - Streamlined workflow that doesn't assume familiarity with differential privacy
 - Interactive visualization of privacy budget choices
@@ -25,29 +25,30 @@ You can check your current version with `python --version`.
 The exact upgrade process will depend on your environment and operating system.
 
 ```
-usage: dp-wizard [-h] [--public_csv CSV] [--private_csv CSV] [--contrib CONTRIB] [--demo]
+usage: dp-wizard [-h] [--demo | --no_uploads]
 
 DP Wizard makes it easier to get started with Differential Privacy.
 
 options:
-  -h, --help         show this help message and exit
-  --public_csv CSV   Path to public CSV
-  --private_csv CSV  Path to private CSV
-  --contrib CONTRIB  How many rows can an individual contribute?
-  --demo             Use generated fake CSV for a quick demo
+  -h, --help    show this help message and exit
+  --demo        Use generated fake CSV for a quick demo
+  --no_uploads  Prompt for column names instead of CSV upload
 
-Use "--public_csv" if you have a public data set, and are curious how
+Unless you have set "--demo" or "--no_uploads", you will specify a CSV
+inside the application.
+
+Provide a "Public CSV" if you have a public data set, and are curious how
 DP can be applied: The preview visualizations will use your public data.
 
-Use "--private_csv" if you only have a private data set, and want to
+Provide a "Private CSV" if you only have a private data set, and want to
 make a release from it: The preview visualizations will only use
 simulated data, and apart from the headers, the private CSV is not
 read until the release.
 
-Use "--public_csv" and "--private_csv" together if you have two CSVs
-with the same structure. Perhaps the public CSV is older and no longer
-sensitive. Preview visualizations will be made with the public data,
-but the release will be made with private data.
+Provide both if you have two CSVs with the same structure.
+Perhaps the public CSV is older and no longer sensitive. Preview
+visualizations will be made with the public data, but the release will
+be made with private data.
 ```
 
 
@@ -122,12 +123,15 @@ If Playwright fails in CI, we can still see what went wrong:
   - Push to github; open PR, with version number in name; merge PR.
 - `flit publish --pypirc .pypirc`
 
+This project is configured so there are two different install possibilities from pypi:
+- `pip install dp_wizard` does not aggressively pin dependency versions. It is preferred if you're using `dp_wizard` as a library.
+- `pip install dp_wizard[app]` pins all dependencies, and will work more reliably for application users.
+
 ### Conventions
 
 Branch names should be of the form `NNNN-short-description`, where `NNNN` is the issue number being addressed.
 
-Dependencies should be pinned for development, but not pinned when the package is installed.
-New dev dependencies can be added to `requirements-dev.in`, and then run `pip-compile requirements-dev.in` to update `requirements-dev.txt`
+Add developer-only dependencies in `requirements-dev.in`; Add other dependencies in `requirements-app.in`. After an edit to either file run `dependencies.py` to install the new dependency locally and update `pyproject.toml`.
 
 A Github [project board](https://github.com/orgs/opendp/projects/10/views/2) provides an overview of the issues and PRs.
 When PRs are [Ready for Review](https://github.com/orgs/opendp/projects/10/views/2?filterQuery=status%3A%22Ready+for+Review%22) they should be flagged as such so reviewers can find them.
