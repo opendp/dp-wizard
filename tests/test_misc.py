@@ -34,8 +34,8 @@ def test_opendp_pin(rel_path):
     opendp_lines = [
         line for line in (root / rel_path).read_text().splitlines() if "opendp[" in line
     ]
-    assert len(opendp_lines) == 1
-    assert "opendp[polars]==0.13.0" in opendp_lines[0]
+    assert len(opendp_lines) == 2 if rel_path == "pyproject.toml" else 1
+    assert all("opendp[polars]==0.13.0" in line for line in opendp_lines)
 
 
 @pytest.mark.parametrize(
