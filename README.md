@@ -127,7 +127,8 @@ This project is configured so there are two different install possibilities from
 - `pip install dp_wizard` does not aggressively pin dependency versions. It is preferred if you're using `dp_wizard` as a library.
 - `pip install dp_wizard[app]` pins all dependencies, and will work more reliably for application users.
 
-The cloud deployment is [configured](https://connect.posit.cloud/mccalluc/content/01966942-7eab-da99-0887-a7c483756aa8/edit) to update on pushes to the `cloud-deployment` branch. For now, this is manual.
+The cloud deployment is [configured](https://connect.posit.cloud/mccalluc/content/01966942-7eab-da99-0887-a7c483756aa8/edit) to update on pushes to the `cloud-deployment` branch.
+If you are on `main`, with no local changes, run `script/deploy.sh`.
 
 ### Conventions
 

@@ -104,15 +104,17 @@ def dataset_server(
                         """
                         # DP Wizard, from OpenDP
 
-                        DP Wizard makes it easier to get started with differential privacy:
-                        You configure a basic analysis interactively,
-                        and then download code which demonstrates
-                        how to use the [OpenDP library](https://docs.opendp.org/).
+                        DP Wizard makes it easier to get started with
+                        differential privacy: You configure a basic analysis
+                        interactively, and then download code which
+                        demonstrates how to use the
+                        [OpenDP library](https://docs.opendp.org/).
 
-                        When [installed and run locally](https://pypi.org/project/dp_wizard/),
+                        When [installed and run
+                        locally](https://pypi.org/project/dp_wizard/),
                         DP Wizard allows you to specify a private CSV,
-                        but for the safety of your data, in the cloud DP Wizard only
-                        accepts column names.
+                        but for the safety of your data, in the cloud
+                        DP Wizard only accepts column names.
                         """
                     ),
                 ),
