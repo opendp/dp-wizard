@@ -39,6 +39,7 @@ click==8.1.8
     # via
     #   black
     #   pip-tools
+    #   rsconnect-python
     #   shiny
     #   uvicorn
 comm==0.2.2
@@ -248,6 +249,8 @@ pygments==2.19.1
     # via
     #   ipython
     #   nbconvert
+pyjwt==2.10.1
+    # via rsconnect-python
 pyparsing==3.2.3
     # via matplotlib
 pyproject-hooks==1.2.0
@@ -304,10 +307,14 @@ rpds-py==0.24.0
     # via
     #   jsonschema
     #   referencing
+rsconnect-python==1.25.2
+    # via -r requirements-dev.in
 scikit-learn==1.6.1
     # via opendp
 scipy==1.15.2
     # via scikit-learn
+semver==3.0.4
+    # via rsconnect-python
 shiny==1.4.0
     # via -r .../dp-wizard/requirements.in
 six==1.17.0
@@ -351,6 +358,7 @@ typing-extensions==4.13.2
     #   htmltools
     #   pyee
     #   pyright
+    #   rsconnect-python
     #   shiny
 uc-micro-py==1.0.3
     # via linkify-it-py

@@ -28,13 +28,13 @@ def pip_compile_install(file_name):  # pragma: no cover
 
 
 def parse_requirements(file_name):  # pragma: no cover
-    requirements_path = Path(__file__).parent / file_name
+    requirements_path = Path(__file__).parent.parent / file_name
     lines = requirements_path.read_text().splitlines()
     return sorted(line for line in lines if line and not line.strip().startswith("#"))
 
 
 def rewrite_pyproject_toml():  # pragma: no cover
-    pyproject_path = Path(__file__).parent / "pyproject.toml"
+    pyproject_path = Path(__file__).parent.parent / "pyproject.toml"
     pyproject = parse(pyproject_path.read_text())
     # TODO: Can we split it to have one dependency per line?
     # https://tomlkit.readthedocs.io/en/latest/api/#tomlkit.items.Array

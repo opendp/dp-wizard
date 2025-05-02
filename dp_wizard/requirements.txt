@@ -1,0 +1,21 @@
+# After making changes here, run scripts/requirements.py.
+
+# OpenDP:
+opendp[polars]==0.13.0
+
+# Conversion:
+jupytext
+jupyter-client
+pyyaml
+nbconvert
+ipykernel
+black
+# May also require:
+# python -m ipykernel install --name kernel_name --user
+
+# Shiny:
+shiny
+faicons
+
+# Visualization:
+matplotlib
