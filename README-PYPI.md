@@ -25,16 +25,16 @@ You can check your current version with `python --version`.
 The exact upgrade process will depend on your environment and operating system.
 
 ```
-usage: dp-wizard [-h] [--demo | --no_uploads]
+usage: dp-wizard [-h] [--demo | --cloud]
 
 DP Wizard makes it easier to get started with Differential Privacy.
 
 options:
-  -h, --help    show this help message and exit
-  --demo        Use generated fake CSV for a quick demo
-  --no_uploads  Prompt for column names instead of CSV upload
+  -h, --help  show this help message and exit
+  --demo      Use generated fake CSV for a quick demo
+  --cloud     Prompt for column names instead of CSV upload
 
-Unless you have set "--demo" or "--no_uploads", you will specify a CSV
+Unless you have set "--demo" or "--cloud", you will specify a CSV
 inside the application.
 
 Provide a "Public CSV" if you have a public data set, and are curious how

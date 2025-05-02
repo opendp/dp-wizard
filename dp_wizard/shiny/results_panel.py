@@ -61,7 +61,7 @@ def results_server(
     input: Inputs,
     output: Outputs,
     session: Session,
-    no_uploads: bool,
+    in_cloud: bool,
     public_csv_path: reactive.Value[str],
     private_csv_path: reactive.Value[str],
     contributions: reactive.Value[int],
@@ -75,7 +75,7 @@ def results_server(
 ):  # pragma: no cover
     @render.ui
     def download_results_ui():
-        if no_uploads:
+        if in_cloud:
             return None
         return [
             ui.h3("Download Results"),
@@ -121,7 +121,7 @@ def results_server(
 
                 In the cloud, DP Wizard only provides unexecuted notebooks and scripts.
                 """
-                if no_uploads
+                if in_cloud
                 else """
                 Alternatively, you can download a script or unexecuted notebook
                 that demonstrates the steps of your analysis,
@@ -135,11 +135,12 @@ def results_server(
                         button("Notebook (unexecuted)", ".ipynb", "book", primary=True),
                         p(
                             """
-                            An unexecuted Jupyter notebook which shows the steps in
-                            a differentially private analysis. It can also be updated with
-                            the path to a private CSV and executed locally.
+                            An unexecuted Jupyter notebook which shows the steps
+                            in a differentially private analysis.
+                            It can also be updated with the path
+                            to a private CSV and executed locally.
                             """
-                            if no_uploads
+                            if in_cloud
                             else """
                             This contains the same code as Jupyter notebook above,
                             but none of the cells are executed,
@@ -172,7 +173,7 @@ def results_server(
                 # > The default value of None will open the first accordion_panel.
                 # > Use a value of True to open all (or False to open none)
                 # > of the items.
-                open=None if no_uploads else False,
+                open=None if in_cloud else False,
             ),
         ]
 

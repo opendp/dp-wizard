@@ -50,7 +50,7 @@ def dataset_server(
     output: Outputs,
     session: Session,
     is_demo: bool,
-    no_uploads: bool,
+    in_cloud: bool,
     initial_public_csv_path: str,
     initial_private_csv_path: str,
     public_csv_path: reactive.Value[str],
@@ -96,7 +96,7 @@ def dataset_server(
 
     @render.ui
     def csv_or_columns_ui():
-        if no_uploads:
+        if in_cloud:
             return ui.card(
                 ui.card_header("CSV Columns"),
                 ui.markdown(
@@ -207,7 +207,7 @@ Choose both **Public CSV** and **Private CSV** {PUBLIC_PRIVATE_TEXT}"""
         return (
             contributions_valid()
             and len(column_names()) > 0
-            and (no_uploads or not csv_column_mismatch_calc())
+            and (in_cloud or not csv_column_mismatch_calc())
         )
 
     @reactive.calc
@@ -242,7 +242,7 @@ Choose both **Public CSV** and **Private CSV** {PUBLIC_PRIVATE_TEXT}"""
             button,
             (
                 "Specify columns and the unit of privacy before proceeding."
-                if no_uploads
+                if in_cloud
                 else "Specify CSV and the unit of privacy before proceeding."
             ),
         ]
