@@ -57,7 +57,7 @@ class AbstractGenerator(ABC):
             .finish()
         )
         # Line length determined by PDF rendering.
-        return black.format_str(code, mode=black.Mode(line_length=74))
+        return black.format_str(code, mode=black.Mode(line_length=74))  # type: ignore
 
     def _make_margins_list(self, bin_names: Iterable[str], groups: Iterable[str]):
         groups_str = ", ".join(f"'{g}'" for g in groups)
