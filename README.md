@@ -94,7 +94,7 @@ Your browser should open and connect you to the application.
 
 Tests should pass, and code coverage should be complete (except blocks we explicitly ignore):
 ```shell
-$ ./ci.sh
+$ scripts/ci.sh
 ```
 
 We're using [Playwright](https://playwright.dev/python/) for end-to-end tests. You can use it to [generate test code](https://playwright.dev/python/docs/codegen-intro) just by interacting with the app in a browser:
@@ -118,7 +118,7 @@ If Playwright fails in CI, we can still see what went wrong:
 
 - Make sure you're up to date, and have the git-ignored credentials file `.pypirc`.
 - Make one last feature branch:
-  - Run `changelog.py` to update the `CHANGELOG.md`.
+  - Run `scripts/changelog.py` to update the `CHANGELOG.md`.
   - Then bump `dp_wizard/VERSION`, and add the new number at the top of the `CHANGELOG.md`.
   - Push to github; open PR, with version number in name; merge PR.
 - `flit publish --pypirc .pypirc`
@@ -133,7 +133,7 @@ The cloud deployment is [configured](https://connect.posit.cloud/mccalluc/conten
 
 Branch names should be of the form `NNNN-short-description`, where `NNNN` is the issue number being addressed.
 
-Add developer-only dependencies in `requirements-dev.in`; Add other dependencies in `requirements.in`. After an edit to either file run `dependencies.py` to install the new dependency locally and update `pyproject.toml`.
+Add developer-only dependencies in `requirements-dev.in`; Add other dependencies in `requirements.in`. After an edit to either file run `scripts/dependencies.py` to install the new dependency locally and update `pyproject.toml`.
 
 A Github [project board](https://github.com/orgs/opendp/projects/10/views/2) provides an overview of the issues and PRs.
 When PRs are [Ready for Review](https://github.com/orgs/opendp/projects/10/views/2?filterQuery=status%3A%22Ready+for+Review%22) they should be flagged as such so reviewers can find them.

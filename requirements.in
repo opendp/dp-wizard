@@ -1,4 +1,4 @@
-# After making changes here, run dependencies.py.
+# After making changes here, run scripts/dependencies.py.
 
 # OpenDP:
 opendp[polars]==0.13.0
