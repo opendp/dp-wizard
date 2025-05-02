@@ -52,12 +52,7 @@ def main():  # pragma: no cover
     new_changelog_lines = []
 
     prev_version = get_prev_version()
-
-    # Nothing in the changelog says "v0.0.1"
-    # but I'll remember on the next release!
-    # For now, just hardcode the name of the last PR in v0.0.1.
-    # TODO: Replace this with "prev_version".
-    log_lines = log_until("add badge")
+    log_lines = log_until(prev_version)
     changelog_update = parse_log(log_lines)
 
     for line in old_changelog_lines:
