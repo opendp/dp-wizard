@@ -97,21 +97,36 @@ def dataset_server(
     @render.ui
     def csv_or_columns_ui():
         if in_cloud:
-            return ui.card(
-                ui.card_header("CSV Columns"),
-                ui.markdown(
-                    """
-                    When run locally, DP Wizard allows you to specify a private CSV,
-                    but for the safety of your data, in the cloud DP Wizard only
-                    accepts column names. After defining your analysis,
-                    you can download a notebook to run locally.
+            return [
+                ui.card(
+                    ui.card_header("Welcome!"),
+                    ui.markdown(
+                        """
+                        # DP Wizard, from OpenDP
 
-                    Provide the names of columns you'll use in your analysis,
-                    one per line, with no extra punctuation.
-                    """
+                        DP Wizard makes it easier to get started with differential privacy:
+                        You configure a basic analysis interactively,
+                        and then download code which demonstrates
+                        how to use the [OpenDP library](https://docs.opendp.org/).
+
+                        When [installed and run locally](https://pypi.org/project/dp_wizard/),
+                        DP Wizard allows you to specify a private CSV,
+                        but for the safety of your data, in the cloud DP Wizard only
+                        accepts column names.
+                        """
+                    ),
                 ),
-                ui.input_text_area("column_names", "CSV Column Names", rows=5),
-            )
+                ui.card(
+                    ui.card_header("CSV Columns"),
+                    ui.markdown(
+                        """
+                        Provide the names of columns you'll use in your analysis,
+                        one per line, with no extra punctuation.
+                        """
+                    ),
+                    ui.input_text_area("column_names", "CSV Column Names", rows=5),
+                ),
+            ]
         return (
             ui.card(
                 ui.card_header("Input CSVs"),
