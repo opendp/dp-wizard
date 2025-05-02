@@ -7,7 +7,7 @@ opendp[polars]==0.13.0
 jupytext
 jupyter-client
 pyyaml
-nbconvert[webpdf]
+nbconvert
 ipykernel
 black
 # May also require:
