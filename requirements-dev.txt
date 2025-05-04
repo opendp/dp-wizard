@@ -90,7 +90,7 @@ fonttools==4.57.0
     # via matplotlib
 greenlet==3.2.0
     # via playwright
-h11==0.14.0
+h11==0.16.0
     # via uvicorn
 htmltools==0.6.0
     # via
