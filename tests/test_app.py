@@ -14,10 +14,11 @@ if bp in Path(__file__).read_text():
         "#run-a-test-from-a-specific-breakpoint"
     )
 
-
-demo_app = create_app_fixture(Path(__file__).parent / "fixtures/apps/demo_app.py")
-cloud_app = create_app_fixture(Path(__file__).parent / "fixtures/apps/cloud_app.py")
-default_app = create_app_fixture(Path(__file__).parent / "fixtures/apps/default_app.py")
+demo_app = create_app_fixture(Path(__file__).parent.parent / "dp_wizard/app_demo.py")
+cloud_app = create_app_fixture(Path(__file__).parent.parent / "dp_wizard/app_cloud.py")
+default_app = create_app_fixture(
+    Path(__file__).parent.parent / "dp_wizard/app_local.py"
+)
 tooltip = "#private_csv_path-label svg"
 for_the_demo = "For the demo, we'll imagine"
 
@@ -151,7 +152,7 @@ def test_default_app_validations(
     expect_no_error()
 
     # -- Feedback --
-    page.get_by_text("Feedback").click()
+    page.get_by_role("tab", name="Feedback").click()
     iframe = page.locator("#feedback-iframe")
     expect(iframe).to_be_visible()
     expect(iframe.content_frame.get_by_text("DP Wizard Feedback")).to_be_visible()
@@ -190,7 +191,7 @@ def test_default_app_downloads(
     matches = [
         re.search(r'button\("([^"]+)", "([^"]+)"', line)
         for line in (
-            Path(__file__).parent.parent / "dp_wizard" / "app" / "results_panel.py"
+            Path(__file__).parent.parent / "dp_wizard" / "shiny" / "results_panel.py"
         )
         .read_text()
         .splitlines()
