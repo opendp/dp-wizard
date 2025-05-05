@@ -151,6 +151,7 @@ def make_server_from_cli_info(cli_info: CLIInfo):
             output,
             session,
             no_uploads=cli_info.no_uploads,
+            qa_mode=cli_info.qa_mode,
             public_csv_path=public_csv_path,
             private_csv_path=private_csv_path,
             contributions=contributions,

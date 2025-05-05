@@ -18,6 +18,9 @@ if bp in Path(__file__).read_text():
 demo_app = create_app_fixture(Path(__file__).parent / "fixtures/apps/demo_app.py")
 cloud_app = create_app_fixture(Path(__file__).parent / "fixtures/apps/cloud_app.py")
 default_app = create_app_fixture(Path(__file__).parent / "fixtures/apps/default_app.py")
+qa_app = create_app_fixture(Path(__file__).parent / "fixtures/apps/qa_app.py")
+
+
 tooltip = "#private_csv_path-label svg"
 for_the_demo = "For the demo, we'll imagine"
 
@@ -27,6 +30,18 @@ def test_cloud_app(page: Page, cloud_app: ShinyAppProc):  # pragma: no cover
     expect(page).to_have_title("DP Wizard")
     expect(page.get_by_text("Choose Public CSV")).not_to_be_visible()
     expect(page.get_by_text("CSV Column Names")).to_be_visible()
+
+
+def test_qa_app(page: Page, qa_app: ShinyAppProc):  # pragma: no cover
+    page.goto(qa_app.url)
+    page.get_by_role("button", name="Define analysis").click()
+
+    page.locator(".selectize-input").nth(1).click()
+    page.get_by_text(": grade").click()
+
+    page.get_by_role("button", name="Download Results").click()
+    page.get_by_role("link", name="Download Notebook (.ipynb)").click()
+    expect(page.get_by_text("raise Exception('qa_mode!')")).to_be_visible()
 
 
 def test_demo_app(page: Page, demo_app: ShinyAppProc):  # pragma: no cover

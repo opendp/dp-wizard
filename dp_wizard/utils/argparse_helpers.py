@@ -70,24 +70,13 @@ def _get_args():
         # Normal parsing:
         args = arg_parser.parse_args()  # pragma: no cover
 
-    if args.demo:  # pragma: no cover
-        other_args = {arg for arg in dir(args) if not arg.startswith("_")} - {
-            "demo",
-            "contributions",
-            "no_uploads",
-        }
-        set_args = [k for k in other_args if getattr(args, k) is not None]
-        if set_args:
-            arg_parser.error(
-                "When --demo is set, other arguments should be skipped: "
-                + ", ".join(set_args)
-            )
     return args
 
 
 class CLIInfo(NamedTuple):
     is_demo: bool
     no_uploads: bool
+    qa_mode: bool
 
 
 def get_cli_info() -> CLIInfo:  # pragma: no cover
@@ -95,4 +84,5 @@ def get_cli_info() -> CLIInfo:  # pragma: no cover
     return CLIInfo(
         is_demo=args.demo,
         no_uploads=args.no_uploads,
+        qa_mode=False,
     )

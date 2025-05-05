@@ -10,6 +10,7 @@ app = App(
         CLIInfo(
             is_demo=False,
             no_uploads=True,
+            qa_mode=False,
         )
     ),
 )
