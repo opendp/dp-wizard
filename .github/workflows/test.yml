@@ -42,7 +42,7 @@ jobs:
         run: playwright install chromium
 
       - name: Test
-        run: ./ci.sh
+        run: scripts/ci.sh
 
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}

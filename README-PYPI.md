@@ -4,15 +4,15 @@
 
 Building on what we've learned from [DP Creator](https://github.com/opendp/dpcreator), DP Wizard offers:
 
-- Easy installation with `pip install dp_wizard`
+- Easy installation with `pip install dp_wizard[app]`
 - Simplified single-user application design
 - Streamlined workflow that doesn't assume familiarity with differential privacy
 - Interactive visualization of privacy budget choices
 - UI development in Python with [Shiny](https://shiny.posit.co/py/)
 
-DP Wizard guides the user through the application of differential privacy.
-After selecting a local CSV, users are prompted to describe the analysis they need.
-Output options include:
+You can run DP Wizard locally and upload your own CSV,
+or use the [cloud deployment](https://01966942-7eab-da99-0887-a7c483756aa8.share.connect.posit.cloud/) and only provide column names to protect your private data.
+In either case, you'll be prompted to describe the analysis you need, and then be able to download outputs including:
 
 - A Jupyter notebook which demonstrates how to use [OpenDP](https://docs.opendp.org/).
 - A plain Python script.
@@ -25,16 +25,16 @@ You can check your current version with `python --version`.
 The exact upgrade process will depend on your environment and operating system.
 
 ```
-usage: dp-wizard [-h] [--demo | --no_uploads]
+usage: dp-wizard [-h] [--demo | --cloud]
 
 DP Wizard makes it easier to get started with Differential Privacy.
 
 options:
-  -h, --help    show this help message and exit
-  --demo        Use generated fake CSV for a quick demo
-  --no_uploads  Prompt for column names instead of CSV upload
+  -h, --help  show this help message and exit
+  --demo      Use generated fake CSV for a quick demo
+  --cloud     Prompt for column names instead of CSV upload
 
-Unless you have set "--demo" or "--no_uploads", you will specify a CSV
+Unless you have set "--demo" or "--cloud", you will specify a CSV
 inside the application.
 
 Provide a "Public CSV" if you have a public data set, and are curious how

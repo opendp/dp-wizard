@@ -45,9 +45,7 @@ class AbstractGenerator(ABC):
     def make_py(self):
         code = (
             Template(self.root_template, __file__)
-            .fill_expressions(
-                DEPENDENCIES="'opendp[polars]==0.12.1a20250227001' matplotlib"
-            )
+            .fill_expressions(DEPENDENCIES="'opendp[polars]==0.13.0' matplotlib")
             .fill_blocks(
                 IMPORTS_BLOCK=Template("imports", __file__).finish(),
                 UTILS_BLOCK=(Path(__file__).parent.parent / "shared.py").read_text(),
@@ -59,7 +57,7 @@ class AbstractGenerator(ABC):
             .finish()
         )
         # Line length determined by PDF rendering.
-        return black.format_str(code, mode=black.Mode(line_length=74))
+        return black.format_str(code, mode=black.Mode(line_length=74))  # type: ignore
 
     def _make_margins_list(self, bin_names: Iterable[str], groups: Iterable[str]):
         groups_str = ", ".join(f"'{g}'" for g in groups)
