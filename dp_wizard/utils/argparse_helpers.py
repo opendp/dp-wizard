@@ -31,7 +31,7 @@ def _get_arg_parser():
         description="DP Wizard makes it easier to get started with "
         "Differential Privacy.",
         epilog=f"""
-Unless you have set "--demo" or "--no_uploads", you will specify a CSV
+Unless you have set "--demo" or "--cloud", you will specify a CSV
 inside the application.
 
 Provide a "Public CSV" {PUBLIC_TEXT}
@@ -48,7 +48,7 @@ Provide both {PUBLIC_PRIVATE_TEXT}
         help="Use generated fake CSV for a quick demo",
     )
     group.add_argument(
-        "--no_uploads",
+        "--cloud",
         action="store_true",
         help="Prompt for column names instead of CSV upload",
     )
@@ -58,7 +58,7 @@ Provide both {PUBLIC_PRIVATE_TEXT}
 def _get_args():
     """
     >>> _get_args()
-    Namespace(demo=False, no_uploads=False)
+    Namespace(demo=False, cloud=False)
     """
     arg_parser = _get_arg_parser()
 
@@ -75,14 +75,10 @@ def _get_args():
 
 class CLIInfo(NamedTuple):
     is_demo: bool
-    no_uploads: bool
+    in_cloud: bool
     qa_mode: bool
 
 
 def get_cli_info() -> CLIInfo:  # pragma: no cover
     args = _get_args()
-    return CLIInfo(
-        is_demo=args.demo,
-        no_uploads=args.no_uploads,
-        qa_mode=False,
-    )
+    return CLIInfo(is_demo=args.demo, in_cloud=args.cloud, qa_mode=False)

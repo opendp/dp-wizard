@@ -14,7 +14,6 @@ from dp_wizard.utils.code_generators.script_generator import ScriptGenerator
 from dp_wizard.utils.converters import (
     convert_py_to_nb,
     convert_nb_to_html,
-    convert_nb_to_pdf,
 )
 
 
@@ -62,7 +61,7 @@ def results_server(
     input: Inputs,
     output: Outputs,
     session: Session,
-    no_uploads: bool,
+    in_cloud: bool,
     qa_mode: bool,
     public_csv_path: reactive.Value[str],
     private_csv_path: reactive.Value[str],
@@ -77,7 +76,7 @@ def results_server(
 ):  # pragma: no cover
     @render.ui
     def download_results_ui():
-        if no_uploads:
+        if in_cloud:
             return None
         return [
             ui.h3("Download Results"),
@@ -95,8 +94,6 @@ def results_server(
                     ),
                     button("HTML", ".html", "file-code"),
                     p("The same content, but exported as HTML."),
-                    button("PDF", ".pdf", "file-pdf"),
-                    p("The same content, but exported as PDF."),
                 ),
                 ui.accordion_panel(
                     "Reports",
@@ -125,7 +122,7 @@ def results_server(
 
                 In the cloud, DP Wizard only provides unexecuted notebooks and scripts.
                 """
-                if no_uploads
+                if in_cloud
                 else """
                 Alternatively, you can download a script or unexecuted notebook
                 that demonstrates the steps of your analysis,
@@ -135,18 +132,25 @@ def results_server(
             ui.accordion(
                 ui.accordion_panel(
                     "Unexecuted Notebooks",
-                    button("Notebook (unexecuted)", ".ipynb", "book", primary=True),
-                    p(
-                        """
-                        This contains the same code as Jupyter notebook above,
-                        but none of the cells are executed,
-                        so it does not contain any results.
-                        """
-                    ),
-                    button("HTML (unexecuted)", ".html", "file-code"),
-                    p("The same content, but exported as HTML."),
-                    button("PDF (unexecuted)", ".pdf", "file-pdf"),
-                    p("The same content, but exported as PDF."),
+                    [
+                        button("Notebook (unexecuted)", ".ipynb", "book", primary=True),
+                        p(
+                            """
+                            An unexecuted Jupyter notebook which shows the steps
+                            in a differentially private analysis.
+                            It can also be updated with the path
+                            to a private CSV and executed locally.
+                            """
+                            if in_cloud
+                            else """
+                            This contains the same code as Jupyter notebook above,
+                            but none of the cells are executed,
+                            so it does not contain any results.
+                            """
+                        ),
+                        button("HTML (unexecuted)", ".html", "file-code"),
+                        p("The same content, but exported as HTML."),
+                    ],
                 ),
                 ui.accordion_panel(
                     "Scripts",
@@ -170,7 +174,7 @@ def results_server(
                 # > The default value of None will open the first accordion_panel.
                 # > Use a value of True to open all (or False to open none)
                 # > of the items.
-                open=None if no_uploads else False,
+                open=None if in_cloud else False,
             ),
         ]
 
@@ -226,14 +230,6 @@ def results_server(
     def notebook_html_unexecuted():
         return convert_nb_to_html(notebook_nb_unexecuted())
 
-    @reactive.calc
-    def notebook_pdf():
-        return convert_nb_to_pdf(notebook_nb())
-
-    @reactive.calc
-    def notebook_pdf_unexecuted():
-        return convert_nb_to_pdf(notebook_nb_unexecuted())
-
     @render.download(
         filename="dp-wizard-script.py",
         media_type="text/x-python",
@@ -277,20 +273,6 @@ def results_server(
     )
     async def download_html_unexecuted():
         yield make_download_or_modal_error(notebook_html_unexecuted)
-
-    @render.download(
-        filename="dp-wizard-notebook.pdf",
-        media_type="application/pdf",
-    )  # pyright: ignore
-    async def download_pdf():
-        yield make_download_or_modal_error(notebook_pdf)
-
-    @render.download(
-        filename="dp-wizard-notebook.pdf",
-        media_type="application/pdf",
-    )  # pyright: ignore
-    async def download_pdf_unexecuted():
-        yield make_download_or_modal_error(notebook_pdf_unexecuted)
 
     @render.download(
         filename="dp-wizard-report.txt",
