@@ -1,17 +1,21 @@
+import os
+from pathlib import Path, PureWindowsPath, PurePosixPath
+
 from dp_wizard.utils.code_generators.abstract_generator import AbstractGenerator
 from dp_wizard.utils.code_template import Template
 from dp_wizard.utils.csv_helper import name_to_identifier
 from dp_wizard.utils.dp_helper import confidence
 
 
-from pathlib import Path
-
-
 class NotebookGenerator(AbstractGenerator):
     root_template = "notebook"
 
     def _make_context(self):
-        return self._make_partial_context().fill_values(CSV_PATH=self.csv_path).finish()
+        return (
+            self._make_partial_context()
+            .fill_values(CSV_PATH=str(self.csv_path))
+            .finish()
+        )
 
     def _make_python_cell(self, block):
         return f"\n# +\n{block}\n# -\n"
@@ -40,6 +44,13 @@ class NotebookGenerator(AbstractGenerator):
             )
             + "}"
         )
+        match os.name:  # pragma: no cover
+            case "nt":
+                pure_path = PureWindowsPath
+            case "posix":
+                pure_path = PurePosixPath
+            case _:
+                raise Exception(f"Unexpected {os.name=}")
         tmp_path = Path(__file__).parent.parent.parent / "tmp"
         reports_block = (
             Template("reports", __file__)
@@ -48,10 +59,10 @@ class NotebookGenerator(AbstractGenerator):
                 COLUMNS={k: v._asdict() for k, v in self.columns.items()},
             )
             .fill_values(
-                CSV_PATH=self.csv_path,
+                CSV_PATH=str(pure_path(self.csv_path)),
                 EPSILON=self.epsilon,
-                TXT_REPORT_PATH=str(tmp_path / "report.txt"),
-                CSV_REPORT_PATH=str(tmp_path / "report.csv"),
+                TXT_REPORT_PATH=str(pure_path(tmp_path / "report.txt")),
+                CSV_REPORT_PATH=str(pure_path(tmp_path / "report.csv")),
             )
             .finish()
         )
