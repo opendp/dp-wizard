@@ -116,7 +116,7 @@ class Template:
                     raise Exception(base_message)
         return self
 
-    def finish(self):
+    def finish(self) -> str:
         unfilled_slots = self._initial_slots & self._find_slots()
         if unfilled_slots:
             slots_str = ", ".join(sorted(f"'{slot}'" for slot in unfilled_slots))

@@ -26,15 +26,27 @@ class AnalysisPlan(NamedTuple):
 
 
 def make_privacy_unit_block(contributions: int):
-    return (
-        Template("privacy_unit", __file__)
-        .fill_values(CONTRIBUTIONS=contributions)
-        .finish()
-    )
+    import opendp.prelude as dp
+
+    def template(CONTRIBUTIONS):
+        contributions = CONTRIBUTIONS
+        privacy_unit = dp.unit_of(contributions=contributions)  # noqa: F841
+
+    return Template(template).fill_values(CONTRIBUTIONS=contributions).finish()
 
 
 def make_privacy_loss_block(epsilon: float):
-    return Template("privacy_loss", __file__).fill_values(EPSILON=epsilon).finish()
+    import opendp.prelude as dp
+
+    def template(EPSILON):
+        # Consider how your budget compares to that of other projects.
+        # https://registry.oblivious.com/#public-dp
+        privacy_loss = dp.loss_of(  # noqa: F841
+            epsilon=EPSILON,
+            delta=1e-7,
+        )
+
+    return Template(template).fill_values(EPSILON=epsilon).finish()
 
 
 def make_column_config_block(
