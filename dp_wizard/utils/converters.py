@@ -83,12 +83,6 @@ def convert_nb_to_html(python_nb: str):
     return convert_nb(python_nb, nbconvert.HTMLExporter)
 
 
-def convert_nb_to_pdf(python_nb: str):
-    # PDFExporter uses LaTeX as an intermediate representation.
-    # WebPDFExporter uses HTML.
-    return convert_nb(python_nb, nbconvert.WebPDFExporter)
-
-
 def convert_nb(python_nb: str, exporter_constructor):
     notebook = nbformat.reads(python_nb, as_version=4)
     exporter = exporter_constructor(

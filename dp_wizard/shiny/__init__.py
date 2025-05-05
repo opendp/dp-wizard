@@ -2,11 +2,11 @@ from pathlib import Path
 import csv
 import random
 
-from shiny import App, ui, reactive, Inputs, Outputs, Session
+from shiny import ui, reactive, Inputs, Outputs, Session
 
-from dp_wizard.utils.argparse_helpers import get_cli_info, CLIInfo
+from dp_wizard.utils.argparse_helpers import CLIInfo
 from dp_wizard.utils.csv_helper import read_csv_names
-from dp_wizard.app import (
+from dp_wizard.shiny import (
     about_panel,
     analysis_panel,
     dataset_panel,
@@ -122,7 +122,7 @@ def make_server_from_cli_info(cli_info: CLIInfo):
             output,
             session,
             is_demo=cli_info.is_demo,
-            no_uploads=cli_info.no_uploads,
+            in_cloud=cli_info.in_cloud,
             initial_public_csv_path="",
             initial_private_csv_path=str(initial_private_csv_path),
             public_csv_path=public_csv_path,
@@ -150,7 +150,7 @@ def make_server_from_cli_info(cli_info: CLIInfo):
             input,
             output,
             session,
-            no_uploads=cli_info.no_uploads,
+            in_cloud=cli_info.in_cloud,
             public_csv_path=public_csv_path,
             private_csv_path=private_csv_path,
             contributions=contributions,
@@ -170,6 +170,3 @@ def make_server_from_cli_info(cli_info: CLIInfo):
         session.on_ended(ctrl_c_reminder)
 
     return server
-
-
-app = App(app_ui, make_server_from_cli_info(get_cli_info()))

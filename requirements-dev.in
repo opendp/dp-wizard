@@ -1,9 +1,8 @@
-# After making changes here, run dependencies.py.
+# After making changes here, run scripts/requirements.py.
 
 # Developer tools:
 pip-tools
 flit
-black
 flake8
 flake8-bugbear
 pre-commit
