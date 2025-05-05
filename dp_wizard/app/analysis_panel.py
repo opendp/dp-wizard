@@ -3,13 +3,13 @@ from typing import Iterable, Any
 from pathlib import Path
 
 from htmltools import tags
-from shiny import ui, reactive, render, req, Inputs, Outputs, Session
+from shiny import ui, reactive, render, Inputs, Outputs, Session
 
 from dp_wizard.app.components.inputs import log_slider
 from dp_wizard.app.components.column_module import column_ui, column_server
 from dp_wizard.utils.csv_helper import (
-    read_csv_ids_labels,
-    read_csv_ids_names,
+    id_names_dict_from_names,
+    id_labels_dict_from_names,
     get_csv_row_count,
 )
 from dp_wizard.app.components.outputs import (
@@ -100,7 +100,8 @@ def analysis_server(
     output: Outputs,
     session: Session,
     public_csv_path: reactive.Value[str],
-    private_csv_path: reactive.Value[str],
+    # private_csv_path is not needed, since we have the column_names.
+    column_names: reactive.Value[list[str]],
     contributions: reactive.Value[int],
     is_demo: bool,
     analysis_types: reactive.Value[dict[str, str]],
@@ -226,13 +227,11 @@ def analysis_server(
 
     @reactive.calc
     def csv_ids_names_calc():
-        # The previous tab validated that if both public and private are given,
-        # the columns match, so it shouldn't matter which is read.
-        return read_csv_ids_names(Path(req(public_csv_path() or private_csv_path())))
+        return id_names_dict_from_names(column_names())
 
     @reactive.calc
     def csv_ids_labels_calc():
-        return read_csv_ids_labels(Path(req(public_csv_path() or private_csv_path())))
+        return id_labels_dict_from_names(column_names())
 
     @reactive.effect
     @reactive.event(input.log_epsilon_slider)

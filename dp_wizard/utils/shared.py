@@ -22,10 +22,15 @@ def interval_bottom(interval: str):
     10.0
     >>> interval_bottom("-10")
     -10.0
+    >>> interval_bottom("unexpected")
+    0.0
     """
     # Intervals from Polars are always open on the left,
     # so that's the only case we cover with replace().
-    return float(interval.split(",")[0].replace("(", ""))
+    try:
+        return float(interval.split(",")[0].replace("(", ""))
+    except ValueError:
+        return 0.0
 
 
 def df_to_columns(df: DataFrame):

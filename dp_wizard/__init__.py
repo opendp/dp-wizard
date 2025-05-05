@@ -8,6 +8,15 @@ __version__ = (Path(__file__).parent / "VERSION").read_text().strip()
 
 
 def main():  # pragma: no cover
+    import sys
+
+    min_version = "3.10"
+    if sys.version_info < tuple(int(v) for v in min_version.split(".")):
+        raise Exception(
+            f"DP Wizard requires Python {min_version}"
+            f" or newer. This is Python {sys.version}."
+        )
+
     import shiny
     from dp_wizard.utils.argparse_helpers import get_cli_info
 

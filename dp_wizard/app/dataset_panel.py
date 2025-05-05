@@ -7,7 +7,6 @@ from dp_wizard.utils.argparse_helpers import (
     PUBLIC_TEXT,
     PRIVATE_TEXT,
     PUBLIC_PRIVATE_TEXT,
-    CLIInfo,
 )
 from dp_wizard.utils.csv_helper import get_csv_names_mismatch
 from dp_wizard.app.components.outputs import (
@@ -18,6 +17,7 @@ from dp_wizard.app.components.outputs import (
     nav_button,
 )
 from dp_wizard.utils.code_generators import make_privacy_unit_block
+from dp_wizard.utils.csv_helper import read_csv_names
 
 
 dataset_panel_id = "dataset_panel"
@@ -26,19 +26,7 @@ dataset_panel_id = "dataset_panel"
 def dataset_ui():
     return ui.nav_panel(
         "Select Dataset",
-        ui.card(
-            ui.card_header("Input CSVs"),
-            ui.markdown(
-                f"""
-Choose **Public CSV** {PUBLIC_TEXT}
-
-Choose **Private CSV** {PRIVATE_TEXT}
-
-Choose both **Public CSV** and **Private CSV** {PUBLIC_PRIVATE_TEXT}"""
-            ),
-            ui.output_ui("input_files_ui"),
-            ui.output_ui("csv_column_match_ui"),
-        ),
+        ui.output_ui("csv_or_columns_ui"),
         ui.card(
             ui.card_header("Unit of privacy"),
             ui.markdown(
@@ -61,20 +49,39 @@ def dataset_server(
     input: Inputs,
     output: Outputs,
     session: Session,
-    cli_info: CLIInfo,
+    is_demo: bool,
+    no_uploads: bool,
+    initial_public_csv_path: str,
+    initial_private_csv_path: str,
     public_csv_path: reactive.Value[str],
     private_csv_path: reactive.Value[str],
+    column_names: reactive.Value[list[str]],
     contributions: reactive.Value[int],
 ):  # pragma: no cover
     @reactive.effect
     @reactive.event(input.public_csv_path)
     def _on_public_csv_path_change():
-        public_csv_path.set(input.public_csv_path()[0]["datapath"])
+        path = input.public_csv_path()[0]["datapath"]
+        public_csv_path.set(path)
+        column_names.set(read_csv_names(Path(path)))
 
     @reactive.effect
     @reactive.event(input.private_csv_path)
     def _on_private_csv_path_change():
-        private_csv_path.set(input.private_csv_path()[0]["datapath"])
+        path = input.private_csv_path()[0]["datapath"]
+        private_csv_path.set(path)
+        column_names.set(read_csv_names(Path(path)))
+
+    @reactive.effect
+    @reactive.event(input.column_names)
+    def _on_column_names_change():
+        column_names.set(
+            [
+                clean
+                for line in input.column_names().splitlines()
+                if (clean := line.strip())
+            ]
+        )
 
     @reactive.calc
     def csv_column_mismatch_calc() -> Optional[tuple[set, set]]:
@@ -86,6 +93,40 @@ def dataset_server(
             )
             if just_public or just_private:
                 return just_public, just_private
+
+    @render.ui
+    def csv_or_columns_ui():
+        if no_uploads:
+            return ui.card(
+                ui.card_header("CSV Columns"),
+                ui.markdown(
+                    """
+                    When run locally, DP Wizard allows you to specify a private CSV,
+                    but for the safety of your data, in the cloud DP Wizard only
+                    accepts column names. After defining your analysis,
+                    you can download a notebook to run locally.
+
+                    Provide the names of columns you'll use in your analysis,
+                    one per line, with no extra punctuation.
+                    """
+                ),
+                ui.input_text_area("column_names", "CSV Column Names", rows=5),
+            )
+        return (
+            ui.card(
+                ui.card_header("Input CSVs"),
+                ui.markdown(
+                    f"""
+Choose **Public CSV** {PUBLIC_TEXT}
+
+Choose **Private CSV** {PRIVATE_TEXT}
+
+Choose both **Public CSV** and **Private CSV** {PUBLIC_PRIVATE_TEXT}"""
+                ),
+                ui.output_ui("input_files_ui"),
+                ui.output_ui("csv_column_match_ui"),
+            ),
+        )
 
     @render.ui
     def input_files_ui():
@@ -103,20 +144,20 @@ def dataset_server(
                 "public_csv_path",
                 "Choose Public CSV",
                 accept=[".csv"],
-                placeholder=Path(cli_info.public_csv_path or "").name,
+                placeholder=Path(initial_public_csv_path).name,
             ),
             ui.input_file(
                 "private_csv_path",
                 [
                     "Choose Private CSV ",  # Trailing space looks better.
                     demo_tooltip(
-                        cli_info.is_demo,
+                        is_demo,
                         "For the demo, we'll imagine we have the grades "
                         "on assignments for a class.",
                     ),
                 ],
                 accept=[".csv"],
-                placeholder=Path(cli_info.private_csv_path or "").name,
+                placeholder=Path(initial_private_csv_path).name,
             ),
         )
 
@@ -146,7 +187,7 @@ def dataset_server(
                 [
                     "Contributions ",  # Trailing space looks better.
                     demo_tooltip(
-                        cli_info.is_demo,
+                        is_demo,
                         "For the demo, we assume that each student "
                         f"can occur at most {contributions()} times in the dataset. ",
                     ),
@@ -163,17 +204,11 @@ def dataset_server(
 
     @reactive.calc
     def button_enabled():
-        public_csv_path_is_set = (
-            input.public_csv_path() is not None and len(input.public_csv_path()) > 0
+        return (
+            contributions_valid()
+            and len(column_names()) > 0
+            and (no_uploads or not csv_column_mismatch_calc())
         )
-        private_csv_path_is_set = (
-            input.private_csv_path() is not None and len(input.private_csv_path()) > 0
-        )
-        csv_path_is_set = (
-            public_csv_path_is_set or private_csv_path_is_set or cli_info.is_demo
-        ) and not csv_column_mismatch_calc()
-        contributions_is_set = input.contributions() is not None
-        return contributions_is_set and csv_path_is_set
 
     @reactive.calc
     def contributions_valid():
@@ -190,7 +225,7 @@ def dataset_server(
     @render.ui
     def python_tooltip_ui():
         return demo_tooltip(
-            cli_info.is_demo,
+            is_demo,
             "Along the way, code samples will demonstrate "
             "how the information you provide is used in OpenDP, "
             "and at the end you can download a notebook "
@@ -199,14 +234,17 @@ def dataset_server(
 
     @render.ui
     def define_analysis_button_ui():
-        button = nav_button(
-            "go_to_analysis", "Define analysis", disabled=not button_enabled()
-        )
-        if button_enabled() and contributions_valid():
+        enabled = button_enabled()
+        button = nav_button("go_to_analysis", "Define analysis", disabled=not enabled)
+        if enabled:
             return button
         return [
             button,
-            "Choose CSV and Contributions before proceeding.",
+            (
+                "Specify columns and the unit of privacy before proceeding."
+                if no_uploads
+                else "Specify CSV and the unit of privacy before proceeding."
+            ),
         ]
 
     @render.code
