@@ -5,14 +5,14 @@ from pathlib import Path
 from htmltools import tags
 from shiny import ui, reactive, render, Inputs, Outputs, Session
 
-from dp_wizard.app.components.inputs import log_slider
-from dp_wizard.app.components.column_module import column_ui, column_server
+from dp_wizard.shiny.components.inputs import log_slider
+from dp_wizard.shiny.components.column_module import column_ui, column_server
 from dp_wizard.utils.csv_helper import (
     id_names_dict_from_names,
     id_labels_dict_from_names,
     get_csv_row_count,
 )
-from dp_wizard.app.components.outputs import (
+from dp_wizard.shiny.components.outputs import (
     output_code_sample,
     demo_tooltip,
     nav_button,
