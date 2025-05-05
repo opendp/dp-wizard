@@ -26,6 +26,7 @@ dataset_panel_id = "dataset_panel"
 def dataset_ui():
     return ui.nav_panel(
         "Select Dataset",
+        ui.output_ui("dataset_release_warning_ui"),
         ui.output_ui("csv_or_columns_ui"),
         ui.card(
             ui.card_header("Unit of privacy"),
@@ -49,6 +50,7 @@ def dataset_server(
     input: Inputs,
     output: Outputs,
     session: Session,
+    released: reactive.Value[bool],
     is_demo: bool,
     in_cloud: bool,
     initial_public_csv_path: str,
@@ -93,6 +95,19 @@ def dataset_server(
             )
             if just_public or just_private:
                 return just_public, just_private
+
+    @render.ui
+    def dataset_release_warning_ui():
+        return hide_if(
+            not released(),
+            info_md_box(
+                """
+            After making a differentially private release,
+            any changes will constitute a new release,
+            and an additional epsilon spend.
+            """
+            ),
+        )
 
     @render.ui
     def csv_or_columns_ui():

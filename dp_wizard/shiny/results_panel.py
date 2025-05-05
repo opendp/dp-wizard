@@ -61,6 +61,7 @@ def results_server(
     input: Inputs,
     output: Outputs,
     session: Session,
+    released: reactive.Value[bool],
     in_cloud: bool,
     public_csv_path: reactive.Value[str],
     private_csv_path: reactive.Value[str],
@@ -209,6 +210,7 @@ def results_server(
         # and drops reports in the tmp dir.
         # Could be slow!
         # Luckily, reactive calcs are lazy.
+        released.set(True)
         notebook_py = NotebookGenerator(analysis_plan()).make_py()
         return convert_py_to_nb(notebook_py, execute=True)
 
