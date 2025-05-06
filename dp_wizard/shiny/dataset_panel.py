@@ -102,10 +102,10 @@ def dataset_server(
             not released(),
             info_md_box(
                 """
-            After making a differentially private release,
-            any changes will constitute a new release,
-            and an additional epsilon spend.
-            """
+                After making a differentially private release,
+                changes to the dataset will constitute a new release,
+                and an additional epsilon spend.
+                """
             ),
         )
 

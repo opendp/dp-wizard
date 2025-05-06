@@ -167,13 +167,19 @@ def test_default_app_validations(
 def test_default_app_downloads(
     page: Page, default_app: ShinyAppProc
 ):  # pragma: no cover
+
+    dataset_release_warning = "changes to the dataset will constitute a new release"
+    analysis_release_warning = "changes to the analysis will constitute a new release"
+
     # -- Select dataset --
     page.goto(default_app.url)
+    expect(page.get_by_text(dataset_release_warning)).not_to_be_visible()
     csv_path = Path(__file__).parent / "fixtures" / "fake.csv"
     page.get_by_label("Choose Public CSV").set_input_files(csv_path.resolve())
 
     # -- Define analysis --
     page.get_by_role("button", name="Define analysis").click()
+    expect(page.get_by_text(analysis_release_warning)).not_to_be_visible()
 
     # Pick grouping:
     page.locator(".selectize-input").nth(0).click()
@@ -214,3 +220,11 @@ def test_default_app_downloads(
         download = download_info.value
         content = download.path().read_bytes()
         assert content  # Could add assertions for different document types.
+
+    # -- Define analysis --
+    page.get_by_role("tab", name="Define Analysis").click()
+    expect(page.get_by_text(analysis_release_warning)).to_be_visible()
+
+    # -- Download Results --
+    page.get_by_role("tab", name="Select Dataset").click()
+    expect(page.get_by_text(dataset_release_warning)).to_be_visible()
