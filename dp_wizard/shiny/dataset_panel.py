@@ -9,7 +9,11 @@ from dp_wizard.utils.argparse_helpers import (
     PUBLIC_PRIVATE_TEXT,
 )
 from dp_wizard.utils.csv_helper import get_csv_names_mismatch
-from dp_wizard.shiny.components.inputs import file_selector
+from dp_wizard.shiny.components.inputs import (
+    get_file_selector_choices,
+    file_selector,
+    parent_name,
+)
 from dp_wizard.shiny.components.outputs import (
     output_code_sample,
     demo_tooltip,
@@ -64,12 +68,22 @@ def dataset_server(
     @reactive.event(input.public_csv_name)
     def _on_public_csv_name_change():
         name = input.public_csv_name()
-        if name == "..":
-            public_csv_dir.set(public_csv_dir().parent)
+        if not name:
+            pass
+        elif name == parent_name:
+            new_dir = public_csv_dir().parent
+            public_csv_dir.set(new_dir)
             public_csv_path.set(None)
+            ui.update_select(
+                "public_csv_name", choices=get_file_selector_choices(new_dir)
+            )
         elif name.endswith("/"):
-            public_csv_dir.set(public_csv_dir() / name)
+            new_dir = public_csv_dir() / name
+            public_csv_dir.set(new_dir)
             public_csv_path.set(None)
+            ui.update_select(
+                "public_csv_name", choices=get_file_selector_choices(new_dir)
+            )
         else:
             new_path = public_csv_dir() / name
             public_csv_path.set(new_path)

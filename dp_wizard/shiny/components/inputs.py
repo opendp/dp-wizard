@@ -3,11 +3,23 @@ from math import log10
 from shiny import ui
 
 
-def file_selector(id: str, label: str, cwd: Path):
-    choices = [None, "../"] + sorted(
+parent_name = "../"
+
+
+def get_file_selector_choices(cwd: Path):
+    return [None, parent_name] + sorted(
         path.name + ("/" if path.is_dir() else "") for path in cwd.iterdir()
     )
-    return ui.input_select(id, label, choices, selected=None)
+
+
+def file_selector(id: str, label: str, cwd: Path):
+    return ui.input_select(
+        id,
+        label,
+        get_file_selector_choices(cwd),
+        size="6",
+        selected=None,
+    )
 
 
 def log_slider(id: str, lower_bound: float, upper_bound: float):
