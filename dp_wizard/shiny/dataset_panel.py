@@ -69,7 +69,7 @@ def dataset_server(
     def _on_public_csv_name_change():
         name = input.public_csv_name()
         if not name:
-            pass
+            column_names.set([])
         elif name == parent_name:
             new_dir = public_csv_dir().parent
             public_csv_dir.set(new_dir)
@@ -77,6 +77,7 @@ def dataset_server(
             ui.update_select(
                 "public_csv_name", choices=get_file_selector_choices(new_dir)
             )
+            column_names.set([])
         elif name.endswith("/"):
             new_dir = public_csv_dir() / name
             public_csv_dir.set(new_dir)
@@ -84,6 +85,7 @@ def dataset_server(
             ui.update_select(
                 "public_csv_name", choices=get_file_selector_choices(new_dir)
             )
+            column_names.set([])
         else:
             new_path = public_csv_dir() / name
             public_csv_path.set(new_path)
@@ -181,7 +183,7 @@ Choose both **Public CSV** and **Private CSV** {PUBLIC_PRIVATE_TEXT}"""
         # - After file upload, the internal copy of the file
         #   is renamed to something like "0.csv".
         return ui.row(
-            file_selector("public_csv_name", "Choose Public CSV", Path.cwd()),
+            file_selector("public_csv_name", "Choose Public CSV", public_csv_dir()),
             ui.input_file(
                 "private_csv_path",
                 [

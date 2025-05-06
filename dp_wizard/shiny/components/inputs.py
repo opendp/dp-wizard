@@ -13,9 +13,11 @@ def get_file_selector_choices(cwd: Path):
 
 
 def file_selector(id: str, label: str, cwd: Path):
+    from dp_wizard.shiny.components.outputs import info_md_box
+
     return ui.input_select(
         id,
-        label,
+        [label, " from:", ui.tags.br(), ui.tags.strong(cwd.name + "/")],
         get_file_selector_choices(cwd),
         size="6",
         selected=None,
