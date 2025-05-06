@@ -123,7 +123,6 @@ def make_server_from_cli_info(cli_info: CLIInfo):
             session,
             is_demo=cli_info.is_demo,
             in_cloud=cli_info.in_cloud,
-            initial_public_csv_path="",
             initial_private_csv_path=str(initial_private_csv_path),
             public_csv_path=public_csv_path,
             private_csv_path=private_csv_path,

@@ -51,7 +51,6 @@ def dataset_server(
     session: Session,
     is_demo: bool,
     in_cloud: bool,
-    initial_public_csv_path: str,
     initial_private_csv_path: str,
     public_csv_path: reactive.Value[str],
     private_csv_path: reactive.Value[str],
@@ -161,7 +160,6 @@ Choose both **Public CSV** and **Private CSV** {PUBLIC_PRIVATE_TEXT}"""
                 "public_csv_path",
                 "Choose Public CSV",
                 accept=[".csv"],
-                placeholder=Path(initial_public_csv_path).name,
             ),
             ui.input_file(
                 "private_csv_path",
