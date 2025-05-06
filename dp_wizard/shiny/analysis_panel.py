@@ -25,6 +25,7 @@ from dp_wizard.utils.code_generators import make_privacy_loss_block
 def analysis_ui():
     return ui.nav_panel(
         "Define Analysis",
+        ui.output_ui("analysis_requirements_warning_ui"),
         ui.output_ui("analysis_release_warning_ui"),
         ui.layout_columns(
             ui.card(
@@ -141,6 +142,18 @@ def analysis_server(
         group_ids_selected = input.groups_selectize()
         column_ids_to_names = csv_ids_names_calc()
         groups.set([column_ids_to_names[id] for id in group_ids_selected])
+
+    @render.ui
+    def analysis_requirements_warning_ui():
+        return hide_if(
+            bool(column_names()),
+            info_md_box(
+                """
+                Please select your dataset on the previous tab
+                before defining your analysis.
+                """
+            ),
+        )
 
     @render.ui
     def analysis_release_warning_ui():

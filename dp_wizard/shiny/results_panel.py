@@ -15,6 +15,10 @@ from dp_wizard.utils.converters import (
     convert_py_to_nb,
     convert_nb_to_html,
 )
+from dp_wizard.shiny.components.outputs import (
+    hide_if,
+    info_md_box,
+)
 
 
 wait_message = "Please wait."
@@ -51,6 +55,7 @@ def make_download_or_modal_error(download_generator):  # pragma: no cover
 def results_ui():  # pragma: no cover
     return ui.nav_panel(
         "Download Results",
+        ui.output_ui("results_requirements_warning_ui"),
         ui.output_ui("download_results_ui"),
         ui.output_ui("download_code_ui"),
         value="results_panel",
@@ -74,6 +79,19 @@ def results_server(
     weights: reactive.Value[dict[str, str]],
     epsilon: reactive.Value[float],
 ):  # pragma: no cover
+
+    @render.ui
+    def results_requirements_warning_ui():
+        return hide_if(
+            bool(weights()),
+            info_md_box(
+                """
+                Please define your analysis on the previous tab
+                before downloading results.
+                """
+            ),
+        )
+
     @render.ui
     def download_results_ui():
         if in_cloud:

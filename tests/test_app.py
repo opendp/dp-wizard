@@ -170,16 +170,25 @@ def test_default_app_downloads(
 
     dataset_release_warning = "changes to the dataset will constitute a new release"
     analysis_release_warning = "changes to the analysis will constitute a new release"
+    analysis_requirements_warning = "select your dataset on the previous tab"
+    results_requirements_warning = "define your analysis on the previous tab"
 
-    # -- Select dataset --
     page.goto(default_app.url)
     expect(page.get_by_text(dataset_release_warning)).not_to_be_visible()
+    page.get_by_role("tab", name="Define Analysis").click()
+    expect(page.get_by_text(analysis_requirements_warning)).to_be_visible()
+    page.get_by_role("tab", name="Download Results").click()
+    expect(page.get_by_text(results_requirements_warning)).to_be_visible()
+    page.get_by_role("tab", name="Select Dataset").click()
+
+    # -- Select dataset --
     csv_path = Path(__file__).parent / "fixtures" / "fake.csv"
     page.get_by_label("Choose Public CSV").set_input_files(csv_path.resolve())
 
     # -- Define analysis --
     page.get_by_role("button", name="Define analysis").click()
     expect(page.get_by_text(analysis_release_warning)).not_to_be_visible()
+    expect(page.get_by_text(analysis_requirements_warning)).not_to_be_visible()
 
     # Pick grouping:
     page.locator(".selectize-input").nth(0).click()
@@ -189,6 +198,7 @@ def test_default_app_downloads(
     page.get_by_text("grade").nth(1).click()
 
     # -- Download Results --
+    expect(page.get_by_text(results_requirements_warning)).not_to_be_visible()
     page.get_by_role("button", name="Download Results").click()
 
     # Right now, the significant test start-up costs mean
@@ -221,10 +231,10 @@ def test_default_app_downloads(
         content = download.path().read_bytes()
         assert content  # Could add assertions for different document types.
 
-    # -- Define analysis --
+    # -- Define Analysis --
     page.get_by_role("tab", name="Define Analysis").click()
     expect(page.get_by_text(analysis_release_warning)).to_be_visible()
 
-    # -- Download Results --
+    # -- Select Dataset --
     page.get_by_role("tab", name="Select Dataset").click()
     expect(page.get_by_text(dataset_release_warning)).to_be_visible()
