@@ -211,6 +211,11 @@ def test_default_app_downloads(
         with page.expect_download() as download_info:
             page.get_by_text(link_text).click()
 
-        download = download_info.value
-        content = download.path().read_bytes()
+        download_name = download_info.value.suggested_filename
+        assert download_name.startswith("dp-")
+        assert "grade-histogram" in download_name
+        assert download_name.endswith(ext)
+
+        download_path = download_info.value.path()
+        content = download_path.read_bytes()
         assert content  # Could add assertions for different document types.
