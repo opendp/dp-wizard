@@ -4,7 +4,7 @@ import re
 from pathlib import Path
 
 
-root_path = Path(__file__).parent
+root_path = Path(__file__).parent.parent
 
 
 def get_prev_version():

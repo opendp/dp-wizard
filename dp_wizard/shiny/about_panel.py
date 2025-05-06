@@ -6,7 +6,7 @@ import urllib.parse
 from htmltools import tags
 from shiny import ui, reactive, Inputs, Outputs, Session
 
-from dp_wizard.app.components.outputs import nav_button
+from dp_wizard.shiny.components.outputs import nav_button
 
 
 def _run(cmd):

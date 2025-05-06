@@ -9,7 +9,7 @@ from dp_wizard.utils.code_generators.analyses import histogram, mean, median
 from dp_wizard.utils.dp_helper import make_accuracy_histogram
 from dp_wizard.utils.shared import plot_bars
 from dp_wizard.utils.code_generators import make_column_config_block
-from dp_wizard.app.components.outputs import (
+from dp_wizard.shiny.components.outputs import (
     output_code_sample,
     demo_tooltip,
     info_md_box,
@@ -206,7 +206,7 @@ def column_server(
             case histogram.name:
                 return ui.markdown(
                     """
-                    Choosing a smaller bin count will conserve your
+                    Choosing a smaller number of bins will conserve your
                     privacy budget and give you more accurate counts.
                     While the bins are evenly spaced in DP Wizard,
                     the OpenDP library lets you pick arbitrary cut points.
@@ -263,7 +263,7 @@ def column_server(
         def bin_count_input():
             return ui.input_numeric(
                 "bins",
-                ["Bin Count", ui.output_ui("bins_tooltip_ui")],
+                ["Number of Bins", ui.output_ui("bins_tooltip_ui")],
                 bin_counts().get(name, 10),
                 width=label_width,
             )
