@@ -205,10 +205,7 @@ def results_server(
 
     @reactive.calc
     def download_stem() -> str:
-        description = ", ".join(
-            f"{k} {v.analysis_type}" for k, v in analysis_plan().columns.items()
-        )
-        return "dp-" + re.sub(r"\W+", "-", description).lower()
+        return "dp-" + re.sub(r"\W+", "-", str(analysis_plan())).lower()
 
     @reactive.calc
     def notebook_nb():

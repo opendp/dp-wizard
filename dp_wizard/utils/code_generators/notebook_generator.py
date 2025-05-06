@@ -11,7 +11,13 @@ class NotebookGenerator(AbstractGenerator):
     root_template = "notebook"
 
     def _make_context(self):
-        return self._make_partial_context().fill_values(CSV_PATH=self.csv_path).finish()
+        return (
+            self._make_partial_context()
+            .fill_values(
+                CSV_PATH=self.analysis_plan.csv_path,
+            )
+            .finish()
+        )
 
     def _make_python_cell(self, block):
         return f"\n# +\n{block}\n# -\n"
@@ -36,7 +42,7 @@ class NotebookGenerator(AbstractGenerator):
             "{"
             + ",".join(
                 self._make_report_kv(name, plan.analysis_type)
-                for name, plan in self.columns.items()
+                for name, plan in self.analysis_plan.columns.items()
             )
             + "}"
         )
@@ -45,11 +51,11 @@ class NotebookGenerator(AbstractGenerator):
             Template("reports", __file__)
             .fill_expressions(
                 OUTPUTS=outputs_expression,
-                COLUMNS={k: v._asdict() for k, v in self.columns.items()},
+                COLUMNS={k: v._asdict() for k, v in self.analysis_plan.columns.items()},
             )
             .fill_values(
-                CSV_PATH=self.csv_path,
-                EPSILON=self.epsilon,
+                CSV_PATH=self.analysis_plan.csv_path,
+                EPSILON=self.analysis_plan.epsilon,
                 TXT_REPORT_PATH=str(tmp_path / "report.txt"),
                 CSV_REPORT_PATH=str(tmp_path / "report.csv"),
             )

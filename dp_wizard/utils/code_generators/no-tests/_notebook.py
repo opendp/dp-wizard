@@ -1,4 +1,4 @@
-# # OpenDP Demo
+# # TITLE
 #
 # This is a demonstration of how OpenDP can be used to create
 # a differentially private release. To learn more about what's
