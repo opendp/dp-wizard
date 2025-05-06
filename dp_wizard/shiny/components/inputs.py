@@ -8,7 +8,9 @@ parent_name = "../"
 
 def get_file_selector_choices(cwd: Path):
     return [None, parent_name] + sorted(
-        path.name + ("/" if path.is_dir() else "") for path in cwd.iterdir()
+        path.name + ("/" if path.is_dir() else "")
+        for path in cwd.iterdir()
+        if path.name.endswith(".csv") or path.is_dir()
     )
 
 
