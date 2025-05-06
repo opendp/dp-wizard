@@ -16,6 +16,8 @@ from dp_wizard.shiny.components.outputs import (
     output_code_sample,
     demo_tooltip,
     nav_button,
+    hide_if,
+    info_md_box,
 )
 from dp_wizard.utils.code_generators import make_privacy_loss_block
 
@@ -23,6 +25,8 @@ from dp_wizard.utils.code_generators import make_privacy_loss_block
 def analysis_ui():
     return ui.nav_panel(
         "Define Analysis",
+        ui.output_ui("analysis_requirements_warning_ui"),
+        ui.output_ui("analysis_release_warning_ui"),
         ui.layout_columns(
             ui.card(
                 ui.card_header("Grouping"),
@@ -99,6 +103,7 @@ def analysis_server(
     input: Inputs,
     output: Outputs,
     session: Session,
+    released: reactive.Value[bool],
     public_csv_path: reactive.Value[str],
     # private_csv_path is not needed, since we have the column_names.
     column_names: reactive.Value[list[str]],
@@ -137,6 +142,31 @@ def analysis_server(
         group_ids_selected = input.groups_selectize()
         column_ids_to_names = csv_ids_names_calc()
         groups.set([column_ids_to_names[id] for id in group_ids_selected])
+
+    @render.ui
+    def analysis_requirements_warning_ui():
+        return hide_if(
+            bool(column_names()),
+            info_md_box(
+                """
+                Please select your dataset on the previous tab
+                before defining your analysis.
+                """
+            ),
+        )
+
+    @render.ui
+    def analysis_release_warning_ui():
+        return hide_if(
+            not released(),
+            info_md_box(
+                """
+                After making a differentially private release,
+                changes to the analysis will constitute a new release,
+                and an additional epsilon spend.
+                """
+            ),
+        )
 
     @reactive.effect
     @reactive.event(input.columns_selectize)
