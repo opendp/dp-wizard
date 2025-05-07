@@ -90,6 +90,7 @@ def results_server(
     session: Session,
     released: reactive.Value[bool],
     in_cloud: bool,
+    qa_mode: bool,
     public_csv_path: reactive.Value[str],
     private_csv_path: reactive.Value[str],
     contributions: reactive.Value[int],
@@ -272,7 +273,11 @@ def results_server(
         # Could be slow!
         # Luckily, reactive calcs are lazy.
         released.set(True)
-        notebook_py = NotebookGenerator(analysis_plan()).make_py()
+        notebook_py = (
+            "raise Exception('qa_mode!')"
+            if qa_mode
+            else NotebookGenerator(analysis_plan()).make_py()
+        )
         return convert_py_to_nb(notebook_py, execute=True)
 
     @reactive.calc
