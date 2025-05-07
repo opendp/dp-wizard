@@ -177,13 +177,28 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
 
 
 def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no cover
-    # -- Select dataset --
+
+    dataset_release_warning = "changes to the dataset will constitute a new release"
+    analysis_release_warning = "changes to the analysis will constitute a new release"
+    analysis_requirements_warning = "select your dataset on the previous tab"
+    results_requirements_warning = "define your analysis on the previous tab"
+
     page.goto(local_app.url)
+    expect(page.get_by_text(dataset_release_warning)).not_to_be_visible()
+    page.get_by_role("tab", name="Define Analysis").click()
+    expect(page.get_by_text(analysis_requirements_warning)).to_be_visible()
+    page.get_by_role("tab", name="Download Results").click()
+    expect(page.get_by_text(results_requirements_warning)).to_be_visible()
+    page.get_by_role("tab", name="Select Dataset").click()
+
+    # -- Select dataset --
     csv_path = Path(__file__).parent / "fixtures" / "fake.csv"
     page.get_by_label("Choose Public CSV").set_input_files(csv_path.resolve())
 
     # -- Define analysis --
     page.get_by_role("button", name="Define analysis").click()
+    expect(page.get_by_text(analysis_release_warning)).not_to_be_visible()
+    expect(page.get_by_text(analysis_requirements_warning)).not_to_be_visible()
 
     # Pick grouping:
     page.locator(".selectize-input").nth(0).click()
@@ -193,6 +208,7 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     page.get_by_text("grade").nth(1).click()
 
     # -- Download Results --
+    expect(page.get_by_text(results_requirements_warning)).not_to_be_visible()
     page.get_by_role("button", name="Download Results").click()
 
     # Right now, the significant test start-up costs mean
@@ -221,6 +237,19 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
         with page.expect_download() as download_info:
             page.get_by_text(link_text).click()
 
-        download = download_info.value
-        content = download.path().read_bytes()
+        download_name = download_info.value.suggested_filename
+        assert download_name.startswith("dp-")
+        assert "grade-histogram" in download_name
+        assert download_name.endswith(ext)
+
+        download_path = download_info.value.path()
+        content = download_path.read_bytes()
         assert content  # Could add assertions for different document types.
+
+    # -- Define Analysis --
+    page.get_by_role("tab", name="Define Analysis").click()
+    expect(page.get_by_text(analysis_release_warning)).to_be_visible()
+
+    # -- Select Dataset --
+    page.get_by_role("tab", name="Select Dataset").click()
+    expect(page.get_by_text(dataset_release_warning)).to_be_visible()

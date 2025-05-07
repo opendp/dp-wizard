@@ -15,6 +15,10 @@ from dp_wizard.utils.converters import (
     convert_py_to_nb,
     convert_nb_to_html,
 )
+from dp_wizard.shiny.components.outputs import (
+    hide_if,
+    info_md_box,
+)
 
 
 wait_message = "Please wait."
@@ -51,6 +55,7 @@ def make_download_or_modal_error(download_generator):  # pragma: no cover
 def results_ui():  # pragma: no cover
     return ui.nav_panel(
         "Download Results",
+        ui.output_ui("results_requirements_warning_ui"),
         ui.output_ui("download_results_ui"),
         ui.output_ui("download_code_ui"),
         value="results_panel",
@@ -61,6 +66,7 @@ def results_server(
     input: Inputs,
     output: Outputs,
     session: Session,
+    released: reactive.Value[bool],
     in_cloud: bool,
     qa_mode: bool,
     public_csv_path: reactive.Value[str],
@@ -74,6 +80,19 @@ def results_server(
     weights: reactive.Value[dict[str, str]],
     epsilon: reactive.Value[float],
 ):  # pragma: no cover
+
+    @render.ui
+    def results_requirements_warning_ui():
+        return hide_if(
+            bool(weights()),
+            info_md_box(
+                """
+                Please define your analysis on the previous tab
+                before downloading results.
+                """
+            ),
+        )
+
     @render.ui
     def download_results_ui():
         if in_cloud:
@@ -205,11 +224,19 @@ def results_server(
         )
 
     @reactive.calc
+    def download_stem() -> str:
+        description = ", ".join(
+            f"{k} {v.analysis_type}" for k, v in analysis_plan().columns.items()
+        )
+        return "dp-" + re.sub(r"\W+", "-", description).lower()
+
+    @reactive.calc
     def notebook_nb():
         # This creates the notebook, and evaluates it,
         # and drops reports in the tmp dir.
         # Could be slow!
         # Luckily, reactive calcs are lazy.
+        released.set(True)
         notebook_py = (
             "raise Exception('qa_mode!')"
             if qa_mode
@@ -231,14 +258,14 @@ def results_server(
         return convert_nb_to_html(notebook_nb_unexecuted())
 
     @render.download(
-        filename="dp-wizard-script.py",
+        filename=lambda: download_stem() + ".py",
         media_type="text/x-python",
     )
     async def download_script():
         yield make_download_or_modal_error(ScriptGenerator(analysis_plan()).make_py)
 
     @render.download(
-        filename="dp-wizard-notebook.py",
+        filename=lambda: download_stem() + ".ipynb.py",
         media_type="text/x-python",
     )
     async def download_notebook_source():
@@ -247,35 +274,35 @@ def results_server(
             yield NotebookGenerator(analysis_plan()).make_py()
 
     @render.download(
-        filename="dp-wizard-notebook.ipynb",
+        filename=lambda: download_stem() + ".ipynb",
         media_type="application/x-ipynb+json",
     )
     async def download_notebook():
         yield make_download_or_modal_error(notebook_nb)
 
     @render.download(
-        filename="dp-wizard-notebook-unexecuted.ipynb",
+        filename=lambda: download_stem() + ".unexecuted.ipynb",
         media_type="application/x-ipynb+json",
     )
     async def download_notebook_unexecuted():
         yield make_download_or_modal_error(notebook_nb_unexecuted)
 
     @render.download(  # pyright: ignore
-        filename="dp-wizard-notebook.html",
+        filename=lambda: download_stem() + ".html",
         media_type="text/html",
     )
     async def download_html():
         yield make_download_or_modal_error(notebook_html)
 
     @render.download(  # pyright: ignore
-        filename="dp-wizard-notebook-unexecuted.html",
+        filename=lambda: download_stem() + ".unexecuted.html",
         media_type="text/html",
     )
     async def download_html_unexecuted():
         yield make_download_or_modal_error(notebook_html_unexecuted)
 
     @render.download(
-        filename="dp-wizard-report.txt",
+        filename=lambda: download_stem() + ".txt",
         media_type="text/plain",
     )
     async def download_report():
@@ -286,8 +313,8 @@ def results_server(
         yield make_download_or_modal_error(make_report)
 
     @render.download(
-        filename="dp-wizard-report.csv",
-        media_type="text/plain",
+        filename=lambda: download_stem() + ".csv",
+        media_type="text/csv",
     )
     async def download_table():
         def make_table():

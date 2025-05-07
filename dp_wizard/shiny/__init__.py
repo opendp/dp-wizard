@@ -111,6 +111,7 @@ def make_server_from_cli_info(cli_info: CLIInfo):
         groups = reactive.value([])
         weights = reactive.value({})
         epsilon = reactive.value(1.0)
+        released = reactive.value(False)
 
         about_panel.about_server(
             input,
@@ -121,6 +122,7 @@ def make_server_from_cli_info(cli_info: CLIInfo):
             input,
             output,
             session,
+            released=released,
             is_demo=cli_info.is_demo,
             in_cloud=cli_info.in_cloud,
             initial_public_csv_path="",
@@ -134,6 +136,7 @@ def make_server_from_cli_info(cli_info: CLIInfo):
             input,
             output,
             session,
+            released=released,
             is_demo=cli_info.is_demo,
             public_csv_path=public_csv_path,
             column_names=column_names,
@@ -150,6 +153,7 @@ def make_server_from_cli_info(cli_info: CLIInfo):
             input,
             output,
             session,
+            released=released,
             in_cloud=cli_info.in_cloud,
             qa_mode=cli_info.qa_mode,
             public_csv_path=public_csv_path,
