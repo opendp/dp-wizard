@@ -47,7 +47,7 @@ def button(
 
 def _strip_ansi(e):
     """
-    >>> e = Exception('\x1B[0;31mValueError\x1B[0m: ...')
+    >>> e = Exception('\x1b[0;31mValueError\x1b[0m: ...')
     >>> _strip_ansi(e)
     'ValueError: ...'
     """
