@@ -11,7 +11,7 @@ Building on what we've learned from [DP Creator](https://github.com/opendp/dpcre
 - UI development in Python with [Shiny](https://shiny.posit.co/py/)
 
 You can run DP Wizard locally and upload your own CSV,
-or use the [cloud deployment](https://01966942-7eab-da99-0887-a7c483756aa8.share.connect.posit.cloud/) and only provide column names to protect your private data.
+or use the [cloud deployment](https://mccalluc-dp-wizard.share.connect.posit.cloud/) and only provide column names to protect your private data.
 In either case, you'll be prompted to describe the analysis you need, and then be able to download outputs including:
 
 - A Jupyter notebook which demonstrates how to use [OpenDP](https://docs.opendp.org/).
@@ -179,6 +179,8 @@ graph TD
 
 ## Other resources
 
-2025-04-11: [Slides for 5 minute mini-talk on v0.3.0](https://docs.google.com/presentation/d/1g1c5ksG9sN8A_qWW9nFmFFZ6dSCkUAmL6_cUahi3VPA/edit#slide=id.g34c5f4bdc6a_0_0)
+2025-05-07: [Slides for 50 presentation at 2025 Harvard IT Summit](https://opendp.github.io/harvard-it-summit-2025)
+
+2025-04-11: [Slides for 5 minute mini-talk on v0.3.0 at ABSURD (Annual Boston Security Usability Research Day)](https://docs.google.com/presentation/d/1g1c5ksG9sN8A_qWW9nFmFFZ6dSCkUAmL6_cUahi3VPA/edit#slide=id.g34c5f4bdc6a_0_0)
 
 2024-12-13: [Blog post for initial release](https://opendp.org/blog/dp-wizard-easy-way-get-started-differential-privacy-and-opendp)
