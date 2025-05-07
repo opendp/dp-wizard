@@ -1,6 +1,6 @@
 # # OpenDP Demo
 #
-# This is a demonstration of how OpenDP can be used to create
+# This is a demonstration of how the OpenDP library can be used to create
 # a differentially private release. To learn more about what's
 # going on here, see the documentation for OpenDP: https://docs.opendp.org/
 #
