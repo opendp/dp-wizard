@@ -15,21 +15,46 @@ from dp_wizard.utils.converters import (
     convert_py_to_nb,
     convert_nb_to_html,
 )
+from dp_wizard.shiny.components.outputs import (
+    hide_if,
+    info_md_box,
+)
 
 
 wait_message = "Please wait."
 
 
-def button(name: str, ext: str, icon: str, primary=False):  # pragma: no cover
+def button(
+    name: str, ext: str, icon: str, primary=False, disabled=False
+):  # pragma: no cover
     clean_name = re.sub(r"\W+", " ", name).strip().replace(" ", "_").lower()
-    function_name = f"download_{clean_name}"
-    return ui.download_button(
-        function_name,
-        f"Download {name} ({ext})",
-        icon=icon_svg(icon, margin_right="0.5em"),
-        width="20em",
-        class_="btn-primary" if primary else None,
-    )
+    kwargs = {
+        "id": f"download_{clean_name}",
+        "label": f"Download {name} ({ext})",
+        "icon": icon_svg(icon, margin_right="0.5em"),
+        "width": "20em",
+        "class_": "btn-primary" if primary else None,
+    }
+    if disabled:
+        # Would prefer just to use ui.download_button,
+        # but it doesn't have a "disabled" option.
+        return ui.input_action_button(
+            disabled=True,
+            **kwargs,
+        )
+    return ui.download_button(**kwargs)
+
+
+def _strip_ansi(e):
+    """
+    >>> e = Exception('\x1B[0;31mValueError\x1B[0m: ...')
+    >>> _strip_ansi(e)
+    'ValueError: ...'
+    """
+    # From https://stackoverflow.com/a/14693789
+    import re
+
+    return re.sub(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])", "", str(e))
 
 
 def make_download_or_modal_error(download_generator):  # pragma: no cover
@@ -38,8 +63,9 @@ def make_download_or_modal_error(download_generator):  # pragma: no cover
             progress.set(message=wait_message)
             return download_generator()
     except Exception as e:
+        message = _strip_ansi(e)
         modal = ui.modal(
-            ui.pre(str(e)),
+            ui.pre(message),
             title="Error generating code",
             size="xl",
             easy_close=True,
@@ -51,6 +77,7 @@ def make_download_or_modal_error(download_generator):  # pragma: no cover
 def results_ui():  # pragma: no cover
     return ui.nav_panel(
         "Download Results",
+        ui.output_ui("results_requirements_warning_ui"),
         ui.output_ui("download_results_ui"),
         ui.output_ui("download_code_ui"),
         value="results_panel",
@@ -61,7 +88,9 @@ def results_server(
     input: Inputs,
     output: Outputs,
     session: Session,
+    released: reactive.Value[bool],
     in_cloud: bool,
+    qa_mode: bool,
     public_csv_path: reactive.Value[str],
     private_csv_path: reactive.Value[str],
     contributions: reactive.Value[int],
@@ -73,10 +102,24 @@ def results_server(
     weights: reactive.Value[dict[str, str]],
     epsilon: reactive.Value[float],
 ):  # pragma: no cover
+
+    @render.ui
+    def results_requirements_warning_ui():
+        return hide_if(
+            bool(weights()),
+            info_md_box(
+                """
+                Please define your analysis on the previous tab
+                before downloading results.
+                """
+            ),
+        )
+
     @render.ui
     def download_results_ui():
         if in_cloud:
             return None
+        disabled = not weights()
         return [
             ui.h3("Download Results"),
             ui.p("You can now make a differentially private release of your data."),
@@ -84,19 +127,23 @@ def results_server(
             ui.accordion(
                 ui.accordion_panel(
                     "Notebooks",
-                    button("Notebook", ".ipynb", "book", primary=True),
+                    button(
+                        "Notebook", ".ipynb", "book", primary=True, disabled=disabled
+                    ),
                     p(
                         """
                         An executed Jupyter notebook which references your CSV
                         and shows the result of a differentially private analysis.
                         """
                     ),
-                    button("HTML", ".html", "file-code"),
+                    button("HTML", ".html", "file-code", disabled=disabled),
                     p("The same content, but exported as HTML."),
                 ),
                 ui.accordion_panel(
                     "Reports",
-                    button("Report", ".txt", "file-lines", primary=True),
+                    button(
+                        "Report", ".txt", "file-lines", primary=True, disabled=disabled
+                    ),
                     p(
                         """
                         A report which includes your parameter choices and the results.
@@ -104,7 +151,7 @@ def results_server(
                         so it can be parsed by other programs.
                         """
                     ),
-                    button("Table", ".csv", "file-csv"),
+                    button("Table", ".csv", "file-csv", disabled=disabled),
                     p("The same information, but condensed into a two-column CSV."),
                 ),
             ),
@@ -112,6 +159,7 @@ def results_server(
 
     @render.ui
     def download_code_ui():
+        disabled = not weights()
         return [
             ui.h3("Download Code"),
             ui.markdown(
@@ -132,7 +180,13 @@ def results_server(
                 ui.accordion_panel(
                     "Unexecuted Notebooks",
                     [
-                        button("Notebook (unexecuted)", ".ipynb", "book", primary=True),
+                        button(
+                            "Notebook (unexecuted)",
+                            ".ipynb",
+                            "book",
+                            primary=True,
+                            disabled=disabled,
+                        ),
                         p(
                             """
                             An unexecuted Jupyter notebook which shows the steps
@@ -147,20 +201,22 @@ def results_server(
                             so it does not contain any results.
                             """
                         ),
-                        button("HTML (unexecuted)", ".html", "file-code"),
+                        button(
+                            "HTML (unexecuted)", ".html", "file-code", disabled=disabled
+                        ),
                         p("The same content, but exported as HTML."),
                     ],
                 ),
                 ui.accordion_panel(
                     "Scripts",
-                    button("Script", ".py", "python", primary=True),
+                    button("Script", ".py", "python", primary=True, disabled=disabled),
                     p(
                         """
                         The same code as the notebooks, but extracted into
                         a Python script which can be run from the command line.
                         """
                     ),
-                    button("Notebook Source", ".py", "python"),
+                    button("Notebook Source", ".py", "python", disabled=disabled),
                     p(
                         """
                         Python source code converted by jupytext into notebook.
@@ -213,8 +269,13 @@ def results_server(
         # and drops reports in the tmp dir.
         # Could be slow!
         # Luckily, reactive calcs are lazy.
+        released.set(True)
         plan = analysis_plan()
-        notebook_py = NotebookGenerator(plan).make_py()
+        notebook_py = (
+            "raise Exception('qa_mode!')"
+            if qa_mode
+            else NotebookGenerator(plan).make_py()
+        )
         return convert_py_to_nb(notebook_py, title=str(plan), execute=True)
 
     @reactive.calc

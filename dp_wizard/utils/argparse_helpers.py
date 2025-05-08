@@ -76,11 +76,9 @@ def _get_args():
 class CLIInfo(NamedTuple):
     is_demo: bool
     in_cloud: bool
+    qa_mode: bool
 
 
 def get_cli_info() -> CLIInfo:  # pragma: no cover
     args = _get_args()
-    return CLIInfo(
-        is_demo=args.demo,
-        in_cloud=args.cloud,
-    )
+    return CLIInfo(is_demo=args.demo, in_cloud=args.cloud, qa_mode=False)

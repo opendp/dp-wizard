@@ -14,11 +14,13 @@ if bp in Path(__file__).read_text():
         "#run-a-test-from-a-specific-breakpoint"
     )
 
-demo_app = create_app_fixture(Path(__file__).parent.parent / "dp_wizard/app_demo.py")
-cloud_app = create_app_fixture(Path(__file__).parent.parent / "dp_wizard/app_cloud.py")
-default_app = create_app_fixture(
-    Path(__file__).parent.parent / "dp_wizard/app_local.py"
-)
+root_path = Path(__file__).parent.parent
+demo_app = create_app_fixture(root_path / "dp_wizard/app_demo.py")
+cloud_app = create_app_fixture(root_path / "dp_wizard/app_cloud.py")
+local_app = create_app_fixture(root_path / "dp_wizard/app_local.py")
+qa_app = create_app_fixture(root_path / "dp_wizard/app_qa.py")
+
+
 tooltip = "#private_csv_path-label svg"
 for_the_demo = "For the demo, we'll imagine"
 
@@ -28,6 +30,18 @@ def test_cloud_app(page: Page, cloud_app: ShinyAppProc):  # pragma: no cover
     expect(page).to_have_title("DP Wizard")
     expect(page.get_by_text("Choose Public CSV")).not_to_be_visible()
     expect(page.get_by_text("CSV Column Names")).to_be_visible()
+
+
+def test_qa_app(page: Page, qa_app: ShinyAppProc):  # pragma: no cover
+    page.goto(qa_app.url)
+    page.get_by_role("button", name="Define analysis").click()
+
+    page.locator(".selectize-input").nth(1).click()
+    page.get_by_text(": grade").click()
+
+    page.get_by_role("button", name="Download Results").click()
+    page.get_by_role("link", name="Download Notebook (.ipynb)").click()
+    expect(page.get_by_text("raise Exception('qa_mode!')")).to_be_visible()
 
 
 def test_demo_app(page: Page, demo_app: ShinyAppProc):  # pragma: no cover
@@ -42,9 +56,7 @@ def test_demo_app(page: Page, demo_app: ShinyAppProc):  # pragma: no cover
     expect(page.get_by_text("This simulation will assume")).to_be_visible()
 
 
-def test_default_app_validations(
-    page: Page, default_app: ShinyAppProc
-):  # pragma: no cover
+def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: no cover
     pick_dataset_text = "How many rows of the CSV"
     perform_analysis_text = "Select columns to calculate statistics on"
     download_results_text = "You can now make a differentially private release"
@@ -59,7 +71,7 @@ def test_default_app_validations(
         expect(page.locator(".shiny-output-error")).not_to_be_attached()
 
     # -- Select dataset --
-    page.goto(default_app.url)
+    page.goto(local_app.url)
     expect(page).to_have_title("DP Wizard")
     expect(page.locator(tooltip)).to_have_count(0)
     expect_visible(pick_dataset_text)
@@ -164,16 +176,29 @@ def test_default_app_validations(
     # to run tests in parallel.
 
 
-def test_default_app_downloads(
-    page: Page, default_app: ShinyAppProc
-):  # pragma: no cover
+def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no cover
+
+    dataset_release_warning = "changes to the dataset will constitute a new release"
+    analysis_release_warning = "changes to the analysis will constitute a new release"
+    analysis_requirements_warning = "select your dataset on the previous tab"
+    results_requirements_warning = "define your analysis on the previous tab"
+
+    page.goto(local_app.url)
+    expect(page.get_by_text(dataset_release_warning)).not_to_be_visible()
+    page.get_by_role("tab", name="Define Analysis").click()
+    expect(page.get_by_text(analysis_requirements_warning)).to_be_visible()
+    page.get_by_role("tab", name="Download Results").click()
+    expect(page.get_by_text(results_requirements_warning)).to_be_visible()
+    page.get_by_role("tab", name="Select Dataset").click()
+
     # -- Select dataset --
-    page.goto(default_app.url)
     csv_path = Path(__file__).parent / "fixtures" / "fake.csv"
     page.get_by_label("Choose Public CSV").set_input_files(csv_path.resolve())
 
     # -- Define analysis --
     page.get_by_role("button", name="Define analysis").click()
+    expect(page.get_by_text(analysis_release_warning)).not_to_be_visible()
+    expect(page.get_by_text(analysis_requirements_warning)).not_to_be_visible()
 
     # Pick grouping:
     page.locator(".selectize-input").nth(0).click()
@@ -183,6 +208,7 @@ def test_default_app_downloads(
     page.get_by_text("grade").nth(1).click()
 
     # -- Download Results --
+    expect(page.get_by_text(results_requirements_warning)).not_to_be_visible()
     page.get_by_role("button", name="Download Results").click()
 
     # Right now, the significant test start-up costs mean
@@ -219,3 +245,11 @@ def test_default_app_downloads(
         download_path = download_info.value.path()
         content = download_path.read_bytes()
         assert content  # Could add assertions for different document types.
+
+    # -- Define Analysis --
+    page.get_by_role("tab", name="Define Analysis").click()
+    expect(page.get_by_text(analysis_release_warning)).to_be_visible()
+
+    # -- Select Dataset --
+    page.get_by_role("tab", name="Select Dataset").click()
+    expect(page.get_by_text(dataset_release_warning)).to_be_visible()
