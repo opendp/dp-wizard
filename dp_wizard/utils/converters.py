@@ -58,7 +58,9 @@ def convert_py_to_nb(python_str: str, execute: bool = False):
             argv.pop()
             argv.append(str(debug_path))  # type: ignore
             raise ConversionException(command=" ".join(argv), stderr=result.stderr)
-        return _clean_nb(result.stdout.strip())
+        dict_nb = json.loads(result.stdout.strip())
+        dict_nb["metadata"]["title"] = "New Title!"
+        return _clean_nb(json.dumps(dict_nb))
 
 
 def _clean_nb(nb_json: str):
