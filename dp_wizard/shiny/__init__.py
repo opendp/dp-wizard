@@ -5,7 +5,7 @@ import random
 from shiny import ui, reactive, Inputs, Outputs, Session
 
 from dp_wizard.utils.argparse_helpers import CLIInfo
-from dp_wizard.utils.csv_helper import read_csv_names
+from dp_wizard.utils.csv_helper import read_csv_names, name_to_id
 from dp_wizard.shiny import (
     about_panel,
     analysis_panel,
@@ -100,8 +100,14 @@ def make_server_from_cli_info(cli_info: CLIInfo):
         if demo:
             _make_demo_csv(initial_private_csv_path, initial_contributions)
             initial_column_names = read_csv_names(initial_private_csv_path)
+            demo_col = "grade"
+            assert (
+                demo_col in initial_column_names
+            ), f"{demo_col} not in {initial_column_names}"
+            id = name_to_id(demo_col)
         else:
             initial_column_names = []
+            id = "typing placeholder: shouldn't be used"
 
         contributions = reactive.value(1 if not demo else initial_contributions)
         public_csv_path = reactive.value("")
@@ -109,12 +115,12 @@ def make_server_from_cli_info(cli_info: CLIInfo):
             "" if not demo else str(initial_private_csv_path)
         )
         column_names = reactive.value(initial_column_names)
-        analysis_types = reactive.value({} if not demo else {"grades": histogram.name})
-        lower_bounds = reactive.value({} if not demo else {"grades": 0.0})
-        upper_bounds = reactive.value({} if not demo else {"grades": 100.0})
-        bin_counts = reactive.value({} if not demo else {"grades": 10})
+        analysis_types = reactive.value({} if not demo else {id: histogram.name})
+        lower_bounds = reactive.value({} if not demo else {id: 0.0})
+        upper_bounds = reactive.value({} if not demo else {id: 100.0})
+        bin_counts = reactive.value({} if not demo else {id: 10})
         groups = reactive.value([])
-        weights = reactive.value({} if not demo else {"grades": str(1)})
+        weights = reactive.value({} if not demo else {id: str(1)})
         epsilon = reactive.value(1.0)
         released = reactive.value(False)
 
