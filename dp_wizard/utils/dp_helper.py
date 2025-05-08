@@ -1,12 +1,39 @@
 import polars as pl
 import opendp.prelude as dp
 
-from dp_wizard.utils.shared import make_cut_points
+from dp_wizard.utils.code_generators.analyses.histogram import (
+    make_column_config_block as make_histogram_config_block,
+)
 
 dp.enable_features("contrib")
 
 
 confidence = 0.95
+
+
+def _make_cut_expr(
+    column_name: str,
+    lower_bound: float,
+    upper_bound: float,
+    bin_count: int,
+):
+    """
+    >>> print(_make_cut_expr("abc", 0, 10, 5))
+    col("abc").cut().alias("bin").strict_cast(String)
+
+    """
+    from dp_wizard.utils.shared import make_cut_points  # noqa: F401
+
+    variables = globals()
+    config_block = make_histogram_config_block(
+        column_name=column_name,
+        lower_bound=lower_bound,
+        upper_bound=upper_bound,
+        bin_count=bin_count,
+    )
+    config_block = config_block.replace(f"{column_name}_bin", "bin")
+    exec(config_block, variables)
+    return variables["bin_expr"]
 
 
 def make_accuracy_histogram(
@@ -59,15 +86,14 @@ def make_accuracy_histogram(
     # When this is stable, merge it to templates, so we can be
     # sure that we're using the same code in the preview that we
     # use in the generated notebook.
-    cut_points = make_cut_points(lower_bound, upper_bound, bin_count)
     context = dp.Context.compositor(
         data=lf.with_columns(
-            # The cut() method returns a Polars categorical type.
-            # Cast to string to get the human-readable label.
-            pl.col(column_name)
-            .cut(cut_points)
-            .alias("bin")
-            .cast(pl.String),
+            _make_cut_expr(
+                column_name,
+                lower_bound,
+                upper_bound,
+                bin_count,
+            )
         ),
         privacy_unit=dp.unit_of(
             contributions=contributions,
