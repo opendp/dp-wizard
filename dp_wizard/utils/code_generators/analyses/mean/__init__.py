@@ -26,9 +26,6 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
 def make_output(code_gen, column_name, accuracy_name, stats_name):
     return (
         Template(f"mean_{code_gen.root_template}_output", __file__)
-        .fill_values(
-            GROUP_NAMES=code_gen.groups,
-        )
         .fill_expressions(
             COLUMN_NAME=column_name,
             STATS_NAME=stats_name,
