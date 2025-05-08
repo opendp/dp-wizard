@@ -213,13 +213,15 @@ def results_server(
         # and drops reports in the tmp dir.
         # Could be slow!
         # Luckily, reactive calcs are lazy.
-        notebook_py = NotebookGenerator(analysis_plan()).make_py()
-        return convert_py_to_nb(notebook_py, execute=True)
+        plan = analysis_plan()
+        notebook_py = NotebookGenerator(plan).make_py()
+        return convert_py_to_nb(notebook_py, title=str(plan), execute=True)
 
     @reactive.calc
     def notebook_nb_unexecuted():
-        notebook_py = NotebookGenerator(analysis_plan()).make_py()
-        return convert_py_to_nb(notebook_py, execute=False)
+        plan = analysis_plan()
+        notebook_py = NotebookGenerator(plan).make_py()
+        return convert_py_to_nb(notebook_py, title=str(plan), execute=False)
 
     @reactive.calc
     def notebook_html():

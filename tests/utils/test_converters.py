@@ -31,7 +31,7 @@ def norm_nb(nb_str):
 
 def test_convert_py_to_nb():
     python_str = (fixtures_path / "fake.py").read_text()
-    actual_nb_str = convert_py_to_nb(python_str)
+    actual_nb_str = convert_py_to_nb(python_str, "Title!")
     expected_nb_str = (fixtures_path / "fake.ipynb").read_text()
 
     normed_actual_nb_str = norm_nb(actual_nb_str)
@@ -41,7 +41,7 @@ def test_convert_py_to_nb():
 
 def test_convert_py_to_nb_execute():
     python_str = (fixtures_path / "fake.py").read_text()
-    actual_nb_str = convert_py_to_nb(python_str, execute=True)
+    actual_nb_str = convert_py_to_nb(python_str, "Title!", execute=True)
     expected_nb_str = (fixtures_path / "fake-executed.ipynb").read_text()
 
     normed_actual_nb_str = norm_nb(actual_nb_str)
@@ -63,7 +63,7 @@ def test_convert_py_to_nb_error():
         # the line with the error shows up in the message.
         match=(r"Invalid python!"),
     ):
-        convert_py_to_nb(python_str, execute=True)
+        convert_py_to_nb(python_str, "Title!", execute=True)
 
 
 def test_convert_nb_to_html():
