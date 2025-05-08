@@ -13,6 +13,7 @@ from dp_wizard.shiny import (
     results_panel,
     feedback_panel,
 )
+from dp_wizard.utils.code_generators.analyses import histogram
 
 
 app_ui = ui.page_bootstrap(
@@ -89,27 +90,31 @@ def _clip(n: float, lower_bound: float, upper_bound: float) -> float:
 
 def make_server_from_cli_info(cli_info: CLIInfo):
     def server(input: Inputs, output: Outputs, session: Session):  # pragma: no cover
-        if cli_info.is_demo:
-            initial_contributions = 10
-            initial_private_csv_path = Path(__file__).parent.parent / "tmp" / "demo.csv"
+        demo = cli_info.is_demo
+
+        initial_contributions = 1 if not demo else 10
+        initial_private_csv_path = (
+            Path() if not demo else Path(__file__).parent.parent / "tmp" / "demo.csv"
+        )
+
+        if demo:
             _make_demo_csv(initial_private_csv_path, initial_contributions)
-            initial_column_names = read_csv_names(Path(initial_private_csv_path))
+            initial_column_names = read_csv_names(initial_private_csv_path)
         else:
-            initial_contributions = 1
-            initial_private_csv_path = ""
             initial_column_names = []
 
-        contributions = reactive.value(initial_contributions)
-        private_csv_path = reactive.value(str(initial_private_csv_path))
-        column_names = reactive.value(initial_column_names)
-
+        contributions = reactive.value(1 if not demo else initial_contributions)
         public_csv_path = reactive.value("")
-        analysis_types = reactive.value({})
-        lower_bounds = reactive.value({})
-        upper_bounds = reactive.value({})
-        bin_counts = reactive.value({})
+        private_csv_path = reactive.value(
+            "" if not demo else str(initial_private_csv_path)
+        )
+        column_names = reactive.value(initial_column_names)
+        analysis_types = reactive.value({} if not demo else {"grades": histogram.name})
+        lower_bounds = reactive.value({} if not demo else {"grades": 0.0})
+        upper_bounds = reactive.value({} if not demo else {"grades": 100.0})
+        bin_counts = reactive.value({} if not demo else {"grades": 10})
         groups = reactive.value([])
-        weights = reactive.value({})
+        weights = reactive.value({} if not demo else {"grades": str(1)})
         epsilon = reactive.value(1.0)
         released = reactive.value(False)
 
