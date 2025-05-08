@@ -5,7 +5,6 @@ title = (
     f"assuming {contributions} contributions per individual"
 )
 
-group_names = GROUP_NAMES
-if group_names:
-    title += f" (grouped by {'/'.join(group_names)})"
+if groups:
+    title += f" (grouped by {'/'.join(groups)})"
 plot_bars(HISTOGRAM_NAME, error=ACCURACY_NAME, cutoff=0, title=title)
