@@ -9,6 +9,11 @@ from dp_wizard.utils.argparse_helpers import (
     PUBLIC_PRIVATE_TEXT,
 )
 from dp_wizard.utils.csv_helper import get_csv_names_mismatch
+from dp_wizard.shiny.components.inputs import (
+    get_file_selector_choices,
+    file_selector,
+    parent_name,
+)
 from dp_wizard.shiny.components.outputs import (
     output_code_sample,
     demo_tooltip,
@@ -53,19 +58,40 @@ def dataset_server(
     released: reactive.Value[bool],
     is_demo: bool,
     in_cloud: bool,
-    initial_public_csv_path: str,
     initial_private_csv_path: str,
-    public_csv_path: reactive.Value[str],
+    public_csv_path: reactive.Value[Path | None],
     private_csv_path: reactive.Value[str],
     column_names: reactive.Value[list[str]],
     contributions: reactive.Value[int],
 ):  # pragma: no cover
+    public_csv_dir = reactive.value(Path.cwd())
+
     @reactive.effect
-    @reactive.event(input.public_csv_path)
-    def _on_public_csv_path_change():
-        path = input.public_csv_path()[0]["datapath"]
-        public_csv_path.set(path)
-        column_names.set(read_csv_names(Path(path)))
+    @reactive.event(input.public_csv_name)
+    def _on_public_csv_name_change():
+        name = input.public_csv_name()
+        if not name:
+            column_names.set([])
+        elif name == parent_name:
+            new_dir = public_csv_dir().parent
+            public_csv_dir.set(new_dir)
+            public_csv_path.set(None)
+            ui.update_select(
+                "public_csv_name", choices=get_file_selector_choices(new_dir)
+            )
+            column_names.set([])
+        elif name.endswith("/"):
+            new_dir = public_csv_dir() / name
+            public_csv_dir.set(new_dir)
+            public_csv_path.set(None)
+            ui.update_select(
+                "public_csv_name", choices=get_file_selector_choices(new_dir)
+            )
+            column_names.set([])
+        else:
+            new_path = public_csv_dir() / name
+            public_csv_path.set(new_path)
+            column_names.set(read_csv_names(new_path))
 
     @reactive.effect
     @reactive.event(input.private_csv_path)
@@ -172,12 +198,7 @@ Choose both **Public CSV** and **Private CSV** {PUBLIC_PRIVATE_TEXT}"""
         # - After file upload, the internal copy of the file
         #   is renamed to something like "0.csv".
         return ui.row(
-            ui.input_file(
-                "public_csv_path",
-                "Choose Public CSV",
-                accept=[".csv"],
-                placeholder=Path(initial_public_csv_path).name,
-            ),
+            file_selector("public_csv_name", "Choose Public CSV", public_csv_dir()),
             ui.input_file(
                 "private_csv_path",
                 [

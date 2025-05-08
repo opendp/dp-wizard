@@ -1,5 +1,29 @@
+from pathlib import Path
 from math import log10
 from shiny import ui
+
+
+parent_name = "../"
+
+
+def get_file_selector_choices(cwd: Path):
+    return [None, parent_name] + sorted(
+        path.name + ("/" if path.is_dir() else "")
+        for path in cwd.iterdir()
+        if path.name.endswith(".csv") or path.is_dir()
+    )
+
+
+def file_selector(id: str, label: str, cwd: Path):
+    from dp_wizard.shiny.components.outputs import info_md_box
+
+    return ui.input_select(
+        id,
+        [label, " from:", ui.tags.br(), ui.tags.strong(cwd.name + "/")],
+        get_file_selector_choices(cwd),
+        size="6",
+        selected=None,
+    )
 
 
 def log_slider(id: str, lower_bound: float, upper_bound: float):
