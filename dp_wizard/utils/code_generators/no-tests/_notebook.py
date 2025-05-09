@@ -52,7 +52,7 @@ CONTEXT_BLOCK
 QUERIES_BLOCK
 
 # If we try to run more queries at this point, it will error. Once the privacy budget
-# is consumed, the library prevents you from running more queries with that Queryable.
+# is consumed, the library prevents you from running any more queries.
 
 # # Coda
 # The code below produces a summary report.
