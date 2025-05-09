@@ -1,4 +1,4 @@
-# See the OpenDP docs for more on making private medians and quantiles:
+# See the OpenDP Library docs for more on making private medians and quantiles:
 # https://docs.opendp.org/en/stable/getting-started/tabular-data/essential-statistics.html#Median
 
 EXPR_NAME = (

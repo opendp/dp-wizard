@@ -84,7 +84,7 @@ def about_ui():
                 you'll be prompted to describe the analysis you need.
                 Output options include:
                 - A Jupyter notebook which demonstrates how to use
-                [OpenDP](https://docs.opendp.org/).
+                the [OpenDP Library](https://docs.opendp.org/).
                 - A plain Python script.
                 - Text and CSV reports.
                 """
