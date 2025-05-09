@@ -18,7 +18,7 @@ class AnalysisPlan(NamedTuple):
     contributions: int
     epsilon: float
     groups: list[str]
-    columns: dict[str, AnalysisPlanColumn]
+    columns: dict[str, list[AnalysisPlanColumn]]
 
 
 # Public functions used to generate code snippets in the UI;
