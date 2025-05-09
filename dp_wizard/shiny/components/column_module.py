@@ -309,12 +309,9 @@ def column_server(
         return demo_tooltip(
             is_demo,
             """
-            DP requires that we limit the sensitivity to the contributions
-            of any individual. To do this, we need an estimate of the lower
-            and upper bounds for each variable. We should not look at the
-            data when estimating the bounds! In this case, we could imagine
-            that "class year" would vary between 1 and 4, and we could limit
-            "grade" to values between 50 and 100.
+            We need to clip our inputs to limit sensitivity.
+            Don't look at the data when estimating the bounds!
+            In this case, we could limit "grade" to values between 50 and 100.
             """,
         )
 
@@ -323,11 +320,10 @@ def column_server(
         return demo_tooltip(
             is_demo,
             """
-            Different statistics can be measured with DP.
-            This tool provides a histogram. If you increase the number of bins,
+            If you increase the number of bins,
             you'll see that each individual bin becomes noisier to provide
-            the same overall privacy guarantee. For this example, give
-            "class_year" 4 bins and "grade" 5 bins.
+            the same overall privacy guarantee.
+            Give "grade" 5 bins.
             """,
         )
 
