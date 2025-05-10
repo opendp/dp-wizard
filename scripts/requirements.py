@@ -6,8 +6,8 @@
 
 from pathlib import Path
 from subprocess import check_call
-
-from tomlkit import dumps, parse
+from os import chdir
+from tomlkit import dumps, parse, array
 
 
 def echo_check_call(cmd):  # pragma: no cover
@@ -28,26 +28,35 @@ def pip_compile_install(file_name):  # pragma: no cover
 
 
 def parse_requirements(file_name):  # pragma: no cover
-    requirements_path = Path(__file__).parent / file_name
-    lines = requirements_path.read_text().splitlines()
+    lines = Path(file_name).read_text().splitlines()
     return sorted(line for line in lines if line and not line.strip().startswith("#"))
 
 
+def to_toml_array(file_name):  # pragma: no cover
+    """
+    Just given a list, the TOML array is a single line,
+    which makes the diff hard to read.
+    This will format the array with one entry per line
+    """
+    toml_array = array()
+    for dependency in parse_requirements(file_name):
+        toml_array.add_line(dependency)
+    toml_array.add_line(indent="")
+    return toml_array
+
+
 def rewrite_pyproject_toml():  # pragma: no cover
-    pyproject_path = Path(__file__).parent / "pyproject.toml"
+    pyproject_path = Path("pyproject.toml")
     pyproject = parse(pyproject_path.read_text())
-    # TODO: Can we split it to have one dependency per line?
-    # https://tomlkit.readthedocs.io/en/latest/api/#tomlkit.items.Array
-    pyproject["project"]["dependencies"] = parse_requirements(
-        "requirements.in",
-    )
-    pyproject["project"]["optional-dependencies"]["app"] = parse_requirements(
-        "requirements.txt",
+    pyproject["project"]["dependencies"] = to_toml_array("requirements.in")
+    pyproject["project"]["optional-dependencies"]["app"] = to_toml_array(
+        "requirements.txt"
     )
     pyproject_path.write_text(dumps(pyproject))
 
 
 def main():  # pragma: no cover
+    chdir(Path(__file__).parent.parent)
     pip_compile_install("requirements.in")
     pip_compile_install("requirements-dev.in")
     rewrite_pyproject_toml()
