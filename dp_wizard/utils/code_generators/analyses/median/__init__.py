@@ -57,6 +57,7 @@ def make_column_config_block(column_name, lower_bound, upper_bound, bin_count):
             COLUMN_NAME=column_name,
             LOWER_BOUND=lower_bound,
             UPPER_BOUND=upper_bound,
+            BIN_COUNT=bin_count,
         )
         .finish()
     )  # pragma: no cover
