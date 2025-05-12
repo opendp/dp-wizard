@@ -29,6 +29,16 @@ def analysis_ui():
         ui.output_ui("analysis_release_warning_ui"),
         ui.layout_columns(
             ui.card(
+                ui.card_header("Columns"),
+                ui.markdown("Select columns to calculate statistics on."),
+                ui.input_selectize(
+                    "columns_selectize",
+                    ["Columns", ui.output_ui("columns_selectize_tooltip_ui")],
+                    [],
+                    multiple=True,
+                ),
+            ),
+            ui.card(
                 ui.card_header("Grouping"),
                 ui.markdown(
                     """
@@ -42,16 +52,6 @@ def analysis_ui():
                 ui.input_selectize(
                     "groups_selectize",
                     "Group by",
-                    [],
-                    multiple=True,
-                ),
-            ),
-            ui.card(
-                ui.card_header("Columns"),
-                ui.markdown("Select columns to calculate statistics on."),
-                ui.input_selectize(
-                    "columns_selectize",
-                    ["Columns", ui.output_ui("columns_selectize_tooltip_ui")],
                     [],
                     multiple=True,
                 ),
