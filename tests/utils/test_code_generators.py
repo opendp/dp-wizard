@@ -54,7 +54,7 @@ def test_make_column_config_block_for_median():
             analysis_type=median.name,
             lower_bound=0,
             upper_bound=100,
-            bin_count=10,
+            bin_count=20,
         ).strip()
         == """# See the OpenDP docs for more on making private medians and quantiles:
 # https://docs.opendp.org/en/stable/getting-started/tabular-data/essential-statistics.html#Median
@@ -64,10 +64,7 @@ hw_grade_expr = (
     .cast(float)
     .fill_nan(0)
     .fill_null(0)
-    .dp.quantile(0.5, make_cut_points(0, 100, bin_count=100))
-    # todo: Get the number of bins from the user?
-    # or get nice round numbers?
-    # See: https://github.com/opendp/opendp/issues/1706
+    .dp.quantile(0.5, make_cut_points(0, 100, bin_count=20))
 )"""
     )
 
@@ -129,7 +126,7 @@ median_plan_column = AnalysisPlanColumn(
     analysis_type=median.name,
     lower_bound=5,
     upper_bound=15,
-    bin_count=0,  # Unused
+    bin_count=10,
     weight=4,
 )
 
