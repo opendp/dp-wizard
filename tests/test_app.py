@@ -163,13 +163,6 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     # https://github.com/opendp/dp-wizard/issues/116
     expect_no_error()
 
-    # -- Feedback --
-    page.get_by_role("tab", name="Feedback").click()
-    iframe = page.locator("#feedback-iframe")
-    expect(iframe).to_be_visible()
-    expect(iframe.content_frame.get_by_text("DP Wizard Feedback")).to_be_visible()
-    # Text comes from iframe, so this does introduce a dependency on an outside service.
-
     # A separate test spends less time on parameter validation
     # and instead exercises all downloads.
     # Splitting the end-to-end tests minimizes the total time

@@ -11,7 +11,6 @@ from dp_wizard.shiny import (
     analysis_panel,
     dataset_panel,
     results_panel,
-    feedback_panel,
 )
 
 
@@ -22,7 +21,6 @@ app_ui = ui.page_bootstrap(
         dataset_panel.dataset_ui(),
         analysis_panel.analysis_ui(),
         results_panel.results_ui(),
-        feedback_panel.feedback_ui(),
         selected=dataset_panel.dataset_panel_id,
         id="top_level_nav",
     ),
@@ -166,11 +164,6 @@ def make_server_from_cli_info(cli_info: CLIInfo):
             groups=groups,
             weights=weights,
             epsilon=epsilon,
-        )
-        feedback_panel.feedback_server(
-            input,
-            output,
-            session,
         )
         session.on_ended(ctrl_c_reminder)
 
