@@ -5,7 +5,7 @@ from shiny import ui, render, module, reactive, Inputs, Outputs, Session
 from shiny.types import SilentException
 import polars as pl
 
-from dp_wizard.utils.code_generators.analyses import histogram, mean, median
+from dp_wizard.utils.code_generators.analyses import histogram, mean, median, count
 from dp_wizard.utils.dp_helper import make_accuracy_histogram
 from dp_wizard.utils.shared import plot_bars
 from dp_wizard.utils.code_generators import make_column_config_block
@@ -91,7 +91,7 @@ def column_ui():  # pragma: no cover
             ui.input_select(
                 "analysis_type",
                 None,
-                [histogram.name, mean.name, median.name],
+                [histogram.name, mean.name, median.name, count.name],
                 width=label_width,
             ),
             ui.output_ui("analysis_info_ui"),
@@ -231,6 +231,13 @@ def column_server(
                     statistics.
                     """
                 )
+            case count.name:
+                return ui.markdown(
+                    """
+                    DP counts can also be used together with grouping to
+                    calculate histograms.
+                    """
+                )
             case _:
                 raise Exception("Unrecognized analysis")
 
@@ -301,6 +308,15 @@ def column_server(
                             ui.output_ui("optional_weight_ui"),
                         ],
                         ui.output_ui("median_preview_ui"),
+                        col_widths=col_widths,  # type: ignore
+                    )
+            case count.name:
+                with reactive.isolate():
+                    return ui.layout_columns(
+                        [
+                            ui.output_ui("optional_weight_ui"),
+                        ],
+                        ui.output_ui("count_preview_ui"),
                         col_widths=col_widths,  # type: ignore
                     )
 
@@ -415,6 +431,18 @@ def column_server(
             ui.p(
                 """
                 Since the median is just a single number,
+                there is not a preview visualization.
+                """
+            ),
+            output_code_sample("Column Definition", "column_code"),
+        ]
+
+    @render.ui
+    def count_preview_ui():
+        return [
+            ui.p(
+                """
+                Since the count is just a single number,
                 there is not a preview visualization.
                 """
             ),
