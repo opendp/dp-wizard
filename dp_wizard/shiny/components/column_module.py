@@ -244,41 +244,34 @@ def column_server(
                 width=label_width,
             )
 
-        match input.analysis_type():
-            case histogram.name:
-                with reactive.isolate():
-                    return ui.layout_columns(
-                        [
-                            lower_bound_input(),
-                            upper_bound_input(),
-                            bin_count_input(),
-                            ui.output_ui("optional_weight_ui"),
-                        ],
-                        ui.output_ui("histogram_preview_ui"),
-                        col_widths=col_widths,  # type: ignore
-                    )
-            case mean.name:
-                with reactive.isolate():
-                    return ui.layout_columns(
-                        [
-                            lower_bound_input(),
-                            upper_bound_input(),
-                            ui.output_ui("optional_weight_ui"),
-                        ],
-                        ui.output_ui("mean_preview_ui"),
-                        col_widths=col_widths,  # type: ignore
-                    )
-            case median.name:
-                with reactive.isolate():
-                    return ui.layout_columns(
-                        [
-                            lower_bound_input(),
-                            upper_bound_input(),
-                            ui.output_ui("optional_weight_ui"),
-                        ],
-                        ui.output_ui("median_preview_ui"),
-                        col_widths=col_widths,  # type: ignore
-                    )
+        name = input.analysis_type()
+        with reactive.isolate():
+            match name:
+                case histogram.name:
+                    inputs = [
+                        lower_bound_input(),
+                        upper_bound_input(),
+                        bin_count_input(),
+                    ]
+                case mean.name:
+                    inputs = [
+                        lower_bound_input(),
+                        upper_bound_input(),
+                    ]
+                case median.name:
+                    inputs = [
+                        lower_bound_input(),
+                        upper_bound_input(),
+                    ]
+                case _:
+                    raise Exception(f"Unexpected analysis {name}")
+        inputs.append(ui.output_ui("optional_weight_ui"))
+
+        return ui.layout_columns(
+            [inputs],
+            ui.output_ui(f"{name.lower()}_preview_ui"),
+            col_widths=col_widths,  # type: ignore
+        )
 
     @render.ui
     def bounds_tooltip_ui():
