@@ -9,6 +9,10 @@ Because the median isn't based on the addition of noise,
 we can't estimate the error as we do with the other
 statistics.
 """
+input_names = [
+    "lower_bound",
+    "upper_bound",
+]
 
 
 def has_bins():

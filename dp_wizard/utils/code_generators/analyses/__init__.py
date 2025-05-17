@@ -10,6 +10,9 @@ class Analysis(Protocol):  # pragma: no cover
     @property
     def blurb_md(self) -> str: ...
 
+    @property
+    def input_names(self) -> list[str]: ...
+
     @staticmethod
     def has_bins() -> bool: ...
 

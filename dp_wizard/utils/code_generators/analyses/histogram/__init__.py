@@ -8,6 +8,11 @@ privacy budget and give you more accurate counts.
 While the bins are evenly spaced in DP Wizard,
 the OpenDP library lets you pick arbitrary cut points.
 """
+input_names = [
+    "lower_bound",
+    "upper_bound",
+    "bin_count",
+]
 
 
 def has_bins():

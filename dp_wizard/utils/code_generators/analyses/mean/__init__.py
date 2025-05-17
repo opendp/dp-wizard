@@ -8,6 +8,10 @@ to the statistics, but if you pick bounds that
 are too tight, you'll miss the contributions of
 outliers.
 """
+input_names = [
+    "lower_bound",
+    "upper_bound",
+]
 
 
 def has_bins():
