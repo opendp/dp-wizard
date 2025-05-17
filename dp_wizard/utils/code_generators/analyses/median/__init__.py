@@ -2,6 +2,17 @@ from dp_wizard.utils.code_template import Template
 
 
 name = "Median"
+blurb_md = """
+In DP Wizard the median is picked from evenly spaced
+candidates, but the OpenDP library is more flexible.
+Because the median isn't based on the addition of noise,
+we can't estimate the error as we do with the other
+statistics.
+"""
+input_names = [
+    "lower_bound",
+    "upper_bound",
+]
 
 
 def has_bins():
