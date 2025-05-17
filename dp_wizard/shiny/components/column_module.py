@@ -5,7 +5,12 @@ from shiny import ui, render, module, reactive, Inputs, Outputs, Session
 from shiny.types import SilentException
 import polars as pl
 
-from dp_wizard.utils.code_generators.analyses import histogram, mean, median
+from dp_wizard.utils.code_generators.analyses import (
+    histogram,
+    mean,
+    median,
+    get_analysis_by_name,
+)
 from dp_wizard.utils.dp_helper import make_accuracy_histogram
 from dp_wizard.utils.shared import plot_bars
 from dp_wizard.utils.code_generators import make_column_config_block
@@ -202,37 +207,8 @@ def column_server(
 
     @render.ui
     def analysis_info_ui():
-        match input.analysis_type():
-            case histogram.name:
-                return ui.markdown(
-                    """
-                    Choosing a smaller number of bins will conserve your
-                    privacy budget and give you more accurate counts.
-                    While the bins are evenly spaced in DP Wizard,
-                    the OpenDP library lets you pick arbitrary cut points.
-                    """
-                )
-            case mean.name:
-                return ui.markdown(
-                    """
-                    Choosing tighter bounds will mean less noise added
-                    to the statistics, but if you pick bounds that
-                    are too tight, you'll miss the contributions of
-                    outliers.
-                    """
-                )
-            case median.name:
-                return ui.markdown(
-                    """
-                    In DP Wizard the median is picked from evenly spaced
-                    candidates, but the OpenDP library is more flexible.
-                    Because the median isn't based on the addition of noise,
-                    we can't estimate the error as we do with the other
-                    statistics.
-                    """
-                )
-            case _:
-                raise Exception("Unrecognized analysis")
+        blurb_md = get_analysis_by_name(input.analysis_type()).blurb_md
+        return ui.markdown(blurb_md)
 
     @render.ui
     def analysis_config_ui():
