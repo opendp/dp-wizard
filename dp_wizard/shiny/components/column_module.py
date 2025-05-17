@@ -245,30 +245,32 @@ def column_server(
             )
 
         name = input.analysis_type()
+        match name:
+            case histogram.name:
+                input_names = [
+                    "lower_bound",
+                    "upper_bound",
+                    "bin_count",
+                ]
+            case mean.name:
+                input_names = [
+                    "lower_bound",
+                    "upper_bound",
+                ]
+            case median.name:
+                input_names = [
+                    "lower_bound",
+                    "upper_bound",
+                ]
+            case _:
+                raise Exception(f"Unexpected analysis {name}")
+
         with reactive.isolate():
-            match name:
-                case histogram.name:
-                    inputs = [
-                        lower_bound_input(),
-                        upper_bound_input(),
-                        bin_count_input(),
-                    ]
-                case mean.name:
-                    inputs = [
-                        lower_bound_input(),
-                        upper_bound_input(),
-                    ]
-                case median.name:
-                    inputs = [
-                        lower_bound_input(),
-                        upper_bound_input(),
-                    ]
-                case _:
-                    raise Exception(f"Unexpected analysis {name}")
+            inputs = [locals()[f"{input_name}_input"]() for input_name in input_names]
         inputs.append(ui.output_ui("optional_weight_ui"))
 
         return ui.layout_columns(
-            [inputs],
+            inputs,
             ui.output_ui(f"{name.lower()}_preview_ui"),
             col_widths=col_widths,  # type: ignore
         )
