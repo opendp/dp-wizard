@@ -246,13 +246,18 @@ def column_server(
 
         name = input.analysis_type()
 
+        # Had trouble with locals() inside comprehension in Python 3.10.
+        # Not sure if this is the exact issue:
+        # https://github.com/python/cpython/issues/105256
+
+        # Fix is just to keep it outside the comprehension.
+        local_variables = locals()
+        input_names = get_analysis_by_name(name).input_names
+        input_functions = [local_variables[input_name] for input_name in input_names]
         with reactive.isolate():
-            inputs = [
-                locals()[input_name]()
-                for input_name in get_analysis_by_name(
-                    input.analysis_type()
-                ).input_names
-            ] + [ui.output_ui("optional_weight_ui")]
+            inputs = [input_function() for input_function in input_functions] + [
+                ui.output_ui("optional_weight_ui")
+            ]
 
         return ui.layout_columns(
             inputs,
