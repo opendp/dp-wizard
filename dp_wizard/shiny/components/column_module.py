@@ -248,7 +248,7 @@ def column_server(
 
         with reactive.isolate():
             inputs = [
-                locals()[f"{input_name}_input"]()
+                locals()[input_name]()
                 for input_name in get_analysis_by_name(
                     input.analysis_type()
                 ).input_names

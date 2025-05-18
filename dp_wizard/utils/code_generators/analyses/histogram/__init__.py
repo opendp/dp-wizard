@@ -9,9 +9,9 @@ While the bins are evenly spaced in DP Wizard,
 the OpenDP library lets you pick arbitrary cut points.
 """
 input_names = [
-    "lower_bound",
-    "upper_bound",
-    "bin_count",
+    "lower_bound_input",
+    "upper_bound_input",
+    "bin_count_input",
 ]
 
 

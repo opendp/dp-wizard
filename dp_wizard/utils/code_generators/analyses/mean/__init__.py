@@ -9,8 +9,8 @@ are too tight, you'll miss the contributions of
 outliers.
 """
 input_names = [
-    "lower_bound",
-    "upper_bound",
+    "lower_bound_input",
+    "upper_bound_input",
 ]
 
 

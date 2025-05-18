@@ -10,8 +10,8 @@ we can't estimate the error as we do with the other
 statistics.
 """
 input_names = [
-    "lower_bound",
-    "upper_bound",
+    "lower_bound_input",
+    "upper_bound_input",
 ]
 
 
