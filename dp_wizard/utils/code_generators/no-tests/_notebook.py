@@ -1,4 +1,4 @@
-# # OpenDP Demo
+# # TITLE
 #
 # This is a demonstration of how the [OpenDP Library](https://docs.opendp.org/)
 # can be used to create a differentially private release.
