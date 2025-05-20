@@ -31,7 +31,7 @@ def test_help():
     assert help in readme_pypi_md, "--help content not in README-PYPI.md"
 
     readme_md = (root_path / "README.md").read_text()
-    assert readme_pypi_md in readme_md, "--help content not in README.md"
+    assert readme_pypi_md in readme_md, "README-PYPI.md content not in README.md"
 
 
 def test_arg_validation_no_file():

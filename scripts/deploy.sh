@@ -12,7 +12,7 @@ echo "Check git..."
 git diff --exit-code || die "There should be no local modifications."
 
 BRANCH=`git rev-parse --abbrev-ref HEAD`
-[ "$BRANCH" != "main" ] || die "Current branch should be 'main', not '$BRANCH'."
+[ "$BRANCH" = "main" ] || die "Current branch should be 'main', not '$BRANCH'."
 
 echo "Check tests..."
 
