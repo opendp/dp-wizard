@@ -156,7 +156,7 @@ class AbstractGenerator(ABC):
         privacy_loss_block = make_privacy_loss_block(self.epsilon)
 
         is_just_histograms = all(
-            plan_column.analysis_type == histogram.name
+            plan_column[0].analysis_type == histogram.name
             for plan_column in self.columns.values()
         )
         margins_list = (
