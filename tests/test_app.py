@@ -36,7 +36,7 @@ def test_qa_app(page: Page, qa_app: ShinyAppProc):  # pragma: no cover
     page.goto(qa_app.url)
     page.get_by_role("button", name="Define analysis").click()
 
-    page.locator(".selectize-input").nth(1).click()
+    page.locator(".selectize-input").nth(0).click()
     page.get_by_text(": grade").click()
 
     page.get_by_role("button", name="Download Results").click()
@@ -126,12 +126,12 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     # but we could have the confidence interval in the text...
     page.get_by_label("Estimated Rows").select_option("1000")
 
-    # Pick grouping:
-    page.locator(".selectize-input").nth(0).click()
-    page.get_by_text("class year").nth(0).click()
     # Pick columns:
+    page.locator(".selectize-input").nth(0).click()
+    page.get_by_text("grade").click()
+    # Pick grouping:
     page.locator(".selectize-input").nth(1).click()
-    page.get_by_text("grade").nth(1).click()
+    page.get_by_text(": class year").nth(2).click()
 
     # Check that default is set correctly:
     # (Explicit "float()" because sometimes returns "10", sometimes "10.0".
@@ -200,12 +200,12 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     expect(page.get_by_text(analysis_release_warning)).not_to_be_visible()
     expect(page.get_by_text(analysis_requirements_warning)).not_to_be_visible()
 
-    # Pick grouping:
-    page.locator(".selectize-input").nth(0).click()
-    page.get_by_text("class year").nth(0).click()
     # Pick columns:
+    page.locator(".selectize-input").nth(0).click()
+    page.get_by_text("grade").nth(0).click()
+    # Pick grouping:
     page.locator(".selectize-input").nth(1).click()
-    page.get_by_text("grade").nth(1).click()
+    page.get_by_text("class year").nth(2).click()
 
     # -- Download Results --
     expect(page.get_by_text(results_requirements_warning)).not_to_be_visible()
