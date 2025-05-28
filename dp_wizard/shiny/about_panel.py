@@ -3,7 +3,7 @@ from pathlib import Path
 import subprocess
 import urllib.parse
 
-from htmltools import tags
+from htmltools import tags, HTML
 from shiny import ui, reactive, Inputs, Outputs, Session
 
 from dp_wizard.shiny.components.outputs import nav_button
@@ -84,23 +84,53 @@ def about_ui():
                 you'll be prompted to describe the analysis you need.
                 Output options include:
                 - A Jupyter notebook which demonstrates how to use
-                [OpenDP](https://docs.opendp.org/).
+                the [OpenDP Library](https://docs.opendp.org/).
                 - A plain Python script.
                 - Text and CSV reports.
                 """
             ),
-            tags.textarea(
-                info,
-                readonly=True,
-                rows=10,
-                style="font-family: monospace;",
-            ),
-            ui.a(
-                "File issue",
-                href=issue_url,
-                target="_blank",
-                class_="btn btn-default",
-                style="width: 10em;",
+            ui.accordion(
+                ui.accordion_panel(
+                    "File an Issue",
+                    tags.div(
+                        tags.textarea(
+                            info,
+                            readonly=True,
+                            rows=10,
+                            columns=60,
+                            style="font-family: monospace;",
+                        ),
+                        ui.a(
+                            "File issue",
+                            href=issue_url,
+                            target="_blank",
+                            class_="btn btn-default",
+                            style="width: 10em;",
+                        ),
+                        class_="bslib-gap-spacing html-fill-container",
+                    ),
+                ),
+                ui.accordion_panel(
+                    "Give Feedback",
+                    ui.div(
+                        HTML(
+                            # Responses to this survey are at:
+                            # https://docs.google.com/forms/d/1l7-RK1R1nRuhHr8pTck1D4RU8Bi6Ehr124bkYvH-96c/edit
+                            """
+                            <iframe
+                                src="https://docs.google.com/forms/d/e/1FAIpQLScaGdKS-vj-RrM7SCV_lAwZmxQ2bOqFrAkyDp4djxTqkTkinA/viewform?embedded=true"
+                                id="feedback-iframe"
+                                width="640"
+                                height="1003"
+                                frameborder="0"
+                                marginheight="0"
+                                marginwidth="0"
+                            >Loading…</iframe>
+                            """
+                        ),
+                    ),
+                ),
+                open=False,
             ),
         ),
         nav_button("go_to_dataset", "Select dataset"),
