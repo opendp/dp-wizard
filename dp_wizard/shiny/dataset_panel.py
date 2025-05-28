@@ -123,7 +123,7 @@ def dataset_server(
                         differential privacy: You configure a basic analysis
                         interactively, and then download code which
                         demonstrates how to use the
-                        [OpenDP library](https://docs.opendp.org/).
+                        [OpenDP Library](https://docs.opendp.org/).
 
                         When [installed and run
                         locally](https://pypi.org/project/dp_wizard/),
@@ -258,10 +258,12 @@ Choose both **Public CSV** and **Private CSV** {PUBLIC_PRIVATE_TEXT}"""
     def python_tooltip_ui():
         return demo_tooltip(
             is_demo,
-            "Along the way, code samples will demonstrate "
-            "how the information you provide is used in OpenDP, "
-            "and at the end you can download a notebook "
-            "for the entire calculation.",
+            """
+            Along the way, code samples will demonstrate
+            how the information you provide is used in the
+            OpenDP Library, and at the end you can download
+            a notebook for the entire calculation.
+            """,
         )
 
     @render.ui

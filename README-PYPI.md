@@ -11,10 +11,10 @@ Building on what we've learned from [DP Creator](https://github.com/opendp/dpcre
 - UI development in Python with [Shiny](https://shiny.posit.co/py/)
 
 You can run DP Wizard locally and upload your own CSV,
-or use the [cloud deployment](https://01966942-7eab-da99-0887-a7c483756aa8.share.connect.posit.cloud/) and only provide column names to protect your private data.
+or use the [cloud deployment](https://mccalluc-dp-wizard.share.connect.posit.cloud/) and only provide column names to protect your private data.
 In either case, you'll be prompted to describe the analysis you need, and then be able to download outputs including:
 
-- A Jupyter notebook which demonstrates how to use [OpenDP](https://docs.opendp.org/).
+- A Jupyter notebook which demonstrates how to use the [OpenDP Library](https://docs.opendp.org/).
 - A plain Python script.
 - Text and CSV reports.
 
