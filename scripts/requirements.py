@@ -28,7 +28,8 @@ def pip_compile_install(file_name):  # pragma: no cover
 
 
 def parse_requirements(file_name):  # pragma: no cover
-    lines = Path(file_name).read_text().splitlines()
+    requirements_path = Path(__file__).parent.parent / file_name
+    lines = requirements_path.read_text().splitlines()
     return sorted(line for line in lines if line and not line.strip().startswith("#"))
 
 
@@ -46,7 +47,7 @@ def to_toml_array(file_name):  # pragma: no cover
 
 
 def rewrite_pyproject_toml():  # pragma: no cover
-    pyproject_path = Path("pyproject.toml")
+    pyproject_path = Path(__file__).parent.parent / "pyproject.toml"
     pyproject = parse(pyproject_path.read_text())
     pyproject["project"]["dependencies"] = to_toml_array("requirements.in")
     pyproject["project"]["optional-dependencies"]["app"] = to_toml_array(

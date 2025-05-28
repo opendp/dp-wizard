@@ -34,7 +34,7 @@ def test_make_column_config_block_for_mean():
             upper_bound=100,
             bin_count=10,
         ).strip()
-        == """# See the OpenDP docs for more on making private means:
+        == """# See the OpenDP Library docs for more on making private means:
 # https://docs.opendp.org/en/stable/getting-started/tabular-data/essential-statistics.html#Mean
 
 hw_grade_expr = (
@@ -56,7 +56,7 @@ def test_make_column_config_block_for_median():
             upper_bound=100,
             bin_count=10,
         ).strip()
-        == """# See the OpenDP docs for more on making private medians and quantiles:
+        == """# See the OpenDP Library docs for more on making private medians and quantiles:
 # https://docs.opendp.org/en/stable/getting-started/tabular-data/essential-statistics.html#Median
 
 hw_grade_expr = (
@@ -68,7 +68,7 @@ hw_grade_expr = (
     # todo: Get the number of bins from the user?
     # or get nice round numbers?
     # See: https://github.com/opendp/opendp/issues/1706
-)"""
+)"""  # noqa: B950 (line too long)
     )
 
 
@@ -81,7 +81,7 @@ def test_make_column_config_block_for_histogram():
             upper_bound=100,
             bin_count=10,
         ).strip()
-        == """# See the OpenDP docs for more on making private histograms:
+        == """# See the OpenDP Library docs for more on making private histograms:
 # https://docs.opendp.org/en/stable/getting-started/examples/histograms.html
 
 # Use the public information to make cut points for 'HW GRADE':
@@ -135,7 +135,7 @@ median_plan_column = AnalysisPlanColumn(
 
 
 def id_for_plan(plan: AnalysisPlan):
-    columns = ", ".join(f"{v.analysis_type} of {k}" for k, v in plan.columns.items())
+    columns = ", ".join(f"{v[0].analysis_type} of {k}" for k, v in plan.columns.items())
     description = f"{columns}; grouped by ({', '.join(plan.groups) or 'nothing'})"
     return re.sub(r"\W+", "_", description)  # For selection with "pytest -k substring"
 
@@ -152,14 +152,14 @@ plans = [
     for groups in [[], ["A"]]
     for columns in [
         # Single:
-        {"B": histogram_plan_column},
-        {"B": mean_plan_column},
-        {"B": median_plan_column},
+        {"B": [histogram_plan_column]},
+        {"B": [mean_plan_column]},
+        {"B": [median_plan_column]},
         # Multiple:
         {
-            "B": histogram_plan_column,
-            "C": mean_plan_column,
-            "D": median_plan_column,
+            "B": [histogram_plan_column],
+            "C": [mean_plan_column],
+            "D": [median_plan_column],
         },
     ]
 ]
