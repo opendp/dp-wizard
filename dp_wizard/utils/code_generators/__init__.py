@@ -18,10 +18,10 @@ class AnalysisPlan(NamedTuple):
     contributions: int
     epsilon: float
     groups: list[str]
-    columns: dict[str, AnalysisPlanColumn]
+    columns: dict[str, list[AnalysisPlanColumn]]
 
     def __str__(self):
-        return ", ".join(f"{k} {v.analysis_type}" for k, v in self.columns.items())
+        return ", ".join(f"{k} {v[0].analysis_type}" for k, v in self.columns.items())
 
 
 # Public functions used to generate code snippets in the UI;
