@@ -9,7 +9,7 @@ from dp_wizard.utils.argparse_helpers import (
     PUBLIC_PRIVATE_TEXT,
 )
 from dp_wizard.utils.csv_helper import get_csv_names_mismatch
-from dp_wizard.app.components.outputs import (
+from dp_wizard.shiny.components.outputs import (
     output_code_sample,
     demo_tooltip,
     hide_if,
@@ -26,6 +26,7 @@ dataset_panel_id = "dataset_panel"
 def dataset_ui():
     return ui.nav_panel(
         "Select Dataset",
+        ui.output_ui("dataset_release_warning_ui"),
         ui.output_ui("csv_or_columns_ui"),
         ui.card(
             ui.card_header("Unit of privacy"),
@@ -49,8 +50,9 @@ def dataset_server(
     input: Inputs,
     output: Outputs,
     session: Session,
+    released: reactive.Value[bool],
     is_demo: bool,
-    no_uploads: bool,
+    in_cloud: bool,
     initial_public_csv_path: str,
     initial_private_csv_path: str,
     public_csv_path: reactive.Value[str],
@@ -95,33 +97,64 @@ def dataset_server(
                 return just_public, just_private
 
     @render.ui
-    def csv_or_columns_ui():
-        if no_uploads:
-            return ui.card(
-                ui.card_header("CSV Columns"),
-                ui.markdown(
-                    """
-                    When run locally, DP Wizard allows you to specify a private CSV,
-                    but for the safety of your data, in the cloud DP Wizard only
-                    accepts column names. After defining your analysis,
-                    you can download a notebook to run locally.
+    def dataset_release_warning_ui():
+        return hide_if(
+            not released(),
+            info_md_box(
+                """
+                After making a differentially private release,
+                changes to the dataset will constitute a new release,
+                and an additional epsilon spend.
+                """
+            ),
+        )
 
-                    Provide the names of columns you'll use in your analysis,
-                    one per line, with no extra punctuation.
-                    """
+    @render.ui
+    def csv_or_columns_ui():
+        if in_cloud:
+            return [
+                ui.card(
+                    ui.card_header("Welcome!"),
+                    ui.markdown(
+                        """
+                        # DP Wizard, from OpenDP
+
+                        DP Wizard makes it easier to get started with
+                        differential privacy: You configure a basic analysis
+                        interactively, and then download code which
+                        demonstrates how to use the
+                        [OpenDP Library](https://docs.opendp.org/).
+
+                        When [installed and run
+                        locally](https://pypi.org/project/dp_wizard/),
+                        DP Wizard allows you to specify a private CSV,
+                        but for the safety of your data, in the cloud
+                        DP Wizard only accepts column names.
+                        """
+                    ),
                 ),
-                ui.input_text_area("column_names", "CSV Column Names", rows=5),
-            )
+                ui.card(
+                    ui.card_header("CSV Columns"),
+                    ui.markdown(
+                        """
+                        Provide the names of columns you'll use in your analysis,
+                        one per line, with no extra punctuation.
+                        """
+                    ),
+                    ui.input_text_area("column_names", "CSV Column Names", rows=5),
+                ),
+            ]
         return (
             ui.card(
                 ui.card_header("Input CSVs"),
                 ui.markdown(
                     f"""
-Choose **Public CSV** {PUBLIC_TEXT}
-
 Choose **Private CSV** {PRIVATE_TEXT}
 
-Choose both **Public CSV** and **Private CSV** {PUBLIC_PRIVATE_TEXT}"""
+Choose **Public CSV** {PUBLIC_TEXT}
+
+Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
+                    """
                 ),
                 ui.output_ui("input_files_ui"),
                 ui.output_ui("csv_column_match_ui"),
@@ -141,12 +174,6 @@ Choose both **Public CSV** and **Private CSV** {PUBLIC_PRIVATE_TEXT}"""
         #   is renamed to something like "0.csv".
         return ui.row(
             ui.input_file(
-                "public_csv_path",
-                "Choose Public CSV",
-                accept=[".csv"],
-                placeholder=Path(initial_public_csv_path).name,
-            ),
-            ui.input_file(
                 "private_csv_path",
                 [
                     "Choose Private CSV ",  # Trailing space looks better.
@@ -158,6 +185,12 @@ Choose both **Public CSV** and **Private CSV** {PUBLIC_PRIVATE_TEXT}"""
                 ],
                 accept=[".csv"],
                 placeholder=Path(initial_private_csv_path).name,
+            ),
+            ui.input_file(
+                "public_csv_path",
+                "Choose Public CSV",
+                accept=[".csv"],
+                placeholder=Path(initial_public_csv_path).name,
             ),
         )
 
@@ -207,7 +240,7 @@ Choose both **Public CSV** and **Private CSV** {PUBLIC_PRIVATE_TEXT}"""
         return (
             contributions_valid()
             and len(column_names()) > 0
-            and (no_uploads or not csv_column_mismatch_calc())
+            and (in_cloud or not csv_column_mismatch_calc())
         )
 
     @reactive.calc
@@ -226,10 +259,12 @@ Choose both **Public CSV** and **Private CSV** {PUBLIC_PRIVATE_TEXT}"""
     def python_tooltip_ui():
         return demo_tooltip(
             is_demo,
-            "Along the way, code samples will demonstrate "
-            "how the information you provide is used in OpenDP, "
-            "and at the end you can download a notebook "
-            "for the entire calculation.",
+            """
+            Along the way, code samples will demonstrate
+            how the information you provide is used in the
+            OpenDP Library, and at the end you can download
+            a notebook for the entire calculation.
+            """,
         )
 
     @render.ui
@@ -242,7 +277,7 @@ Choose both **Public CSV** and **Private CSV** {PUBLIC_PRIVATE_TEXT}"""
             button,
             (
                 "Specify columns and the unit of privacy before proceeding."
-                if no_uploads
+                if in_cloud
                 else "Specify CSV and the unit of privacy before proceeding."
             ),
         ]

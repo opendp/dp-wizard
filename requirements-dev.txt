@@ -24,7 +24,7 @@ attrs==25.3.0
 beautifulsoup4==4.13.4
     # via nbconvert
 black==25.1.0
-    # via -r requirements-dev.in
+    # via -r .../dp-wizard/requirements.in
 bleach[css]==6.2.0
     # via nbconvert
 build==1.2.2.post1
@@ -90,7 +90,7 @@ fonttools==4.57.0
     # via matplotlib
 greenlet==3.2.0
     # via playwright
-h11==0.14.0
+h11==0.16.0
     # via uvicorn
 htmltools==0.6.0
     # via

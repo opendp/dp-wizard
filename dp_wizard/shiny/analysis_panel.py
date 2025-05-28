@@ -5,17 +5,19 @@ from pathlib import Path
 from htmltools import tags
 from shiny import ui, reactive, render, Inputs, Outputs, Session
 
-from dp_wizard.app.components.inputs import log_slider
-from dp_wizard.app.components.column_module import column_ui, column_server
+from dp_wizard.shiny.components.inputs import log_slider
+from dp_wizard.shiny.components.column_module import column_ui, column_server
 from dp_wizard.utils.csv_helper import (
     id_names_dict_from_names,
     id_labels_dict_from_names,
     get_csv_row_count,
 )
-from dp_wizard.app.components.outputs import (
+from dp_wizard.shiny.components.outputs import (
     output_code_sample,
     demo_tooltip,
     nav_button,
+    hide_if,
+    info_md_box,
 )
 from dp_wizard.utils.code_generators import make_privacy_loss_block
 
@@ -23,7 +25,19 @@ from dp_wizard.utils.code_generators import make_privacy_loss_block
 def analysis_ui():
     return ui.nav_panel(
         "Define Analysis",
+        ui.output_ui("analysis_requirements_warning_ui"),
+        ui.output_ui("analysis_release_warning_ui"),
         ui.layout_columns(
+            ui.card(
+                ui.card_header("Columns"),
+                ui.markdown("Select columns to calculate statistics on."),
+                ui.input_selectize(
+                    "columns_selectize",
+                    ["Columns", ui.output_ui("columns_selectize_tooltip_ui")],
+                    [],
+                    multiple=True,
+                ),
+            ),
             ui.card(
                 ui.card_header("Grouping"),
                 ui.markdown(
@@ -38,16 +52,6 @@ def analysis_ui():
                 ui.input_selectize(
                     "groups_selectize",
                     "Group by",
-                    [],
-                    multiple=True,
-                ),
-            ),
-            ui.card(
-                ui.card_header("Columns"),
-                ui.markdown("Select columns to calculate statistics on."),
-                ui.input_selectize(
-                    "columns_selectize",
-                    ["Columns", ui.output_ui("columns_selectize_tooltip_ui")],
                     [],
                     multiple=True,
                 ),
@@ -99,6 +103,7 @@ def analysis_server(
     input: Inputs,
     output: Outputs,
     session: Session,
+    released: reactive.Value[bool],
     public_csv_path: reactive.Value[str],
     # private_csv_path is not needed, since we have the column_names.
     column_names: reactive.Value[list[str]],
@@ -137,6 +142,31 @@ def analysis_server(
         group_ids_selected = input.groups_selectize()
         column_ids_to_names = csv_ids_names_calc()
         groups.set([column_ids_to_names[id] for id in group_ids_selected])
+
+    @render.ui
+    def analysis_requirements_warning_ui():
+        return hide_if(
+            bool(column_names()),
+            info_md_box(
+                """
+                Please select your dataset on the previous tab
+                before defining your analysis.
+                """
+            ),
+        )
+
+    @render.ui
+    def analysis_release_warning_ui():
+        return hide_if(
+            not released(),
+            info_md_box(
+                """
+                After making a differentially private release,
+                changes to the analysis will constitute a new release,
+                and an additional epsilon spend.
+                """
+            ),
+        )
 
     @reactive.effect
     @reactive.event(input.columns_selectize)

@@ -2,16 +2,15 @@ from pathlib import Path
 import csv
 import random
 
-from shiny import App, ui, reactive, Inputs, Outputs, Session
+from shiny import ui, reactive, Inputs, Outputs, Session
 
-from dp_wizard.utils.argparse_helpers import get_cli_info, CLIInfo
+from dp_wizard.utils.argparse_helpers import CLIInfo
 from dp_wizard.utils.csv_helper import read_csv_names
-from dp_wizard.app import (
+from dp_wizard.shiny import (
     about_panel,
     analysis_panel,
     dataset_panel,
     results_panel,
-    feedback_panel,
 )
 
 
@@ -22,7 +21,6 @@ app_ui = ui.page_bootstrap(
         dataset_panel.dataset_ui(),
         analysis_panel.analysis_ui(),
         results_panel.results_ui(),
-        feedback_panel.feedback_ui(),
         selected=dataset_panel.dataset_panel_id,
         id="top_level_nav",
     ),
@@ -111,6 +109,7 @@ def make_server_from_cli_info(cli_info: CLIInfo):
         groups = reactive.value([])
         weights = reactive.value({})
         epsilon = reactive.value(1.0)
+        released = reactive.value(False)
 
         about_panel.about_server(
             input,
@@ -121,8 +120,9 @@ def make_server_from_cli_info(cli_info: CLIInfo):
             input,
             output,
             session,
+            released=released,
             is_demo=cli_info.is_demo,
-            no_uploads=cli_info.no_uploads,
+            in_cloud=cli_info.in_cloud,
             initial_public_csv_path="",
             initial_private_csv_path=str(initial_private_csv_path),
             public_csv_path=public_csv_path,
@@ -134,6 +134,7 @@ def make_server_from_cli_info(cli_info: CLIInfo):
             input,
             output,
             session,
+            released=released,
             is_demo=cli_info.is_demo,
             public_csv_path=public_csv_path,
             column_names=column_names,
@@ -150,7 +151,9 @@ def make_server_from_cli_info(cli_info: CLIInfo):
             input,
             output,
             session,
-            no_uploads=cli_info.no_uploads,
+            released=released,
+            in_cloud=cli_info.in_cloud,
+            qa_mode=cli_info.qa_mode,
             public_csv_path=public_csv_path,
             private_csv_path=private_csv_path,
             contributions=contributions,
@@ -162,14 +165,6 @@ def make_server_from_cli_info(cli_info: CLIInfo):
             weights=weights,
             epsilon=epsilon,
         )
-        feedback_panel.feedback_server(
-            input,
-            output,
-            session,
-        )
         session.on_ended(ctrl_c_reminder)
 
     return server
-
-
-app = App(app_ui, make_server_from_cli_info(get_cli_info()))

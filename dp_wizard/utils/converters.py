@@ -1,6 +1,7 @@
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from dataclasses import dataclass
+from sys import executable
 import subprocess
 import json
 import nbformat
@@ -35,7 +36,8 @@ def convert_py_to_nb(python_str: str, execute: bool = False):
     with TemporaryDirectory() as temp_dir:
         if not _is_kernel_installed():
             subprocess.run(  # pragma: no cover
-                "python -m ipykernel install --name kernel_name --user".split(" "),
+                [executable]
+                + "-m ipykernel install --name kernel_name --user".split(" "),
                 check=True,
             )
 
@@ -43,7 +45,7 @@ def convert_py_to_nb(python_str: str, execute: bool = False):
         py_path = temp_dir_path / "input.py"
         py_path.write_text(python_str)
 
-        argv = "jupytext --from .py --to .ipynb --output -".split(" ")
+        argv = [executable] + "-m jupytext --from .py --to .ipynb --output -".split(" ")
         if execute:
             argv.append("--execute")
         argv.append(str(py_path.absolute()))  # type: ignore
@@ -81,12 +83,6 @@ def _clean_nb(nb_json: str):
 
 def convert_nb_to_html(python_nb: str):
     return convert_nb(python_nb, nbconvert.HTMLExporter)
-
-
-def convert_nb_to_pdf(python_nb: str):
-    # PDFExporter uses LaTeX as an intermediate representation.
-    # WebPDFExporter uses HTML.
-    return convert_nb(python_nb, nbconvert.WebPDFExporter)
 
 
 def convert_nb(python_nb: str, exporter_constructor):
