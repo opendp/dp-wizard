@@ -209,7 +209,7 @@ def column_server(
                     Choosing a smaller number of bins will conserve your
                     privacy budget and give you more accurate counts.
                     While the bins are evenly spaced in DP Wizard,
-                    the OpenDP library lets you pick arbitrary cut points.
+                    the OpenDP Library lets you pick arbitrary cut points.
                     """
                 )
             case mean.name:
@@ -225,7 +225,7 @@ def column_server(
                 return ui.markdown(
                     """
                     In DP Wizard the median is picked from evenly spaced
-                    candidates, but the OpenDP library is more flexible.
+                    candidates, but the OpenDP Library is more flexible.
                     Because the median isn't based on the addition of noise,
                     we can't estimate the error as we do with the other
                     statistics.

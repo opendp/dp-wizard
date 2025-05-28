@@ -1,4 +1,4 @@
-# See the OpenDP docs for more on making private means:
+# See the OpenDP Library docs for more on making private means:
 # https://docs.opendp.org/en/stable/getting-started/tabular-data/essential-statistics.html#Mean
 
 EXPR_NAME = (
