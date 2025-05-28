@@ -423,6 +423,8 @@ def column_server(
 
     @render.ui
     def median_preview_ui():
+        if error_md := error_md_calc():
+            return error_md_ui(error_md)
         return [
             ui.p(
                 """
