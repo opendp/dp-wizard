@@ -135,7 +135,7 @@ median_plan_column = AnalysisPlanColumn(
 
 
 def id_for_plan(plan: AnalysisPlan):
-    columns = ", ".join(f"{v.analysis_type} of {k}" for k, v in plan.columns.items())
+    columns = ", ".join(f"{v[0].analysis_type} of {k}" for k, v in plan.columns.items())
     description = f"{columns}; grouped by ({', '.join(plan.groups) or 'nothing'})"
     return re.sub(r"\W+", "_", description)  # For selection with "pytest -k substring"
 
@@ -152,14 +152,14 @@ plans = [
     for groups in [[], ["A"]]
     for columns in [
         # Single:
-        {"B": histogram_plan_column},
-        {"B": mean_plan_column},
-        {"B": median_plan_column},
+        {"B": [histogram_plan_column]},
+        {"B": [mean_plan_column]},
+        {"B": [median_plan_column]},
         # Multiple:
         {
-            "B": histogram_plan_column,
-            "C": mean_plan_column,
-            "D": median_plan_column,
+            "B": [histogram_plan_column],
+            "C": [mean_plan_column],
+            "D": [median_plan_column],
         },
     ]
 ]
