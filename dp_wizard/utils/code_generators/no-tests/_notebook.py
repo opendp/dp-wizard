@@ -1,8 +1,7 @@
 # # OpenDP Demo
 #
-# This is a demonstration of how the OpenDP library can be used to create
-# a differentially private release. To learn more about what's
-# going on here, see the documentation for OpenDP: https://docs.opendp.org/
+# This is a demonstration of how the [OpenDP Library](https://docs.opendp.org/)
+# can be used to create a differentially private release.
 #
 # ## Prerequisites
 #
@@ -52,7 +51,7 @@ CONTEXT_BLOCK
 QUERIES_BLOCK
 
 # If we try to run more queries at this point, it will error. Once the privacy budget
-# is consumed, the library prevents you from running more queries with that Queryable.
+# is consumed, the library prevents you from running any more queries.
 
 # # Coda
 # The code below produces a summary report.

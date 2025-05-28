@@ -13,7 +13,7 @@ In either case, you'll be prompted to describe your privacy budget and the analy
 
 With that information, DP Wizard provides
 
-- A Jupyter notebook which demonstrates how to use the [OpenDP](https://docs.opendp.org/) library.
+- A Jupyter notebook which demonstrates how to use the [OpenDP Library](https://docs.opendp.org/).
 - A plain Python script.
 - Text and CSV reports.
 
