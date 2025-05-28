@@ -45,27 +45,34 @@ def _make_demo_csv(path: Path, contributions):
     ...         rows = list(reader)
     ...         rows[0].values()
     ...         rows[-1].values()
-    ['student_id', 'class_year', 'hw_number', 'grade', 'self_assessment']
-    dict_values(['1', '2', '1', '82', '0'])
-    dict_values(['100', '2', '10', '78', '0'])
+    ['student_id', 'class_year_str', 'hw_number', 'grade', 'self_assessment']
+    dict_values(['1', 'sophomore', '1', '82', '0'])
+    dict_values(['100', 'sophomore', '10', '78', '0'])
     """
     random.seed(0)  # So the mock data will be stable across runs.
     with path.open("w", newline="") as demo_handle:
-        fields = ["student_id", "class_year", "hw_number", "grade", "self_assessment"]
+        fields = [
+            "student_id",
+            "class_year_str",
+            "hw_number",
+            "grade",
+            "self_assessment",
+        ]
+        class_year_map = ["first year", "sophomore", "junior", "senior"]
         writer = csv.DictWriter(demo_handle, fieldnames=fields)
         writer.writeheader()
         for student_id in range(1, 101):
-            class_year = int(_clip(random.gauss(2, 1), 1, 4))
+            class_year = int(_clip(random.gauss(1, 1), 0, 3))
             for hw_number in range(1, contributions + 1):
                 # Older students do slightly better in the class,
                 # but each assignment gets harder.
-                mean_grade = random.gauss(90, 5) + class_year * 2 - hw_number
+                mean_grade = random.gauss(90, 5) + (class_year + 1) * 2 - hw_number
                 grade = int(_clip(random.gauss(mean_grade, 5), 0, 100))
                 self_assessment = 1 if grade > 90 and random.random() > 0.1 else 0
                 writer.writerow(
                     {
                         "student_id": student_id,
-                        "class_year": class_year,
+                        "class_year_str": class_year_map[class_year],
                         "hw_number": hw_number,
                         "grade": grade,
                         "self_assessment": self_assessment,

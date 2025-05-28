@@ -34,6 +34,10 @@ def make_output(code_gen, column_name, accuracy_name, stats_name):
     )
 
 
+def make_note():
+    return ""
+
+
 def make_report_kv(name, confidence, identifier):
     return (
         Template("mean_report_kv", __file__)
