@@ -20,6 +20,9 @@ class AnalysisPlan(NamedTuple):
     groups: list[str]
     columns: dict[str, list[AnalysisPlanColumn]]
 
+    def __str__(self):
+        return ", ".join(f"{k} {v[0].analysis_type}" for k, v in self.columns.items())
+
 
 # Public functions used to generate code snippets in the UI;
 # These do not require an entire analysis plan, so they stand on their own.
