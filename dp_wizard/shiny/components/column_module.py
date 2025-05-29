@@ -268,6 +268,17 @@ def column_server(
                 width=label_width,
             )
 
+        def candidate_count_input():
+            # Just change the user-visible label,
+            # but still call it "bin" internally.
+            # Less new code; pretty much the same thing.
+            return ui.input_numeric(
+                "bins",
+                "Number of Candidates",
+                bin_counts().get(name, 10),
+                width=label_width,
+            )
+
         match input.analysis_type():
             case histogram.name:
                 with reactive.isolate():
@@ -298,6 +309,7 @@ def column_server(
                         [
                             lower_bound_input(),
                             upper_bound_input(),
+                            candidate_count_input(),
                             ui.output_ui("optional_weight_ui"),
                         ],
                         ui.output_ui("median_preview_ui"),
@@ -411,6 +423,8 @@ def column_server(
 
     @render.ui
     def median_preview_ui():
+        if error_md := error_md_calc():
+            return error_md_ui(error_md)
         return [
             ui.p(
                 """
