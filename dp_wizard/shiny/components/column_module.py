@@ -244,6 +244,17 @@ def column_server(
                 width=label_width,
             )
 
+        def candidate_count_input():
+            # Just change the user-visible label,
+            # but still call it "bin" internally.
+            # Less new code; pretty much the same thing.
+            return ui.input_numeric(
+                "bins",
+                "Number of Candidates",
+                bin_counts().get(name, 10),
+                width=label_width,
+            )
+
         name = input.analysis_type()
 
         # Had trouble with locals() inside comprehension in Python 3.10.
@@ -372,6 +383,8 @@ def column_server(
 
     @render.ui
     def median_preview_ui():
+        if error_md := error_md_calc():
+            return error_md_ui(error_md)
         return [
             ui.p(
                 """

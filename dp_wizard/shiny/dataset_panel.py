@@ -149,11 +149,12 @@ def dataset_server(
                 ui.card_header("Input CSVs"),
                 ui.markdown(
                     f"""
-Choose **Public CSV** {PUBLIC_TEXT}
-
 Choose **Private CSV** {PRIVATE_TEXT}
 
-Choose both **Public CSV** and **Private CSV** {PUBLIC_PRIVATE_TEXT}"""
+Choose **Public CSV** {PUBLIC_TEXT}
+
+Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
+                    """
                 ),
                 ui.output_ui("input_files_ui"),
                 ui.output_ui("csv_column_match_ui"),
@@ -173,12 +174,6 @@ Choose both **Public CSV** and **Private CSV** {PUBLIC_PRIVATE_TEXT}"""
         #   is renamed to something like "0.csv".
         return ui.row(
             ui.input_file(
-                "public_csv_path",
-                "Choose Public CSV",
-                accept=[".csv"],
-                placeholder=Path(initial_public_csv_path).name,
-            ),
-            ui.input_file(
                 "private_csv_path",
                 [
                     "Choose Private CSV ",  # Trailing space looks better.
@@ -190,6 +185,12 @@ Choose both **Public CSV** and **Private CSV** {PUBLIC_PRIVATE_TEXT}"""
                 ],
                 accept=[".csv"],
                 placeholder=Path(initial_private_csv_path).name,
+            ),
+            ui.input_file(
+                "public_csv_path",
+                "Choose Public CSV",
+                accept=[".csv"],
+                placeholder=Path(initial_public_csv_path).name,
             ),
         )
 

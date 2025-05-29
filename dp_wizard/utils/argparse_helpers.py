@@ -34,9 +34,9 @@ def _get_arg_parser():
 Unless you have set "--demo" or "--cloud", you will specify a CSV
 inside the application.
 
-Provide a "Public CSV" {PUBLIC_TEXT}
-
 Provide a "Private CSV" {PRIVATE_TEXT}
+
+Provide a "Public CSV" {PUBLIC_TEXT}
 
 Provide both {PUBLIC_PRIVATE_TEXT}
 """,

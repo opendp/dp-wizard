@@ -2,17 +2,16 @@
 
 [![pypi](https://img.shields.io/pypi/v/dp_wizard)](https://pypi.org/project/dp_wizard/)
 
-Building on what we've learned from [DP Creator](https://github.com/opendp/dpcreator), DP Wizard offers:
-
-- Easy installation with `pip install dp_wizard[app]`
-- Simplified single-user application design
-- Streamlined workflow that doesn't assume familiarity with differential privacy
-- Interactive visualization of privacy budget choices
-- UI development in Python with [Shiny](https://shiny.posit.co/py/)
+DP Wizard makes it easier to get started with differential privacy.
 
 You can run DP Wizard locally and upload your own CSV,
 or use the [cloud deployment](https://mccalluc-dp-wizard.share.connect.posit.cloud/) and only provide column names to protect your private data.
-In either case, you'll be prompted to describe the analysis you need, and then be able to download outputs including:
+In either case, you'll be prompted to describe your privacy budget and the analysis you need, including:
+
+- Grouping
+- DP means, medians, and histograms
+
+With that information, DP Wizard provides
 
 - A Jupyter notebook which demonstrates how to use the [OpenDP Library](https://docs.opendp.org/).
 - A plain Python script.
@@ -23,6 +22,8 @@ In either case, you'll be prompted to describe the analysis you need, and then b
 DP Wizard requires Python 3.10 or later.
 You can check your current version with `python --version`.
 The exact upgrade process will depend on your environment and operating system.
+
+Install with `pip install dp_wizard[app]` and you can start DP Wizard from the command line.
 
 ```
 usage: dp-wizard [-h] [--demo | --cloud]
@@ -37,13 +38,13 @@ options:
 Unless you have set "--demo" or "--cloud", you will specify a CSV
 inside the application.
 
-Provide a "Public CSV" if you have a public data set, and are curious how
-DP can be applied: The preview visualizations will use your public data.
-
 Provide a "Private CSV" if you only have a private data set, and want to
 make a release from it: The preview visualizations will only use
 simulated data, and apart from the headers, the private CSV is not
 read until the release.
+
+Provide a "Public CSV" if you have a public data set, and are curious how
+DP can be applied: The preview visualizations will use your public data.
 
 Provide both if you have two CSVs with the same structure.
 Perhaps the public CSV is older and no longer sensitive. Preview

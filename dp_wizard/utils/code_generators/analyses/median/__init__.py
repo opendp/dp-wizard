@@ -12,6 +12,7 @@ statistics.
 input_names = [
     "lower_bound_input",
     "upper_bound_input",
+    "candidate_count_input",
 ]
 
 
@@ -35,9 +36,14 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
 
 
 def make_output(code_gen, column_name, accuracy_name, stats_name):
-    return Template(
-        f"median_{code_gen.root_template}_output", __file__
-    ).finish()  # pragma: no cover
+    return (
+        Template(f"median_{code_gen.root_template}_output", __file__)
+        .fill_expressions(
+            COLUMN_NAME=column_name,
+            STATS_NAME=stats_name,
+        )
+        .finish()  # pragma: no cover
+    )
 
 
 def make_report_kv(name, confidence, identifier):
@@ -45,6 +51,9 @@ def make_report_kv(name, confidence, identifier):
         Template("median_report_kv", __file__)
         .fill_values(
             NAME=name,
+        )
+        .fill_expressions(
+            IDENTIFIER_STATS=f"{identifier}_stats",
         )
         .finish()
     )  # pragma: no cover
@@ -63,6 +72,7 @@ def make_column_config_block(column_name, lower_bound, upper_bound, bin_count):
             COLUMN_NAME=column_name,
             LOWER_BOUND=lower_bound,
             UPPER_BOUND=upper_bound,
+            BIN_COUNT=bin_count,
         )
         .finish()
     )  # pragma: no cover
