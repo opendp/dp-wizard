@@ -24,5 +24,3 @@ echo "Push..."
 git push -f origin main:cloud-deployment
 
 echo "Redeployed!"
-
-git checkout main
