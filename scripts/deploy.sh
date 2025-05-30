@@ -20,6 +20,10 @@ CI='true' scripts/ci.sh --exitfirst || die "Tests should pass"
 
 echo "Push..."
 
+git branch -D cloud-deployment
+git checkout -b cloud-deployment
 git push -f origin cloud-deployment
 
 echo "Redployed!"
+
+git checkout main
