@@ -14,6 +14,8 @@ git diff --exit-code || die "There should be no local modifications."
 BRANCH=`git rev-parse --abbrev-ref HEAD`
 [ "$BRANCH" = "main" ] || die "Current branch should be 'main', not '$BRANCH'."
 
+git pull
+
 echo "Check tests..."
 
 CI='true' scripts/ci.sh --exitfirst || die "Tests should pass"
