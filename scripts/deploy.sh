@@ -9,6 +9,7 @@ set -euo pipefail
 
 echo "Check git..."
 
+git pull
 git diff --exit-code || die "There should be no local modifications."
 
 BRANCH=`git rev-parse --abbrev-ref HEAD`
@@ -20,6 +21,6 @@ CI='true' scripts/ci.sh --exitfirst || die "Tests should pass"
 
 echo "Push..."
 
-git push -f origin cloud-deployment
+git push -f origin main:cloud-deployment
 
-echo "Redployed!"
+echo "Redeployed!"
