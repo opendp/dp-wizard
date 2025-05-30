@@ -26,6 +26,6 @@ git branch -D cloud-deployment
 git checkout -b cloud-deployment
 git push -f origin cloud-deployment
 
-echo "Redployed!"
+echo "Redeployed!"
 
 git checkout main
