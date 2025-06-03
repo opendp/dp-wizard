@@ -263,10 +263,7 @@ def results_server(
 
     @reactive.calc
     def download_stem() -> str:
-        description = ", ".join(
-            f"{k} {v[0].analysis_type}" for k, v in analysis_plan().columns.items()
-        )
-        return "dp-" + re.sub(r"\W+", "-", description).lower()
+        return "dp-" + re.sub(r"\W+", "-", str(analysis_plan())).lower()
 
     @reactive.calc
     def notebook_nb():
@@ -275,17 +272,19 @@ def results_server(
         # Could be slow!
         # Luckily, reactive calcs are lazy.
         released.set(True)
+        plan = analysis_plan()
         notebook_py = (
             "raise Exception('qa_mode!')"
             if qa_mode
-            else NotebookGenerator(analysis_plan()).make_py()
+            else NotebookGenerator(plan).make_py()
         )
-        return convert_py_to_nb(notebook_py, execute=True)
+        return convert_py_to_nb(notebook_py, title=str(plan), execute=True)
 
     @reactive.calc
     def notebook_nb_unexecuted():
-        notebook_py = NotebookGenerator(analysis_plan()).make_py()
-        return convert_py_to_nb(notebook_py, execute=False)
+        plan = analysis_plan()
+        notebook_py = NotebookGenerator(plan).make_py()
+        return convert_py_to_nb(notebook_py, title=str(plan), execute=False)
 
     @reactive.calc
     def notebook_html():
