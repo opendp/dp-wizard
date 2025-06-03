@@ -91,7 +91,7 @@ hw_grade_cut_points = make_cut_points(
 # Use these cut points to add a new binned column to the table:
 hw_grade_bin_expr = (
     pl.col('HW GRADE')
-    .cut(hw_grade_cut_points)
+    .cut(hw_grade_cut_points)  # Use "left_closed=True" to switch endpoint inclusion.
     .alias('hw_grade_bin')  # Give the new column a name.
     .cast(pl.String)
 )"""
