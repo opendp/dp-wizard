@@ -1,5 +1,44 @@
 # CHANGELOG
 
+## 0.4.0
+
+Highlights:
+
+- Run DP wizard in the cloud [#404](https://github.com/opendp/dp-wizard/pull/404)
+- And since we don't allow uploads in the cloud, let user just provide column names [#388](https://github.com/opendp/dp-wizard/pull/388)
+
+Also includes:
+
+- Better title at the top of the notebook [#418](https://github.com/opendp/dp-wizard/pull/418)
+- pull out highlights in changelog [#466](https://github.com/opendp/dp-wizard/pull/466)
+- deployment fixes [#462](https://github.com/opendp/dp-wizard/pull/462)
+- Move analysis blurbs and inputs lists [#458](https://github.com/opendp/dp-wizard/pull/458)
+- Fill in templates for medians [#451](https://github.com/opendp/dp-wizard/pull/451)
+- Update READMEs with current information [#428](https://github.com/opendp/dp-wizard/pull/428)
+- Merge feedback and about tabs [#456](https://github.com/opendp/dp-wizard/pull/456)
+- Histograms do not need margins [#453](https://github.com/opendp/dp-wizard/pull/453)
+- swap public and private [#447](https://github.com/opendp/dp-wizard/pull/447)
+- generalize analysis plans [#440](https://github.com/opendp/dp-wizard/pull/440)
+- swap columns and grouping in ui [#452](https://github.com/opendp/dp-wizard/pull/452)
+- Python executable might not be named "python" [#429](https://github.com/opendp/dp-wizard/pull/429)
+- Fix deploy script [#423](https://github.com/opendp/dp-wizard/pull/423)
+- in histogram results, rename len to count [#432](https://github.com/opendp/dp-wizard/pull/432)
+- remove reference to "Queryable" [#443](https://github.com/opendp/dp-wizard/pull/443)
+- capital "L" in "Library" [#439](https://github.com/opendp/dp-wizard/pull/439)
+- Upgrade h11 [#412](https://github.com/opendp/dp-wizard/pull/412)
+- test error handling in notebook execution [#415](https://github.com/opendp/dp-wizard/pull/415)
+- strip ansi from stack traces [#403](https://github.com/opendp/dp-wizard/pull/403)
+- OpenDP -> "the OpenDP library" [#408](https://github.com/opendp/dp-wizard/pull/408)
+- Disable downloads if analysis undefined [#422](https://github.com/opendp/dp-wizard/pull/422)
+- Changelog bug was a hack I had left from the first release [#409](https://github.com/opendp/dp-wizard/pull/409)
+- Show warnings if you jump around tabs [#417](https://github.com/opendp/dp-wizard/pull/417)
+- "bin count" -> "number of bins" [#413](https://github.com/opendp/dp-wizard/pull/413)
+- informative download file names [#416](https://github.com/opendp/dp-wizard/pull/416)
+- upgrade opendp and recompile requirements [#397](https://github.com/opendp/dp-wizard/pull/397)
+- Fix `type` in issue template [#402](https://github.com/opendp/dp-wizard/pull/402)
+- fallback to 0 if unexpected key [#396](https://github.com/opendp/dp-wizard/pull/396)
+- Pin all dependencies for application install [#386](https://github.com/opendp/dp-wizard/pull/386)
+
 ## 0.3.1
 
 Highlight:
