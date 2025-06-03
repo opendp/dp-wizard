@@ -2,6 +2,17 @@ from dp_wizard.utils.code_template import Template
 
 
 name = "Histogram"
+blurb_md = """
+Choosing a smaller number of bins will conserve your
+privacy budget and give you more accurate counts.
+While the bins are evenly spaced in DP Wizard,
+the OpenDP library lets you pick arbitrary cut points.
+"""
+input_names = [
+    "lower_bound_input",
+    "upper_bound_input",
+    "bin_count_input",
+]
 
 
 def has_bins():
