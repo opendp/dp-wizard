@@ -25,11 +25,18 @@ tooltip = "#private_csv_path-label svg"
 for_the_demo = "For the demo, we'll imagine"
 
 
+def screenshot(page, name):
+    page.screenshot(
+        path=root_path / f"dp_wizard/images/gitignore-{name}.png", full_page=True
+    )
+
+
 def test_cloud_app(page: Page, cloud_app: ShinyAppProc):  # pragma: no cover
     page.goto(cloud_app.url)
     expect(page).to_have_title("DP Wizard")
     expect(page.get_by_text("Choose Public CSV")).not_to_be_visible()
     expect(page.get_by_text("CSV Column Names")).to_be_visible()
+    screenshot(page, "cloud-select")
 
 
 def test_qa_app(page: Page, qa_app: ShinyAppProc):  # pragma: no cover
