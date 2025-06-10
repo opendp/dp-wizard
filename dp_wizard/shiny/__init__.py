@@ -21,6 +21,8 @@ app_ui = ui.page_bootstrap(
         dataset_panel.dataset_ui(),
         analysis_panel.analysis_ui(),
         results_panel.results_ui(),
+        ui.nav_spacer(),
+        ui.nav_control(ui.input_dark_mode()),
         selected=dataset_panel.dataset_panel_id,
         id="top_level_nav",
     ),
