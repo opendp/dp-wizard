@@ -34,7 +34,7 @@ def save_html_report(report):
     from htmltools import tags
 
     html = tags.html(tags.head(tags.title("foo")), tags.body("bar"))
-    Path(HTML_REPORT_PATH).write_text(html)
+    Path(HTML_REPORT_PATH).write_text(str(html))
 
 
 # https://stackoverflow.com/a/6027615/10727889
@@ -71,3 +71,4 @@ def flatten_dict(dictionary, parent_key=""):
 report = make_report()
 save_txt_report(report)
 save_csv_report(report)
+save_html_report(report)

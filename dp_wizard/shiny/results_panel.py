@@ -157,6 +157,8 @@ def results_server(
                     ),
                     button("CSV Report", ".csv", "file-csv", disabled=disabled),
                     p("The same information, but condensed into a two-column CSV."),
+                    button("HTML Report", ".html", "file-code", disabled=disabled),
+                    p("Human-readable HTML report with tables and graphs."),
                 ),
             ),
         ]
@@ -345,26 +347,31 @@ def results_server(
     # The reports are all created by the code in the "coda" of the generated notebook.
     # Executing the notebook creates these files in the tmp directory.
 
-    tmp_path = Path(__file__).parent.parent / "tmp"
+    def make_make_report(ext):
+        def make_report():
+            notebook_nb()  # Evaluate just for the side effect of creating report.
+            tmp_path = Path(__file__).parent.parent / "tmp"
+            return (tmp_path / f"report.{ext}").read_text()
+
+        return make_report
 
     @render.download(
         filename=lambda: download_stem() + ".txt",
         media_type="text/plain",
     )
     async def download_text_report():
-        def make_report():
-            notebook_nb()  # Evaluate just for the side effect of creating report.
-            return (tmp_path / "report.txt").read_text()
-
-        yield make_download_or_modal_error(make_report)
+        yield make_download_or_modal_error(make_make_report("txt"))
 
     @render.download(
         filename=lambda: download_stem() + ".csv",
         media_type="text/csv",
     )
     async def download_csv_report():
-        def make_report():
-            notebook_nb()  # Evaluate just for the side effect of creating report.
-            return (tmp_path / "report.csv").read_text()
+        yield make_download_or_modal_error(make_make_report("csv"))
 
-        yield make_download_or_modal_error(make_report)
+    @render.download(
+        filename=lambda: download_stem() + ".html",
+        media_type="text/html",
+    )
+    async def download_html_report():
+        yield make_download_or_modal_error(make_make_report("html"))
