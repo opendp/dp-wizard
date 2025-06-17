@@ -60,6 +60,7 @@ class NotebookGenerator(AbstractGenerator):
                 EPSILON=self.analysis_plan.epsilon,
                 TXT_REPORT_PATH=str(tmp_path / "report.txt"),
                 CSV_REPORT_PATH=str(tmp_path / "report.csv"),
+                HTML_REPORT_PATH=str(tmp_path / "report.html"),
             )
             .finish()
         )

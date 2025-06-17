@@ -1,6 +1,7 @@
 from pathlib import Path
 import csv
 
+
 def make_report():
     return {
         "inputs": {
@@ -12,9 +13,12 @@ def make_report():
         "outputs": OUTPUTS,
     }
 
+
 def save_txt_report(report):
     from yaml import dump
+
     Path(TXT_REPORT_PATH).write_text(dump(report))
+
 
 def save_csv_report(report):
     flat_report = flatten_dict(report)
@@ -22,6 +26,16 @@ def save_csv_report(report):
         writer = csv.writer(handle)
         for kv_pair in flat_report.items():
             writer.writerow(kv_pair)
+
+
+def save_html_report(report):
+    # There are lots of ways to build html,
+    # but htmltools comes bundled with shiny.
+    from htmltools import tags
+
+    html = tags.html(tags.head(tags.title("foo")), tags.body("bar"))
+    Path(HTML_REPORT_PATH).write_text(html)
+
 
 # https://stackoverflow.com/a/6027615/10727889
 def flatten_dict(dictionary, parent_key=""):
