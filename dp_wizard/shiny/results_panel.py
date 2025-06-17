@@ -345,6 +345,8 @@ def results_server(
     # The reports are all created by the code in the "coda" of the generated notebook.
     # Executing the notebook creates these files in the tmp directory.
 
+    tmp_path = Path(__file__).parent.parent / "tmp"
+
     @render.download(
         filename=lambda: download_stem() + ".txt",
         media_type="text/plain",
@@ -352,7 +354,7 @@ def results_server(
     async def download_text_report():
         def make_report():
             notebook_nb()  # Evaluate just for the side effect of creating report.
-            return (Path(__file__).parent.parent / "tmp" / "report.txt").read_text()
+            return (tmp_path / "report.txt").read_text()
 
         yield make_download_or_modal_error(make_report)
 
@@ -363,6 +365,6 @@ def results_server(
     async def download_csv_report():
         def make_report():
             notebook_nb()  # Evaluate just for the side effect of creating report.
-            return (Path(__file__).parent.parent / "tmp" / "report.csv").read_text()
+            return (tmp_path / "report.csv").read_text()
 
         yield make_download_or_modal_error(make_report)
