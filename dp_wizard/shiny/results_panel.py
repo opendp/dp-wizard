@@ -142,7 +142,11 @@ def results_server(
                 ui.accordion_panel(
                     "Reports",
                     button(
-                        "Report", ".txt", "file-lines", primary=True, disabled=disabled
+                        "Text Report",
+                        ".txt",
+                        "file-lines",
+                        primary=True,
+                        disabled=disabled,
                     ),
                     p(
                         """
@@ -151,7 +155,7 @@ def results_server(
                         so it can be parsed by other programs.
                         """
                     ),
-                    button("Table", ".csv", "file-csv", disabled=disabled),
+                    button("CSV Report", ".csv", "file-csv", disabled=disabled),
                     p("The same information, but condensed into a two-column CSV."),
                 ),
             ),
@@ -338,11 +342,14 @@ def results_server(
     async def download_html_unexecuted():
         yield make_download_or_modal_error(notebook_html_unexecuted)
 
+    # The reports are all created by the code in the "coda" of the generated notebook.
+    # Executing the notebook creates these files in the tmp directory.
+
     @render.download(
         filename=lambda: download_stem() + ".txt",
         media_type="text/plain",
     )
-    async def download_report():
+    async def download_text_report():
         def make_report():
             notebook_nb()  # Evaluate just for the side effect of creating report.
             return (Path(__file__).parent.parent / "tmp" / "report.txt").read_text()
@@ -353,9 +360,9 @@ def results_server(
         filename=lambda: download_stem() + ".csv",
         media_type="text/csv",
     )
-    async def download_table():
-        def make_table():
+    async def download_csv_report():
+        def make_report():
             notebook_nb()  # Evaluate just for the side effect of creating report.
             return (Path(__file__).parent.parent / "tmp" / "report.csv").read_text()
 
-        yield make_download_or_modal_error(make_table)
+        yield make_download_or_modal_error(make_report)
