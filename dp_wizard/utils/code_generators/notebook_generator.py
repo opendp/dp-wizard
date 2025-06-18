@@ -6,11 +6,14 @@ from dp_wizard.utils.dp_helper import confidence
 
 from pathlib import Path
 
+PLACEHOLDER_CSV_NAME = "fill-in-correct-path.csv"
+
 
 class NotebookGenerator(AbstractGenerator):
     root_template = "notebook"
 
     def _make_context(self):
+        placeholder_csv_content = ",".join(self.analysis_plan.columns)
         return (
             self._make_partial_context()
             .fill_values(
@@ -18,8 +21,10 @@ class NotebookGenerator(AbstractGenerator):
             )
             .fill_blocks(
                 OPTIONAL_CSV_BLOCK=(
-                    "# optional csv block"
-                    if self.analysis_plan.csv_path == "fill-in-correct-path.csv"
+                    "# Write to placeholder CSV so the notebook can still execute:\n"
+                    "from pathlib import Path\n"
+                    f"Path('{PLACEHOLDER_CSV_NAME}').write_text('{placeholder_csv_content}')\n"
+                    if self.analysis_plan.csv_path == PLACEHOLDER_CSV_NAME
                     else ""
                 )
             )
