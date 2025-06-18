@@ -139,6 +139,10 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     assert float(page.get_by_label("Upper").input_value()) == 10.0
 
     # Input validation:
+    page.get_by_label("Number of Bins").fill("-1")
+    expect_visible("Number should be a positive integer.")
+    page.get_by_label("Number of Bins").fill("10")
+
     page.get_by_label("Upper").fill("")
     expect_visible("Upper bound is required")
     page.get_by_label("Upper").fill("nan")

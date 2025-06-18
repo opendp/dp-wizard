@@ -84,6 +84,26 @@ def get_bound_errors(lower_bound, upper_bound):
     return messages
 
 
+def get_bin_errors(count):
+    """
+    This function might be applied to either histogram bin counts,
+    or median candidate counts, so the wording is a little vague.
+
+    >>> get_bin_errors("5")
+    []
+    >>> get_bin_errors("abc")
+    ['Number should be a number.']
+    >>> get_bin_errors("-1")
+    ['Number should be a positive integer.']
+    """
+    messages = []
+    if error := get_float_error(count):
+        messages.append(f"Number {error}.")
+    elif not int(float(count)) > 0:
+        messages.append("Number should be a positive integer.")
+    return messages
+
+
 def error_md_ui(markdown):  # pragma: no cover
     return info_md_box(markdown)
 
@@ -336,6 +356,7 @@ def column_server(
         return "\n".join(
             f"- {error}"
             for error in get_bound_errors(input.lower_bound(), input.upper_bound())
+            + get_bin_errors(input.bins())
         )
 
     @render.code
