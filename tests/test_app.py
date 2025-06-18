@@ -29,7 +29,18 @@ def test_cloud_app(page: Page, cloud_app: ShinyAppProc):  # pragma: no cover
     page.goto(cloud_app.url)
     expect(page).to_have_title("DP Wizard")
     expect(page.get_by_text("Choose Public CSV")).not_to_be_visible()
-    expect(page.get_by_text("CSV Column Names")).to_be_visible()
+    page.get_by_label("CSV Column Names").fill("a_column")
+
+    page.get_by_role("button", name="Define analysis").click()
+    page.locator(".selectize-input").nth(0).click()
+    page.get_by_text("a_column").click()
+
+    page.get_by_role("button", name="Download Results").click()
+    with page.expect_download() as download_info:
+        page.get_by_role("link", name="Download Notebook (unexecuted").click()
+
+    download_path = download_info.value.path()
+    # TODO: execute notebook
 
 
 def test_qa_app(page: Page, qa_app: ShinyAppProc):  # pragma: no cover
