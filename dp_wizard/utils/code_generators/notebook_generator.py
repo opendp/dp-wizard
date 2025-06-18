@@ -16,6 +16,13 @@ class NotebookGenerator(AbstractGenerator):
             .fill_values(
                 CSV_PATH=self.analysis_plan.csv_path,
             )
+            .fill_blocks(
+                OPTIONAL_CSV_BLOCK=(
+                    "# optional csv block"
+                    if self.analysis_plan.csv_path == "fill-in-correct-path.csv"
+                    else ""
+                )
+            )
             .finish()
         )
 
