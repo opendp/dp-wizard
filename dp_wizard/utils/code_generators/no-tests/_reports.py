@@ -32,8 +32,11 @@ def save_html_report(report):
     # There are lots of ways to build html,
     # but htmltools comes bundled with shiny.
     from htmltools import tags
+    from yaml import dump
 
-    html = tags.html(tags.head(tags.title("foo")), tags.body("bar"))
+    html = tags.html(
+        tags.head(tags.title("DP Wizard Report")), tags.body(tags.pre(dump(report)))
+    )
     Path(HTML_REPORT_PATH).write_text(str(html))
 
 
