@@ -1,5 +1,6 @@
 PRIVACY_UNIT_BLOCK
 PRIVACY_LOSS_BLOCK
+OPTIONAL_CSV_BLOCK
 # See the OpenDP Library docs for more on Context:
 # https://docs.opendp.org/en/stable/api/user-guide/context/index.html#context:
 context = dp.Context.compositor(

@@ -9,7 +9,10 @@ from dp_wizard.utils.code_generators import (
     AnalysisPlan,
     AnalysisPlanColumn,
 )
-from dp_wizard.utils.code_generators.notebook_generator import NotebookGenerator
+from dp_wizard.utils.code_generators.notebook_generator import (
+    NotebookGenerator,
+    PLACEHOLDER_CSV_NAME,
+)
 from dp_wizard.utils.code_generators.script_generator import ScriptGenerator
 from dp_wizard.utils.converters import (
     convert_py_to_nb,
@@ -252,9 +255,7 @@ def results_server(
         }
         return AnalysisPlan(
             # Prefer private CSV, if available:
-            csv_path=private_csv_path()
-            or public_csv_path()
-            or "fill-in-correct-path.csv",
+            csv_path=private_csv_path() or public_csv_path() or PLACEHOLDER_CSV_NAME,
             contributions=contributions(),
             epsilon=epsilon(),
             groups=groups(),
