@@ -34,8 +34,21 @@ def save_html_report(report):
     from htmltools import tags
     from yaml import dump
 
+    inputs_html = tags.div(
+        tags.h2("Inputs"),
+        tags.dl(tags.dt("epsilon"), tags.dd(report["inputs"]["epsilon"])),
+    )
+
+    outputs_html = tags.div(
+        tags.h2("Outputs"),
+        [
+            [tags.h3(tags.code(k)), tags.pre(dump(v))]
+            for k, v in report["outputs"].items()
+        ],
+    )
+
     html = tags.html(
-        tags.head(tags.title("DP Wizard Report")), tags.body(tags.pre(dump(report)))
+        tags.head(tags.title("DP Wizard Report")), tags.body(inputs_html, outputs_html)
     )
     Path(HTML_REPORT_PATH).write_text(str(html))
 
