@@ -1,9 +1,14 @@
 from pathlib import Path
 import re
 
+import nbformat
+from nbconvert.preprocessors import ExecutePreprocessor
+
 from shiny.run import ShinyAppProc
 from playwright.sync_api import Page, expect
 from shiny.pytest import create_app_fixture
+
+from dp_wizard.utils.code_generators.notebook_generator import PLACEHOLDER_CSV_NAME
 
 
 bp = "BREAKPOINT()".lower()
@@ -40,7 +45,13 @@ def test_cloud_app(page: Page, cloud_app: ShinyAppProc):  # pragma: no cover
         page.get_by_role("link", name="Download Notebook (unexecuted").click()
 
     download_path = download_info.value.path()
-    # TODO: execute notebook
+    # Based on https://nbconvert.readthedocs.io/en/latest/execute_api.html#example
+    nb = nbformat.read(download_path.open(), as_version=4)
+    ep = ExecutePreprocessor(timeout=600, kernel_name="python3")
+    ep.preprocess(nb)
+
+    # Clean up file in CWD that is created by notebook execution.
+    Path(PLACEHOLDER_CSV_NAME).unlink()
 
 
 def test_qa_app(page: Page, qa_app: ShinyAppProc):  # pragma: no cover
