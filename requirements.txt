@@ -8,6 +8,8 @@ anyio==4.9.0
     # via
     #   starlette
     #   watchfiles
+anywidget==0.9.18
+    # via shinywidgets
 appdirs==1.4.4
     # via shiny
 appnope==0.1.4
@@ -32,7 +34,9 @@ click==8.1.8
     #   shiny
     #   uvicorn
 comm==0.2.2
-    # via ipykernel
+    # via
+    #   ipykernel
+    #   ipywidgets
 debugpy==1.8.14
     # via ipykernel
 decorator==5.2.1
@@ -62,7 +66,13 @@ idna==3.10
 ipykernel==6.29.5
     # via -r requirements.in
 ipython==8.35.0
-    # via ipykernel
+    # via
+    #   ipykernel
+    #   ipywidgets
+ipywidgets==8.1.7
+    # via
+    #   anywidget
+    #   shinywidgets
 jedi==0.19.2
     # via ipython
 jinja2==3.1.6
@@ -85,8 +95,11 @@ jupyter-core==5.7.2
     #   nbclient
     #   nbconvert
     #   nbformat
+    #   shinywidgets
 jupyterlab-pygments==0.3.0
     # via nbconvert
+jupyterlab-widgets==3.0.15
+    # via ipywidgets
 jupytext==1.17.0
     # via -r requirements.in
 linkify-it-py==2.0.3
@@ -171,6 +184,8 @@ prompt-toolkit==3.0.51
     #   shiny
 psutil==7.0.0
     # via ipykernel
+psygnal==0.13.0
+    # via anywidget
 ptyprocess==0.7.0
     # via pexpect
 pure-eval==0.2.3
@@ -182,7 +197,9 @@ pygments==2.19.1
     #   ipython
     #   nbconvert
 python-dateutil==2.9.0.post0
-    # via jupyter-client
+    # via
+    #   jupyter-client
+    #   shinywidgets
 python-multipart==0.0.20
     # via shiny
 pyyaml==6.0.2
@@ -210,6 +227,10 @@ scikit-learn==1.6.1
 scipy==1.15.2
     # via scikit-learn
 shiny==1.4.0
+    # via
+    #   -r requirements.in
+    #   shinywidgets
+shinywidgets==0.6.2
     # via -r requirements.in
 six==1.17.0
     # via python-dateutil
@@ -238,6 +259,7 @@ traitlets==5.14.3
     #   comm
     #   ipykernel
     #   ipython
+    #   ipywidgets
     #   jupyter-client
     #   jupyter-core
     #   matplotlib-inline
@@ -247,6 +269,7 @@ traitlets==5.14.3
 typing-extensions==4.13.2
     # via
     #   anyio
+    #   anywidget
     #   asgiref
     #   beautifulsoup4
     #   black
@@ -270,5 +293,7 @@ webencodings==0.5.1
     #   tinycss2
 websockets==15.0.1
     # via shiny
+widgetsnbextension==4.0.14
+    # via ipywidgets
 wrapt==1.17.2
     # via deprecated
