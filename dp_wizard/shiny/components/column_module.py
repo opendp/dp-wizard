@@ -3,6 +3,7 @@ from logging import info
 from htmltools.tags import details, summary
 from shiny import ui, render, module, reactive, Inputs, Outputs, Session
 from shiny.types import SilentException
+from shinywidgets import output_widget, render_widget
 import polars as pl
 
 from dp_wizard.utils.code_generators.analyses import (
@@ -400,7 +401,7 @@ def column_server(
         accuracy, histogram = accuracy_histogram()
         return render.DataGrid(histogram)
 
-    @render.plot
+    @render_widget
     def histogram_preview_plot():
         accuracy, histogram = accuracy_histogram()
         s = "s" if contributions > 1 else ""

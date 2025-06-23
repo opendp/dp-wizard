@@ -44,7 +44,7 @@ class AbstractGenerator(ABC):
             Template(self.root_template, __file__)
             .fill_expressions(
                 TITLE=str(self.analysis_plan),
-                DEPENDENCIES="'opendp[polars]==0.13.0' matplotlib",
+                DEPENDENCIES="'opendp[polars]==0.13.0' plotly",
             )
             .fill_blocks(
                 IMPORTS_BLOCK=Template("imports", __file__).finish(),
