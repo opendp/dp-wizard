@@ -118,18 +118,20 @@ If Playwright fails in CI, we can still see what went wrong:
 ### Release
 
 - Make sure you're up to date, and have the git-ignored credentials file `.pypirc`.
-- Make one last feature branch:
+- Make one last feature branch with the new version number in the name:
   - Run `scripts/changelog.py` to update the `CHANGELOG.md`.
-  - Then bump `dp_wizard/VERSION`, and add the new number at the top of the `CHANGELOG.md`.
-  - Push to github; open PR, with version number in name; merge PR.
-- `flit publish --pypirc .pypirc`
+  - Review the updates and pull a couple highlights to the top.
+  - Bump `dp_wizard/VERSION`, and add the new number at the top of the `CHANGELOG.md`.
+  - Commit your changes, make a PR, and merge this branch to main.
+- Update `main` with the latest changes: `git checkout main; git pull`
+- Publish: `flit publish --pypirc .pypirc`
 
 This project is configured so there are two different install possibilities from pypi:
 - `pip install dp_wizard` does not aggressively pin dependency versions. It is preferred if you're using `dp_wizard` as a library.
 - `pip install dp_wizard[app]` pins all dependencies, and will work more reliably for application users.
 
 The cloud deployment is [configured](https://connect.posit.cloud/mccalluc/content/01966942-7eab-da99-0887-a7c483756aa8/edit) to update on pushes to the `cloud-deployment` branch.
-If you are on `main`, with no local changes, run `script/deploy.sh`.
+If you are on `main`, with no local changes, run `scripts/deploy.sh`.
 
 ### Conventions
 

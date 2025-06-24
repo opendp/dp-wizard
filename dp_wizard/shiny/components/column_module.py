@@ -5,7 +5,12 @@ from shiny import ui, render, module, reactive, Inputs, Outputs, Session
 from shiny.types import SilentException
 import polars as pl
 
-from dp_wizard.utils.code_generators.analyses import histogram, mean, median
+from dp_wizard.utils.code_generators.analyses import (
+    histogram,
+    mean,
+    median,
+    get_analysis_by_name,
+)
 from dp_wizard.utils.dp_helper import make_accuracy_histogram
 from dp_wizard.utils.shared import plot_bars
 from dp_wizard.utils.code_generators import make_column_config_block
@@ -202,37 +207,8 @@ def column_server(
 
     @render.ui
     def analysis_info_ui():
-        match input.analysis_type():
-            case histogram.name:
-                return ui.markdown(
-                    """
-                    Choosing a smaller number of bins will conserve your
-                    privacy budget and give you more accurate counts.
-                    While the bins are evenly spaced in DP Wizard,
-                    the OpenDP Library lets you pick arbitrary cut points.
-                    """
-                )
-            case mean.name:
-                return ui.markdown(
-                    """
-                    Choosing tighter bounds will mean less noise added
-                    to the statistics, but if you pick bounds that
-                    are too tight, you'll miss the contributions of
-                    outliers.
-                    """
-                )
-            case median.name:
-                return ui.markdown(
-                    """
-                    In DP Wizard the median is picked from evenly spaced
-                    candidates, but the OpenDP Library is more flexible.
-                    Because the median isn't based on the addition of noise,
-                    we can't estimate the error as we do with the other
-                    statistics.
-                    """
-                )
-            case _:
-                raise Exception("Unrecognized analysis")
+        blurb_md = get_analysis_by_name(input.analysis_type()).blurb_md
+        return ui.markdown(blurb_md)
 
     @render.ui
     def analysis_config_ui():
@@ -268,53 +244,46 @@ def column_server(
                 width=label_width,
             )
 
-        match input.analysis_type():
-            case histogram.name:
-                with reactive.isolate():
-                    return ui.layout_columns(
-                        [
-                            lower_bound_input(),
-                            upper_bound_input(),
-                            bin_count_input(),
-                            ui.output_ui("optional_weight_ui"),
-                        ],
-                        ui.output_ui("histogram_preview_ui"),
-                        col_widths=col_widths,  # type: ignore
-                    )
-            case mean.name:
-                with reactive.isolate():
-                    return ui.layout_columns(
-                        [
-                            lower_bound_input(),
-                            upper_bound_input(),
-                            ui.output_ui("optional_weight_ui"),
-                        ],
-                        ui.output_ui("mean_preview_ui"),
-                        col_widths=col_widths,  # type: ignore
-                    )
-            case median.name:
-                with reactive.isolate():
-                    return ui.layout_columns(
-                        [
-                            lower_bound_input(),
-                            upper_bound_input(),
-                            ui.output_ui("optional_weight_ui"),
-                        ],
-                        ui.output_ui("median_preview_ui"),
-                        col_widths=col_widths,  # type: ignore
-                    )
+        def candidate_count_input():
+            # Just change the user-visible label,
+            # but still call it "bin" internally.
+            # Less new code; pretty much the same thing.
+            return ui.input_numeric(
+                "bins",
+                "Number of Candidates",
+                bin_counts().get(name, 10),
+                width=label_width,
+            )
+
+        name = input.analysis_type()
+
+        # Had trouble with locals() inside comprehension in Python 3.10.
+        # Not sure if this is the exact issue:
+        # https://github.com/python/cpython/issues/105256
+
+        # Fix is just to keep it outside the comprehension.
+        local_variables = locals()
+        input_names = get_analysis_by_name(name).input_names
+        input_functions = [local_variables[input_name] for input_name in input_names]
+        with reactive.isolate():
+            inputs = [input_function() for input_function in input_functions] + [
+                ui.output_ui("optional_weight_ui")
+            ]
+
+        return ui.layout_columns(
+            inputs,
+            ui.output_ui(f"{name.lower()}_preview_ui"),
+            col_widths=col_widths,  # type: ignore
+        )
 
     @render.ui
     def bounds_tooltip_ui():
         return demo_tooltip(
             is_demo,
             """
-            DP requires that we limit the sensitivity to the contributions
-            of any individual. To do this, we need an estimate of the lower
-            and upper bounds for each variable. We should not look at the
-            data when estimating the bounds! In this case, we could imagine
-            that "class year" would vary between 1 and 4, and we could limit
-            "grade" to values between 50 and 100.
+            We need to clip our inputs to limit sensitivity.
+            Don't look at the data when estimating the bounds!
+            In this case, we could limit "grade" to values between 50 and 100.
             """,
         )
 
@@ -323,11 +292,10 @@ def column_server(
         return demo_tooltip(
             is_demo,
             """
-            Different statistics can be measured with DP.
-            This tool provides a histogram. If you increase the number of bins,
+            If you increase the number of bins,
             you'll see that each individual bin becomes noisier to provide
-            the same overall privacy guarantee. For this example, give
-            "class_year" 4 bins and "grade" 5 bins.
+            the same overall privacy guarantee.
+            Give "grade" 5 bins.
             """,
         )
 
@@ -411,6 +379,8 @@ def column_server(
 
     @render.ui
     def median_preview_ui():
+        if error_md := error_md_calc():
+            return error_md_ui(error_md)
         return [
             ui.p(
                 """

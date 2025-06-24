@@ -22,11 +22,7 @@ class AbstractGenerator(ABC):
     root_template = "placeholder"
 
     def __init__(self, analysis_plan: AnalysisPlan):
-        self.csv_path = analysis_plan.csv_path
-        self.contributions = analysis_plan.contributions
-        self.epsilon = analysis_plan.epsilon
-        self.groups = analysis_plan.groups
-        self.columns = analysis_plan.columns
+        self.analysis_plan = analysis_plan
 
     @abstractmethod
     def _make_context(self) -> str: ...  # pragma: no cover
@@ -55,7 +51,10 @@ class AbstractGenerator(ABC):
 
         code = (
             Template(self.root_template, __file__)
-            .fill_expressions(DEPENDENCIES="'opendp[polars]==0.13.0' matplotlib")
+            .fill_expressions(
+                TITLE=str(self.analysis_plan),
+                DEPENDENCIES="'opendp[polars]==0.13.0' matplotlib",
+            )
             .fill_blocks(
                 IMPORTS_BLOCK=Template(template).finish(),
                 UTILS_BLOCK=(Path(__file__).parent.parent / "shared.py").read_text(),
@@ -105,7 +104,7 @@ class AbstractGenerator(ABC):
                 upper_bound=col[0].upper_bound,
                 bin_count=col[0].bin_count,
             )
-            for name, col in self.columns.items()
+            for name, col in self.analysis_plan.columns.items()
         }
 
     def _make_confidence_note(self):
@@ -117,13 +116,13 @@ class AbstractGenerator(ABC):
                 f"confidence = {confidence} # {self._make_confidence_note()}"
             )
         ]
-        for column_name in self.columns.keys():
+        for column_name in self.analysis_plan.columns.keys():
             to_return.append(self._make_query(column_name))
 
         return "\n".join(to_return)
 
     def _make_query(self, column_name):
-        plan = self.columns[column_name]
+        plan = self.analysis_plan.columns[column_name]
         identifier = name_to_identifier(column_name)
         accuracy_name = f"{identifier}_accuracy"
         stats_name = f"{identifier}_stats"
@@ -143,30 +142,32 @@ class AbstractGenerator(ABC):
             accuracy_name=accuracy_name,
             stats_name=stats_name,
         )
+        note = analysis.make_note()
 
         return (
             self._make_comment_cell(f"### Query for `{column_name}`:")
             + self._make_python_cell(query)
             + self._make_python_cell(output)
+            + (self._make_comment_cell(note) if note else "")
         )
 
     def _make_partial_context(self):
-        weights = [column[0].weight for column in self.columns.values()]
+        weights = [column[0].weight for column in self.analysis_plan.columns.values()]
 
         from dp_wizard.utils.code_generators.analyses import get_analysis_by_name
 
         bin_column_names = [
             name_to_identifier(name)
-            for name, plan in self.columns.items()
+            for name, plan in self.analysis_plan.columns.items()
             if get_analysis_by_name(plan[0].analysis_type).has_bins()
         ]
 
-        privacy_unit_block = make_privacy_unit_block(self.contributions)
-        privacy_loss_block = make_privacy_loss_block(self.epsilon)
+        privacy_unit_block = make_privacy_unit_block(self.analysis_plan.contributions)
+        privacy_loss_block = make_privacy_loss_block(self.analysis_plan.epsilon)
 
         is_just_histograms = all(
             plan_column[0].analysis_type == histogram.name
-            for plan_column in self.columns.values()
+            for plan_column in self.analysis_plan.columns.values()
         )
         margins_list = (
             # Histograms don't need margins.
@@ -174,13 +175,13 @@ class AbstractGenerator(ABC):
             if is_just_histograms
             else self._make_margins_list(
                 [f"{name}_bin" for name in bin_column_names],
-                self.groups,
+                self.analysis_plan.groups,
             )
         )
         extra_columns = ", ".join(
             [
                 f"{name_to_identifier(name)}_bin_expr"
-                for name, plan in self.columns.items()
+                for name, plan in self.analysis_plan.columns.items()
                 if get_analysis_by_name(plan[0].analysis_type).has_bins()
             ]
         )

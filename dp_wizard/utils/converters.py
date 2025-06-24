@@ -27,7 +27,7 @@ class ConversionException(Exception):
         return f"Script to notebook conversion failed: {self.command}\n{self.stderr})"
 
 
-def convert_py_to_nb(python_str: str, execute: bool = False):
+def convert_py_to_nb(python_str: str, title: str, execute: bool = False):
     """
     Given Python code as a string, returns a notebook as a string.
     Calls jupytext as a subprocess:
@@ -50,17 +50,19 @@ def convert_py_to_nb(python_str: str, execute: bool = False):
             argv.append("--execute")
         argv.append(str(py_path.absolute()))  # type: ignore
         result = subprocess.run(argv, text=True, capture_output=True)
-        if result.returncode != 0:
-            # If there is an error, we want a copy of the file that will stay around,
-            # outside the "with TemporaryDirectory()" block.
-            # The command we show in the error message isn't exactly what was run,
-            # but it should reproduce the error.
-            debug_path = Path("/tmp/script.py")
-            debug_path.write_text(python_str)
-            argv.pop()
-            argv.append(str(debug_path))  # type: ignore
-            raise ConversionException(command=" ".join(argv), stderr=result.stderr)
-        return _clean_nb(result.stdout.strip())
+    if result.returncode != 0:
+        # If there is an error, we want a copy of the file that will stay around,
+        # outside the "with TemporaryDirectory()" block.
+        # The command we show in the error message isn't exactly what was run,
+        # but it should reproduce the error.
+        debug_path = Path("/tmp/script.py")
+        debug_path.write_text(python_str)
+        argv.pop()
+        argv.append(str(debug_path))  # type: ignore
+        raise ConversionException(command=" ".join(argv), stderr=result.stderr)
+    nb_dict = json.loads(result.stdout.strip())
+    nb_dict["metadata"]["title"] = title
+    return _clean_nb(json.dumps(nb_dict))
 
 
 def _clean_nb(nb_json: str):
