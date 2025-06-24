@@ -2,6 +2,17 @@ from dp_wizard.utils.code_template import Template
 
 
 name = "Histogram"
+blurb_md = """
+Choosing a smaller number of bins will conserve your
+privacy budget and give you more accurate counts.
+While the bins are evenly spaced in DP Wizard,
+the OpenDP library lets you pick arbitrary cut points.
+"""
+input_names = [
+    "lower_bound_input",
+    "upper_bound_input",
+    "bin_count_input",
+]
 
 
 def has_bins():
@@ -13,7 +24,7 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
         Template("histogram_query", __file__)
         .fill_values(
             BIN_NAME=f"{identifier}_bin",
-            GROUP_NAMES=code_gen.groups,
+            GROUP_NAMES=code_gen.analysis_plan.groups,
         )
         .fill_expressions(
             QUERY_NAME=f"{identifier}_query",
@@ -29,7 +40,7 @@ def make_output(code_gen, column_name, accuracy_name, stats_name):
         Template(f"histogram_{code_gen.root_template}_output", __file__)
         .fill_values(
             COLUMN_NAME=column_name,
-            GROUP_NAMES=code_gen.groups,
+            GROUP_NAMES=code_gen.analysis_plan.groups,
         )
         .fill_expressions(
             ACCURACY_NAME=accuracy_name,
