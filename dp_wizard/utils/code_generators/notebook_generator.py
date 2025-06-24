@@ -51,9 +51,9 @@ class NotebookGenerator(AbstractGenerator):
             Template("reports", __file__)
             .fill_expressions(
                 OUTPUTS=outputs_expression,
-                COLUMNS={
-                    k: v[0]._asdict() for k, v in self.analysis_plan.columns.items()
-                },
+                COLUMNS=str(
+                    {k: v[0]._asdict() for k, v in self.analysis_plan.columns.items()}
+                ),
             )
             .fill_values(
                 CSV_PATH=self.analysis_plan.csv_path,
