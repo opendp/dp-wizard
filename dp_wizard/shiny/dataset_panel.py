@@ -123,7 +123,7 @@ def dataset_server(
                         differential privacy: You configure a basic analysis
                         interactively, and then download code which
                         demonstrates how to use the
-                        [OpenDP library](https://docs.opendp.org/).
+                        [OpenDP Library](https://docs.opendp.org/).
 
                         When [installed and run
                         locally](https://pypi.org/project/dp_wizard/),
@@ -149,11 +149,12 @@ def dataset_server(
                 ui.card_header("Input CSVs"),
                 ui.markdown(
                     f"""
-Choose **Public CSV** {PUBLIC_TEXT}
-
 Choose **Private CSV** {PRIVATE_TEXT}
 
-Choose both **Public CSV** and **Private CSV** {PUBLIC_PRIVATE_TEXT}"""
+Choose **Public CSV** {PUBLIC_TEXT}
+
+Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
+                    """
                 ),
                 ui.output_ui("input_files_ui"),
                 ui.output_ui("csv_column_match_ui"),
@@ -173,12 +174,6 @@ Choose both **Public CSV** and **Private CSV** {PUBLIC_PRIVATE_TEXT}"""
         #   is renamed to something like "0.csv".
         return ui.row(
             ui.input_file(
-                "public_csv_path",
-                "Choose Public CSV",
-                accept=[".csv"],
-                placeholder=Path(initial_public_csv_path).name,
-            ),
-            ui.input_file(
                 "private_csv_path",
                 [
                     "Choose Private CSV ",  # Trailing space looks better.
@@ -190,6 +185,12 @@ Choose both **Public CSV** and **Private CSV** {PUBLIC_PRIVATE_TEXT}"""
                 ],
                 accept=[".csv"],
                 placeholder=Path(initial_private_csv_path).name,
+            ),
+            ui.input_file(
+                "public_csv_path",
+                "Choose Public CSV",
+                accept=[".csv"],
+                placeholder=Path(initial_public_csv_path).name,
             ),
         )
 
@@ -258,10 +259,12 @@ Choose both **Public CSV** and **Private CSV** {PUBLIC_PRIVATE_TEXT}"""
     def python_tooltip_ui():
         return demo_tooltip(
             is_demo,
-            "Along the way, code samples will demonstrate "
-            "how the information you provide is used in OpenDP, "
-            "and at the end you can download a notebook "
-            "for the entire calculation.",
+            """
+            Along the way, code samples will demonstrate
+            how the information you provide is used in the
+            OpenDP Library, and at the end you can download
+            a notebook for the entire calculation.
+            """,
         )
 
     @render.ui

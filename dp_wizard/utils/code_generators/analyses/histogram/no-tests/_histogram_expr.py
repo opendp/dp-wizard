@@ -1,4 +1,4 @@
-# See the OpenDP docs for more on making private histograms:
+# See the OpenDP Library docs for more on making private histograms:
 # https://docs.opendp.org/en/stable/getting-started/examples/histograms.html
 
 # Use the public information to make cut points for COLUMN_NAME:
