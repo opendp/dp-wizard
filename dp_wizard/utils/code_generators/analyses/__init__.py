@@ -4,9 +4,14 @@ from dp_wizard.utils.code_generators.abstract_generator import AbstractGenerator
 
 
 class Analysis(Protocol):  # pragma: no cover
-    # There should also be a "name".
-    # @property can't be combined with @staticmethod,
-    # so we can't make that explicit here.
+    @property
+    def name(self) -> str: ...
+
+    @property
+    def blurb_md(self) -> str: ...
+
+    @property
+    def input_names(self) -> list[str]: ...
 
     @staticmethod
     def has_bins() -> bool: ...
@@ -26,6 +31,9 @@ class Analysis(Protocol):  # pragma: no cover
         accuracy_name: str,
         stats_name: str,
     ) -> str: ...
+
+    @staticmethod
+    def make_note() -> str: ...
 
     @staticmethod
     def make_report_kv(

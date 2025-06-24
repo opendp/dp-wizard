@@ -2,6 +2,16 @@ from dp_wizard.utils.code_template import Template
 
 
 name = "Mean"
+blurb_md = """
+Choosing tighter bounds will mean less noise added
+to the statistics, but if you pick bounds that
+are too tight, you'll miss the contributions of
+outliers.
+"""
+input_names = [
+    "lower_bound_input",
+    "upper_bound_input",
+]
 
 
 def has_bins():
@@ -12,7 +22,7 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
     return (
         Template("mean_query", __file__)
         .fill_values(
-            GROUP_NAMES=code_gen.groups,
+            GROUP_NAMES=code_gen.analysis_plan.groups,
         )
         .fill_expressions(
             QUERY_NAME=f"{identifier}_query",
@@ -32,6 +42,10 @@ def make_output(code_gen, column_name, accuracy_name, stats_name):
         )
         .finish()
     )
+
+
+def make_note():
+    return ""
 
 
 def make_report_kv(name, confidence, identifier):

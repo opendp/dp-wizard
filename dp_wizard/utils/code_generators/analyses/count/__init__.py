@@ -2,6 +2,10 @@ from dp_wizard.utils.code_template import Template
 
 
 name = "Count"
+blurb_md = """
+DP counts can also be used together with grouping to calculate histograms.
+"""
+input_names = []
 
 
 def has_bins():
@@ -12,7 +16,7 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
     return (
         Template("count_query", __file__)
         .fill_values(
-            GROUP_NAMES=code_gen.groups,
+            GROUP_NAMES=code_gen.analysis_plan.groups,
         )
         .fill_expressions(
             QUERY_NAME=f"{identifier}_query",
@@ -32,6 +36,10 @@ def make_output(code_gen, column_name, accuracy_name, stats_name):
         )
         .finish()
     )
+
+
+def make_note():
+    return ""
 
 
 def make_report_kv(name, confidence, identifier):
