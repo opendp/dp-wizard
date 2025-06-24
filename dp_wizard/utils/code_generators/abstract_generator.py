@@ -133,11 +133,13 @@ class AbstractGenerator(ABC):
             accuracy_name=accuracy_name,
             stats_name=stats_name,
         )
+        note = analysis.make_note()
 
         return (
             self._make_comment_cell(f"### Query for `{column_name}`:")
             + self._make_python_cell(query)
             + self._make_python_cell(output)
+            + (self._make_comment_cell(note) if note else "")
         )
 
     def _make_partial_context(self):

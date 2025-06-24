@@ -51,7 +51,7 @@ def analysis_ui():
                 ),
                 ui.input_selectize(
                     "groups_selectize",
-                    "Group by",
+                    ["Group by", ui.output_ui("groups_selectize_tooltip_ui")],
                     [],
                     multiple=True,
                 ),
@@ -178,12 +178,23 @@ def analysis_server(
         _cleanup_reactive_dict(weights, column_ids_selected)
 
     @render.ui
+    def groups_selectize_tooltip_ui():
+        return demo_tooltip(
+            is_demo,
+            """
+            DP Wizard only supports the analysis of numeric data,
+            but string values can be used for grouping.
+            Select "class_year_str".
+            """,
+        )
+
+    @render.ui
     def columns_selectize_tooltip_ui():
         return demo_tooltip(
             is_demo,
             """
             Not all columns need analysis. For this demo, just check
-            "class_year" and "grade". With more columns selected,
+            "grade". With more columns selected,
             each column has a smaller share of the privacy budget.
             """,
         )
