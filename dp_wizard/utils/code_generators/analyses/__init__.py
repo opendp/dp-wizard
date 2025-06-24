@@ -33,6 +33,9 @@ class Analysis(Protocol):  # pragma: no cover
     ) -> str: ...
 
     @staticmethod
+    def make_note() -> str: ...
+
+    @staticmethod
     def make_report_kv(
         name: str,
         confidence: float,
