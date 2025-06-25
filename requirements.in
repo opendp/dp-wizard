@@ -18,4 +18,5 @@ shiny
 faicons
 
 # Visualization:
-matplotlib
+plotly
+shinywidgets

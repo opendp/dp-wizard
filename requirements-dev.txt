@@ -8,6 +8,8 @@ anyio==4.9.0
     # via
     #   starlette
     #   watchfiles
+anywidget==0.9.18
+    # via shinywidgets
 appdirs==1.4.4
     # via shiny
 appnope==0.1.4
@@ -42,13 +44,11 @@ click==8.1.8
     #   shiny
     #   uvicorn
 comm==0.2.2
-    # via ipykernel
-contourpy==1.3.2
-    # via matplotlib
+    # via
+    #   ipykernel
+    #   ipywidgets
 coverage[toml]==7.8.0
     # via pytest-cov
-cycler==0.12.1
-    # via matplotlib
 debugpy==1.8.14
     # via ipykernel
 decorator==5.2.1
@@ -86,8 +86,6 @@ flit==3.12.0
     # via -r requirements-dev.in
 flit-core==3.12.0
     # via flit
-fonttools==4.57.0
-    # via matplotlib
 greenlet==3.2.0
     # via playwright
 h11==0.16.0
@@ -107,7 +105,13 @@ iniconfig==2.1.0
 ipykernel==6.29.5
     # via -r .../dp-wizard/requirements.in
 ipython==8.35.0
-    # via ipykernel
+    # via
+    #   ipykernel
+    #   ipywidgets
+ipywidgets==8.1.7
+    # via
+    #   anywidget
+    #   shinywidgets
 jedi==0.19.2
     # via ipython
 jinja2==3.1.6
@@ -130,12 +134,13 @@ jupyter-core==5.7.2
     #   nbclient
     #   nbconvert
     #   nbformat
+    #   shinywidgets
 jupyterlab-pygments==0.3.0
     # via nbconvert
+jupyterlab-widgets==3.0.15
+    # via ipywidgets
 jupytext==1.17.0
     # via -r .../dp-wizard/requirements.in
-kiwisolver==1.4.8
-    # via matplotlib
 linkify-it-py==2.0.3
     # via shiny
 markdown-it-py==3.0.0
@@ -147,8 +152,6 @@ markupsafe==3.0.2
     # via
     #   jinja2
     #   nbconvert
-matplotlib==3.10.1
-    # via -r .../dp-wizard/requirements.in
 matplotlib-inline==0.1.7
     # via
     #   ipykernel
@@ -166,7 +169,9 @@ mistune==3.1.3
 mypy-extensions==1.0.0
     # via black
 narwhals==1.35.0
-    # via shiny
+    # via
+    #   plotly
+    #   shiny
 nbclient==0.10.2
     # via nbconvert
 nbconvert==7.16.6
@@ -184,8 +189,6 @@ nodeenv==1.9.1
     #   pyright
 numpy==2.2.4
     # via
-    #   contourpy
-    #   matplotlib
     #   opendp
     #   randomgen
     #   scikit-learn
@@ -201,8 +204,8 @@ packaging==24.2
     #   htmltools
     #   ipykernel
     #   jupytext
-    #   matplotlib
     #   nbconvert
+    #   plotly
     #   pytest
     #   shiny
 pandocfilters==1.5.1
@@ -213,8 +216,6 @@ pathspec==0.12.1
     # via black
 pexpect==4.9.0
     # via ipython
-pillow==11.2.1
-    # via matplotlib
 pip-tools==7.4.1
     # via -r requirements-dev.in
 platformdirs==4.3.7
@@ -224,6 +225,8 @@ platformdirs==4.3.7
     #   virtualenv
 playwright==1.51.0
     # via pytest-playwright
+plotly==6.1.2
+    # via -r .../dp-wizard/requirements.in
 pluggy==1.5.0
     # via pytest
 polars==1.12.0
@@ -237,6 +240,8 @@ prompt-toolkit==3.0.51
     #   shiny
 psutil==7.0.0
     # via ipykernel
+psygnal==0.13.0
+    # via anywidget
 ptyprocess==0.7.0
     # via pexpect
 pure-eval==0.2.3
@@ -253,8 +258,6 @@ pygments==2.19.1
     # via
     #   ipython
     #   nbconvert
-pyparsing==3.2.3
-    # via matplotlib
 pyproject-hooks==1.2.0
     # via
     #   build
@@ -279,7 +282,7 @@ pytest-xdist==3.6.1
 python-dateutil==2.9.0.post0
     # via
     #   jupyter-client
-    #   matplotlib
+    #   shinywidgets
 python-multipart==0.0.20
     # via shiny
 python-slugify==8.0.4
@@ -314,6 +317,10 @@ scikit-learn==1.6.1
 scipy==1.15.2
     # via scikit-learn
 shiny==1.4.0
+    # via
+    #   -r .../dp-wizard/requirements.in
+    #   shinywidgets
+shinywidgets==0.6.2
     # via -r .../dp-wizard/requirements.in
 six==1.17.0
     # via python-dateutil
@@ -352,6 +359,7 @@ traitlets==5.14.3
     #   comm
     #   ipykernel
     #   ipython
+    #   ipywidgets
     #   jupyter-client
     #   jupyter-core
     #   matplotlib-inline
@@ -361,6 +369,7 @@ traitlets==5.14.3
 typing-extensions==4.13.2
     # via
     #   anyio
+    #   anywidget
     #   asgiref
     #   beautifulsoup4
     #   black
@@ -392,6 +401,8 @@ websockets==15.0.1
     # via shiny
 wheel==0.45.1
     # via pip-tools
+widgetsnbextension==4.0.14
+    # via ipywidgets
 wrapt==1.17.2
     # via deprecated
 
