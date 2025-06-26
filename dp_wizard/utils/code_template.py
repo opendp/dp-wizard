@@ -1,8 +1,9 @@
 import re
 from pathlib import Path
+from typing import Callable, Any
 
 
-def _get_body(func):
+def _get_body(func: Callable[..., str]):
     import inspect
     import re
 
@@ -20,7 +21,7 @@ def _get_body(func):
 
 
 class Template:
-    def __init__(self, template, root=__file__):
+    def __init__(self, template: str | Callable[..., str], root: str = __file__):
         # TODO: Check if template is a Path, eventually.
         # Don't want to introduce a lot of changes right now.
         template_name = f"_{template}.py"
@@ -47,7 +48,7 @@ class Template:
         slot_re = r"\b[A-Z][A-Z_]{2,}\b"
         return set(re.findall(slot_re, self._template))
 
-    def fill_expressions(self, **kwargs):
+    def fill_expressions(self, **kwargs: str):
         """
         Fill in variable names, or dicts or lists represented as strings.
         """
@@ -61,7 +62,7 @@ class Template:
                 )
         return self
 
-    def fill_values(self, **kwargs):
+    def fill_values(self, **kwargs: Any):
         """
         Fill in string or numeric values. `repr` is called before filling.
         """
@@ -75,19 +76,19 @@ class Template:
                 )
         return self
 
-    def fill_blocks(self, **kwargs):
+    def fill_blocks(self, **kwargs: str):
         """
         Fill in code blocks. Slot must be alone on line.
         """
         for k, v in kwargs.items():
-            if not isinstance(v, str):
+            if not isinstance(v, str):  # type: ignore
                 raise Exception(f"For {k} in {self._source}, expected string, not {v}")
 
-            def match_indent(match):
+            def match_indent(match: re.Match[str]):
                 # This does what we want, but binding is confusing.
                 return "\n".join(
-                    match.group(1) + line for line in v.split("\n")  # noqa: B023
-                )
+                    match.group(1) + line for line in v.split("\n")
+                )  # noqa: B023
 
             k_re = re.escape(k)
             self._template, count = re.subn(

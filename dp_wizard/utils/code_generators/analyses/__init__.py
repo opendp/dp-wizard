@@ -51,7 +51,7 @@ class Analysis(Protocol):  # pragma: no cover
     ) -> str: ...
 
 
-def get_analysis_by_name(name) -> Analysis:  # pragma: no cover
+def get_analysis_by_name(name: str) -> Analysis:  # pragma: no cover
     # Avoid circular import:
     from dp_wizard.utils.code_generators.analyses import histogram, mean, median
 
