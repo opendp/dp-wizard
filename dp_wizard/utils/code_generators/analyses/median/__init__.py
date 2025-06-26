@@ -1,4 +1,5 @@
 from dp_wizard.utils.code_template import Template
+from dp_wizard.utils.code_generators.abstract_generator import AbstractGenerator
 
 
 name = "Median"
@@ -20,7 +21,10 @@ def has_bins():
     return False  # pragma: no cover
 
 
-def make_query(code_gen, identifier, accuracy_name, stats_name):
+def make_query(
+    code_gen: AbstractGenerator, identifier: str, accuracy_name: str, stats_name: str
+):
+
     return (  # pragma: no cover
         Template("median_query", __file__)
         .fill_values(
