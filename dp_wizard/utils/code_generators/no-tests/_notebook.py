@@ -3,6 +3,10 @@
 # This is a demonstration of how the [OpenDP Library](https://docs.opendp.org/)
 # can be used to create a differentially private release.
 #
+# Jump ahead:
+# - [Analysis](#Analysis)
+# - [Results](#Results)
+#
 # ## Prerequisites
 #
 # First install and import the required dependencies:
