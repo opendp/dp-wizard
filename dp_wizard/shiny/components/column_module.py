@@ -9,6 +9,7 @@ from dp_wizard.utils.code_generators.analyses import (
     histogram,
     mean,
     median,
+    count,
     get_analysis_by_name,
 )
 from dp_wizard.utils.dp_helper import make_accuracy_histogram
@@ -125,7 +126,7 @@ def column_ui():  # pragma: no cover
             ui.input_select(
                 "analysis_type",
                 None,
-                [histogram.name, mean.name, median.name],
+                [histogram.name, mean.name, median.name, count.name],
                 width=label_width,
             ),
             ui.output_ui("analysis_info_ui"),
@@ -418,6 +419,18 @@ def column_server(
             ui.p(
                 """
                 Since the median is just a single number,
+                there is not a preview visualization.
+                """
+            ),
+            output_code_sample("Column Definition", "column_code"),
+        ]
+
+    @render.ui
+    def count_preview_ui():
+        return [
+            ui.p(
+                """
+                Since the count is just a single number,
                 there is not a preview visualization.
                 """
             ),
