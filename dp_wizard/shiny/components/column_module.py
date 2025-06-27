@@ -99,8 +99,12 @@ def get_bin_errors(count):
     messages = []
     if error := get_float_error(count):
         messages.append(f"Number {error}.")
-    elif not int(float(count)) > 0:
+    elif int(float(count)) <= 0:
         messages.append("Number should be a positive integer.")
+    elif count > 1000:
+        messages.append(
+            "Number should be less than 1000, just to keep computation from running too long."
+        )
     return messages
 
 
