@@ -91,21 +91,24 @@ def get_bin_errors(count):
 
     >>> get_bin_errors("5")
     []
+    >>> get_bin_errors(None)
+    ['Number is required.']
     >>> get_bin_errors("abc")
     ['Number should be a number.']
     >>> get_bin_errors("-1")
     ['Number should be a positive integer.']
     """
-    messages = []
     if error := get_float_error(count):
-        messages.append(f"Number {error}.")
-    elif int(float(count)) <= 0:
-        messages.append("Number should be a positive integer.")
-    elif count > 1000:
-        messages.append(
-            "Number should be less than 1000, just to keep computation from running too long."
-        )
-    return messages
+        return [f"Number {error}."]
+    count = int(float(count))
+    if count <= 0:
+        return ["Number should be a positive integer."]
+    if count > 1000:
+        return [
+            "Number should be less than 1000, "
+            "just to keep computation from running too long."
+        ]
+    return []
 
 
 def error_md_ui(markdown):  # pragma: no cover

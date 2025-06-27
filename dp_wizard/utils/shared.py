@@ -6,7 +6,7 @@ from polars import DataFrame
 def round_2(number):
     """
     >>> round_2(1234)
-    1200
+    1200.0
     >>> round_2(0.001234)
     0.0012
     """
