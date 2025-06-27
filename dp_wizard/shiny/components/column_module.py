@@ -224,7 +224,7 @@ def column_server(
             return ui.input_text(
                 "lower_bound",
                 ["Lower Bound", ui.output_ui("bounds_tooltip_ui")],
-                str(lower_bounds().get(name, 0)),
+                str(lower_bounds().get(name, "")),
                 width=label_width,
             )
 
@@ -232,7 +232,7 @@ def column_server(
             return ui.input_text(
                 "upper_bound",
                 "Upper Bound",
-                str(upper_bounds().get(name, 10)),
+                str(upper_bounds().get(name, "")),
                 width=label_width,
             )
 
@@ -240,7 +240,7 @@ def column_server(
             return ui.input_numeric(
                 "bins",
                 ["Number of Bins", ui.output_ui("bins_tooltip_ui")],
-                bin_counts().get(name, 10),
+                bin_counts().get(name, 0),
                 width=label_width,
             )
 
@@ -251,7 +251,7 @@ def column_server(
             return ui.input_numeric(
                 "bins",
                 "Number of Candidates",
-                bin_counts().get(name, 10),
+                bin_counts().get(name, 0),
                 width=label_width,
             )
 
