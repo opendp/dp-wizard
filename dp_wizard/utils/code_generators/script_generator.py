@@ -13,7 +13,10 @@ class ScriptGenerator(AbstractGenerator):
 
     def _make_context(self):
         return (
-            self._make_partial_context().fill_expressions(CSV_PATH="csv_path").finish()
+            self._make_partial_context()
+            .fill_expressions(CSV_PATH="csv_path")
+            .fill_blocks(OPTIONAL_CSV_BLOCK="")
+            .finish()
         )
 
     def _make_confidence_note(self):

@@ -62,16 +62,16 @@ def get_float_error(number_str):
     return None
 
 
-def get_bound_error(lower_bound, upper_bound):
+def get_bound_errors(lower_bound, upper_bound):
     """
-    >>> get_bound_error(1, 2)
-    ''
-    >>> get_bound_error('abc', 'xyz')
-    '- Lower bound should be a number.\\n- Upper bound should be a number.'
-    >>> get_bound_error(1, None)
-    '- Upper bound is required.'
-    >>> get_bound_error(1, 0)
-    '- Lower bound should be less than upper bound.'
+    >>> get_bound_errors(1, 2)
+    []
+    >>> get_bound_errors('abc', 'xyz')
+    ['Lower bound should be a number.', 'Upper bound should be a number.']
+    >>> get_bound_errors(1, None)
+    ['Upper bound is required.']
+    >>> get_bound_errors(1, 0)
+    ['Lower bound should be less than upper bound.']
     """
     messages = []
     if error := get_float_error(lower_bound):
@@ -81,7 +81,36 @@ def get_bound_error(lower_bound, upper_bound):
     if not messages:
         if not (float(lower_bound) < float(upper_bound)):
             messages.append("Lower bound should be less than upper bound.")
-    return "\n".join(f"- {m}" for m in messages)
+    return messages
+
+
+def get_bin_errors(count):
+    """
+    This function might be applied to either histogram bin counts,
+    or median candidate counts, so the wording is a little vague.
+
+    >>> get_bin_errors("5")
+    []
+    >>> get_bin_errors(None)
+    ['Number is required.']
+    >>> get_bin_errors("abc")
+    ['Number should be a number.']
+    >>> get_bin_errors("-1")
+    ['Number should be a positive integer.']
+    >>> get_bin_errors("1001")
+    ['Number should be less than 1000, just to keep computation from running too long.']
+    """
+    if error := get_float_error(count):
+        return [f"Number {error}."]
+    count = int(float(count))
+    if count <= 0:
+        return ["Number should be a positive integer."]
+    if count > 1000:
+        return [
+            "Number should be less than 1000, "
+            "just to keep computation from running too long."
+        ]
+    return []
 
 
 def error_md_ui(markdown):  # pragma: no cover
@@ -329,7 +358,11 @@ def column_server(
 
     @reactive.calc
     def error_md_calc():
-        return get_bound_error(input.lower_bound(), input.upper_bound())
+        return "\n".join(
+            f"- {error}"
+            for error in get_bound_errors(input.lower_bound(), input.upper_bound())
+            + get_bin_errors(input.bins())
+        )
 
     @render.code
     def column_code():
