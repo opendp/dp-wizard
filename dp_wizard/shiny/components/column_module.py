@@ -117,6 +117,7 @@ def column_server(
     epsilon: float,
     row_count: int,
     analysis_types: reactive.Value[dict[str, str]],
+    analysis_errors: reactive.Value[dict[str, bool]],
     lower_bounds: reactive.Value[dict[str, float]],
     upper_bounds: reactive.Value[dict[str, float]],
     bin_counts: reactive.Value[dict[str, int]],
@@ -240,7 +241,7 @@ def column_server(
             return ui.input_numeric(
                 "bins",
                 ["Number of Bins", ui.output_ui("bins_tooltip_ui")],
-                bin_counts().get(name, 0),
+                bin_counts().get(name, 10),
                 width=label_width,
             )
 
@@ -330,6 +331,12 @@ def column_server(
     @reactive.calc
     def error_md_calc():
         return get_bound_error(input.lower_bound(), input.upper_bound())
+
+    @reactive.effect
+    def set_analysis_errors():
+        with reactive.isolate():
+            prev_analysis_errors = analysis_errors()
+        analysis_errors.set({**prev_analysis_errors, name: bool(error_md_calc())})
 
     @render.code
     def column_code():

@@ -134,15 +134,11 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     page.get_by_text(": class year").nth(2).click()
 
     # Check that default is set correctly:
-    # (Explicit "float()" because sometimes returns "10", sometimes "10.0".
-    #  Weird, but not something to spend time on.)
-    assert float(page.get_by_label("Upper").input_value()) == 10.0
-
-    # Input validation:
-    page.get_by_label("Upper").fill("")
+    assert page.get_by_label("Upper").input_value() == ""
     expect_visible("Upper bound is required")
     page.get_by_label("Upper").fill("nan")
     expect_visible("Upper bound should be a number")
+    page.get_by_label("Lower").fill("0")
     page.get_by_label("Upper").fill("-1")
     expect_visible("Lower bound should be less than upper bound")
 
