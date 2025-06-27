@@ -97,6 +97,8 @@ def get_bin_errors(count):
     ['Number should be a number.']
     >>> get_bin_errors("-1")
     ['Number should be a positive integer.']
+    >>> get_bin_errors("1001")
+    ['Number should be less than 1000, just to keep computation from running too long.']
     """
     if error := get_float_error(count):
         return [f"Number {error}."]
