@@ -1,4 +1,4 @@
-from htmltools.tags import details, summary
+from htmltools.tags import details, summary, small
 from shiny import ui
 from faicons import icon_svg
 
@@ -10,12 +10,11 @@ def output_code_sample(title, name_of_render_function: str):
     )
 
 
-def demo_tooltip(is_demo: bool, text: str):  # pragma: no cover
+def demo_help(is_demo: bool, text: str):  # pragma: no cover
     if is_demo:
-        return ui.tooltip(
-            icon_svg("circle-question"),
-            text,
-            placement="right",
+        return ui.div(
+            small(icon_svg("circle-question"), " ", text),
+            class_="alert alert-info p-2",
         )
 
 
