@@ -38,6 +38,8 @@ def test_qa_app(page: Page, qa_app: ShinyAppProc):  # pragma: no cover
 
     page.locator(".selectize-input").nth(0).click()
     page.get_by_text(": grade").click()
+    page.get_by_label("Lower").fill("0")
+    page.get_by_label("Upper").fill("10")
 
     page.get_by_role("button", name="Download Results").click()
     page.get_by_role("link", name="Download Notebook (.ipynb)").click()
@@ -195,6 +197,9 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     # Pick grouping:
     page.locator(".selectize-input").nth(1).click()
     page.get_by_text("class year").nth(2).click()
+    # Fill inputs:
+    page.get_by_label("Lower").fill("0")
+    page.get_by_label("Upper").fill("10")
 
     # -- Download Results --
     expect(page.get_by_text(results_requirements_warning)).not_to_be_visible()
