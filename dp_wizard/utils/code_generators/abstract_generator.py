@@ -54,7 +54,8 @@ class AbstractGenerator(ABC):
             .fill_expressions(
                 TITLE=str(self.analysis_plan),
                 DEPENDENCIES="'opendp[polars]==0.13.0' matplotlib",
-                WINDOWS_NOTE="(If installing in the Windows CMD shell, use double-quotes instead of single-quotes above.)",
+                WINDOWS_NOTE="(If installing in the Windows CMD shell, "
+                "use double-quotes instead of single-quotes above.)",
             )
             .fill_blocks(
                 IMPORTS_BLOCK=Template(template).finish(),
