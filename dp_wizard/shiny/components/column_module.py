@@ -145,6 +145,7 @@ def column_server(
     contributions: int,
     epsilon: float,
     row_count: int,
+    groups: reactive.Value[list[str]],
     analysis_types: reactive.Value[dict[str, str]],
     lower_bounds: reactive.Value[dict[str, float]],
     upper_bounds: reactive.Value[dict[str, float]],
@@ -232,7 +233,10 @@ def column_server(
 
     @render.text
     def card_header():
-        return name
+        groups_str = ", ".join(groups())
+        if not groups_str:
+            return name
+        return f"{name} (grouped by {groups_str})"
 
     @render.ui
     def analysis_info_ui():
