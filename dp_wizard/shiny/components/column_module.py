@@ -53,7 +53,7 @@ def get_float_error(number_str):
     'should be a number'
     """
     if number_str is None or number_str == "":
-        return "is required"
+        return "is a required number"
     else:
         try:
             int(float(number_str))
@@ -69,7 +69,7 @@ def get_bound_errors(lower_bound, upper_bound):
     >>> get_bound_errors('abc', 'xyz')
     ['Lower bound should be a number.', 'Upper bound should be a number.']
     >>> get_bound_errors(1, None)
-    ['Upper bound is required.']
+    ['Upper bound is a required number.']
     >>> get_bound_errors(1, 0)
     ['Lower bound should be less than upper bound.']
     """
