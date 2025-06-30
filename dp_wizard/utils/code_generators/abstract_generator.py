@@ -40,6 +40,15 @@ class AbstractGenerator(ABC):
         return "".join(f"# {line}\n" for line in comment.splitlines())
 
     def make_py(self):
+        def template():
+            import polars as pl  # noqa: F401
+            import opendp.prelude as dp  # noqa: F401
+            import matplotlib.pyplot as plt  # noqa: F401
+
+            # The OpenDP team is working to vet the core algorithms.
+            # Until that is complete we need to opt-in to use these features.
+            dp.enable_features("contrib")
+
         code = (
             Template(self.root_template, __file__)
             .fill_expressions(
@@ -47,7 +56,7 @@ class AbstractGenerator(ABC):
                 DEPENDENCIES="'opendp[polars]==0.13.0' matplotlib",
             )
             .fill_blocks(
-                IMPORTS_BLOCK=Template("imports", __file__).finish(),
+                IMPORTS_BLOCK=Template(template).finish(),
                 UTILS_BLOCK=(Path(__file__).parent.parent / "shared.py").read_text(),
                 COLUMNS_BLOCK=self._make_columns(),
                 CONTEXT_BLOCK=self._make_context(),
