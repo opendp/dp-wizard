@@ -401,12 +401,23 @@ def column_server(
     def stat_preview_ui():
         if error_md := error_md_calc():
             return error_md_ui(error_md)
+        optional_grouping_message = (
+            (
+                """
+                Because the data is grouped, the final release will include a bar chart,
+                where each bar is the value of the statistic for one group.
+                """
+            )
+            if groups()
+            else ""
+        )
         return [
             ui.p(
+                f"""
+                Since this stat is just a single number,
+                there is not a preview visualization.
+                {optional_grouping_message}
                 """
-                    Since this stat is just a single number,
-                    there is not a preview visualization.
-                    """
             ),
             output_code_sample("Column Definition", "column_code"),
         ]
