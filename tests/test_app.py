@@ -170,7 +170,7 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     page.get_by_label("Number of Bins").fill("10")
 
     page.get_by_label("Upper").fill("")
-    expect_visible("Upper bound is required")
+    expect_visible("Upper bound is a required number")
     page.get_by_label("Upper").fill("nan")
     expect_visible("Upper bound should be a number")
     page.get_by_label("Lower").fill("0")

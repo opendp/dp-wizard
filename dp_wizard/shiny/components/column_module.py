@@ -43,9 +43,9 @@ def get_float_error(number_str):
     so the "should be a number" errors may not be seen in practice.
     >>> get_float_error('0')
     >>> get_float_error(None)
-    'is required'
+    'is a required number'
     >>> get_float_error('')
-    'is required'
+    'is a required number'
     >>> get_float_error('1.1')
     >>> get_float_error('nan')
     'should be a number'
@@ -92,7 +92,7 @@ def get_bin_errors(count):
     >>> get_bin_errors("5")
     []
     >>> get_bin_errors(None)
-    ['Number is required.']
+    ['Number is a required number.']
     >>> get_bin_errors("abc")
     ['Number should be a number.']
     >>> get_bin_errors("-1")
