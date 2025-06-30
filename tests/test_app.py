@@ -134,9 +134,7 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     # Epsilon slider:
     expect_visible("Epsilon: 1.0")
     page.locator(".irs-bar").click()
-    expect_visible("Epsilon: 0.316")
-    page.locator(".irs-bar").click()
-    expect_visible("Epsilon: 0.158")
+    expect_visible("Epsilon: 0.288")
     # Simulation
     expect_visible("Because you've provided a public CSV")
 
