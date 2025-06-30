@@ -398,35 +398,26 @@ def column_server(
                 ),
             ]
 
-    @render.ui
-    def mean_preview_ui():
-        # accuracy, histogram = accuracy_histogram()
-        if error_md := error_md_calc():
-            return error_md_ui(error_md)
-        else:
-            return [
-                ui.p(
-                    """
-                    Since the mean is just a single number,
-                    there is not a preview visualization.
-                    """
-                ),
-                output_code_sample("Column Definition", "column_code"),
-            ]
-
-    @render.ui
-    def median_preview_ui():
+    def stat_preview_ui():
         if error_md := error_md_calc():
             return error_md_ui(error_md)
         return [
             ui.p(
                 """
-                Since the median is just a single number,
-                there is not a preview visualization.
-                """
+                    Since this stat is just a single number,
+                    there is not a preview visualization.
+                    """
             ),
             output_code_sample("Column Definition", "column_code"),
         ]
+
+    @render.ui
+    def mean_preview_ui():
+        return stat_preview_ui()
+
+    @render.ui
+    def median_preview_ui():
+        return stat_preview_ui()
 
     @render.data_frame
     def data_frame():
