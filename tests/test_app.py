@@ -1,9 +1,14 @@
 from pathlib import Path
 import re
 
+import nbformat
+from nbconvert.preprocessors import ExecutePreprocessor
+
 from shiny.run import ShinyAppProc
 from playwright.sync_api import Page, expect
 from shiny.pytest import create_app_fixture
+
+from dp_wizard.utils.code_generators.notebook_generator import PLACEHOLDER_CSV_NAME
 
 
 bp = "BREAKPOINT()".lower()
@@ -29,7 +34,26 @@ def test_cloud_app(page: Page, cloud_app: ShinyAppProc):  # pragma: no cover
     page.goto(cloud_app.url)
     expect(page).to_have_title("DP Wizard")
     expect(page.get_by_text("Choose Public CSV")).not_to_be_visible()
-    expect(page.get_by_text("CSV Column Names")).to_be_visible()
+    page.get_by_label("CSV Column Names").fill("a_column")
+
+    page.get_by_role("button", name="Define analysis").click()
+    page.locator(".selectize-input").nth(0).click()
+    page.get_by_text("a_column").click()
+    page.get_by_label("Lower").fill("0")
+    page.get_by_label("Upper").fill("10")
+
+    page.get_by_role("button", name="Download Results").click()
+    with page.expect_download() as download_info:
+        page.get_by_role("link", name="Download Notebook (unexecuted").click()
+
+    download_path = download_info.value.path()
+    # Based on https://nbconvert.readthedocs.io/en/latest/execute_api.html#example
+    nb = nbformat.read(download_path.open(), as_version=4)
+    ep = ExecutePreprocessor(timeout=600, kernel_name="python3")
+    ep.preprocess(nb)
+
+    # Clean up file in CWD that is created by notebook execution.
+    Path(PLACEHOLDER_CSV_NAME).unlink()
 
 
 def test_qa_app(page: Page, qa_app: ShinyAppProc):  # pragma: no cover
@@ -136,7 +160,16 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     page.get_by_text(": class year").nth(2).click()
 
     # Check that default is set correctly:
+    # (Explicit "float()" because sometimes returns "10", sometimes "10.0".
+    #  Weird, but not something to spend time on.)
     assert page.get_by_label("Upper").input_value() == ""
+
+    # Input validation:
+    page.get_by_label("Number of Bins").fill("-1")
+    expect_visible("Number should be a positive integer.")
+    page.get_by_label("Number of Bins").fill("10")
+
+    page.get_by_label("Upper").fill("")
     expect_visible("Upper bound is required")
     page.get_by_label("Upper").fill("nan")
     expect_visible("Upper bound should be a number")

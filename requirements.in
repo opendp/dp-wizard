@@ -19,3 +19,7 @@ faicons
 
 # Visualization:
 matplotlib
+
+# Security constraints:
+tornado>=6.5
+requests>=2.32.4
