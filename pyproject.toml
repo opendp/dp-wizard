@@ -44,6 +44,12 @@ Home = "https://github.com/opendp/dp-wizard"
 include = ["dp_wizard"]
 ignore = ["**/no-tests/"]
 
+# TODO: Expand strict type checking
+strict = [
+    "dp_wizard/utils/code_template.py",
+    "dp_wizard/utils/code_generators/**"
+]
+
 [project.optional-dependencies]
 app = [
     "anyio==4.9.0",
