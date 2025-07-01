@@ -2,6 +2,7 @@ from tempfile import NamedTemporaryFile
 import subprocess
 import pytest
 import re
+from pathlib import Path
 import opendp.prelude as dp
 
 from dp_wizard import opendp_version
@@ -13,6 +14,15 @@ from dp_wizard.utils.code_generators import (
 )
 from dp_wizard.utils.code_generators.notebook_generator import NotebookGenerator
 from dp_wizard.utils.code_generators.script_generator import ScriptGenerator
+
+
+python_paths = Path(__file__).parent.parent.parent.glob("dp_wizard/**/*.py")
+
+
+@pytest.mark.parametrize("python_path", python_paths, ids=lambda path: path.name)
+def test_no_unparameterized_docs_urls(python_path: Path):
+    python_code = python_path.read_text()
+    assert not re.search(r"docs\.opendp\.org/en/[^O{]", python_code)
 
 
 def test_make_column_config_block_for_unrecognized():
