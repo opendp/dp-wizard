@@ -54,11 +54,10 @@ def get_float_error(number_str):
     """
     if number_str is None or number_str == "":
         return "is required"
-    else:
-        try:
-            int(float(number_str))
-        except (TypeError, ValueError, OverflowError):
-            return "should be a number"
+    try:
+        int(float(number_str))
+    except (TypeError, ValueError, OverflowError):
+        return "should be a number"
     return None
 
 
@@ -212,13 +211,13 @@ def column_server(
         # Mock data only depends on lower and upper bounds, so it could be cached,
         # but I'd guess this is dominated by the DP operations,
         # so not worth optimizing.
-        # TODO: Use real public data, if we have it!
-        if public_csv_path:
-            lf = pl.scan_csv(public_csv_path)
-        else:
-            lf = pl.LazyFrame(
+        lf = (
+            pl.scan_csv(public_csv_path)
+            if public_csv_path
+            else pl.LazyFrame(
                 mock_data({name: ColumnDef(lower_x, upper_x)}, row_count=row_count)
             )
+        )
         return make_accuracy_histogram(
             lf=lf,
             column_name=name,
@@ -378,37 +377,35 @@ def column_server(
     def histogram_preview_ui():
         if error_md := error_md_calc():
             return error_md_ui(error_md)
-        else:
-            accuracy, histogram = accuracy_histogram()
-            return [
-                ui.output_plot("histogram_preview_plot", height="300px"),
-                ui.layout_columns(
-                    ui.markdown(
-                        f"The {confidence:.0%} confidence interval is ±{accuracy:.3g}."
-                    ),
-                    details(
-                        summary("Data Table"),
-                        ui.output_data_frame("data_frame"),
-                    ),
-                    output_code_sample("Column Definition", "column_code"),
+        accuracy, histogram = accuracy_histogram()
+        return [
+            ui.output_plot("histogram_preview_plot", height="300px"),
+            ui.layout_columns(
+                ui.markdown(
+                    f"The {confidence:.0%} confidence interval is ±{accuracy:.3g}."
                 ),
-            ]
+                details(
+                    summary("Data Table"),
+                    ui.output_data_frame("data_frame"),
+                ),
+                output_code_sample("Column Definition", "column_code"),
+            ),
+        ]
 
     @render.ui
     def mean_preview_ui():
         # accuracy, histogram = accuracy_histogram()
         if error_md := error_md_calc():
             return error_md_ui(error_md)
-        else:
-            return [
-                ui.p(
-                    """
-                    Since the mean is just a single number,
-                    there is not a preview visualization.
-                    """
-                ),
-                output_code_sample("Column Definition", "column_code"),
-            ]
+        return [
+            ui.p(
+                """
+                Since the mean is just a single number,
+                there is not a preview visualization.
+                """
+            ),
+            output_code_sample("Column Definition", "column_code"),
+        ]
 
     @render.ui
     def median_preview_ui():
