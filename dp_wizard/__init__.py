@@ -5,6 +5,7 @@ from logging import warning
 
 
 __version__ = (Path(__file__).parent / "VERSION").read_text().strip()
+opendp_version = "0.13.0"
 
 
 def main():  # pragma: no cover

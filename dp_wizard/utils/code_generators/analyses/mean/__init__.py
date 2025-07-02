@@ -1,3 +1,4 @@
+from dp_wizard import opendp_version
 from dp_wizard.utils.code_template import Template
 
 
@@ -69,6 +70,7 @@ def make_column_config_block(column_name, lower_bound, upper_bound, bin_count):
         Template("mean_expr", __file__)
         .fill_expressions(
             EXPR_NAME=f"{snake_name}_expr",
+            OPENDP_VERSION=opendp_version,
         )
         .fill_values(
             COLUMN_NAME=column_name,
