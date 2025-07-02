@@ -45,8 +45,8 @@ def test_make_column_config_block_for_count():
             upper_bound=0,
             bin_count=0,
         ).strip()
-        == """# See the OpenDP docs for more on making private counts:
-# https://docs.opendp.org/en/stable/getting-started/tabular-data/essential-statistics.html#Count
+        == f"""# See the OpenDP docs for more on making private counts:
+# https://docs.opendp.org/en/{opendp_version}/getting-started/tabular-data/essential-statistics.html#Count
 
 hw_grade_expr = (
     pl.col('HW GRADE').cast(float).fill_nan(0).fill_null(0).dp.count().alias("count")
