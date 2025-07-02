@@ -1,6 +1,8 @@
 from pathlib import Path
 import csv
 import random
+import re
+from collections import defaultdict
 
 from shiny import ui, reactive, Inputs, Outputs, Session
 
@@ -94,7 +96,55 @@ def _clip(n: float, lower_bound: float, upper_bound: float) -> float:
     return max(min(n, upper_bound), lower_bound)
 
 
+def _scan_text_for_input_ids(text, rel_path, errors):
+    """
+    >>> text = '''
+    ... ui.input_text("spill")
+    ... @reactive.event(input.spell)
+    ... '''
+    >>> rel_path = 'fake/component.py'
+    >>> errors = []
+    >>> _scan_text_for_input_ids(text, rel_path, errors)
+    >>> errors
+    ['fake/component.py:2 includes "input.spell", but there is no "spell" id']
+    """
+    lines = text.splitlines()
+    props = defaultdict(list)
+    for number, line in enumerate(lines):
+        if line.strip().startswith("..."):
+            continue
+        for match in re.findall(r"input\.(\w+)", line):
+            props[match].append(str(number))
+    for prop in props.keys():
+        if f'"{prop}"' not in text:
+            errors.append(
+                f'{rel_path}:{",".join(props[prop])} includes "input.{prop}", but there is no "{prop}" id'
+            )
+
+
+def _scan_files_for_input_ids():
+    """
+    A really hacky scan of the source code to find IDs with typos.
+    There is an issue filed with Shiny, but no comments since May 2024:
+
+    "If an nonexistent input is accessed in an output, no error is printed"
+    https://github.com/posit-dev/py-shiny/issues/400
+
+    This is only checking in one direction, but picking out strings
+    that are used as IDs and then looking for "inputs" would be much more work.
+    """
+    errors = []
+    for path in Path(__file__).parent.glob("**/*.py"):
+        text = path.read_text()
+        rel_path = path.relative_to(Path(__file__).parent)
+        _scan_text_for_input_ids(text, rel_path, errors)
+    if errors:
+        raise Exception("\n".join(errors))
+
+
 def make_server_from_cli_info(cli_info: CLIInfo):
+    _scan_files_for_input_ids()
+
     def server(input: Inputs, output: Outputs, session: Session):  # pragma: no cover
         if cli_info.is_demo:
             initial_contributions = 10
