@@ -269,8 +269,11 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                         "Contributions ",  # Trailing space looks better.
                         demo_tooltip(
                             is_demo,
-                            "For the demo, we assume that each student "
-                            f"can occur at most {contributions()} times in the dataset. ",
+                            f"""
+                            For the demo, we assume that each student
+                            can occur at most {contributions()} times
+                            in the dataset.
+                            """,
                         ),
                     ],
                     contributions(),
