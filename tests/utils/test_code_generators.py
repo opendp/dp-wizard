@@ -6,7 +6,7 @@ from pathlib import Path
 import opendp.prelude as dp
 
 from dp_wizard import opendp_version
-from dp_wizard.utils.code_generators.analyses import histogram, mean, median
+from dp_wizard.utils.code_generators.analyses import histogram, mean, median, count
 from dp_wizard.utils.code_generators import (
     make_column_config_block,
     AnalysisPlan,
@@ -34,6 +34,24 @@ def test_make_column_config_block_for_unrecognized():
             upper_bound=100,
             bin_count=10,
         )
+
+
+def test_make_column_config_block_for_count():
+    assert (
+        make_column_config_block(
+            name="HW GRADE",
+            analysis_type=count.name,
+            lower_bound=0,
+            upper_bound=0,
+            bin_count=0,
+        ).strip()
+        == f"""# See the OpenDP docs for more on making private counts:
+# https://docs.opendp.org/en/{opendp_version}/getting-started/tabular-data/essential-statistics.html#Count
+
+hw_grade_expr = (
+    pl.col('HW GRADE').cast(float).fill_nan(0).fill_null(0).dp.count().alias("count")
+)"""
+    )
 
 
 def test_make_column_config_block_for_mean():
@@ -140,6 +158,13 @@ median_plan_column = AnalysisPlanColumn(
     bin_count=10,
     weight=4,
 )
+count_plan_column = AnalysisPlanColumn(
+    analysis_type=count.name,
+    lower_bound=0,  # Unused
+    upper_bound=0,  # Unused
+    bin_count=0,  # Unused
+    weight=4,
+)
 
 
 def id_for_plan(plan: AnalysisPlan):
@@ -163,11 +188,13 @@ plans = [
         {"B": [histogram_plan_column]},
         {"B": [mean_plan_column]},
         {"B": [median_plan_column]},
+        {"B": [count_plan_column]},
         # Multiple:
         {
             "B": [histogram_plan_column],
             "C": [mean_plan_column],
             "D": [median_plan_column],
+            "E": [count_plan_column],
         },
     ]
 ]
