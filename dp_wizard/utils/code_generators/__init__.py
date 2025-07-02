@@ -1,7 +1,7 @@
 from typing import NamedTuple, Optional
 import re
 
-
+from dp_wizard import opendp_version
 from dp_wizard.utils.code_template import Template
 
 
@@ -41,15 +41,31 @@ def make_privacy_unit_block(contributions: int):
 def make_privacy_loss_block(epsilon: float):
     import opendp.prelude as dp
 
-    def template(EPSILON):
-        # Consider how your budget compares to that of other projects.
-        # https://registry.oblivious.com/#public-dp
+    def template(EPSILON, OPENDP_VERSION):
         privacy_loss = dp.loss_of(  # noqa: F841
+            # Your privacy budget is captured in the "epsilon" parameter.
+            # Larger values increase the risk that personal data could be reconstructed,
+            # so choose the smallest value that gives you the needed accuracy.
+            # You can also compare your budget to other projects:
+            # https://registry.oblivious.com/#public-dp
             epsilon=EPSILON,
+            # There are many models of differential privacy.
+            # Pure DP only requires an epsilon parameter.
+            # (δ, ε)-DP is a looser model that tolerates a small chance (δ)
+            # that data may be released in the clear.
+            # Delta should be smaller than 1/(population size).
+            # https://docs.opendp.org/en/OPENDP_VERSION/getting-started/tabular-data/grouping.html#Stable-Keys
             delta=1e-7,
         )
 
-    return Template(template).fill_values(EPSILON=epsilon).finish()
+    return (
+        Template(template)
+        .fill_values(
+            EPSILON=epsilon,
+            OPENDP_VERSION=opendp_version,
+        )
+        .finish()
+    )
 
 
 def make_column_config_block(
