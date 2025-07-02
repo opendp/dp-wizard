@@ -118,7 +118,8 @@ def _scan_text_for_input_ids(text, rel_path, errors):
     for prop in props.keys():
         if f'"{prop}"' not in text:
             errors.append(
-                f'{rel_path}:{",".join(props[prop])} includes "input.{prop}", but there is no "{prop}" id'
+                f'{rel_path}:{",".join(props[prop])} includes '
+                f'"input.{prop}", but there is no "{prop}" id'
             )
 
 
@@ -138,7 +139,7 @@ def _scan_files_for_input_ids():
         text = path.read_text()
         rel_path = path.relative_to(Path(__file__).parent)
         _scan_text_for_input_ids(text, rel_path, errors)
-    if errors:
+    if errors:  # pragma: no cover
         raise Exception("\n".join(errors))
 
 
