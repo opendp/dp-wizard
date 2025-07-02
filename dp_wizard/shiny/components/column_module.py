@@ -44,9 +44,9 @@ def get_float_error(number_str):
     so the "should be a number" errors may not be seen in practice.
     >>> get_float_error('0')
     >>> get_float_error(None)
-    'is a required number'
+    'is required'
     >>> get_float_error('')
-    'is a required number'
+    'is required'
     >>> get_float_error('1.1')
     >>> get_float_error('nan')
     'should be a number'
@@ -54,7 +54,7 @@ def get_float_error(number_str):
     'should be a number'
     """
     if number_str is None or number_str == "":
-        return "is a required number"
+        return "is required"
     else:
         try:
             int(float(number_str))
@@ -70,7 +70,7 @@ def get_bound_errors(lower_bound, upper_bound):
     >>> get_bound_errors('abc', 'xyz')
     ['Lower bound should be a number.', 'Upper bound should be a number.']
     >>> get_bound_errors(1, None)
-    ['Upper bound is a required number.']
+    ['Upper bound is required.']
     >>> get_bound_errors(1, 0)
     ['Lower bound should be less than upper bound.']
     """
@@ -93,7 +93,7 @@ def get_bin_errors(count):
     >>> get_bin_errors("5")
     []
     >>> get_bin_errors(None)
-    ['Number is a required number.']
+    ['Number is required.']
     >>> get_bin_errors("abc")
     ['Number should be a number.']
     >>> get_bin_errors("-1")
