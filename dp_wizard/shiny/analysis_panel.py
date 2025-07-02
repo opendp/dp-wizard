@@ -254,7 +254,7 @@ def analysis_server(
                 public_csv_path=public_csv_path(),
                 name=column_ids_to_names[column_id],
                 contributions=contributions(),
-                epsilon=epsilon,
+                epsilon=epsilon(),
                 row_count=int(input.row_count()),
                 analysis_types=analysis_types,
                 lower_bounds=lower_bounds,
