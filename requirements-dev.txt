@@ -213,8 +213,10 @@ pathspec==0.12.1
     # via black
 pexpect==4.9.0
     # via ipython
-pillow==11.2.1
-    # via matplotlib
+pillow==11.3.0
+    # via
+    #   -r .../dp-wizard/requirements.in
+    #   matplotlib
 pip-tools==7.4.1
     # via -r requirements-dev.in
 platformdirs==4.3.7
@@ -377,8 +379,10 @@ typing-extensions==4.13.2
     #   uvicorn
 uc-micro-py==1.0.3
     # via linkify-it-py
-urllib3==2.4.0
-    # via requests
+urllib3==2.5.0
+    # via
+    #   -r .../dp-wizard/requirements.in
+    #   requests
 uvicorn==0.34.1
     # via shiny
 virtualenv==20.30.0
