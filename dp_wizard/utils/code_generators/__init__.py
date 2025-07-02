@@ -60,10 +60,8 @@ def make_privacy_loss_block(epsilon: float):
 
     return (
         Template(template)
-        .fill_values(
-            EPSILON=epsilon,
-            OPENDP_VERSION=opendp_version,
-        )
+        .fill_expressions(OPENDP_VERSION=opendp_version)
+        .fill_values(EPSILON=epsilon)
         .finish()
     )
 
