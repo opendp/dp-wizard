@@ -221,6 +221,23 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 )
         return hide_if(not messages, info_md_box("\n".join(messages)))
 
+    entities = {
+        "📅 Individual Per Period": """
+            DP can also be used to protect an individual's data for only a span of time.
+            This can give more accurate results, and may also be more tractable
+            if indivuals don't have IDs.
+            """,
+        "👤 Individual": """
+            DP often is used to protect the privacy of individuals,
+            but but depending on your needs you might want a smaller or larger entity.
+            """,
+        "🏠 Household": """
+            If the privacy of a member of my family is violated,
+            I may consider my own privacy to be violated.
+            We may want to protect a larger entity than the individual.
+            """,
+    }
+
     @render.ui
     def input_entity_ui():
         return (
@@ -228,17 +245,17 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 ui.input_select(
                     "entity",
                     None,
-                    [
-                        "📅 Individual Per Period",
-                        "👤 Individual",
-                        "🏠 Household",
-                    ],
+                    list(entities.keys()),
                     selected="👤 Individual",
                 ),
-                "TODO",
+                ui.output_ui("entity_info_ui"),
                 col_widths=col_widths,  # type: ignore
             ),
         )
+
+    @render.ui
+    def entity_info_ui():
+        return ui.markdown(entities[input.entity()])
 
     @render.ui
     def input_contributions_ui():
