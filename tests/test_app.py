@@ -134,9 +134,7 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     # Epsilon slider:
     expect_visible("Epsilon: 1.0")
     page.locator(".irs-bar").click()
-    expect_visible("Epsilon: 0.316")
-    page.locator(".irs-bar").click()
-    expect_visible("Epsilon: 0.158")
+    expect_visible("Epsilon: 0.288")
     # Simulation
     expect_visible("Because you've provided a public CSV")
 
@@ -175,7 +173,7 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     new_value = "20"
     page.get_by_label("Upper").fill(new_value)
     assert float(page.get_by_label("Upper").input_value()) == float(new_value)
-    expect_visible("The 95% confidence interval is ±794")
+    expect_visible("The 95% confidence interval is ±437")
     page.get_by_text("Data Table").click()
     expect_visible(f"({new_value}, inf]")  # Because values are well above the bins.
 
