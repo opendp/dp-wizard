@@ -6,6 +6,7 @@
 # ## Prerequisites
 #
 # First install and import the required dependencies:
+# WINDOWS_NOTE
 
 # +
 # %pip install DEPENDENCIES
