@@ -3,6 +3,7 @@ from typing import Optional
 
 from shiny import ui, reactive, render, Inputs, Outputs, Session
 
+from dp_wizard.shiny.components.outputs import col_widths
 from dp_wizard.utils.argparse_helpers import (
     PUBLIC_TEXT,
     PRIVATE_TEXT,
@@ -31,8 +32,16 @@ def dataset_ui():
         ui.card(
             ui.card_header("Unit of privacy"),
             ui.markdown(
-                "How many rows of the CSV can one individual contribute to? "
-                'This is the "unit of privacy" which will be protected.'
+                """
+                First, what is the entity whose privacy you want to protect?
+                """
+            ),
+            ui.output_ui("input_entity_ui"),
+            ui.markdown(
+                """
+                How many rows of the CSV can this entity contribute to?
+                This is the "unit of privacy" which will be protected.
+                """
             ),
             ui.output_ui("input_contributions_ui"),
             ui.output_ui("contributions_validation_ui"),
@@ -213,8 +222,27 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
         return hide_if(not messages, info_md_box("\n".join(messages)))
 
     @render.ui
+    def input_entity_ui():
+        return (
+            ui.layout_columns(
+                ui.input_select(
+                    "entity",
+                    None,
+                    [
+                        "📅 Individual Per Period",
+                        "👤 Individual",
+                        "🏠 Household",
+                    ],
+                    selected="👤 Individual",
+                ),
+                "TODO",
+                col_widths=col_widths,  # type: ignore
+            ),
+        )
+
+    @render.ui
     def input_contributions_ui():
-        return ui.row(
+        return ui.layout_columns(
             ui.input_numeric(
                 "contributions",
                 [
@@ -227,7 +255,8 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 ],
                 contributions(),
                 min=1,
-            )
+            ),
+            col_widths=col_widths,  # type: ignore
         )
 
     @reactive.effect
