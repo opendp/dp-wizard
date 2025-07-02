@@ -31,18 +31,7 @@ def dataset_ui():
         ui.output_ui("csv_or_columns_ui"),
         ui.card(
             ui.card_header("Unit of privacy"),
-            ui.markdown(
-                """
-                First, what is the entity whose privacy you want to protect?
-                """
-            ),
             ui.output_ui("input_entity_ui"),
-            ui.markdown(
-                """
-                How many rows of the CSV can this entity contribute to?
-                This is the "unit of privacy" which will be protected.
-                """
-            ),
             ui.output_ui("input_contributions_ui"),
             ui.output_ui("contributions_validation_ui"),
             output_code_sample(
@@ -240,7 +229,12 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
 
     @render.ui
     def input_entity_ui():
-        return (
+        return [
+            ui.markdown(
+                """
+                First, what is the entity whose privacy you want to protect?
+                """
+            ),
             ui.layout_columns(
                 ui.input_select(
                     "entity",
@@ -251,7 +245,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 ui.output_ui("entity_info_ui"),
                 col_widths=col_widths,  # type: ignore
             ),
-        )
+        ]
 
     @render.ui
     def entity_info_ui():
@@ -259,22 +253,32 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
 
     @render.ui
     def input_contributions_ui():
-        return ui.layout_columns(
-            ui.input_numeric(
-                "contributions",
-                [
-                    "Contributions ",  # Trailing space looks better.
-                    demo_tooltip(
-                        is_demo,
-                        "For the demo, we assume that each student "
-                        f"can occur at most {contributions()} times in the dataset. ",
-                    ),
-                ],
-                contributions(),
-                min=1,
+        entity = input.entity()[2:].lower()
+
+        return [
+            ui.markdown(
+                f"""
+                How many rows of the CSV can each {entity} contribute to?
+                This is the "unit of privacy" which will be protected.
+                """
             ),
-            col_widths=col_widths,  # type: ignore
-        )
+            ui.layout_columns(
+                ui.input_numeric(
+                    "contributions",
+                    [
+                        "Contributions ",  # Trailing space looks better.
+                        demo_tooltip(
+                            is_demo,
+                            "For the demo, we assume that each student "
+                            f"can occur at most {contributions()} times in the dataset. ",
+                        ),
+                    ],
+                    contributions(),
+                    min=1,
+                ),
+                col_widths=col_widths,  # type: ignore
+            ),
+        ]
 
     @reactive.effect
     @reactive.event(input.contributions)
