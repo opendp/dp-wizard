@@ -159,7 +159,7 @@ class AbstractGenerator(ABC):
         bin_column_names = [
             name_to_identifier(name)
             for name, plan in self.analysis_plan.columns.items()
-            if get_analysis_by_name(plan[0].analysis_type).has_bins()
+            if get_analysis_by_name(plan[0].analysis_type).has_bins
         ]
 
         privacy_unit_block = make_privacy_unit_block(self.analysis_plan.contributions)
@@ -182,7 +182,7 @@ class AbstractGenerator(ABC):
             [
                 f"{name_to_identifier(name)}_bin_expr"
                 for name, plan in self.analysis_plan.columns.items()
-                if get_analysis_by_name(plan[0].analysis_type).has_bins()
+                if get_analysis_by_name(plan[0].analysis_type).has_bins
             ]
         )
         return (

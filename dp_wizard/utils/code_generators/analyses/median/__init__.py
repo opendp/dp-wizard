@@ -14,10 +14,7 @@ input_names = [
     "upper_bound_input",
     "candidate_count_input",
 ]
-
-
-def has_bins():
-    return False  # pragma: no cover
+has_bins = False
 
 
 def make_query(code_gen, identifier, accuracy_name, stats_name):

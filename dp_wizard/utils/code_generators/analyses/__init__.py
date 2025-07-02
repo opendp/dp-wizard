@@ -13,8 +13,8 @@ class Analysis(Protocol):  # pragma: no cover
     @property
     def input_names(self) -> list[str]: ...
 
-    @staticmethod
-    def has_bins() -> bool: ...
+    @property
+    def has_bins(self) -> bool: ...
 
     @staticmethod
     def make_query(

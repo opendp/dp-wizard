@@ -13,10 +13,7 @@ input_names = [
     "upper_bound_input",
     "bin_count_input",
 ]
-
-
-def has_bins():
-    return True
+has_bins = True
 
 
 def make_query(code_gen, identifier, accuracy_name, stats_name):
