@@ -14,7 +14,7 @@ from dp_wizard.utils.csv_helper import (
 )
 from dp_wizard.shiny.components.outputs import (
     output_code_sample,
-    demo_tooltip,
+    demo_help,
     nav_button,
     hide_if,
     info_md_box,
@@ -179,7 +179,7 @@ def analysis_server(
 
     @render.ui
     def groups_selectize_tooltip_ui():
-        return demo_tooltip(
+        return demo_help(
             is_demo,
             """
             DP Wizard only supports the analysis of numeric data,
@@ -190,7 +190,7 @@ def analysis_server(
 
     @render.ui
     def columns_selectize_tooltip_ui():
-        return demo_tooltip(
+        return demo_help(
             is_demo,
             """
             Not all columns need analysis. For this demo, just check
@@ -283,7 +283,7 @@ def analysis_server(
     def epsilon_ui():
         return tags.label(
             f"Epsilon: {epsilon():0.3} ",
-            demo_tooltip(
+            demo_help(
                 is_demo,
                 """
                 If you set epsilon above one, you'll see that the distribution
