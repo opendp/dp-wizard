@@ -1,3 +1,5 @@
+from math import gcd
+
 from dp_wizard.utils.code_generators import (
     AnalysisPlan,
     make_column_config_block,
@@ -151,8 +153,26 @@ class AbstractGenerator(ABC):
             + (self._make_comment_cell(note) if note else "")
         )
 
+    def _make_weights_expression(self):
+        weights_dict = {
+            name: plans[0].weight for name, plans in self.analysis_plan.columns.items()
+        }
+        weights_message = (
+            "Allocate the privacy budget to your queries in this ratio:"
+            if len(weights_dict) > 1
+            else "With only one query, the entire budget is allocated to that query:"
+        )
+        weights_gcd = gcd(*(weights_dict.values()))
+        return (
+            f"[ # {weights_message}\n"
+            + "".join(
+                f"{weight//weights_gcd}, # {name}\n"
+                for name, weight in weights_dict.items()
+            )
+            + "]"
+        )
+
     def _make_partial_context(self):
-        weights = [column[0].weight for column in self.analysis_plan.columns.values()]
 
         from dp_wizard.utils.code_generators.analyses import get_analysis_by_name
 
@@ -190,9 +210,7 @@ class AbstractGenerator(ABC):
             .fill_expressions(
                 MARGINS_LIST=margins_list,
                 EXTRA_COLUMNS=extra_columns,
-            )
-            .fill_values(
-                WEIGHTS=weights,
+                WEIGHTS=self._make_weights_expression(),
             )
             .fill_blocks(
                 PRIVACY_UNIT_BLOCK=privacy_unit_block,
