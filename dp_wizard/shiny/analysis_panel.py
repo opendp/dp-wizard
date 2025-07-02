@@ -255,6 +255,7 @@ def analysis_server(
                 contributions=contributions,
                 epsilon=epsilon,
                 row_count=int(input.row_count()),
+                groups=groups,
                 analysis_types=analysis_types,
                 lower_bounds=lower_bounds,
                 upper_bounds=upper_bounds,
