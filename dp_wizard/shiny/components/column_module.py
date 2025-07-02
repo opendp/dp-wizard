@@ -9,6 +9,7 @@ from dp_wizard.utils.code_generators.analyses import (
     histogram,
     mean,
     median,
+    count,
     get_analysis_by_name,
 )
 from dp_wizard.utils.dp_helper import make_accuracy_histogram
@@ -125,7 +126,7 @@ def column_ui():  # pragma: no cover
             ui.input_select(
                 "analysis_type",
                 None,
-                [histogram.name, mean.name, median.name],
+                [histogram.name, mean.name, median.name, count.name],
                 width=label_width,
             ),
             ui.output_ui("analysis_info_ui"),
@@ -142,7 +143,7 @@ def column_server(
     session: Session,
     public_csv_path: str,
     name: str,
-    contributions: int,
+    contributions: reactive.Value[int],
     epsilon: float,
     row_count: int,
     groups: reactive.Value[list[str]],
@@ -227,7 +228,7 @@ def column_server(
             lower_bound=lower_x,
             upper_bound=upper_x,
             bin_count=bin_count,
-            contributions=contributions,
+            contributions=contributions(),
             weighted_epsilon=epsilon * weight / weights_sum,
         )
 
@@ -430,6 +431,10 @@ def column_server(
     def median_preview_ui():
         return stat_preview_ui()
 
+    @render.ui
+    def count_preview_ui():
+        return stat_preview_ui()
+
     @render.data_frame
     def data_frame():
         accuracy, histogram = accuracy_histogram()
@@ -438,11 +443,12 @@ def column_server(
     @render.plot
     def histogram_preview_plot():
         accuracy, histogram = accuracy_histogram()
-        s = "s" if contributions > 1 else ""
+        contributions_int = contributions()
+        s = "s" if contributions_int > 1 else ""
         title = ", ".join(
             [
                 name if public_csv_path else f"Simulated {name}: normal distribution",
-                f"{contributions} contribution{s} / individual",
+                f"{contributions_int} contribution{s} / individual",
             ]
         )
         return plot_bars(

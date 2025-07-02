@@ -253,7 +253,7 @@ def analysis_server(
                 column_id,
                 public_csv_path=public_csv_path(),
                 name=column_ids_to_names[column_id],
-                contributions=contributions(),
+                contributions=contributions,
                 epsilon=epsilon(),
                 row_count=int(input.row_count()),
                 groups=groups,
