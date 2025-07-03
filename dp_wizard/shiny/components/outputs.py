@@ -3,6 +3,15 @@ from shiny import ui
 from faicons import icon_svg
 
 
+col_widths = {
+    # Controls stay roughly a constant width;
+    # Graph expands to fill space.
+    "sm": [4, 8],
+    "md": [3, 9],
+    "lg": [2, 10],
+}
+
+
 def output_code_sample(title, name_of_render_function: str):
     return details(
         summary(["Code sample: ", title]),

@@ -3,6 +3,7 @@ from typing import Optional
 
 from shiny import ui, reactive, render, Inputs, Outputs, Session
 
+from dp_wizard.shiny.components.outputs import col_widths
 from dp_wizard.utils.argparse_helpers import (
     PUBLIC_TEXT,
     PRIVATE_TEXT,
@@ -30,10 +31,7 @@ def dataset_ui():
         ui.output_ui("csv_or_columns_ui"),
         ui.card(
             ui.card_header("Unit of privacy"),
-            ui.markdown(
-                "How many rows of the CSV can one individual contribute to? "
-                'This is the "unit of privacy" which will be protected.'
-            ),
+            ui.output_ui("input_entity_ui"),
             ui.output_ui("input_contributions_ui"),
             ui.output_ui("contributions_validation_ui"),
             output_code_sample(
@@ -212,23 +210,78 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 )
         return hide_if(not messages, info_md_box("\n".join(messages)))
 
+    entities = {
+        "📅 Individual Per Period": """
+            DP can also be used to protect an individual's data for only a span of time.
+            This can give more accurate results, and may also be more tractable
+            if indivuals don't have IDs.
+            """,
+        "👤 Individual": """
+            DP often is used to protect the privacy of individuals,
+            but but depending on your needs you might want a smaller or larger entity.
+            """,
+        "🏠 Household": """
+            If the privacy of a member of my family is violated,
+            I may consider my own privacy to be violated.
+            We may want to protect a larger entity than the individual.
+            """,
+    }
+
+    @render.ui
+    def input_entity_ui():
+        return [
+            ui.markdown(
+                """
+                First, what is the entity whose privacy you want to protect?
+                """
+            ),
+            ui.layout_columns(
+                ui.input_select(
+                    "entity",
+                    None,
+                    list(entities.keys()),
+                    selected="👤 Individual",
+                ),
+                ui.output_ui("entity_info_ui"),
+                col_widths=col_widths,  # type: ignore
+            ),
+        ]
+
+    @render.ui
+    def entity_info_ui():
+        return ui.markdown(entities[input.entity()])
+
     @render.ui
     def input_contributions_ui():
-        return ui.row(
-            ui.input_numeric(
-                "contributions",
-                [
-                    "Contributions ",  # Trailing space looks better.
-                    demo_tooltip(
-                        is_demo,
-                        "For the demo, we assume that each student "
-                        f"can occur at most {contributions()} times in the dataset. ",
-                    ),
-                ],
-                contributions(),
-                min=1,
-            )
-        )
+        entity = input.entity()[2:].lower()
+
+        return [
+            ui.markdown(
+                f"""
+                How many rows of the CSV can each {entity} contribute to?
+                This is the "unit of privacy" which will be protected.
+                """
+            ),
+            ui.layout_columns(
+                ui.input_numeric(
+                    "contributions",
+                    [
+                        "Contributions ",  # Trailing space looks better.
+                        demo_tooltip(
+                            is_demo,
+                            f"""
+                            For the demo, we assume that each student
+                            can occur at most {contributions()} times
+                            in the dataset.
+                            """,
+                        ),
+                    ],
+                    contributions(),
+                    min=1,
+                ),
+                col_widths=col_widths,  # type: ignore
+            ),
+        ]
 
     @reactive.effect
     @reactive.event(input.contributions)
