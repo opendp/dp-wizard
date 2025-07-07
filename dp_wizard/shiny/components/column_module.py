@@ -143,8 +143,8 @@ def column_server(
     session: Session,
     public_csv_path: str,
     name: str,
-    contributions: int,
-    epsilon: float,
+    contributions: reactive.Value[int],
+    epsilon: reactive.Value[float],
     row_count: int,
     analysis_types: reactive.Value[dict[str, str]],
     analysis_errors: reactive.Value[dict[str, bool]],
@@ -228,8 +228,8 @@ def column_server(
             lower_bound=lower_x,
             upper_bound=upper_x,
             bin_count=bin_count,
-            contributions=contributions,
-            weighted_epsilon=epsilon * weight / weights_sum,
+            contributions=contributions(),
+            weighted_epsilon=epsilon() * weight / weights_sum,
         )
 
     @render.text
@@ -452,11 +452,12 @@ def column_server(
     @render.plot
     def histogram_preview_plot():
         accuracy, histogram = accuracy_histogram()
-        s = "s" if contributions > 1 else ""
+        contributions_int = contributions()
+        s = "s" if contributions_int > 1 else ""
         title = ", ".join(
             [
                 name if public_csv_path else f"Simulated {name}: normal distribution",
-                f"{contributions} contribution{s} / individual",
+                f"{contributions_int} contribution{s} / individual",
             ]
         )
         return plot_bars(

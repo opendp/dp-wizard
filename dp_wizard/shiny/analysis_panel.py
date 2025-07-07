@@ -120,7 +120,7 @@ def analysis_server(
 ):  # pragma: no cover
     @reactive.calc
     def button_enabled():
-        at_least_one_column = len(input.columns_selectize()) > 0
+        at_least_one_column = bool(weights())
         no_errors = not any(analysis_errors().values())
         return at_least_one_column and no_errors
 
@@ -255,8 +255,8 @@ def analysis_server(
                 column_id,
                 public_csv_path=public_csv_path(),
                 name=column_ids_to_names[column_id],
-                contributions=contributions(),
-                epsilon=epsilon(),
+                contributions=contributions,
+                epsilon=epsilon,
                 row_count=int(input.row_count()),
                 analysis_types=analysis_types,
                 analysis_errors=analysis_errors,
@@ -307,11 +307,12 @@ def analysis_server(
 
     @render.ui
     def download_results_button_ui():
+        is_enabled = button_enabled()
         button = nav_button(
-            "go_to_results", "Download Results", disabled=not button_enabled()
+            "go_to_results", "Download Results", disabled=not is_enabled
         )
 
-        if button_enabled():
+        if is_enabled:
             return button
         return [
             button,
