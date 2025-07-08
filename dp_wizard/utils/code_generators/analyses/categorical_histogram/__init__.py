@@ -3,13 +3,12 @@ from dp_wizard.utils.code_template import Template
 
 name = "Categorical Histogram"
 blurb_md = """
-Choosing a smaller number of bins will conserve your
-privacy budget and give you more accurate counts.
-While the bins are evenly spaced in DP Wizard,
-the OpenDP library lets you pick arbitrary cut points.
+Because DP Wizard does not read your private data until the release,
+we need to prompt you for the expected number of categories.
+This number is only used for the preview, and not in the real analysis.
 """
 input_names = [
-    "bin_count_input",
+    "estimated_count_input",
 ]
 
 

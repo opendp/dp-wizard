@@ -281,16 +281,21 @@ def column_server(
                 width=label_width,
             )
 
-        def candidate_count_input():
-            # Just change the user-visible label,
-            # but still call it "bin" internally.
-            # Less new code; pretty much the same thing.
-            return ui.input_numeric(
-                "bins",
-                "Number of Candidates",
-                bin_counts().get(name, 10),
-                width=label_width,
-            )
+        # Just change the user-visible label,
+        # but still call it "bin" internally.
+        # Less new code; pretty much the same thing.
+        candidate_count_input = lambda: ui.input_numeric(
+            "bins",
+            "Number of Candidates",
+            bin_counts().get(name, 10),
+            width=label_width,
+        )
+        estimated_count_input = lambda: ui.input_numeric(
+            "bins",
+            "Estimated Category Count",
+            bin_counts().get(name, 10),
+            width=label_width,
+        )
 
         name = input.analysis_type()
 
