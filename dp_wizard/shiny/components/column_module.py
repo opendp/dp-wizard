@@ -7,6 +7,7 @@ import polars as pl
 
 from dp_wizard.utils.code_generators.analyses import (
     numeric_histogram,
+    categorical_histogram,
     mean,
     median,
     count,
@@ -126,7 +127,13 @@ def column_ui():  # pragma: no cover
             ui.input_select(
                 "analysis_type",
                 None,
-                [numeric_histogram.name, mean.name, median.name, count.name],
+                [
+                    numeric_histogram.name,
+                    categorical_histogram.name,
+                    mean.name,
+                    median.name,
+                    count.name,
+                ],
                 width=label_width,
             ),
             ui.output_ui("analysis_info_ui"),

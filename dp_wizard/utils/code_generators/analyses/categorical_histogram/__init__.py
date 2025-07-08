@@ -1,7 +1,7 @@
 from dp_wizard.utils.code_template import Template
 
 
-name = "Numeric Histogram"
+name = "Categorical Histogram"
 blurb_md = """
 Choosing a smaller number of bins will conserve your
 privacy budget and give you more accurate counts.
@@ -9,8 +9,6 @@ While the bins are evenly spaced in DP Wizard,
 the OpenDP library lets you pick arbitrary cut points.
 """
 input_names = [
-    "lower_bound_input",
-    "upper_bound_input",
     "bin_count_input",
 ]
 
@@ -21,7 +19,7 @@ def has_bins():
 
 def make_query(code_gen, identifier, accuracy_name, stats_name):
     return (
-        Template("numeric_histogram_query", __file__)
+        Template("histogram_query", __file__)
         .fill_values(
             BIN_NAME=f"{identifier}_bin",
             GROUP_NAMES=code_gen.analysis_plan.groups,
@@ -37,7 +35,7 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
 
 def make_output(code_gen, column_name, accuracy_name, stats_name):
     return (
-        Template(f"numeric_histogram_{code_gen.root_template}_output", __file__)
+        Template(f"histogram_{code_gen.root_template}_output", __file__)
         .fill_values(
             COLUMN_NAME=column_name,
             GROUP_NAMES=code_gen.analysis_plan.groups,
@@ -52,15 +50,12 @@ def make_output(code_gen, column_name, accuracy_name, stats_name):
 
 
 def make_note():
-    return (
-        "`None` values above may indicate strings "
-        "which could not be converted to numbers."
-    )
+    return ""
 
 
 def make_report_kv(name, confidence, identifier):
     return (
-        Template("numeric_histogram_report_kv", __file__)
+        Template("histogram_report_kv", __file__)
         .fill_values(
             NAME=name,
             CONFIDENCE=confidence,
@@ -78,7 +73,7 @@ def make_column_config_block(column_name, lower_bound, upper_bound, bin_count):
 
     snake_name = snake_case(column_name)
     return (
-        Template("numeric_histogram_expr", __file__)
+        Template("histogram_expr", __file__)
         .fill_expressions(
             CUT_LIST_NAME=f"{snake_name}_cut_points",
             BIN_EXPR_NAME=f"{snake_name}_bin_expr",

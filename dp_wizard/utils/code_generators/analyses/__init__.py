@@ -55,19 +55,13 @@ def get_analysis_by_name(name) -> Analysis:  # pragma: no cover
     # Avoid circular import:
     from dp_wizard.utils.code_generators.analyses import (
         numeric_histogram,
+        categorical_histogram,
         mean,
         median,
         count,
     )
 
-    match name:
-        case numeric_histogram.name:
-            return numeric_histogram
-        case mean.name:
-            return mean
-        case median.name:
-            return median
-        case count.name:
-            return count
-        case _:
-            raise Exception("Unrecognized analysis")
+    for analysis in [numeric_histogram, categorical_histogram, mean, median, count]:
+        if name == analysis.name:
+            return analysis  # type: ignore
+    raise Exception("Unrecognized analysis")
