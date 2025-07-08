@@ -1,7 +1,7 @@
 from dp_wizard.utils.code_template import Template
 
 
-name = "Histogram"
+name = "Numeric Histogram"
 blurb_md = """
 Choosing a smaller number of bins will conserve your
 privacy budget and give you more accurate counts.

@@ -6,7 +6,7 @@ from shiny.types import SilentException
 import polars as pl
 
 from dp_wizard.utils.code_generators.analyses import (
-    histogram,
+    numeric_histogram,
     mean,
     median,
     count,
@@ -25,7 +25,7 @@ from dp_wizard.utils.dp_helper import confidence
 from dp_wizard.utils.mock_data import mock_data, ColumnDef
 
 
-default_analysis_type = histogram.name
+default_analysis_type = numeric_histogram.name
 default_weight = "2"
 label_width = "10em"  # Just wide enough so the text isn't trucated.
 col_widths = {
@@ -126,7 +126,7 @@ def column_ui():  # pragma: no cover
             ui.input_select(
                 "analysis_type",
                 None,
-                [histogram.name, mean.name, median.name, count.name],
+                [numeric_histogram.name, mean.name, median.name, count.name],
                 width=label_width,
             ),
             ui.output_ui("analysis_info_ui"),
@@ -302,7 +302,7 @@ def column_server(
 
         return ui.layout_columns(
             inputs,
-            ui.output_ui(f"{name.lower()}_preview_ui"),
+            ui.output_ui(f"{name.lower().replace(' ', '_')}_preview_ui"),
             col_widths=col_widths,  # type: ignore
         )
 
@@ -376,7 +376,7 @@ def column_server(
         )
 
     @render.ui
-    def histogram_preview_ui():
+    def numeric_histogram_preview_ui():
         if error_md := error_md_calc():
             return error_md_ui(error_md)
         else:
