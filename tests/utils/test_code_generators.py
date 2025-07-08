@@ -4,7 +4,12 @@ import pytest
 import re
 import opendp.prelude as dp
 
-from dp_wizard.utils.code_generators.analyses import histogram, mean, median, count
+from dp_wizard.utils.code_generators.analyses import (
+    numeric_histogram,
+    mean,
+    median,
+    count,
+)
 from dp_wizard.utils.code_generators import (
     make_column_config_block,
     AnalysisPlan,
@@ -91,7 +96,7 @@ def test_make_column_config_block_for_histogram():
     assert (
         make_column_config_block(
             name="HW GRADE",
-            analysis_type=histogram.name,
+            analysis_type=numeric_histogram.name,
             lower_bound=0,
             upper_bound=100,
             bin_count=10,
@@ -126,8 +131,8 @@ def number_lines(text: str):
     )
 
 
-histogram_plan_column = AnalysisPlanColumn(
-    analysis_type=histogram.name,
+numeric_histogram_plan_column = AnalysisPlanColumn(
+    analysis_type=numeric_histogram.name,
     lower_bound=5,
     upper_bound=15,
     bin_count=20,
@@ -174,13 +179,13 @@ plans = [
     for groups in [[], ["A"]]
     for columns in [
         # Single:
-        {"B": [histogram_plan_column]},
+        {"B": [numeric_histogram_plan_column]},
         {"B": [mean_plan_column]},
         {"B": [median_plan_column]},
         {"B": [count_plan_column]},
         # Multiple:
         {
-            "B": [histogram_plan_column],
+            "B": [numeric_histogram_plan_column],
             "C": [mean_plan_column],
             "D": [median_plan_column],
             "E": [count_plan_column],

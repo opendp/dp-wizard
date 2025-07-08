@@ -6,7 +6,8 @@ from shiny.types import SilentException
 import polars as pl
 
 from dp_wizard.utils.code_generators.analyses import (
-    histogram,
+    numeric_histogram,
+    categorical_histogram,
     mean,
     median,
     count,
@@ -25,7 +26,7 @@ from dp_wizard.utils.dp_helper import confidence
 from dp_wizard.utils.mock_data import mock_data, ColumnDef
 
 
-default_analysis_type = histogram.name
+default_analysis_type = numeric_histogram.name
 default_weight = "2"
 label_width = "10em"  # Just wide enough so the text isn't trucated.
 col_widths = {
@@ -126,7 +127,13 @@ def column_ui():  # pragma: no cover
             ui.input_select(
                 "analysis_type",
                 None,
-                [histogram.name, mean.name, median.name, count.name],
+                [
+                    numeric_histogram.name,
+                    categorical_histogram.name,
+                    mean.name,
+                    median.name,
+                    count.name,
+                ],
                 width=label_width,
             ),
             ui.output_ui("analysis_info_ui"),
@@ -274,16 +281,21 @@ def column_server(
                 width=label_width,
             )
 
-        def candidate_count_input():
-            # Just change the user-visible label,
-            # but still call it "bin" internally.
-            # Less new code; pretty much the same thing.
-            return ui.input_numeric(
-                "bins",
-                "Number of Candidates",
-                bin_counts().get(name, 10),
-                width=label_width,
-            )
+        # Just change the user-visible label,
+        # but still call it "bin" internally.
+        # Less new code; pretty much the same thing.
+        candidate_count_input = lambda: ui.input_numeric(
+            "bins",
+            "Number of Candidates",
+            bin_counts().get(name, 10),
+            width=label_width,
+        )
+        estimated_count_input = lambda: ui.input_numeric(
+            "bins",
+            "Estimated Category Count",
+            bin_counts().get(name, 10),
+            width=label_width,
+        )
 
         name = input.analysis_type()
 
@@ -302,7 +314,7 @@ def column_server(
 
         return ui.layout_columns(
             inputs,
-            ui.output_ui(f"{name.lower()}_preview_ui"),
+            ui.output_ui(f"{name.lower().replace(' ', '_')}_preview_ui"),
             col_widths=col_widths,  # type: ignore
         )
 
@@ -376,7 +388,7 @@ def column_server(
         )
 
     @render.ui
-    def histogram_preview_ui():
+    def numeric_histogram_preview_ui():
         if error_md := error_md_calc():
             return error_md_ui(error_md)
         else:

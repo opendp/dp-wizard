@@ -4,7 +4,7 @@ from dp_wizard.utils.code_generators import (
     make_privacy_loss_block,
     make_privacy_unit_block,
 )
-from dp_wizard.utils.code_generators.analyses import histogram
+from dp_wizard.utils.code_generators.analyses import numeric_histogram
 from dp_wizard.utils.code_template import Template
 from dp_wizard.utils.csv_helper import name_to_identifier
 from dp_wizard.utils.dp_helper import confidence
@@ -166,7 +166,7 @@ class AbstractGenerator(ABC):
         privacy_loss_block = make_privacy_loss_block(self.analysis_plan.epsilon)
 
         is_just_histograms = all(
-            plan_column[0].analysis_type == histogram.name
+            plan_column[0].analysis_type == numeric_histogram.name
             for plan_column in self.analysis_plan.columns.values()
         )
         margins_list = (
