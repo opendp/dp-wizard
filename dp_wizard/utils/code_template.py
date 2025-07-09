@@ -112,8 +112,7 @@ class Template:
                     raise Exception(
                         f"Block slots must be alone on line; {base_message}"
                     )
-                else:
-                    raise Exception(base_message)
+                raise Exception(base_message)
         return self
 
     def finish(self) -> str:
