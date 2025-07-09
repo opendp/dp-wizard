@@ -212,18 +212,21 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
 
     entities = {
         "📅 Individual Per Period": """
-            DP can also be used to protect an individual's data for only a span of time.
-            This can give more accurate results, and may also be more tractable
-            if indivuals don't have IDs.
+            You can use differential privacy to protect your data
+            over specific time periods.
+            This may improve accuracy and be easier to implement
+            when individuals don’t have unique IDs.
             """,
         "👤 Individual": """
-            DP often is used to protect the privacy of individuals,
-            but but depending on your needs you might want a smaller or larger entity.
+            Differential privacy is often used to protect your privacy
+            as an individual, but depending on your needs,
+            you might want to protect a smaller or larger entity.
             """,
         "🏠 Household": """
-            If the privacy of a member of my family is violated,
-            I may consider my own privacy to be violated.
-            We may want to protect a larger entity than the individual.
+            If someone in your household has their privacy violated,
+            you might feel that your own privacy is also compromised.
+            In that case, you may prefer to protect your entire household
+            rather than just yourself.
             """,
     }
 
