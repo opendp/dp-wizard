@@ -113,7 +113,7 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
         page.get_by_text("Specify CSV and the unit of privacy before proceeding")
     ).to_be_visible()
 
-    page.get_by_label("Contributions").fill("42")
+    page.get_by_label("Contributions").fill("2")
     expect(page.get_by_text("Contributions must be 1 or greater")).not_to_be_visible()
     expect(
         page.get_by_text("Specify CSV and the unit of privacy before proceeding")
@@ -158,6 +158,9 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     # Input validation:
     page.get_by_label("Number of Bins").fill("-1")
     expect(page.get_by_text("Number should be a positive integer.")).to_be_visible()
+    # Changing epsilon should not reset column details:
+    page.locator(".irs-bar").click()
+    expect(page.get_by_text("Number should be a positive integer.")).to_be_visible()
     page.get_by_label("Number of Bins").fill("10")
 
     page.get_by_label("Upper").fill("")
@@ -172,7 +175,7 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     new_value = "20"
     page.get_by_label("Upper").fill(new_value)
     assert float(page.get_by_label("Upper").input_value()) == float(new_value)
-    expect(page.get_by_text("The 95% confidence interval is ±794")).to_be_visible()
+    expect(page.get_by_text("The 95% confidence interval is ±48.1")).to_be_visible()
     page.get_by_text("Data Table").click()
     expect(
         page.get_by_text(f"({new_value}, inf]")
