@@ -144,7 +144,7 @@ def column_server(
     public_csv_path: str,
     name: str,
     contributions: reactive.Value[int],
-    epsilon: float,
+    epsilon: reactive.Value[float],
     row_count: int,
     groups: reactive.Value[list[str]],
     analysis_types: reactive.Value[dict[str, str]],
@@ -229,7 +229,7 @@ def column_server(
             upper_bound=upper_x,
             bin_count=bin_count,
             contributions=contributions(),
-            weighted_epsilon=epsilon * weight / weights_sum,
+            weighted_epsilon=epsilon() * weight / weights_sum,
         )
 
     @render.text

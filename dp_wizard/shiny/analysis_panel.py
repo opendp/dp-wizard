@@ -119,8 +119,7 @@ def analysis_server(
 ):  # pragma: no cover
     @reactive.calc
     def button_enabled():
-        column_ids_selected = input.columns_selectize()
-        return len(column_ids_selected) > 0
+        return bool(weights())
 
     @reactive.effect
     def _update_columns():
@@ -254,7 +253,7 @@ def analysis_server(
                 public_csv_path=public_csv_path(),
                 name=column_ids_to_names[column_id],
                 contributions=contributions,
-                epsilon=epsilon(),
+                epsilon=epsilon,
                 row_count=int(input.row_count()),
                 groups=groups,
                 analysis_types=analysis_types,
@@ -305,11 +304,12 @@ def analysis_server(
 
     @render.ui
     def download_results_button_ui():
+        is_enabled = button_enabled()
         button = nav_button(
-            "go_to_results", "Download Results", disabled=not button_enabled()
+            "go_to_results", "Download Results", disabled=not is_enabled
         )
 
-        if button_enabled():
+        if is_enabled:
             return button
         return [
             button,
