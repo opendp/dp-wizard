@@ -212,8 +212,6 @@ class AbstractGenerator(ABC):
                 MARGINS_LIST=margins_list,
                 EXTRA_COLUMNS=extra_columns,
                 OPENDP_VERSION=opendp_version,
-            )
-            .fill_values(
                 WEIGHTS=self._make_weights_expression(),
             )
             .fill_blocks(
