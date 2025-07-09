@@ -1,3 +1,4 @@
+from dp_wizard import opendp_version
 from math import gcd
 
 from dp_wizard.utils.code_generators import (
@@ -55,7 +56,7 @@ class AbstractGenerator(ABC):
             Template(self.root_template, __file__)
             .fill_expressions(
                 TITLE=str(self.analysis_plan),
-                DEPENDENCIES="'opendp[polars]==0.13.0' matplotlib",
+                DEPENDENCIES=f"'opendp[polars]=={opendp_version}' matplotlib",
             )
             .fill_blocks(
                 IMPORTS_BLOCK=Template(template).finish(),
@@ -77,7 +78,7 @@ class AbstractGenerator(ABC):
                 f"""
             # "max_partition_length" should be a loose upper bound,
             # for example, the size of the total population being sampled.
-            # https://docs.opendp.org/en/stable/api/python/opendp.extras.polars.html#opendp.extras.polars.Margin.max_partition_length
+            # https://docs.opendp.org/en/{opendp_version}/api/python/opendp.extras.polars.html#opendp.extras.polars.Margin.max_partition_length
             #
             # In production, "max_num_partitions" should be set by considering the number
             # of possible values for each grouping column, and taking their product.
@@ -210,6 +211,7 @@ class AbstractGenerator(ABC):
             .fill_expressions(
                 MARGINS_LIST=margins_list,
                 EXTRA_COLUMNS=extra_columns,
+                OPENDP_VERSION=opendp_version,
                 WEIGHTS=self._make_weights_expression(),
             )
             .fill_blocks(
