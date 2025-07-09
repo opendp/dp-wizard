@@ -265,20 +265,22 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 This is the "unit of privacy" which will be protected.
                 """
             ),
+            # TODO: Add this back when "Make the demo tooltips always-on" is merged.
+            #     https://github.com/opendp/dp-wizard/pull/503
+            # Without the input label, the tooltip floats way to the right, and looks wrong.
+            #
+            # demo_tooltip(
+            #     is_demo,
+            #     f"""
+            #     For the demo, we assume that each student
+            #     can occur at most {contributions()} times
+            #     in the dataset.
+            #     """,
+            # ),
             ui.layout_columns(
                 ui.input_numeric(
                     "contributions",
-                    [
-                        "Contributions ",  # Trailing space looks better.
-                        demo_tooltip(
-                            is_demo,
-                            f"""
-                            For the demo, we assume that each student
-                            can occur at most {contributions()} times
-                            in the dataset.
-                            """,
-                        ),
-                    ],
+                    None,
                     contributions(),
                     min=1,
                 ),
