@@ -6,10 +6,7 @@ blurb_md = """
 DP counts can also be used together with grouping to calculate histograms.
 """
 input_names = []
-
-
-def has_bins():
-    return False
+has_bins = False
 
 
 def make_query(code_gen, identifier, accuracy_name, stats_name):
