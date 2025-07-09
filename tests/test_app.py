@@ -99,7 +99,7 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     expect_visible(pick_dataset_text)
     expect_not_visible(perform_analysis_text)
     expect_not_visible(download_results_text)
-    page.get_by_label("Contributions").fill("42")
+    page.locator("#contributions").fill("42")
     page.get_by_text("Code sample: Unit of Privacy").click()
     expect_visible("contributions = 42")
     expect_no_error()
@@ -116,11 +116,11 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     # Playwright itself won't let us fill non-numbers in this field.
     # "assert define_analysis_button.is_enabled()" has spurious errors.
     # https://github.com/opendp/dp-wizard/issues/221
-    page.get_by_label("Contributions").fill("0")
+    page.locator("#contributions").fill("0")
     expect_visible("Contributions must be 1 or greater")
     expect_visible("Specify CSV and the unit of privacy before proceeding")
 
-    page.get_by_label("Contributions").fill("2")
+    page.locator("#contributions").fill("2")
     expect_not_visible("Contributions must be 1 or greater")
     expect_not_visible("Specify CSV and the unit of privacy before proceeding")
 
