@@ -267,7 +267,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             ),
             # TODO: Add this back when "Make the demo tooltips always-on" is merged.
             #     https://github.com/opendp/dp-wizard/pull/503
-            # Without the input label, the tooltip floats way to the right, and looks wrong.
+            # Without the input label, the tooltip floats way too far the right.
             #
             # demo_tooltip(
             #     is_demo,
