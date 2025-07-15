@@ -13,10 +13,7 @@ input_names = [
     "lower_bound_input",
     "upper_bound_input",
 ]
-
-
-def has_bins():
-    return False
+has_bins = False
 
 
 def make_query(code_gen, identifier, accuracy_name, stats_name):
