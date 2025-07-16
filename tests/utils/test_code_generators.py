@@ -2,9 +2,11 @@ from tempfile import NamedTemporaryFile
 import subprocess
 import pytest
 import re
+from pathlib import Path
 import opendp.prelude as dp
 
-from dp_wizard.utils.code_generators.analyses import histogram, mean, median
+from dp_wizard import opendp_version
+from dp_wizard.utils.code_generators.analyses import histogram, mean, median, count
 from dp_wizard.utils.code_generators import (
     make_column_config_block,
     AnalysisPlan,
@@ -12,6 +14,15 @@ from dp_wizard.utils.code_generators import (
 )
 from dp_wizard.utils.code_generators.notebook_generator import NotebookGenerator
 from dp_wizard.utils.code_generators.script_generator import ScriptGenerator
+
+
+python_paths = Path(__file__).parent.parent.parent.glob("dp_wizard/**/*.py")
+
+
+@pytest.mark.parametrize("python_path", python_paths, ids=lambda path: path.name)
+def test_no_unparameterized_docs_urls(python_path: Path):
+    python_code = python_path.read_text()
+    assert not re.search(r"docs\.opendp\.org/en/[^O{]", python_code)
 
 
 def test_make_column_config_block_for_unrecognized():
@@ -25,6 +36,24 @@ def test_make_column_config_block_for_unrecognized():
         )
 
 
+def test_make_column_config_block_for_count():
+    assert (
+        make_column_config_block(
+            name="HW GRADE",
+            analysis_type=count.name,
+            lower_bound=0,
+            upper_bound=0,
+            bin_count=0,
+        ).strip()
+        == f"""# See the OpenDP docs for more on making private counts:
+# https://docs.opendp.org/en/{opendp_version}/getting-started/tabular-data/essential-statistics.html#Count
+
+hw_grade_expr = (
+    pl.col('HW GRADE').cast(float).fill_nan(0).fill_null(0).dp.count().alias("count")
+)"""
+    )
+
+
 def test_make_column_config_block_for_mean():
     assert (
         make_column_config_block(
@@ -34,8 +63,8 @@ def test_make_column_config_block_for_mean():
             upper_bound=100,
             bin_count=10,
         ).strip()
-        == """# See the OpenDP Library docs for more on making private means:
-# https://docs.opendp.org/en/stable/getting-started/tabular-data/essential-statistics.html#Mean
+        == f"""# See the OpenDP Library docs for more on making private means:
+# https://docs.opendp.org/en/{opendp_version}/getting-started/tabular-data/essential-statistics.html#Mean
 
 hw_grade_expr = (
     pl.col('HW GRADE')
@@ -56,8 +85,8 @@ def test_make_column_config_block_for_median():
             upper_bound=100,
             bin_count=20,
         ).strip()
-        == """# See the OpenDP Library docs for more on making private medians and quantiles:
-# https://docs.opendp.org/en/stable/getting-started/tabular-data/essential-statistics.html#Median
+        == f"""# See the OpenDP Library docs for more on making private medians and quantiles:
+# https://docs.opendp.org/en/{opendp_version}/getting-started/tabular-data/essential-statistics.html#Median
 
 hw_grade_expr = (
     pl.col('HW GRADE')
@@ -78,8 +107,8 @@ def test_make_column_config_block_for_histogram():
             upper_bound=100,
             bin_count=10,
         ).strip()
-        == """# See the OpenDP Library docs for more on making private histograms:
-# https://docs.opendp.org/en/stable/getting-started/examples/histograms.html
+        == f"""# See the OpenDP Library docs for more on making private histograms:
+# https://docs.opendp.org/en/{opendp_version}/getting-started/examples/histograms.html
 
 # Use the public information to make cut points for 'HW GRADE':
 hw_grade_cut_points = make_cut_points(
@@ -129,6 +158,13 @@ median_plan_column = AnalysisPlanColumn(
     bin_count=10,
     weight=4,
 )
+count_plan_column = AnalysisPlanColumn(
+    analysis_type=count.name,
+    lower_bound=0,  # Unused
+    upper_bound=0,  # Unused
+    bin_count=0,  # Unused
+    weight=4,
+)
 
 
 def id_for_plan(plan: AnalysisPlan):
@@ -152,11 +188,13 @@ plans = [
         {"B": [histogram_plan_column]},
         {"B": [mean_plan_column]},
         {"B": [median_plan_column]},
+        {"B": [count_plan_column]},
         # Multiple:
         {
             "B": [histogram_plan_column],
             "C": [mean_plan_column],
             "D": [median_plan_column],
+            "E": [count_plan_column],
         },
     ]
 ]

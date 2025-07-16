@@ -3,6 +3,7 @@ from typing import Optional
 
 from shiny import ui, reactive, render, Inputs, Outputs, Session
 
+from dp_wizard.shiny.components.outputs import col_widths
 from dp_wizard.utils.argparse_helpers import (
     PUBLIC_TEXT,
     PRIVATE_TEXT,
@@ -30,10 +31,7 @@ def dataset_ui():
         ui.output_ui("csv_or_columns_ui"),
         ui.card(
             ui.card_header("Unit of privacy"),
-            ui.markdown(
-                "How many rows of the CSV can one individual contribute to? "
-                'This is the "unit of privacy" which will be protected.'
-            ),
+            ui.output_ui("input_entity_ui"),
             ui.output_ui("input_contributions_ui"),
             ui.output_ui("contributions_validation_ui"),
             output_code_sample(
@@ -212,23 +210,83 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 )
         return hide_if(not messages, info_md_box("\n".join(messages)))
 
+    entities = {
+        "📅 Individual Per Period": """
+            You can use differential privacy to protect your data
+            over specific time periods.
+            This may improve accuracy and be easier to implement
+            when individuals don’t have unique IDs.
+            """,
+        "👤 Individual": """
+            Differential privacy is often used to protect your privacy
+            as an individual, but depending on your needs,
+            you might want to protect a smaller or larger entity.
+            """,
+        "🏠 Household": """
+            If someone in your household has their privacy violated,
+            you might feel that your own privacy is also compromised.
+            In that case, you may prefer to protect your entire household
+            rather than just yourself.
+            """,
+    }
+
+    @render.ui
+    def input_entity_ui():
+        return [
+            ui.markdown(
+                """
+                First, what is the entity whose privacy you want to protect?
+                """
+            ),
+            ui.layout_columns(
+                ui.input_select(
+                    "entity",
+                    None,
+                    list(entities.keys()),
+                    selected="👤 Individual",
+                ),
+                ui.output_ui("entity_info_ui"),
+                col_widths=col_widths,  # type: ignore
+            ),
+        ]
+
+    @render.ui
+    def entity_info_ui():
+        return ui.markdown(entities[input.entity()])
+
     @render.ui
     def input_contributions_ui():
-        return ui.row(
-            ui.input_numeric(
-                "contributions",
-                [
-                    "Contributions ",  # Trailing space looks better.
-                    demo_tooltip(
-                        is_demo,
-                        "For the demo, we assume that each student "
-                        f"can occur at most {contributions()} times in the dataset. ",
-                    ),
-                ],
-                contributions(),
-                min=1,
-            )
-        )
+        entity = input.entity()[2:].lower()
+
+        return [
+            ui.markdown(
+                f"""
+                How many rows of the CSV can each {entity} contribute to?
+                This is the "unit of privacy" which will be protected.
+                """
+            ),
+            # TODO: Add this back when "Make the demo tooltips always-on" is merged.
+            #     https://github.com/opendp/dp-wizard/pull/503
+            # Without the input label, the tooltip floats way too far the right.
+            #
+            # demo_tooltip(
+            #     is_demo,
+            #     f"""
+            #     For the demo, we assume that each student
+            #     can occur at most {contributions()} times
+            #     in the dataset.
+            #     """,
+            # ),
+            ui.layout_columns(
+                ui.input_numeric(
+                    "contributions",
+                    None,
+                    contributions(),
+                    min=1,
+                ),
+                col_widths=col_widths,  # type: ignore
+            ),
+        ]
 
     @reactive.effect
     @reactive.event(input.contributions)
