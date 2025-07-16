@@ -1,3 +1,6 @@
+from dp_wizard import opendp_version
+from math import gcd
+
 from dp_wizard.utils.code_generators import (
     AnalysisPlan,
     make_column_config_block,
@@ -53,7 +56,7 @@ class AbstractGenerator(ABC):
             Template(self.root_template, __file__)
             .fill_expressions(
                 TITLE=str(self.analysis_plan),
-                DEPENDENCIES="'opendp[polars]==0.13.0' matplotlib",
+                DEPENDENCIES="'opendp[polars]=={opendp_version}' matplotlib",
                 WINDOWS_NOTE="(If installing in the Windows CMD shell, "
                 "use double-quotes instead of single-quotes above.)",
             )
@@ -77,7 +80,7 @@ class AbstractGenerator(ABC):
                 f"""
             # "max_partition_length" should be a loose upper bound,
             # for example, the size of the total population being sampled.
-            # https://docs.opendp.org/en/stable/api/python/opendp.extras.polars.html#opendp.extras.polars.Margin.max_partition_length
+            # https://docs.opendp.org/en/{opendp_version}/api/python/opendp.extras.polars.html#opendp.extras.polars.Margin.max_partition_length
             #
             # In production, "max_num_partitions" should be set by considering the number
             # of possible values for each grouping column, and taking their product.
@@ -153,15 +156,33 @@ class AbstractGenerator(ABC):
             + (self._make_comment_cell(note) if note else "")
         )
 
+    def _make_weights_expression(self):
+        weights_dict = {
+            name: plans[0].weight for name, plans in self.analysis_plan.columns.items()
+        }
+        weights_message = (
+            "Allocate the privacy budget to your queries in this ratio:"
+            if len(weights_dict) > 1
+            else "With only one query, the entire budget is allocated to that query:"
+        )
+        weights_gcd = gcd(*(weights_dict.values()))
+        return (
+            f"[ # {weights_message}\n"
+            + "".join(
+                f"{weight//weights_gcd}, # {name}\n"
+                for name, weight in weights_dict.items()
+            )
+            + "]"
+        )
+
     def _make_partial_context(self):
-        weights = [column[0].weight for column in self.analysis_plan.columns.values()]
 
         from dp_wizard.utils.code_generators.analyses import get_analysis_by_name
 
         bin_column_names = [
             name_to_identifier(name)
             for name, plan in self.analysis_plan.columns.items()
-            if get_analysis_by_name(plan[0].analysis_type).has_bins()
+            if get_analysis_by_name(plan[0].analysis_type).has_bins
         ]
 
         privacy_unit_block = make_privacy_unit_block(self.analysis_plan.contributions)
@@ -184,7 +205,7 @@ class AbstractGenerator(ABC):
             [
                 f"{name_to_identifier(name)}_bin_expr"
                 for name, plan in self.analysis_plan.columns.items()
-                if get_analysis_by_name(plan[0].analysis_type).has_bins()
+                if get_analysis_by_name(plan[0].analysis_type).has_bins
             ]
         )
         return (
@@ -192,9 +213,8 @@ class AbstractGenerator(ABC):
             .fill_expressions(
                 MARGINS_LIST=margins_list,
                 EXTRA_COLUMNS=extra_columns,
-            )
-            .fill_values(
-                WEIGHTS=weights,
+                OPENDP_VERSION=opendp_version,
+                WEIGHTS=self._make_weights_expression(),
             )
             .fill_blocks(
                 PRIVACY_UNIT_BLOCK=privacy_unit_block,

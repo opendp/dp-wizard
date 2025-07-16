@@ -13,8 +13,8 @@ class Analysis(Protocol):  # pragma: no cover
     @property
     def input_names(self) -> list[str]: ...
 
-    @staticmethod
-    def has_bins() -> bool: ...
+    @property
+    def has_bins(self) -> bool: ...
 
     @staticmethod
     def make_query(
@@ -53,7 +53,7 @@ class Analysis(Protocol):  # pragma: no cover
 
 def get_analysis_by_name(name) -> Analysis:  # pragma: no cover
     # Avoid circular import:
-    from dp_wizard.utils.code_generators.analyses import histogram, mean, median
+    from dp_wizard.utils.code_generators.analyses import histogram, mean, median, count
 
     match name:
         case histogram.name:
@@ -62,5 +62,7 @@ def get_analysis_by_name(name) -> Analysis:  # pragma: no cover
             return mean
         case median.name:
             return median
+        case count.name:
+            return count
         case _:
             raise Exception("Unrecognized analysis")
