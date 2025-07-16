@@ -22,10 +22,12 @@ dependencies = [
     "matplotlib",
     "nbconvert",
     "opendp[polars]==0.13.0",
+    "pillow>=11.3.0",
     "pyyaml",
     "requests>=2.32.4",
     "shiny",
     "tornado>=6.5",
+    "urllib3>=2.5.0",
 ]
 
 [options]
@@ -107,7 +109,7 @@ app = [
     "parso==0.8.4",
     "pathspec==0.12.1",
     "pexpect==4.9.0",
-    "pillow==11.2.1",
+    "pillow==11.3.0",
     "platformdirs==4.3.7",
     "polars==1.12.0",
     "prompt-toolkit==3.0.51",
@@ -141,7 +143,7 @@ app = [
     "traitlets==5.14.3",
     "typing-extensions==4.13.2",
     "uc-micro-py==1.0.3",
-    "urllib3==2.4.0",
+    "urllib3==2.5.0",
     "uvicorn==0.34.1",
     "watchfiles==1.0.5",
     "wcwidth==0.2.13",
