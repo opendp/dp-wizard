@@ -1,3 +1,4 @@
+from dp_wizard import opendp_version
 from dp_wizard.utils.code_template import Template
 
 
@@ -12,10 +13,7 @@ input_names = [
     "lower_bound_input",
     "upper_bound_input",
 ]
-
-
-def has_bins():
-    return False
+has_bins = False
 
 
 def make_query(code_gen, identifier, accuracy_name, stats_name):
@@ -69,6 +67,7 @@ def make_column_config_block(column_name, lower_bound, upper_bound, bin_count):
         Template("mean_expr", __file__)
         .fill_expressions(
             EXPR_NAME=f"{snake_name}_expr",
+            OPENDP_VERSION=opendp_version,
         )
         .fill_values(
             COLUMN_NAME=column_name,

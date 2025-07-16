@@ -1,3 +1,4 @@
+from dp_wizard import opendp_version
 from dp_wizard.utils.code_template import Template
 
 
@@ -13,10 +14,7 @@ input_names = [
     "upper_bound_input",
     "bin_count_input",
 ]
-
-
-def has_bins():
-    return True
+has_bins = True
 
 
 def make_query(code_gen, identifier, accuracy_name, stats_name):
@@ -82,6 +80,7 @@ def make_column_config_block(column_name, lower_bound, upper_bound, bin_count):
         .fill_expressions(
             CUT_LIST_NAME=f"{snake_name}_cut_points",
             BIN_EXPR_NAME=f"{snake_name}_bin_expr",
+            OPENDP_VERSION=opendp_version,
         )
         .fill_values(
             LOWER_BOUND=lower_bound,
