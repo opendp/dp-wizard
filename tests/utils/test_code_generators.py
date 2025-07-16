@@ -94,6 +94,7 @@ hw_grade_expr = (
     .fill_nan(0)
     .fill_null(0)
     .dp.quantile(0.5, make_cut_points(0, 100, bin_count=20))
+    # Or use "dp.median" which provides 0.5 implicitly.
 )"""  # noqa: B950 (too long!)
     )
 
