@@ -8,15 +8,22 @@ def _get_body(func):
 
     source_lines = inspect.getsource(func).splitlines()
     first_line = source_lines[0]
-    if not re.match(r"def \w+\(\w+(, \w+)+\):", first_line.strip()):
+    if not re.match(r"def \w+\((\w+(, \w+)*)?\):", first_line.strip()):
         # Parsing to AST and unparsing is a more robust option,
         # but more complicated.
         raise Exception(f"def and parameters should fit on one line: {first_line}")
-    return re.sub(
+    body = inspect.cleandoc("\n".join(source_lines[1:]))
+    body = re.sub(
         r"\s*#\s+type:\s+ignore\s*",
         "\n",
-        inspect.cleandoc("\n".join(source_lines[1:])),
+        body,
     )
+    body = re.sub(
+        r"\s*#\s+noqa:.+",
+        "",
+        body,
+    )
+    return body
 
 
 class Template:
@@ -105,11 +112,10 @@ class Template:
                     raise Exception(
                         f"Block slots must be alone on line; {base_message}"
                     )
-                else:
-                    raise Exception(base_message)
+                raise Exception(base_message)
         return self
 
-    def finish(self):
+    def finish(self) -> str:
         unfilled_slots = self._initial_slots & self._find_slots()
         if unfilled_slots:
             slots_str = ", ".join(sorted(f"'{slot}'" for slot in unfilled_slots))

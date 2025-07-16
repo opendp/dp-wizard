@@ -9,6 +9,7 @@ from dp_wizard.utils.code_generators.analyses import (
     histogram,
     mean,
     median,
+    count,
     get_analysis_by_name,
 )
 from dp_wizard.utils.dp_helper import make_accuracy_histogram
@@ -19,6 +20,7 @@ from dp_wizard.shiny.components.outputs import (
     demo_help,
     info_md_box,
     hide_if,
+    col_widths,
 )
 from dp_wizard.utils.dp_helper import confidence
 from dp_wizard.utils.mock_data import mock_data, ColumnDef
@@ -27,13 +29,6 @@ from dp_wizard.utils.mock_data import mock_data, ColumnDef
 default_analysis_type = histogram.name
 default_weight = "2"
 label_width = "10em"  # Just wide enough so the text isn't trucated.
-col_widths = {
-    # Controls stay roughly a constant width;
-    # Graph expands to fill space.
-    "sm": [4, 8],
-    "md": [3, 9],
-    "lg": [2, 10],
-}
 
 
 def get_float_error(number_str):
@@ -54,24 +49,23 @@ def get_float_error(number_str):
     """
     if number_str is None or number_str == "":
         return "is required"
-    else:
-        try:
-            int(float(number_str))
-        except (TypeError, ValueError, OverflowError):
-            return "should be a number"
+    try:
+        int(float(number_str))
+    except (TypeError, ValueError, OverflowError):
+        return "should be a number"
     return None
 
 
-def get_bound_error(lower_bound, upper_bound):
+def get_bound_errors(lower_bound, upper_bound):
     """
-    >>> get_bound_error(1, 2)
-    ''
-    >>> get_bound_error('abc', 'xyz')
-    '- Lower bound should be a number.\\n- Upper bound should be a number.'
-    >>> get_bound_error(1, None)
-    '- Upper bound is required.'
-    >>> get_bound_error(1, 0)
-    '- Lower bound should be less than upper bound.'
+    >>> get_bound_errors(1, 2)
+    []
+    >>> get_bound_errors('abc', 'xyz')
+    ['Lower bound should be a number.', 'Upper bound should be a number.']
+    >>> get_bound_errors(1, None)
+    ['Upper bound is required.']
+    >>> get_bound_errors(1, 0)
+    ['Lower bound should be less than upper bound.']
     """
     messages = []
     if error := get_float_error(lower_bound):
@@ -81,7 +75,36 @@ def get_bound_error(lower_bound, upper_bound):
     if not messages:
         if not (float(lower_bound) < float(upper_bound)):
             messages.append("Lower bound should be less than upper bound.")
-    return "\n".join(f"- {m}" for m in messages)
+    return messages
+
+
+def get_bin_errors(count):
+    """
+    This function might be applied to either histogram bin counts,
+    or median candidate counts, so the wording is a little vague.
+
+    >>> get_bin_errors("5")
+    []
+    >>> get_bin_errors(None)
+    ['Number is required.']
+    >>> get_bin_errors("abc")
+    ['Number should be a number.']
+    >>> get_bin_errors("-1")
+    ['Number should be a positive integer.']
+    >>> get_bin_errors("1001")
+    ['Number should be less than 1000, just to keep computation from running too long.']
+    """
+    if error := get_float_error(count):
+        return [f"Number {error}."]
+    count = int(float(count))
+    if count <= 0:
+        return ["Number should be a positive integer."]
+    if count > 1000:
+        return [
+            "Number should be less than 1000, "
+            "just to keep computation from running too long."
+        ]
+    return []
 
 
 def error_md_ui(markdown):  # pragma: no cover
@@ -96,7 +119,7 @@ def column_ui():  # pragma: no cover
             ui.input_select(
                 "analysis_type",
                 None,
-                [histogram.name, mean.name, median.name],
+                [histogram.name, mean.name, median.name, count.name],
                 width=label_width,
             ),
             ui.output_ui("analysis_info_ui"),
@@ -113,8 +136,8 @@ def column_server(
     session: Session,
     public_csv_path: str,
     name: str,
-    contributions: int,
-    epsilon: float,
+    contributions: reactive.Value[int],
+    epsilon: reactive.Value[float],
     row_count: int,
     analysis_types: reactive.Value[dict[str, str]],
     lower_bounds: reactive.Value[dict[str, float]],
@@ -183,13 +206,13 @@ def column_server(
         # Mock data only depends on lower and upper bounds, so it could be cached,
         # but I'd guess this is dominated by the DP operations,
         # so not worth optimizing.
-        # TODO: Use real public data, if we have it!
-        if public_csv_path:
-            lf = pl.scan_csv(public_csv_path)
-        else:
-            lf = pl.LazyFrame(
+        lf = (
+            pl.scan_csv(public_csv_path)
+            if public_csv_path
+            else pl.LazyFrame(
                 mock_data({name: ColumnDef(lower_x, upper_x)}, row_count=row_count)
             )
+        )
         return make_accuracy_histogram(
             lf=lf,
             column_name=name,
@@ -197,8 +220,8 @@ def column_server(
             lower_bound=lower_x,
             upper_bound=upper_x,
             bin_count=bin_count,
-            contributions=contributions,
-            weighted_epsilon=epsilon * weight / weights_sum,
+            contributions=contributions(),
+            weighted_epsilon=epsilon() * weight / weights_sum,
         )
 
     @render.text
@@ -212,14 +235,6 @@ def column_server(
 
     @render.ui
     def analysis_config_ui():
-        col_widths = {
-            # Controls stay roughly a constant width;
-            # Graph expands to fill space.
-            "sm": [4, 8],
-            "md": [3, 9],
-            "lg": [2, 10],
-        }
-
         def lower_bound_input():
             return ui.input_text(
                 "lower_bound",
@@ -329,7 +344,11 @@ def column_server(
 
     @reactive.calc
     def error_md_calc():
-        return get_bound_error(input.lower_bound(), input.upper_bound())
+        return "\n".join(
+            f"- {error}"
+            for error in get_bound_errors(input.lower_bound(), input.upper_bound())
+            + get_bin_errors(input.bins())
+        )
 
     @render.code
     def column_code():
@@ -345,37 +364,35 @@ def column_server(
     def histogram_preview_ui():
         if error_md := error_md_calc():
             return error_md_ui(error_md)
-        else:
-            accuracy, histogram = accuracy_histogram()
-            return [
-                ui.output_plot("histogram_preview_plot", height="300px"),
-                ui.layout_columns(
-                    ui.markdown(
-                        f"The {confidence:.0%} confidence interval is ±{accuracy:.3g}."
-                    ),
-                    details(
-                        summary("Data Table"),
-                        ui.output_data_frame("data_frame"),
-                    ),
-                    output_code_sample("Column Definition", "column_code"),
+        accuracy, histogram = accuracy_histogram()
+        return [
+            ui.output_plot("histogram_preview_plot", height="300px"),
+            ui.layout_columns(
+                ui.markdown(
+                    f"The {confidence:.0%} confidence interval is ±{accuracy:.3g}."
                 ),
-            ]
+                details(
+                    summary("Data Table"),
+                    ui.output_data_frame("data_frame"),
+                ),
+                output_code_sample("Column Definition", "column_code"),
+            ),
+        ]
 
     @render.ui
     def mean_preview_ui():
         # accuracy, histogram = accuracy_histogram()
         if error_md := error_md_calc():
             return error_md_ui(error_md)
-        else:
-            return [
-                ui.p(
-                    """
-                    Since the mean is just a single number,
-                    there is not a preview visualization.
-                    """
-                ),
-                output_code_sample("Column Definition", "column_code"),
-            ]
+        return [
+            ui.p(
+                """
+                Since the mean is just a single number,
+                there is not a preview visualization.
+                """
+            ),
+            output_code_sample("Column Definition", "column_code"),
+        ]
 
     @render.ui
     def median_preview_ui():
@@ -391,6 +408,18 @@ def column_server(
             output_code_sample("Column Definition", "column_code"),
         ]
 
+    @render.ui
+    def count_preview_ui():
+        return [
+            ui.p(
+                """
+                Since the count is just a single number,
+                there is not a preview visualization.
+                """
+            ),
+            output_code_sample("Column Definition", "column_code"),
+        ]
+
     @render.data_frame
     def data_frame():
         accuracy, histogram = accuracy_histogram()
@@ -399,11 +428,12 @@ def column_server(
     @render.plot
     def histogram_preview_plot():
         accuracy, histogram = accuracy_histogram()
-        s = "s" if contributions > 1 else ""
+        contributions_int = contributions()
+        s = "s" if contributions_int > 1 else ""
         title = ", ".join(
             [
                 name if public_csv_path else f"Simulated {name}: normal distribution",
-                f"{contributions} contribution{s} / individual",
+                f"{contributions_int} contribution{s} / individual",
             ]
         )
         return plot_bars(
