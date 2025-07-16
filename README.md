@@ -23,7 +23,7 @@ DP Wizard requires Python 3.10 or later.
 You can check your current version with `python --version`.
 The exact upgrade process will depend on your environment and operating system.
 
-Install with `pip install dp_wizard[app]` and you can start DP Wizard from the command line.
+Install with `pip install 'dp_wizard[app]'` and you can start DP Wizard from the command line.
 
 ```
 usage: dp-wizard [-h] [--demo | --cloud]
@@ -127,8 +127,9 @@ If Playwright fails in CI, we can still see what went wrong:
 - Publish: `flit publish --pypirc .pypirc`
 
 This project is configured so there are two different install possibilities from pypi:
-- `pip install dp_wizard` does not aggressively pin dependency versions. It is preferred if you're using `dp_wizard` as a library.
-- `pip install dp_wizard[app]` pins all dependencies, and will work more reliably for application users.
+- `pip install 'dp_wizard[app]'` pins all dependencies, and is the best route for most users.
+- `pip install dp_wizard` does not pin dependencies, and is best if you're using `dp_wizard` as a library.
+
 
 The cloud deployment is [configured](https://connect.posit.cloud/mccalluc/content/01966942-7eab-da99-0887-a7c483756aa8/edit) to update on pushes to the `cloud-deployment` branch.
 If you are on `main`, with no local changes, run `scripts/deploy.sh`.
