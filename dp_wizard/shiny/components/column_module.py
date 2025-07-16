@@ -141,6 +141,7 @@ def column_server(
     row_count: int,
     groups: reactive.Value[list[str]],
     analysis_types: reactive.Value[dict[str, str]],
+    analysis_errors: reactive.Value[dict[str, bool]],
     lower_bounds: reactive.Value[dict[str, float]],
     upper_bounds: reactive.Value[dict[str, float]],
     bin_counts: reactive.Value[dict[str, int]],
@@ -243,7 +244,7 @@ def column_server(
             return ui.input_text(
                 "lower_bound",
                 ["Lower Bound", ui.output_ui("bounds_tooltip_ui")],
-                str(lower_bounds().get(name, 0)),
+                str(lower_bounds().get(name, "")),
                 width=label_width,
             )
 
@@ -251,7 +252,7 @@ def column_server(
             return ui.input_text(
                 "upper_bound",
                 "Upper Bound",
-                str(upper_bounds().get(name, 10)),
+                str(upper_bounds().get(name, "")),
                 width=label_width,
             )
 
@@ -270,7 +271,7 @@ def column_server(
             return ui.input_numeric(
                 "bins",
                 "Number of Candidates",
-                bin_counts().get(name, 10),
+                bin_counts().get(name, 0),
                 width=label_width,
             )
 
@@ -353,6 +354,12 @@ def column_server(
             for error in get_bound_errors(input.lower_bound(), input.upper_bound())
             + get_bin_errors(input.bins())
         )
+
+    @reactive.effect
+    def set_analysis_errors():
+        with reactive.isolate():
+            prev_analysis_errors = analysis_errors()
+        analysis_errors.set({**prev_analysis_errors, name: bool(error_md_calc())})
 
     @render.code
     def column_code():
