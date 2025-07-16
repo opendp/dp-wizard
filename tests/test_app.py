@@ -87,26 +87,17 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     perform_analysis_text = "Select columns to calculate statistics on"
     download_results_text = "You can now make a differentially private release"
 
-    def expect_visible(text):
-        expect(page.get_by_text(text)).to_be_visible()
-
-    def expect_not_visible(text):
-        expect(page.get_by_text(text)).not_to_be_visible()
-
-    def expect_no_error():
-        expect(page.locator(".shiny-output-error")).not_to_be_attached()
-
     # -- Select dataset --
     page.goto(local_app.url)
     expect(page).to_have_title("DP Wizard")
     expect(page.locator(tooltip)).to_have_count(0)
-    expect_visible(pick_dataset_text)
-    expect_not_visible(perform_analysis_text)
-    expect_not_visible(download_results_text)
-    page.get_by_label("Contributions").fill("42")
+    expect(page.get_by_text(pick_dataset_text)).to_be_visible()
+    expect(page.get_by_text(perform_analysis_text)).not_to_be_visible()
+    expect(page.get_by_text(download_results_text)).not_to_be_visible()
+    page.locator("#contributions").fill("42")
     page.get_by_text("Code sample: Unit of Privacy").click()
-    expect_visible("contributions = 42")
-    expect_no_error()
+    expect(page.get_by_text("contributions = 42")).to_be_visible()
+    expect(page.locator(".shiny-output-error")).not_to_be_attached()
 
     # Button disabled until upload:
     define_analysis_button = page.get_by_role("button", name="Define analysis")
@@ -120,29 +111,33 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     # Playwright itself won't let us fill non-numbers in this field.
     # "assert define_analysis_button.is_enabled()" has spurious errors.
     # https://github.com/opendp/dp-wizard/issues/221
-    page.get_by_label("Contributions").fill("0")
-    expect_visible("Contributions must be 1 or greater")
-    expect_visible("Specify CSV and the unit of privacy before proceeding")
+    page.locator("#contributions").fill("0")
+    expect(page.get_by_text("Contributions must be 1 or greater")).to_be_visible()
+    expect(
+        page.get_by_text("Specify CSV and the unit of privacy before proceeding")
+    ).to_be_visible()
 
-    page.get_by_label("Contributions").fill("2")
-    expect_not_visible("Contributions must be 1 or greater")
-    expect_not_visible("Specify CSV and the unit of privacy before proceeding")
+    page.locator("#contributions").fill("2")
+    expect(page.get_by_text("Contributions must be 1 or greater")).not_to_be_visible()
+    expect(
+        page.get_by_text("Specify CSV and the unit of privacy before proceeding")
+    ).not_to_be_visible()
 
-    expect_no_error()
+    expect(page.locator(".shiny-output-error")).not_to_be_attached()
 
     # -- Define analysis --
     define_analysis_button.click()
-    expect_not_visible(pick_dataset_text)
-    expect_visible(perform_analysis_text)
-    expect_not_visible(download_results_text)
+    expect(page.get_by_text(pick_dataset_text)).not_to_be_visible()
+    expect(page.get_by_text(perform_analysis_text)).to_be_visible()
+    expect(page.get_by_text(download_results_text)).not_to_be_visible()
     # Epsilon slider:
-    expect_visible("Epsilon: 1.0")
+    expect(page.get_by_text("Epsilon: 1.0")).to_be_visible()
     page.locator(".irs-bar").click()
-    expect_visible("Epsilon: 0.316")
+    expect(page.get_by_text("Epsilon: 0.316")).to_be_visible()
     page.locator(".irs-bar").click()
-    expect_visible("Epsilon: 0.158")
+    expect(page.get_by_text("Epsilon: 0.158")).to_be_visible()
     # Simulation
-    expect_visible("Because you've provided a public CSV")
+    expect(page.get_by_text("Because you've provided a public CSV")).to_be_visible()
 
     # Button disabled until column selected:
     download_results_button = page.get_by_role("button", name="Download Results")
@@ -166,26 +161,30 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
 
     # Input validation:
     page.get_by_label("Number of Bins").fill("-1")
-    expect_visible("Number should be a positive integer.")
+    expect(page.get_by_text("Number should be a positive integer.")).to_be_visible()
     # Changing epsilon should not reset column details:
     page.locator(".irs-bar").click()
-    expect_visible("Number should be a positive integer.")
+    expect(page.get_by_text("Number should be a positive integer.")).to_be_visible()
     page.get_by_label("Number of Bins").fill("10")
 
     page.get_by_label("Upper").fill("")
-    expect_visible("Upper bound is required")
+    expect(page.get_by_text("Upper bound is required")).to_be_visible()
     page.get_by_label("Upper").fill("nan")
-    expect_visible("Upper bound should be a number")
+    expect(page.get_by_text("Upper bound should be a number")).to_be_visible()
     page.get_by_label("Lower").fill("0")
     page.get_by_label("Upper").fill("-1")
-    expect_visible("Lower bound should be less than upper bound")
+    expect(
+        page.get_by_text("Lower bound should be less than upper bound")
+    ).to_be_visible()
 
     new_value = "20"
     page.get_by_label("Upper").fill(new_value)
     assert float(page.get_by_label("Upper").input_value()) == float(new_value)
-    expect_visible("The 95% confidence interval is ±48.1")
+    expect(page.get_by_text("The 95% confidence interval is ±48.1")).to_be_visible()
     page.get_by_text("Data Table").click()
-    expect_visible(f"({new_value}, inf]")  # Because values are well above the bins.
+    expect(
+        page.get_by_text(f"({new_value}, inf]")
+    ).to_be_visible()  # Because values are well above the bins.
 
     # Add a second column:
     # page.get_by_label("blank").check()
@@ -195,7 +194,7 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     # causes recalculations to pile up, and these cause timeouts on CI:
     # It is still rerendering the graph after hitting "Download Results".
     # https://github.com/opendp/dp-wizard/issues/116
-    expect_no_error()
+    expect(page.locator(".shiny-output-error")).not_to_be_attached()
 
     # A separate test spends less time on parameter validation
     # and instead exercises all downloads.
