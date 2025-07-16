@@ -17,7 +17,7 @@ from dp_wizard.utils.shared import plot_bars
 from dp_wizard.utils.code_generators import make_column_config_block
 from dp_wizard.shiny.components.outputs import (
     output_code_sample,
-    demo_tooltip,
+    demo_help,
     info_md_box,
     hide_if,
     col_widths,
@@ -293,7 +293,7 @@ def column_server(
 
     @render.ui
     def bounds_tooltip_ui():
-        return demo_tooltip(
+        return demo_help(
             is_demo,
             """
             We need to clip our inputs to limit sensitivity.
@@ -304,7 +304,7 @@ def column_server(
 
     @render.ui
     def bins_tooltip_ui():
-        return demo_tooltip(
+        return demo_help(
             is_demo,
             """
             If you increase the number of bins,
@@ -333,7 +333,7 @@ def column_server(
 
     @render.ui
     def weight_tooltip_ui():
-        return demo_tooltip(
+        return demo_help(
             is_demo,
             """
             You have a finite privacy budget, but you can choose
