@@ -138,7 +138,7 @@ def column_server(
     name: str,
     contributions: reactive.Value[int],
     epsilon: reactive.Value[float],
-    row_count: int,
+    row_count_str: reactive.Value[str],
     groups: reactive.Value[list[str]],
     analysis_types: reactive.Value[dict[str, str]],
     analysis_errors: reactive.Value[dict[str, bool]],
@@ -204,6 +204,8 @@ def column_server(
             # This function is triggered when column is removed;
             # Exit early to avoid divide-by-zero.
             raise SilentException("weights_sum == 0")
+
+        row_count = int(row_count_str())
 
         # Mock data only depends on lower and upper bounds, so it could be cached,
         # but I'd guess this is dominated by the DP operations,
