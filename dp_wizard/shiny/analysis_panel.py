@@ -204,7 +204,7 @@ def analysis_server(
     @render.ui
     def simulation_card_ui():
         if public_csv_path():
-            row_count = get_csv_row_count(Path(public_csv_path()))
+            csv_row_count = get_csv_row_count(Path(public_csv_path()))
             return [
                 ui.markdown(
                     f"""
@@ -212,16 +212,16 @@ def analysis_server(
                     it *will be read* to generate previews.
 
                     The confidence interval depends on the number of rows.
-                    Your public CSV has {row_count} rows,
+                    Your public CSV has {csv_row_count} rows,
                     but if you believe the private CSV will be
                     much larger or smaller, please update.
                     """
                 ),
                 ui.input_select(
-                    "row_count",
+                    "row_count_str",
                     "Estimated Rows",
-                    choices=[row_count, "100", "1000", "10000"],
-                    selected=row_count,
+                    choices=[csv_row_count, "100", "1000", "10000"],
+                    selected=csv_row_count,
                 ),
             ]
         else:
@@ -239,7 +239,7 @@ def analysis_server(
                     """
                 ),
                 ui.input_select(
-                    "row_count",
+                    "row_count_str",
                     "Estimated Rows",
                     choices=["100", "1000", "10000"],
                     selected="100",
@@ -257,7 +257,7 @@ def analysis_server(
                 name=column_ids_to_names[column_id],
                 contributions=contributions,
                 epsilon=epsilon,
-                row_count=int(input.row_count()),
+                row_count_str=input.row_count_str,
                 groups=groups,
                 analysis_types=analysis_types,
                 analysis_errors=analysis_errors,

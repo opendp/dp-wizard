@@ -143,10 +143,6 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     download_results_button = page.get_by_role("button", name="Download Results")
     assert download_results_button.is_disabled()
 
-    # Currently the only change when the estimated rows changes is the plot,
-    # but we could have the confidence interval in the text...
-    page.get_by_label("Estimated Rows").select_option("1000")
-
     # Pick columns:
     page.locator(".selectize-input").nth(0).click()
     page.get_by_text("grade").click()
@@ -155,8 +151,6 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     page.get_by_text(": class year").nth(2).click()
 
     # Check that default is set correctly:
-    # (Explicit "float()" because sometimes returns "10", sometimes "10.0".
-    #  Weird, but not something to spend time on.)
     assert page.get_by_label("Upper").input_value() == ""
 
     # Input validation:
@@ -181,6 +175,11 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     page.get_by_label("Upper").fill(new_value)
     assert float(page.get_by_label("Upper").input_value()) == float(new_value)
     expect(page.get_by_text("The 95% confidence interval is ±48.1")).to_be_visible()
+
+    # Updating the estimated rows changes the confidence interval:
+    page.get_by_label("Estimated Rows").select_option("1000")
+
+    # Data Table is populated:
     page.get_by_text("Data Table").click()
     expect(
         page.get_by_text(f"({new_value}, inf]")
