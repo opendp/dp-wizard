@@ -149,7 +149,7 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
 
     # Pick columns:
     page.locator(".selectize-input").nth(0).click()
-    page.get_by_text("grade").click()
+    page.get_by_text(": grade").click()
     # Pick grouping:
     page.locator(".selectize-input").nth(1).click()
     page.get_by_text(": class year").nth(2).click()
@@ -228,7 +228,7 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
 
     # Pick columns:
     page.locator(".selectize-input").nth(0).click()
-    page.get_by_text("grade").nth(0).click()
+    page.get_by_text(": grade").nth(0).click()
     # Pick grouping:
     page.locator(".selectize-input").nth(1).click()
     page.get_by_text("class year").nth(2).click()

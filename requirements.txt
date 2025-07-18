@@ -151,7 +151,7 @@ numpy==2.2.4
     #   randomgen
     #   scikit-learn
     #   scipy
-opendp[polars]==0.13.0
+opendp[polars]==0.13.0b20250422001
     # via -r requirements.in
 orjson==3.10.16
     # via shiny

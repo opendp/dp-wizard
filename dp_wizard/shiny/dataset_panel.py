@@ -277,14 +277,11 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             #     in the dataset.
             #     """,
             # ),
-            ui.layout_columns(
-                ui.input_numeric(
-                    "contributions",
-                    None,
-                    contributions(),
-                    min=1,
-                ),
-                col_widths=col_widths,  # type: ignore
+            ui.input_numeric(
+                "contributions",
+                None,
+                contributions(),
+                min=1,
             ),
         ]
 

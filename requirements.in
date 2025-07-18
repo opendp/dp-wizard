@@ -1,7 +1,7 @@
 # After making changes here, run scripts/requirements.py.
 
 # OpenDP:
-opendp[polars]==0.13.0
+opendp[polars]==0.13.0b20250422001
 
 # Conversion:
 jupytext
