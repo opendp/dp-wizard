@@ -190,7 +190,7 @@ numpy==2.2.4
     #   randomgen
     #   scikit-learn
     #   scipy
-opendp[polars]==0.13.0
+opendp[polars]==0.13.0b20250422001
     # via -r .../dp-wizard/requirements.in
 orjson==3.10.15
     # via shiny
