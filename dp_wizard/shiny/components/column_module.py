@@ -149,6 +149,22 @@ def column_server(
     is_demo: bool,
     is_single_column: bool,
 ):  # pragma: no cover
+    @reactive.calc
+    def lower_bound_float():
+        try:
+            value = float(input.lower_bound())
+        except ValueError:
+            raise SilentException()
+        return value
+
+    @reactive.calc
+    def upper_bound_float():
+        try:
+            value = float(input.upper_bound())
+        except ValueError:
+            raise SilentException()
+        return value
+
     @reactive.effect
     def _set_hidden_inputs():
         # TODO: Is isolate still needed?
@@ -163,20 +179,12 @@ def column_server(
     @reactive.effect
     @reactive.event(input.lower_bound)
     def _set_lower_bound():
-        try:
-            value = float(input.lower_bound())
-        except ValueError:
-            raise SilentException()
-        lower_bounds.set({**lower_bounds(), name: value})
+        lower_bounds.set({**lower_bounds(), name: lower_bound_float()})
 
     @reactive.effect
     @reactive.event(input.upper_bound)
     def _set_upper_bound():
-        try:
-            value = float(input.upper_bound())
-        except ValueError:
-            raise SilentException()
-        upper_bounds.set({**upper_bounds(), name: value})
+        upper_bounds.set({**upper_bounds(), name: upper_bound_float()})
 
     @reactive.effect
     @reactive.event(input.bins)
@@ -194,8 +202,8 @@ def column_server(
 
     @reactive.calc()
     def accuracy_histogram():
-        lower_x = float(input.lower_bound())
-        upper_x = float(input.upper_bound())
+        lower_x = lower_bound_float()
+        upper_x = upper_bound_float()
         bin_count = int(input.bins())
         weight = float(input.weight())
         weights_sum = sum(float(weight) for weight in weights().values())
@@ -368,8 +376,8 @@ def column_server(
         return make_column_config_block(
             name=name,
             analysis_type=input.analysis_type(),
-            lower_bound=float(input.lower_bound()),
-            upper_bound=float(input.upper_bound()),
+            lower_bound=lower_bound_float(),
+            upper_bound=upper_bound_float(),
             bin_count=int(input.bins()),
         )
 
