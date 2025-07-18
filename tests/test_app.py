@@ -155,8 +155,6 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     page.get_by_text(": class year").nth(2).click()
 
     # Check that default is set correctly:
-    # (Explicit "float()" because sometimes returns "10", sometimes "10.0".
-    #  Weird, but not something to spend time on.)
     assert page.get_by_label("Upper").input_value() == ""
 
     # Input validation:
