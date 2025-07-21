@@ -3,7 +3,7 @@ from typing import Optional
 
 from shiny import ui, reactive, render, Inputs, Outputs, Session
 
-from dp_wizard.shiny.components.outputs import col_widths
+from dp_wizard.shiny.components.outputs import col_widths, demo_help
 from dp_wizard.utils.argparse_helpers import (
     PUBLIC_TEXT,
     PRIVATE_TEXT,
@@ -12,7 +12,7 @@ from dp_wizard.utils.argparse_helpers import (
 from dp_wizard.utils.csv_helper import get_csv_names_mismatch
 from dp_wizard.shiny.components.outputs import (
     output_code_sample,
-    demo_tooltip,
+    demo_help,
     hide_if,
     info_md_box,
     nav_button,
@@ -175,7 +175,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 "private_csv_path",
                 [
                     "Choose Private CSV ",  # Trailing space looks better.
-                    demo_tooltip(
+                    demo_help(
                         is_demo,
                         "For the demo, we'll imagine we have the grades "
                         "on assignments for a class.",
@@ -265,18 +265,15 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 This is the "unit of privacy" which will be protected.
                 """
             ),
-            # TODO: Add this back when "Make the demo tooltips always-on" is merged.
-            #     https://github.com/opendp/dp-wizard/pull/503
             # Without the input label, the tooltip floats way too far the right.
-            #
-            # demo_tooltip(
-            #     is_demo,
-            #     f"""
-            #     For the demo, we assume that each student
-            #     can occur at most {contributions()} times
-            #     in the dataset.
-            #     """,
-            # ),
+            demo_tooltip(
+                is_demo,
+                f"""
+                For the demo, we assume that each student
+                can occur at most {contributions()} times
+                in the dataset.
+                """,
+            ),
             ui.layout_columns(
                 ui.input_numeric(
                     "contributions",
@@ -315,7 +312,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
 
     @render.ui
     def python_tooltip_ui():
-        return demo_tooltip(
+        return demo_help(
             is_demo,
             """
             Along the way, code samples will demonstrate
