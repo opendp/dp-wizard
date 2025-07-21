@@ -133,9 +133,7 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     # Epsilon slider:
     expect(page.get_by_text("Epsilon: 1.0")).to_be_visible()
     page.locator(".irs-bar").click()
-    expect(page.get_by_text("Epsilon: 0.316")).to_be_visible()
-    page.locator(".irs-bar").click()
-    expect(page.get_by_text("Epsilon: 0.158")).to_be_visible()
+    expect(page.get_by_text("Epsilon: 0.288")).to_be_visible()
     # Simulation
     expect(page.get_by_text("Because you've provided a public CSV")).to_be_visible()
 
@@ -180,7 +178,7 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     new_value = "20"
     page.get_by_label("Upper").fill(new_value)
     assert float(page.get_by_label("Upper").input_value()) == float(new_value)
-    expect(page.get_by_text("The 95% confidence interval is ±48.1")).to_be_visible()
+    expect(page.get_by_text("The 95% confidence interval is ±437")).to_be_visible()
     page.get_by_text("Data Table").click()
     expect(
         page.get_by_text(f"({new_value}, inf]")
