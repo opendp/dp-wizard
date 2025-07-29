@@ -24,6 +24,7 @@ from dp_wizard.shiny.components.outputs import (
 )
 from dp_wizard.utils.dp_helper import confidence
 from dp_wizard.utils.mock_data import mock_data, ColumnDef
+from dp_wizard.utils.csv_helper import name_to_id
 
 
 default_analysis_type = histogram.name
@@ -169,16 +170,22 @@ def column_server(
     def _set_hidden_inputs():
         # TODO: Is isolate still needed?
         with reactive.isolate():  # Without isolate, there is an infinite loop.
-            ui.update_numeric("weight", value=int(weights().get(name, default_weight)))
+            ui.update_numeric(
+                "weight", value=int(weights().get(name_to_id(name), default_weight))
+            )  # TODO
 
     @reactive.effect
     @reactive.event(input.analysis_type)
     def _set_analysis_type():
+        # print(f'before: {analysis_types()=}')
+        # print(f'{name=} ({name_to_id(name)}): {input.analysis_type()}')
         analysis_types.set({**analysis_types(), name: input.analysis_type()})
+        # print(f'after: {analysis_types()=}')
 
     @reactive.effect
     @reactive.event(input.lower_bound)
     def _set_lower_bound():
+        print(f"!!!!!! name should be column, not analysis type: {name=}")
         lower_bounds.set({**lower_bounds(), name: lower_bound_float()})
 
     @reactive.effect
@@ -198,7 +205,7 @@ def column_server(
     @reactive.effect
     @reactive.event(input.weight)
     def _set_weight():
-        weights.set({**weights(), name: input.weight()})
+        weights.set({**weights(), name: input.weight()})  # TODO
 
     @reactive.calc()
     def accuracy_histogram():
@@ -251,10 +258,19 @@ def column_server(
     @render.ui
     def analysis_config_ui():
         def lower_bound_input():
+            print(
+                f"""
+{lower_bounds()=}
+{name=} ({name_to_id(name)=})
+Expecting name to be column name, not the name of an anlysis!
+"""
+            )
+            value = str(lower_bounds().get(name_to_id(name), ""))
+            print(f"{value=}")
             return ui.input_text(
                 "lower_bound",
                 ["Lower Bound", ui.output_ui("bounds_tooltip_ui")],
-                str(lower_bounds().get(name, "")),
+                value=value,
                 width=label_width,
             )
 
@@ -262,7 +278,7 @@ def column_server(
             return ui.input_text(
                 "upper_bound",
                 "Upper Bound",
-                str(upper_bounds().get(name, "")),
+                str(upper_bounds().get(name_to_id(name), "")),
                 width=label_width,
             )
 
@@ -270,7 +286,7 @@ def column_server(
             return ui.input_numeric(
                 "bins",
                 ["Number of Bins", ui.output_ui("bins_tooltip_ui")],
-                bin_counts().get(name, 10),
+                bin_counts().get(name_to_id(name), 10),
                 width=label_width,
             )
 
@@ -281,11 +297,11 @@ def column_server(
             return ui.input_numeric(
                 "bins",
                 "Number of Candidates",
-                bin_counts().get(name, 0),
+                bin_counts().get(name_to_id(name), 0),
                 width=label_width,
             )
 
-        name = input.analysis_type()
+        analysis_type = input.analysis_type()
 
         # Had trouble with locals() inside comprehension in Python 3.10.
         # Not sure if this is the exact issue:
@@ -293,7 +309,7 @@ def column_server(
 
         # Fix is just to keep it outside the comprehension.
         local_variables = locals()
-        input_names = get_analysis_by_name(name).input_names
+        input_names = get_analysis_by_name(analysis_type).input_names
         input_functions = [local_variables[input_name] for input_name in input_names]
         with reactive.isolate():
             inputs = [input_function() for input_function in input_functions] + [
@@ -302,7 +318,7 @@ def column_server(
 
         return ui.layout_columns(
             inputs,
-            ui.output_ui(f"{name.lower()}_preview_ui"),
+            ui.output_ui(f"{analysis_type.lower()}_preview_ui"),
             col_widths=col_widths,  # type: ignore
         )
 

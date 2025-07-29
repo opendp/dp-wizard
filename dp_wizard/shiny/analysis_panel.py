@@ -93,9 +93,13 @@ def _cleanup_reactive_dict(
     reactive_dict: reactive.Value[dict[str, Any]], keys_to_keep: Iterable[str]
 ):  # pragma: no cover
     reactive_dict_copy = {**reactive_dict()}
+    # print(f'before: {reactive_dict_copy=}')
+    # print(f'{keys_to_keep=}')
     keys_to_del = set(reactive_dict_copy.keys()) - set(keys_to_keep)
     for key in keys_to_del:
         del reactive_dict_copy[key]
+
+    # print(f'after: {reactive_dict_copy=}')
     reactive_dict.set(reactive_dict_copy)
 
 
@@ -250,6 +254,7 @@ def analysis_server(
     def columns_ui():
         column_ids = input.columns_selectize()
         column_ids_to_names = csv_ids_names_calc()
+        print(f"!!! Want column names, not analysis types !!! {column_ids_to_names=}")
         for column_id in column_ids:
             column_server(
                 column_id,
