@@ -1,5 +1,5 @@
 from math import pow
-from typing import Iterable, Any
+from typing import Iterable
 from pathlib import Path
 
 from htmltools import tags
