@@ -53,7 +53,7 @@ class NotebookGenerator(AbstractGenerator):
         outputs_expression = (
             "{"
             + ",".join(
-                self._make_report_kv(name, plan[0].analysis_type)
+                self._make_report_kv(name, plan[0].analysis_name)
                 for name, plan in self.analysis_plan.columns.items()
             )
             + "}"

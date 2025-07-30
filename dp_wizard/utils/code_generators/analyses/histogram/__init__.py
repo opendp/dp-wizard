@@ -1,8 +1,9 @@
 from dp_wizard import opendp_version
 from dp_wizard.utils.code_template import Template
+from dp_wizard.types import AnalysisName
 
 
-name = "Histogram"
+name = AnalysisName("Histogram")
 blurb_md = """
 Choosing a smaller number of bins will conserve your
 privacy budget and give you more accurate counts.

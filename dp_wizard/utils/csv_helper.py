@@ -9,6 +9,7 @@ We'll use the following terms consistently throughout the application:
 import re
 import polars as pl
 from pathlib import Path
+from dp_wizard.types import ColumnName
 
 
 def read_csv_names(csv_path: Path):
@@ -19,7 +20,7 @@ def read_csv_names(csv_path: Path):
     # > Determining the column names of a LazyFrame requires
     # > resolving its schema, which is a potentially expensive operation.
     lf = pl.scan_csv(csv_path)
-    return lf.collect_schema().names()
+    return [ColumnName(name) for name in lf.collect_schema().names()]
 
 
 def get_csv_names_mismatch(public_csv_path: Path, private_csv_path: Path):
@@ -35,7 +36,7 @@ def get_csv_row_count(csv_path: Path):
     return lf.select(pl.len()).collect().item()
 
 
-def id_labels_dict_from_names(names: list[str]):
+def id_labels_dict_from_names(names: list[ColumnName]):
     """
     >>> id_labels_dict_from_names(["abc"])
     {'...': '1: abc'}
@@ -45,7 +46,7 @@ def id_labels_dict_from_names(names: list[str]):
     }
 
 
-def id_names_dict_from_names(names: list[str]):
+def id_names_dict_from_names(names: list[ColumnName]):
     """
     >>> id_names_dict_from_names(["abc"])
     {'...': 'abc'}
@@ -53,7 +54,7 @@ def id_names_dict_from_names(names: list[str]):
     return {name_to_id(name): name for name in names}
 
 
-def name_to_id(name: str):
+def name_to_id(name: ColumnName):
     """
     >>> import re
     >>> assert re.match(r'^[_0-9]+$', name_to_id('xyz'))
@@ -63,7 +64,7 @@ def name_to_id(name: str):
     return str(hash(name)).replace("-", "_")
 
 
-def name_to_identifier(name: str):
+def name_to_identifier(name: ColumnName):
     """
     >>> name_to_identifier("Does this work?!")
     'does_this_work_'

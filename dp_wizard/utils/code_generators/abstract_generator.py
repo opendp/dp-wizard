@@ -104,7 +104,7 @@ class AbstractGenerator(ABC):
         return {
             name: make_column_config_block(
                 name=name,
-                analysis_type=col[0].analysis_type,
+                analysis_name=col[0].analysis_name,
                 lower_bound=col[0].lower_bound,
                 upper_bound=col[0].upper_bound,
                 bin_count=col[0].bin_count,
@@ -134,7 +134,7 @@ class AbstractGenerator(ABC):
 
         from dp_wizard.utils.code_generators.analyses import get_analysis_by_name
 
-        analysis = get_analysis_by_name(plan[0].analysis_type)
+        analysis = get_analysis_by_name(plan[0].analysis_name)
         query = analysis.make_query(
             code_gen=self,
             identifier=identifier,
@@ -182,14 +182,14 @@ class AbstractGenerator(ABC):
         bin_column_names = [
             name_to_identifier(name)
             for name, plan in self.analysis_plan.columns.items()
-            if get_analysis_by_name(plan[0].analysis_type).has_bins
+            if get_analysis_by_name(plan[0].analysis_name).has_bins
         ]
 
         privacy_unit_block = make_privacy_unit_block(self.analysis_plan.contributions)
         privacy_loss_block = make_privacy_loss_block(self.analysis_plan.epsilon)
 
         is_just_histograms = all(
-            plan_column[0].analysis_type == histogram.name
+            plan_column[0].analysis_name == histogram.name
             for plan_column in self.analysis_plan.columns.values()
         )
         margins_list = (
@@ -205,7 +205,7 @@ class AbstractGenerator(ABC):
             [
                 f"{name_to_identifier(name)}_bin_expr"
                 for name, plan in self.analysis_plan.columns.items()
-                if get_analysis_by_name(plan[0].analysis_type).has_bins
+                if get_analysis_by_name(plan[0].analysis_name).has_bins
             ]
         )
         return (
