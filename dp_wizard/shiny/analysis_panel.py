@@ -20,6 +20,7 @@ from dp_wizard.shiny.components.outputs import (
     info_md_box,
 )
 from dp_wizard.utils.code_generators import make_privacy_loss_block
+from dp_wizard.types import AnalysisName
 
 
 def analysis_ui():
@@ -109,7 +110,7 @@ def analysis_server(
     column_names: reactive.Value[list[str]],
     contributions: reactive.Value[int],
     is_demo: bool,
-    analysis_types: reactive.Value[dict[str, str]],
+    analysis_types: reactive.Value[dict[str, AnalysisName]],
     analysis_errors: reactive.Value[dict[str, bool]],
     lower_bounds: reactive.Value[dict[str, float]],
     upper_bounds: reactive.Value[dict[str, float]],
