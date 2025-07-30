@@ -20,7 +20,7 @@ from dp_wizard.shiny.components.outputs import (
     info_md_box,
 )
 from dp_wizard.utils.code_generators import make_privacy_loss_block
-from dp_wizard.types import AnalysisName
+from dp_wizard.types import AnalysisName, ColumnName
 
 
 def analysis_ui():
@@ -91,7 +91,7 @@ def analysis_ui():
 
 
 def _cleanup_reactive_dict(
-    reactive_dict: reactive.Value[dict[str, Any]], keys_to_keep: Iterable[str]
+    reactive_dict: reactive.Value[dict], keys_to_keep: Iterable[str]
 ):  # pragma: no cover
     reactive_dict_copy = {**reactive_dict()}
     keys_to_del = set(reactive_dict_copy.keys()) - set(keys_to_keep)
@@ -107,16 +107,16 @@ def analysis_server(
     released: reactive.Value[bool],
     public_csv_path: reactive.Value[str],
     # private_csv_path is not needed, since we have the column_names.
-    column_names: reactive.Value[list[str]],
+    column_names: reactive.Value[list[ColumnName]],
     contributions: reactive.Value[int],
     is_demo: bool,
-    analysis_types: reactive.Value[dict[str, AnalysisName]],
-    analysis_errors: reactive.Value[dict[str, bool]],
-    lower_bounds: reactive.Value[dict[str, float]],
-    upper_bounds: reactive.Value[dict[str, float]],
-    bin_counts: reactive.Value[dict[str, int]],
-    groups: reactive.Value[list[str]],
-    weights: reactive.Value[dict[str, str]],
+    analysis_types: reactive.Value[dict[ColumnName, AnalysisName]],
+    analysis_errors: reactive.Value[dict[ColumnName, bool]],
+    lower_bounds: reactive.Value[dict[ColumnName, float]],
+    upper_bounds: reactive.Value[dict[ColumnName, float]],
+    bin_counts: reactive.Value[dict[ColumnName, int]],
+    groups: reactive.Value[list[ColumnName]],
+    weights: reactive.Value[dict[ColumnName, str]],
     epsilon: reactive.Value[float],
 ):  # pragma: no cover
     @reactive.calc

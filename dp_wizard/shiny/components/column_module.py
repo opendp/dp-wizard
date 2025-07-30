@@ -24,7 +24,7 @@ from dp_wizard.shiny.components.outputs import (
 )
 from dp_wizard.utils.dp_helper import confidence
 from dp_wizard.utils.mock_data import mock_data, ColumnDef
-from dp_wizard.types import AnalysisName
+from dp_wizard.types import AnalysisName, ColumnName
 
 
 default_analysis_type = histogram.name
@@ -127,17 +127,17 @@ def column_server(
     output: Outputs,
     session: Session,
     public_csv_path: str,
-    name: str,
+    name: ColumnName,
     contributions: reactive.Value[int],
     epsilon: reactive.Value[float],
     row_count: int,
-    groups: reactive.Value[list[str]],
-    analysis_types: reactive.Value[dict[str, AnalysisName]],
-    analysis_errors: reactive.Value[dict[str, bool]],
-    lower_bounds: reactive.Value[dict[str, float]],
-    upper_bounds: reactive.Value[dict[str, float]],
-    bin_counts: reactive.Value[dict[str, int]],
-    weights: reactive.Value[dict[str, str]],
+    groups: reactive.Value[list[ColumnName]],
+    analysis_types: reactive.Value[dict[ColumnName, AnalysisName]],
+    analysis_errors: reactive.Value[dict[ColumnName, bool]],
+    lower_bounds: reactive.Value[dict[ColumnName, float]],
+    upper_bounds: reactive.Value[dict[ColumnName, float]],
+    bin_counts: reactive.Value[dict[ColumnName, int]],
+    weights: reactive.Value[dict[ColumnName, str]],
     is_demo: bool,
     is_single_column: bool,
 ):  # pragma: no cover

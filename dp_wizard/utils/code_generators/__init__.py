@@ -3,7 +3,7 @@ import re
 
 from dp_wizard import opendp_version
 from dp_wizard.utils.code_template import Template
-from dp_wizard.types import AnalysisName
+from dp_wizard.types import AnalysisName, ColumnName
 
 
 class AnalysisPlanColumn(NamedTuple):
@@ -18,8 +18,8 @@ class AnalysisPlan(NamedTuple):
     csv_path: Optional[str]
     contributions: int
     epsilon: float
-    groups: list[str]
-    columns: dict[str, list[AnalysisPlanColumn]]
+    groups: list[ColumnName]
+    columns: dict[ColumnName, list[AnalysisPlanColumn]]
 
     def __str__(self):
         return ", ".join(f"{k} {v[0].analysis_name}" for k, v in self.columns.items())
