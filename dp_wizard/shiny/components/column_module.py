@@ -275,7 +275,7 @@ def column_server(
                 width=label_width,
             )
 
-        name = input.analysis_type()
+        analysis_name = input.analysis_type()
 
         # Had trouble with locals() inside comprehension in Python 3.10.
         # Not sure if this is the exact issue:
@@ -283,7 +283,7 @@ def column_server(
 
         # Fix is just to keep it outside the comprehension.
         local_variables = locals()
-        input_names = get_analysis_by_name(name).input_names
+        input_names = get_analysis_by_name(analysis_name).input_names
         input_functions = [local_variables[input_name] for input_name in input_names]
         with reactive.isolate():
             inputs = [input_function() for input_function in input_functions] + [
@@ -292,7 +292,7 @@ def column_server(
 
         return ui.layout_columns(
             inputs,
-            ui.output_ui(f"{name.lower()}_preview_ui"),
+            ui.output_ui(f"{analysis_name.lower()}_preview_ui"),
             col_widths=col_widths,  # type: ignore
         )
 
@@ -365,7 +365,7 @@ def column_server(
     def column_code():
         return make_column_config_block(
             name=name,
-            analysis_type=input.analysis_type(),
+            analysis_name=input.analysis_type(),
             lower_bound=float(input.lower_bound()),
             upper_bound=float(input.upper_bound()),
             bin_count=int(input.bins()),

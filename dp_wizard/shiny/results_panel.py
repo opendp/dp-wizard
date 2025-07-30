@@ -22,6 +22,7 @@ from dp_wizard.shiny.components.outputs import (
     hide_if,
     info_md_box,
 )
+from dp_wizard.types import AnalysisName
 
 
 wait_message = "Please wait."
@@ -97,7 +98,7 @@ def results_server(
     public_csv_path: reactive.Value[str],
     private_csv_path: reactive.Value[str],
     contributions: reactive.Value[int],
-    analysis_types: reactive.Value[dict[str, str]],
+    analysis_types: reactive.Value[dict[str, AnalysisName]],
     lower_bounds: reactive.Value[dict[str, float]],
     upper_bounds: reactive.Value[dict[str, float]],
     bin_counts: reactive.Value[dict[str, int]],
@@ -244,7 +245,7 @@ def results_server(
         columns = {
             col: [
                 AnalysisPlanColumn(
-                    analysis_type=analysis_types()[col],
+                    analysis_name=analysis_types()[col],
                     lower_bound=lower_bounds()[col],
                     upper_bound=upper_bounds()[col],
                     bin_count=int(bin_counts()[col]),

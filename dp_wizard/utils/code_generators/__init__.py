@@ -3,10 +3,11 @@ import re
 
 from dp_wizard import opendp_version
 from dp_wizard.utils.code_template import Template
+from dp_wizard.types import AnalysisName
 
 
 class AnalysisPlanColumn(NamedTuple):
-    analysis_type: str
+    analysis_name: AnalysisName
     lower_bound: float
     upper_bound: float
     bin_count: int
@@ -21,7 +22,7 @@ class AnalysisPlan(NamedTuple):
     columns: dict[str, list[AnalysisPlanColumn]]
 
     def __str__(self):
-        return ", ".join(f"{k} {v[0].analysis_type}" for k, v in self.columns.items())
+        return ", ".join(f"{k} {v[0].analysis_name}" for k, v in self.columns.items())
 
 
 # Public functions used to generate code snippets in the UI;
@@ -68,14 +69,14 @@ def make_privacy_loss_block(epsilon: float):
 
 def make_column_config_block(
     name: str,
-    analysis_type: str,
+    analysis_name: AnalysisName,
     lower_bound: float,
     upper_bound: float,
     bin_count: int,
 ):
     from dp_wizard.utils.code_generators.analyses import get_analysis_by_name
 
-    return get_analysis_by_name(analysis_type).make_column_config_block(
+    return get_analysis_by_name(analysis_name).make_column_config_block(
         column_name=name,
         lower_bound=lower_bound,
         upper_bound=upper_bound,

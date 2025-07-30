@@ -1,0 +1,2 @@
+class AnalysisName(str):
+    pass
