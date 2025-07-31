@@ -1,4 +1,4 @@
-from dp_wizard.utils.shared import df_to_columns
+from dp_wizard.utils.shared import df_to_columns, plot_bars
 import polars as pl
 
 
@@ -55,3 +55,22 @@ def test_no_rows_df_to_columns():
         tuple(),
         tuple(),
     )
+
+
+def test_plot_bars():
+    # TODO: This test should be stronger, but wait until we move to plotly.
+    # https://github.com/opendp/dp-wizard/issues/552
+    plot_bars(
+        df=pl.DataFrame(
+            {
+                "x": ["a", "b", "c"],
+                "y": [0, 20, 10],
+            }
+        ),
+        error=10,
+        cutoff=0,
+        title="Testing 123",
+    )
+    import matplotlib.pyplot as plt
+
+    plt.close()
