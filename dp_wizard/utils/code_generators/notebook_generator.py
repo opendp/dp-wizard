@@ -1,7 +1,7 @@
 from dp_wizard.utils.code_generators.abstract_generator import AbstractGenerator
 from dp_wizard.utils.code_template import Template
-from dp_wizard.utils.csv_helper import name_to_identifier
 from dp_wizard.utils.dp_helper import confidence
+from dp_wizard.types import ColumnIdentifier
 
 
 from pathlib import Path
@@ -46,7 +46,7 @@ class NotebookGenerator(AbstractGenerator):
 
         analysis = get_analysis_by_name(analysis_type)
         return analysis.make_report_kv(
-            name=name, confidence=confidence, identifier=name_to_identifier(name)
+            name=name, confidence=confidence, identifier=ColumnIdentifier(name)
         )
 
     def _make_extra_blocks(self):

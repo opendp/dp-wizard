@@ -9,8 +9,8 @@ from dp_wizard.utils.code_generators import (
 )
 from dp_wizard.utils.code_generators.analyses import histogram
 from dp_wizard.utils.code_template import Template
-from dp_wizard.utils.csv_helper import name_to_identifier
 from dp_wizard.utils.dp_helper import confidence
+from dp_wizard.types import ColumnIdentifier
 
 
 import black
@@ -128,7 +128,7 @@ class AbstractGenerator(ABC):
 
     def _make_query(self, column_name):
         plan = self.analysis_plan.columns[column_name]
-        identifier = name_to_identifier(column_name)
+        identifier = ColumnIdentifier(column_name)
         accuracy_name = f"{identifier}_accuracy"
         stats_name = f"{identifier}_stats"
 
@@ -180,7 +180,7 @@ class AbstractGenerator(ABC):
         from dp_wizard.utils.code_generators.analyses import get_analysis_by_name
 
         bin_column_names = [
-            name_to_identifier(name)
+            ColumnIdentifier(name)
             for name, plan in self.analysis_plan.columns.items()
             if get_analysis_by_name(plan[0].analysis_name).has_bins
         ]
@@ -203,7 +203,7 @@ class AbstractGenerator(ABC):
         )
         extra_columns = ", ".join(
             [
-                f"{name_to_identifier(name)}_bin_expr"
+                f"{ColumnIdentifier(name)}_bin_expr"
                 for name, plan in self.analysis_plan.columns.items()
                 if get_analysis_by_name(plan[0].analysis_name).has_bins
             ]
