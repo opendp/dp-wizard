@@ -36,7 +36,7 @@ def id_labels_dict_from_names(names: list[ColumnName]) -> dict[ColumnId, ColumnL
     {'...': '1: abc'}
     """
     return {
-        name_to_id(name): ColumnLabel(f"{i+1}: {name or '[blank]'}")
+        ColumnId(name): ColumnLabel(f"{i+1}: {name or '[blank]'}")
         for i, name in enumerate(names)
     }
 
@@ -46,17 +46,7 @@ def id_names_dict_from_names(names: list[ColumnName]) -> dict[ColumnId, ColumnNa
     >>> id_names_dict_from_names(["abc"])
     {'...': 'abc'}
     """
-    return {name_to_id(name): name for name in names}
-
-
-def name_to_id(name: ColumnName) -> ColumnId:
-    """
-    >>> import re
-    >>> assert re.match(r'^[_0-9]+$', name_to_id('xyz'))
-    """
-    # Shiny is fussy about module IDs,
-    # but we don't need them to be human readable.
-    return ColumnId(str(hash(name)).replace("-", "_"))
+    return {ColumnId(name): name for name in names}
 
 
 def name_to_identifier(name: ColumnName) -> ColumnIdentifier:

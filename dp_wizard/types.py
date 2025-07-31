@@ -25,9 +25,17 @@ class ColumnLabel(str):
 class ColumnId(str):
     """
     The opaque string we pass as a module ID.
+
+    If we just sanitize the user string, it might collide with another string.
+    Hashing is safer, though hash collisions are not impossible.
+
+    >>> import re
+    >>> assert re.match(r'^[_0-9]+$', ColumnId('xyz'))
     """
 
-    pass
+    def __new__(cls, content):
+        id = str(hash(content)).replace("-", "_")
+        return str.__new__(cls, id)
 
 
 class ColumnIdentifier(str):
