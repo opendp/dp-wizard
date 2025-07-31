@@ -204,6 +204,9 @@ plans = [
 @pytest.mark.parametrize("plan", plans, ids=id_for_plan)
 def test_make_notebook(plan):
     notebook = NotebookGenerator(plan).make_py()
+
+    assert "no cover" not in notebook
+
     print(number_lines(notebook))
     globals = {}
     exec(notebook, globals)
@@ -218,6 +221,8 @@ def test_make_script(plan):
     # https://jupytext.readthedocs.io/en/latest/formats-scripts.html#the-light-format
     assert "# -" not in script
     assert "# +" not in script
+
+    assert "no cover" not in script
 
     with NamedTemporaryFile(mode="w") as fp:
         fp.write(script)

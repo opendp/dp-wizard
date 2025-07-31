@@ -61,9 +61,7 @@ def df_to_columns(df: DataFrame):
     return transposed if transposed else (tuple(), tuple())
 
 
-def plot_bars(
-    df: DataFrame, error: float, cutoff: float, title: str
-):  # pragma: no cover
+def plot_bars(df: DataFrame, error: float, cutoff: float, title: str):
     """
     Given a Dataframe, make a bar plot of the data in the last column,
     with labels from the prior columns.
