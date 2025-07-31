@@ -1,3 +1,6 @@
+import re
+
+
 class AnalysisName(str):
     """
     A name like "Histogram" or "Mean".
@@ -26,8 +29,8 @@ class ColumnId(str):
     """
     The opaque string we pass as a module ID.
 
-    If we just sanitize the user string, it might collide with another string.
-    Hashing is safer, though hash collisions are not impossible.
+    If we just sanitize the user string, it might collide with another user string.
+    Hashing is safer, although hash collisions are not impossible.
 
     >>> import re
     >>> assert re.match(r'^[_0-9]+$', ColumnId('xyz'))
@@ -41,6 +44,11 @@ class ColumnId(str):
 class ColumnIdentifier(str):
     """
     A human-readable form that is a valid Python identifier.
+
+    >>> ColumnIdentifier("Does this work?!")
+    'does_this_work_'
     """
 
-    pass
+    def __new__(cls, content):
+        identifier = re.sub(r"\W+", "_", content).lower()
+        return str.__new__(cls, identifier)

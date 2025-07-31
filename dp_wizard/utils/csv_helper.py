@@ -1,7 +1,6 @@
-import re
 import polars as pl
 from pathlib import Path
-from dp_wizard.types import ColumnName, ColumnId, ColumnLabel, ColumnIdentifier
+from dp_wizard.types import ColumnName, ColumnId, ColumnLabel
 
 
 def read_csv_names(csv_path: Path) -> list[ColumnName]:
@@ -47,11 +46,3 @@ def id_names_dict_from_names(names: list[ColumnName]) -> dict[ColumnId, ColumnNa
     {'...': 'abc'}
     """
     return {ColumnId(name): name for name in names}
-
-
-def name_to_identifier(name: ColumnName) -> ColumnIdentifier:
-    """
-    >>> name_to_identifier("Does this work?!")
-    'does_this_work_'
-    """
-    return ColumnIdentifier(re.sub(r"\W+", "_", name).lower())
