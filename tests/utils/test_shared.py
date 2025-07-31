@@ -71,3 +71,6 @@ def test_plot_bars():
         cutoff=0,
         title="Testing 123",
     )
+    import matplotlib.pyplot as plt
+
+    plt.close()
