@@ -243,8 +243,10 @@ soupsieve==2.6
     # via beautifulsoup4
 stack-data==0.6.3
     # via ipython
-starlette==0.46.2
-    # via shiny
+starlette==0.47.2
+    # via
+    #   -r requirements.in
+    #   shiny
 threadpoolctl==3.6.0
     # via scikit-learn
 tinycss2==1.4.0
@@ -281,6 +283,7 @@ typing-extensions==4.13.2
     #   mistune
     #   referencing
     #   shiny
+    #   starlette
     #   uvicorn
 uc-micro-py==1.0.3
     # via linkify-it-py
