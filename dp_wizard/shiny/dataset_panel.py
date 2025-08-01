@@ -358,7 +358,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                         "min_rows",
                         None,
                         min_rows(),
-                        min=1,
+                        min=100,
                     ),
                     [],  # column placeholder
                     col_widths=col_widths,  # type: ignore
