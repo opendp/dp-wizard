@@ -47,6 +47,8 @@ def test_cloud_app(page: Page, cloud_app: ShinyAppProc):  # pragma: no cover
         page.get_by_role("link", name="Download Notebook (unexecuted").click()
 
     download_path = download_info.value.path()
+
+    # Try to execute the downloaded file:
     # Based on https://nbconvert.readthedocs.io/en/latest/execute_api.html#example
     nb = nbformat.read(download_path.open(), as_version=4)
     ep = ExecutePreprocessor(timeout=600, kernel_name="python3")
