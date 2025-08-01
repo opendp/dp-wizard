@@ -105,6 +105,7 @@ def results_server(
     weights: reactive.Value[dict[str, str]],
     epsilon: reactive.Value[float],
     min_rows: reactive.Value[int],
+    max_rows: reactive.Value[int],
 ):  # pragma: no cover
 
     @render.ui
@@ -260,6 +261,7 @@ def results_server(
             contributions=contributions(),
             epsilon=epsilon(),
             min_rows=min_rows(),
+            max_rows=max_rows(),
             groups=groups(),
             columns=columns,
         )

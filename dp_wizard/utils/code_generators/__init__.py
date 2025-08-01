@@ -18,6 +18,7 @@ class AnalysisPlan(NamedTuple):
     contributions: int
     epsilon: float
     min_rows: int
+    max_rows: int
     groups: list[str]
     columns: dict[str, list[AnalysisPlanColumn]]
 

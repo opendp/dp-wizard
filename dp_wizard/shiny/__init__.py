@@ -232,6 +232,7 @@ def make_server_from_cli_info(cli_info: CLIInfo):
             weights=weights,
             epsilon=epsilon,
             min_rows=min_rows,
+            max_rows=max_rows,
         )
         session.on_ended(ctrl_c_reminder)
 

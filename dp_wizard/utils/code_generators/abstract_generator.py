@@ -73,7 +73,12 @@ class AbstractGenerator(ABC):
         # Line length determined by PDF rendering.
         return black.format_str(code, mode=black.Mode(line_length=74))  # type: ignore
 
-    def _make_margins_list(self, bin_names: Iterable[str], groups: Iterable[str]):
+    def _make_margins_list(
+        self,
+        bin_names: Iterable[str],
+        groups: Iterable[str],
+        max_rows: int,
+    ):
         groups_str = ", ".join(f"'{g}'" for g in groups)
         margins = (
             [
@@ -84,7 +89,7 @@ class AbstractGenerator(ABC):
             #
             # In production, "max_num_partitions" should be set by considering the number
             # of possible values for each grouping column, and taking their product.
-            dp.polars.Margin(by=[{groups_str}], public_info='keys', max_partition_length=1000000, max_num_partitions=100),
+            dp.polars.Margin(by=[{groups_str}], public_info='keys', max_partition_length={max_rows}, max_num_partitions=100),
             """  # noqa: B950 (too long!)
             ]
             + [
@@ -200,8 +205,9 @@ class AbstractGenerator(ABC):
             "[]"
             if is_just_histograms
             else self._make_margins_list(
-                [f"{name}_bin" for name in bin_column_names],
-                self.analysis_plan.groups,
+                bin_names=[f"{name}_bin" for name in bin_column_names],
+                groups=self.analysis_plan.groups,
+                max_rows=self.analysis_plan.max_rows,
             )
         )
         extra_columns = ", ".join(
