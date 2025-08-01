@@ -171,7 +171,7 @@ def make_server_from_cli_info(cli_info: CLIInfo):
         weights = reactive.value({})
         epsilon = reactive.value(1.0)
         released = reactive.value(False)
-        min_rows = reactive.value(0)
+        min_rows = reactive.value(1)
         max_rows = reactive.value(10_000_000_000)
 
         about_panel.about_server(
@@ -212,6 +212,7 @@ def make_server_from_cli_info(cli_info: CLIInfo):
             groups=groups,
             weights=weights,
             epsilon=epsilon,
+            min_rows=min_rows,
         )
         results_panel.results_server(
             input,
@@ -230,6 +231,7 @@ def make_server_from_cli_info(cli_info: CLIInfo):
             groups=groups,
             weights=weights,
             epsilon=epsilon,
+            min_rows=min_rows,
         )
         session.on_ended(ctrl_c_reminder)
 

@@ -329,6 +329,16 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             """,
         )
 
+    @reactive.effect
+    @reactive.event(input.min_rows)
+    def _on_min_rows_change():
+        min_rows.set(input.min_rows())
+
+    @reactive.effect
+    @reactive.event(input.max_rows)
+    def _on_max_rows_change():
+        max_rows.set(input.max_rows())
+
     @render.ui
     def row_count_bounds_ui():
         return (
@@ -336,38 +346,40 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 ui.card_header("Row Count Bounds"),
                 ui.markdown(
                     """
-                What is a **lower bound on the row count** in your CSV?
-                The type of differential privacy used by DP Wizard has a very small,
-                but non-negative probability of releasing information in the clear.
-                With fewer rows, more noise needs to be added.
-            """
+                    What is a **lower bound on row count** in your CSV?
+                    The type of differential privacy used by DP Wizard has a
+                    very small, but non-negative probability of releasing
+                    information in the clear. With fewer rows, more noise
+                    needs to be added.
+                    """
                 ),
                 ui.layout_columns(
                     ui.input_numeric(
                         "min_rows",
                         None,
                         min_rows(),
-                        min=0,
+                        min=1,
                     ),
                     [],  # column placeholder
                     col_widths=col_widths,  # type: ignore
                 ),
                 ui.markdown(
                     """
-                We also need an **upper bound on the row count** in your CSV.
-                This is more subtle: Floating point numbers on computers do not have
-                infinite precision. For very large datasets, this accumulated difference
-                between the "real numbers" of mathematics and the floating point numbers
-                on computers make a difference. This upper bound is used to add enough noise
-                to account for that difference.
-            """
+                    We also need an **upper bound on row count** in your CSV.
+                    This is more subtle: Floating point numbers on computers
+                    do not have infinite precision. For very large datasets,
+                    this accumulated difference between the "real numbers" of
+                    mathematics and the floating point numbers on computers
+                    make a difference. This upper bound is used to add enough
+                    noise to account for that difference.
+                    """
                 ),
                 ui.layout_columns(
                     ui.input_numeric(
                         "max_rows",
                         None,
                         max_rows(),
-                        min=0,
+                        min=1,
                     ),
                     [],  # column placeholder
                     col_widths=col_widths,  # type: ignore

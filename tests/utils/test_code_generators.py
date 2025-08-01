@@ -181,6 +181,7 @@ plans = [
         contributions=contributions,
         csv_path=abc_csv,
         epsilon=1,
+        min_rows=1000,
     )
     for contributions in [1, 10]
     for groups in [[], ["A"]]

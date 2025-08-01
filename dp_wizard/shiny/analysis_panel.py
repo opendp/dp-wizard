@@ -117,6 +117,7 @@ def analysis_server(
     groups: reactive.Value[list[str]],
     weights: reactive.Value[dict[str, str]],
     epsilon: reactive.Value[float],
+    min_rows: reactive.Value[int],
 ):  # pragma: no cover
     @reactive.calc
     def button_enabled():
@@ -299,7 +300,7 @@ def analysis_server(
 
     @render.code
     def privacy_loss_python():
-        return make_privacy_loss_block(epsilon())
+        return make_privacy_loss_block(epsilon=epsilon(), min_rows=min_rows())
 
     @reactive.effect
     @reactive.event(input.go_to_results)

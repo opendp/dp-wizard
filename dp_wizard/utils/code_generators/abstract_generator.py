@@ -186,7 +186,10 @@ class AbstractGenerator(ABC):
         ]
 
         privacy_unit_block = make_privacy_unit_block(self.analysis_plan.contributions)
-        privacy_loss_block = make_privacy_loss_block(self.analysis_plan.epsilon)
+        privacy_loss_block = make_privacy_loss_block(
+            epsilon=self.analysis_plan.epsilon,
+            min_rows=self.analysis_plan.min_rows,
+        )
 
         is_just_histograms = all(
             plan_column[0].analysis_type == histogram.name

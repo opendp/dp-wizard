@@ -17,6 +17,7 @@ class AnalysisPlan(NamedTuple):
     csv_path: Optional[str]
     contributions: int
     epsilon: float
+    min_rows: int
     groups: list[str]
     columns: dict[str, list[AnalysisPlanColumn]]
 
@@ -38,16 +39,16 @@ def make_privacy_unit_block(contributions: int):
     return Template(template).fill_values(CONTRIBUTIONS=contributions).finish()
 
 
-def make_privacy_loss_block(epsilon: float):
+def make_privacy_loss_block(epsilon: float, min_rows: int):
     import opendp.prelude as dp
 
-    def template(EPSILON, OPENDP_VERSION):
+    def template(EPSILON, MIN_ROWS, OPENDP_VERSION):
         privacy_loss = dp.loss_of(  # noqa: F841
             # Your privacy budget is captured in the "epsilon" parameter.
             # Larger values increase the risk that personal data could be reconstructed,
             # so choose the smallest value that gives you the needed accuracy.
             # You can also compare your budget to other projects:
-            # https://registry.oblivious.com/#public-dp
+            # https://registry.opendp.org/
             epsilon=EPSILON,
             # There are many models of differential privacy.
             # Pure DP only requires an epsilon parameter.
@@ -55,13 +56,13 @@ def make_privacy_loss_block(epsilon: float):
             # that data may be released in the clear.
             # Delta should be smaller than 1/(population size).
             # https://docs.opendp.org/en/OPENDP_VERSION/getting-started/tabular-data/grouping.html#Stable-Keys
-            delta=1e-7,
+            delta=1 / MIN_ROWS,
         )
 
     return (
         Template(template)
         .fill_expressions(OPENDP_VERSION=opendp_version)
-        .fill_values(EPSILON=epsilon)
+        .fill_values(EPSILON=epsilon, MIN_ROWS=min_rows)
         .finish()
     )
 
