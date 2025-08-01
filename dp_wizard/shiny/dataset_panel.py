@@ -30,7 +30,7 @@ def dataset_ui():
         ui.output_ui("dataset_release_warning_ui"),
         ui.output_ui("csv_or_columns_ui"),
         ui.card(
-            ui.card_header("Unit of privacy"),
+            ui.card_header("Unit of Privacy"),
             ui.output_ui("input_entity_ui"),
             ui.output_ui("input_contributions_ui"),
             ui.output_ui("contributions_validation_ui"),
@@ -39,6 +39,7 @@ def dataset_ui():
                 "unit_of_privacy_python",
             ),
         ),
+        ui.output_ui("row_count_bounds_ui"),
         ui.output_ui("define_analysis_button_ui"),
         value="dataset_panel",
     )
@@ -57,6 +58,8 @@ def dataset_server(
     private_csv_path: reactive.Value[str],
     column_names: reactive.Value[list[str]],
     contributions: reactive.Value[int],
+    min_rows: reactive.Value[int],
+    max_rows: reactive.Value[int],
 ):  # pragma: no cover
     @reactive.effect
     @reactive.event(input.public_csv_path)
@@ -235,7 +238,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
         return [
             ui.markdown(
                 """
-                First, what is the entity whose privacy you want to protect?
+                First, what is the **entity** whose privacy you want to protect?
                 """
             ),
             ui.layout_columns(
@@ -261,7 +264,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
         return [
             ui.markdown(
                 f"""
-                How many rows of the CSV can each {entity} contribute to?
+                How many **rows** of the CSV can each {entity} contribute to?
                 This is the "unit of privacy" which will be protected.
                 """
             ),
@@ -284,6 +287,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                     contributions(),
                     min=1,
                 ),
+                [],  # Column placeholder
                 col_widths=col_widths,  # type: ignore
             ),
         ]
@@ -323,6 +327,52 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             OpenDP Library, and at the end you can download
             a notebook for the entire calculation.
             """,
+        )
+
+    @render.ui
+    def row_count_bounds_ui():
+        return (
+            ui.card(
+                ui.card_header("Row Count Bounds"),
+                ui.markdown(
+                    """
+                What is a **lower bound on the row count** in your CSV?
+                The type of differential privacy used by DP Wizard has a very small,
+                but non-negative probability of releasing information in the clear.
+                With fewer rows, more noise needs to be added.
+            """
+                ),
+                ui.layout_columns(
+                    ui.input_numeric(
+                        "min_rows",
+                        None,
+                        min_rows(),
+                        min=0,
+                    ),
+                    [],  # column placeholder
+                    col_widths=col_widths,  # type: ignore
+                ),
+                ui.markdown(
+                    """
+                We also need an **upper bound on the row count** in your CSV.
+                This is more subtle: Floating point numbers on computers do not have
+                infinite precision. For very large datasets, this accumulated difference
+                between the "real numbers" of mathematics and the floating point numbers
+                on computers make a difference. This upper bound is used to add enough noise
+                to account for that difference.
+            """
+                ),
+                ui.layout_columns(
+                    ui.input_numeric(
+                        "max_rows",
+                        None,
+                        max_rows(),
+                        min=0,
+                    ),
+                    [],  # column placeholder
+                    col_widths=col_widths,  # type: ignore
+                ),
+            ),
         )
 
     @render.ui

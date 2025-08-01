@@ -171,6 +171,8 @@ def make_server_from_cli_info(cli_info: CLIInfo):
         weights = reactive.value({})
         epsilon = reactive.value(1.0)
         released = reactive.value(False)
+        min_rows = reactive.value(0)
+        max_rows = reactive.value(10_000_000_000)
 
         about_panel.about_server(
             input,
@@ -190,6 +192,8 @@ def make_server_from_cli_info(cli_info: CLIInfo):
             private_csv_path=private_csv_path,
             column_names=column_names,
             contributions=contributions,
+            min_rows=min_rows,
+            max_rows=max_rows,
         )
         analysis_panel.analysis_server(
             input,
