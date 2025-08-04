@@ -33,10 +33,11 @@ def analysis_ui():
                 ui.markdown("Select columns to calculate statistics on."),
                 ui.input_selectize(
                     "columns_selectize",
-                    ["Columns", ui.output_ui("columns_selectize_tooltip_ui")],
+                    "Columns",
                     [],
                     multiple=True,
                 ),
+                ui.output_ui("columns_selectize_tooltip_ui"),
             ),
             ui.card(
                 ui.card_header("Grouping"),
@@ -51,10 +52,11 @@ def analysis_ui():
                 ),
                 ui.input_selectize(
                     "groups_selectize",
-                    ["Group by", ui.output_ui("groups_selectize_tooltip_ui")],
+                    "Group by",
                     [],
                     multiple=True,
                 ),
+                ui.output_ui("groups_selectize_tooltip_ui"),
             ),
             ui.card(
                 ui.card_header("Privacy Budget"),
