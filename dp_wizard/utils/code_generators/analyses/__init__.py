@@ -1,7 +1,7 @@
 from typing import Protocol
 
-from dp_wizard.utils.code_generators.abstract_generator import AbstractGenerator
 from dp_wizard.types import AnalysisName
+from dp_wizard.utils.code_generators.abstract_generator import AbstractGenerator
 
 
 class Analysis(Protocol):  # pragma: no cover
@@ -54,7 +54,7 @@ class Analysis(Protocol):  # pragma: no cover
 
 def get_analysis_by_name(name: AnalysisName) -> Analysis:  # pragma: no cover
     # Avoid circular import:
-    from dp_wizard.utils.code_generators.analyses import histogram, mean, median, count
+    from dp_wizard.utils.code_generators.analyses import count, histogram, mean, median
 
     match name:
         case histogram.name:

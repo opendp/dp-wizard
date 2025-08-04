@@ -1,21 +1,15 @@
-from pathlib import Path
 import csv
 import random
 import re
 from collections import defaultdict
+from pathlib import Path
 
-from shiny import ui, reactive, Inputs, Outputs, Session
+from shiny import Inputs, Outputs, Session, reactive, ui
 
+from dp_wizard.shiny import about_panel, analysis_panel, dataset_panel, results_panel
+from dp_wizard.types import ColumnName
 from dp_wizard.utils.argparse_helpers import CLIInfo
 from dp_wizard.utils.csv_helper import read_csv_names
-from dp_wizard.shiny import (
-    about_panel,
-    analysis_panel,
-    dataset_panel,
-    results_panel,
-)
-from dp_wizard.types import ColumnName
-
 
 app_ui = ui.page_bootstrap(
     ui.head_content(ui.include_css(Path(__file__).parent / "css" / "styles.css")),

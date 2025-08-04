@@ -1,10 +1,10 @@
-import sys
-from pathlib import Path
 import subprocess
+import sys
 import urllib.parse
+from pathlib import Path
 
-from htmltools import tags, HTML
-from shiny import ui, reactive, Inputs, Outputs, Session
+from htmltools import HTML, tags
+from shiny import Inputs, Outputs, Session, reactive, ui
 
 from dp_wizard.shiny.components.outputs import nav_button
 

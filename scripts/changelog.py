@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-import subprocess
 import re
+import subprocess
 from pathlib import Path
-
 
 root_path = Path(__file__).parent.parent
 

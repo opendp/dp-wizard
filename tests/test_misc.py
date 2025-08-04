@@ -1,9 +1,10 @@
-import subprocess
-import pytest
-from pathlib import Path
 import re
-import dp_wizard
+import subprocess
+from pathlib import Path
 
+import pytest
+
+import dp_wizard
 
 tests = {
     "flake8 linting": "flake8 . --count --show-source --statistics",

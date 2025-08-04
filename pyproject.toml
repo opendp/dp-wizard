@@ -46,6 +46,9 @@ Home = "https://github.com/opendp/dp-wizard"
 include = ["dp_wizard"]
 ignore = ["**/no-tests/"]
 
+[tool.isort]
+profile = "black"
+
 [project.optional-dependencies]
 app = [
     "anyio==4.9.0",

@@ -4,10 +4,11 @@
 # but by design they are both simple tools that do one job.
 # TODO: See if pip-tools or poetry can handle this?
 
+from os import chdir
 from pathlib import Path
 from subprocess import check_call
-from os import chdir
-from tomlkit import dumps, parse, array
+
+from tomlkit import array, dumps, parse
 
 
 def echo_check_call(cmd):

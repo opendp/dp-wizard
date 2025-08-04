@@ -1,15 +1,13 @@
-from pathlib import Path
 import re
+from pathlib import Path
 
 import nbformat
 from nbconvert.preprocessors import ExecutePreprocessor
-
-from shiny.run import ShinyAppProc
 from playwright.sync_api import Page, expect
 from shiny.pytest import create_app_fixture
+from shiny.run import ShinyAppProc
 
 from dp_wizard.utils.code_generators.notebook_generator import PLACEHOLDER_CSV_NAME
-
 
 bp = "BREAKPOINT()".lower()
 if bp in Path(__file__).read_text():

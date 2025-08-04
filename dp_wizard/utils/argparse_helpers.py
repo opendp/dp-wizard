@@ -1,6 +1,6 @@
-from sys import argv
-from pathlib import Path
 import argparse
+from pathlib import Path
+from sys import argv
 from typing import NamedTuple
 
 

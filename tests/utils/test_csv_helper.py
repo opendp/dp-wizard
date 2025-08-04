@@ -1,15 +1,12 @@
 import csv
-import polars as pl
-import polars.testing as pl_testing
 import tempfile
-import pytest
-
 from pathlib import Path
 
-from dp_wizard.utils.csv_helper import (
-    get_csv_names_mismatch,
-    get_csv_row_count,
-)
+import polars as pl
+import polars.testing as pl_testing
+import pytest
+
+from dp_wizard.utils.csv_helper import get_csv_names_mismatch, get_csv_row_count
 
 
 def test_get_csv_names_mismatch():

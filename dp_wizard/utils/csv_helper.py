@@ -1,6 +1,8 @@
-import polars as pl
 from pathlib import Path
-from dp_wizard.types import ColumnName, ColumnId, ColumnLabel
+
+import polars as pl
+
+from dp_wizard.types import ColumnId, ColumnLabel, ColumnName
 
 
 def read_csv_names(csv_path: Path) -> list[ColumnName]:

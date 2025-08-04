@@ -1,12 +1,13 @@
-from pathlib import Path
-from tempfile import TemporaryDirectory
-from dataclasses import dataclass
-from sys import executable
-import subprocess
 import json
-import nbformat
-import nbconvert
+import subprocess
+from dataclasses import dataclass
+from pathlib import Path
+from sys import executable
+from tempfile import TemporaryDirectory
+
 import jupytext
+import nbconvert
+import nbformat
 
 
 def _is_kernel_installed() -> bool:
