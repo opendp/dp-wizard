@@ -23,7 +23,7 @@ def demo_help(is_demo: bool, text: str):  # pragma: no cover
     if is_demo:
         return ui.div(
             small(icon_svg("circle-question"), " ", text),
-            class_="alert alert-info p-2",
+            class_="alert alert-info p-2 col-md-8 col-lg-6 col-xl-4",
         )
 
 
