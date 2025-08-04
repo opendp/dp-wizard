@@ -25,13 +25,61 @@ from dp_wizard.types import ColumnName
 dataset_panel_id = "dataset_panel"
 
 
+def get_pos_int_error(number_str, minimum=100):
+    """
+    If the inputs are numeric, I think shiny converts
+    any strings that can't be parsed to numbers into None,
+    so the "should be a number" errors may not be seen in practice.
+    >>> get_pos_int_error('100')
+    >>> get_pos_int_error('0')
+    'should be greater than 100'
+    >>> get_pos_int_error(None)
+    'is required'
+    >>> get_pos_int_error('')
+    'is required'
+    >>> get_pos_int_error('100.1')
+    'should be an integer'
+    """
+    if number_str is None or number_str == "":
+        return "is required"
+    try:
+        number = int(number_str)
+    except (TypeError, ValueError, OverflowError):
+        return "should be an integer"
+    if number < minimum:
+        return f"should be greater than {minimum}"
+    return None
+
+
+def get_row_count_errors(min_rows, max_rows):
+    """
+    >>> get_row_count_errors(100, 200)
+    []
+    >>> get_row_count_errors('abc', 'xyz')
+    ['Lower bound should be an integer.', 'Upper bound should be an integer.']
+    >>> get_row_count_errors(100, None)
+    ['Upper bound is required.']
+    >>> get_row_count_errors(200, 100)
+    ['Lower bound should be less than upper bound.']
+    """
+    messages = []
+    if error := get_pos_int_error(min_rows):
+        messages.append(f"Lower bound {error}.")
+    if error := get_pos_int_error(max_rows):
+        messages.append(f"Upper bound {error}.")
+    if not messages:
+        if not (int(min_rows) <= int(max_rows)):
+            messages.append("Lower bound should be less than upper bound.")
+    return messages
+
+
 def dataset_ui():
     return ui.nav_panel(
         "Select Dataset",
         ui.output_ui("dataset_release_warning_ui"),
         ui.output_ui("csv_or_columns_ui"),
         ui.card(
-            ui.card_header("Unit of privacy"),
+            ui.card_header("Unit of Privacy"),
             ui.output_ui("input_entity_ui"),
             ui.output_ui("input_contributions_ui"),
             ui.output_ui("contributions_validation_ui"),
@@ -40,6 +88,7 @@ def dataset_ui():
                 "unit_of_privacy_python",
             ),
         ),
+        ui.output_ui("row_count_bounds_ui"),
         ui.output_ui("define_analysis_button_ui"),
         value="dataset_panel",
     )
@@ -58,6 +107,8 @@ def dataset_server(
     private_csv_path: reactive.Value[str],
     column_names: reactive.Value[list[ColumnName]],
     contributions: reactive.Value[int],
+    min_rows: reactive.Value[str],
+    max_rows: reactive.Value[str],
 ):  # pragma: no cover
     @reactive.effect
     @reactive.event(input.public_csv_path)
@@ -236,7 +287,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
         return [
             ui.markdown(
                 """
-                First, what is the entity whose privacy you want to protect?
+                First, what is the **entity** whose privacy you want to protect?
                 """
             ),
             ui.layout_columns(
@@ -262,7 +313,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
         return [
             ui.markdown(
                 f"""
-                How many rows of the CSV can each {entity} contribute to?
+                How many **rows** of the CSV can each {entity} contribute to?
                 This is the "unit of privacy" which will be protected.
                 """
             ),
@@ -285,6 +336,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                     contributions(),
                     min=1,
                 ),
+                [],  # Column placeholder
                 col_widths=col_widths,  # type: ignore
             ),
         ]
@@ -298,6 +350,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
     def button_enabled():
         return (
             contributions_valid()
+            and not error_md_calc()
             and len(column_names()) > 0
             and (in_cloud or not csv_column_mismatch_calc())
         )
@@ -326,6 +379,71 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             """,
         )
 
+    @reactive.effect
+    @reactive.event(input.min_rows)
+    def _on_min_rows_change():
+        min_rows.set(input.min_rows())
+
+    @reactive.effect
+    @reactive.event(input.max_rows)
+    def _on_max_rows_change():
+        max_rows.set(input.max_rows())
+
+    @reactive.calc
+    def error_md_calc():
+        return "\n".join(
+            f"- {error}" for error in get_row_count_errors(min_rows(), max_rows())
+        )
+
+    @render.ui
+    def row_count_bounds_ui():
+        error_md = error_md_calc()
+
+        return (
+            ui.card(
+                ui.card_header("Row Count Bounds"),
+                ui.markdown(
+                    """
+                    What is a **lower bound on row count** in your CSV?
+                    The type of differential privacy used by DP Wizard has a
+                    very small, but non-negative probability of releasing
+                    information in the clear. With fewer rows, more noise
+                    needs to be added.
+                    """
+                ),
+                ui.layout_columns(
+                    ui.input_text(
+                        "min_rows",
+                        None,
+                        str(min_rows() or ""),
+                    ),
+                    [],  # column placeholder
+                    col_widths=col_widths,  # type: ignore
+                ),
+                ui.markdown(
+                    """
+                    We also need an **upper bound on row count** in your CSV.
+                    This is more subtle: Floating point numbers on computers
+                    do not have infinite precision. For very large datasets,
+                    this accumulated difference between the "real numbers" of
+                    mathematics and the floating point numbers on computers
+                    makes a difference. This upper bound is used to add enough
+                    noise to account for that difference.
+                    """
+                ),
+                ui.layout_columns(
+                    ui.input_text(
+                        "max_rows",
+                        None,
+                        str(max_rows() or ""),
+                    ),
+                    [],  # column placeholder
+                    col_widths=col_widths,  # type: ignore
+                ),
+                info_md_box(error_md) if error_md else [],
+            ),
+        )
+
     @render.ui
     def define_analysis_button_ui():
         enabled = button_enabled()
@@ -334,11 +452,8 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             return button
         return [
             button,
-            (
-                "Specify columns and the unit of privacy before proceeding."
-                if in_cloud
-                else "Specify CSV and the unit of privacy before proceeding."
-            ),
+            f"Specify {'columns' if in_cloud else 'CSV'}, unit of privacy, "
+            "and row count bounds before proceeding.",
         ]
 
     @render.code
