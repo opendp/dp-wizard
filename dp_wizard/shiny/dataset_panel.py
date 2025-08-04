@@ -24,6 +24,54 @@ from dp_wizard.utils.csv_helper import read_csv_names
 dataset_panel_id = "dataset_panel"
 
 
+def get_pos_int_error(number_str):
+    """
+    If the inputs are numeric, I think shiny converts
+    any strings that can't be parsed to numbers into None,
+    so the "should be a number" errors may not be seen in practice.
+    >>> get_pos_int_error('1')
+    >>> get_pos_int_error('0')
+    'should be greater than zero'
+    >>> get_pos_int_error(None)
+    'is required'
+    >>> get_pos_int_error('')
+    'is required'
+    >>> get_pos_int_error('1.1')
+    'should be an integer'
+    """
+    if number_str is None or number_str == "":
+        return "is required"
+    try:
+        number = int(float(number_str))
+    except (TypeError, ValueError, OverflowError):
+        return "should be an integer"
+    if number <= 0:
+        return "should be greater than 0"
+    return None
+
+
+def get_row_count_errors(min_rows, max_rows):
+    """
+    >>> get_row_count_errors(1, 2)
+    []
+    >>> get_row_count_errors('abc', 'xyz')
+    ['Lower bound should be a number.', 'Upper bound should be a number.']
+    >>> get_row_count_errors(1, None)
+    ['Upper bound is required.']
+    >>> get_row_count_errors(1, 0)
+    ['Lower bound should be less than upper bound.']
+    """
+    messages = []
+    if error := get_pos_int_error(min_rows):
+        messages.append(f"Lower bound {error}.")
+    if error := get_pos_int_error(max_rows):
+        messages.append(f"Upper bound {error}.")
+    if not messages:
+        if not (int(min_rows) <= int(max_rows)):
+            messages.append("Lower bound should be less than upper bound.")
+    return messages
+
+
 def dataset_ui():
     return ui.nav_panel(
         "Select Dataset",
@@ -339,8 +387,16 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
     def _on_max_rows_change():
         max_rows.set(input.max_rows())
 
+    @reactive.calc
+    def error_md_calc():
+        return "\n".join(
+            f"- {error}" for error in get_row_count_errors(min_rows(), max_rows())
+        )
+
     @render.ui
     def row_count_bounds_ui():
+        error_md = error_md_calc()
+
         return (
             ui.card(
                 ui.card_header("Row Count Bounds"),
@@ -354,11 +410,10 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                     """
                 ),
                 ui.layout_columns(
-                    ui.input_numeric(
+                    ui.input_text(
                         "min_rows",
                         None,
-                        min_rows(),
-                        min=100,
+                        str(min_rows()),
                     ),
                     [],  # column placeholder
                     col_widths=col_widths,  # type: ignore
@@ -370,20 +425,20 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                     do not have infinite precision. For very large datasets,
                     this accumulated difference between the "real numbers" of
                     mathematics and the floating point numbers on computers
-                    make a difference. This upper bound is used to add enough
+                    makes a difference. This upper bound is used to add enough
                     noise to account for that difference.
                     """
                 ),
                 ui.layout_columns(
-                    ui.input_numeric(
+                    ui.input_text(
                         "max_rows",
                         None,
-                        max_rows(),
-                        min=1,
+                        str(max_rows()),
                     ),
                     [],  # column placeholder
                     col_widths=col_widths,  # type: ignore
                 ),
+                info_md_box(error_md) if error_md else [],
             ),
         )
 
