@@ -243,7 +243,7 @@ def column_server(
         def lower_bound_input():
             return ui.input_text(
                 "lower_bound",
-                ["Lower Bound", ui.output_ui("bounds_tooltip_ui")],
+                "Lower Bound",
                 str(lower_bounds().get(name, "")),
                 width=label_width,
             )
@@ -259,7 +259,7 @@ def column_server(
         def bin_count_input():
             return ui.input_numeric(
                 "bins",
-                ["Number of Bins", ui.output_ui("bins_tooltip_ui")],
+                "Number of Bins",
                 bin_counts().get(name, 10),
                 width=label_width,
             )
@@ -286,9 +286,11 @@ def column_server(
         input_names = get_analysis_by_name(name).input_names
         input_functions = [local_variables[input_name] for input_name in input_names]
         with reactive.isolate():
-            inputs = [input_function() for input_function in input_functions] + [
-                ui.output_ui("optional_weight_ui")
-            ]
+            inputs = (
+                [ui.output_ui("bounds_tooltip_ui")]
+                + [input_function() for input_function in input_functions]
+                + [ui.output_ui("bins_tooltip_ui"), ui.output_ui("optional_weight_ui")]
+            )
 
         return ui.layout_columns(
             inputs,
@@ -301,7 +303,6 @@ def column_server(
         return demo_help(
             is_demo,
             """
-            We need to clip our inputs to limit sensitivity.
             Don't look at the data when estimating the bounds!
             In this case, we could limit "grade" to values between 50 and 100.
             """,
