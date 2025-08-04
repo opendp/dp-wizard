@@ -1,5 +1,5 @@
 from math import pow
-from typing import Iterable, Any
+from typing import Iterable
 from pathlib import Path
 
 from htmltools import tags
@@ -20,6 +20,7 @@ from dp_wizard.shiny.components.outputs import (
     info_md_box,
 )
 from dp_wizard.utils.code_generators import make_privacy_loss_block
+from dp_wizard.types import AnalysisName, ColumnName
 
 
 def analysis_ui():
@@ -90,7 +91,7 @@ def analysis_ui():
 
 
 def _cleanup_reactive_dict(
-    reactive_dict: reactive.Value[dict[str, Any]], keys_to_keep: Iterable[str]
+    reactive_dict: reactive.Value[dict], keys_to_keep: Iterable[str]
 ):  # pragma: no cover
     reactive_dict_copy = {**reactive_dict()}
     keys_to_del = set(reactive_dict_copy.keys()) - set(keys_to_keep)
@@ -106,16 +107,16 @@ def analysis_server(
     released: reactive.Value[bool],
     public_csv_path: reactive.Value[str],
     # private_csv_path is not needed, since we have the column_names.
-    column_names: reactive.Value[list[str]],
+    column_names: reactive.Value[list[ColumnName]],
     contributions: reactive.Value[int],
     is_demo: bool,
-    analysis_types: reactive.Value[dict[str, str]],
-    analysis_errors: reactive.Value[dict[str, bool]],
-    lower_bounds: reactive.Value[dict[str, float]],
-    upper_bounds: reactive.Value[dict[str, float]],
-    bin_counts: reactive.Value[dict[str, int]],
-    groups: reactive.Value[list[str]],
-    weights: reactive.Value[dict[str, str]],
+    analysis_types: reactive.Value[dict[ColumnName, AnalysisName]],
+    analysis_errors: reactive.Value[dict[ColumnName, bool]],
+    lower_bounds: reactive.Value[dict[ColumnName, float]],
+    upper_bounds: reactive.Value[dict[ColumnName, float]],
+    bin_counts: reactive.Value[dict[ColumnName, int]],
+    groups: reactive.Value[list[ColumnName]],
+    weights: reactive.Value[dict[ColumnName, str]],
     epsilon: reactive.Value[float],
     min_rows: reactive.Value[str],
 ):  # pragma: no cover
@@ -127,7 +128,11 @@ def analysis_server(
 
     @reactive.effect
     def _update_columns():
-        csv_ids_labels = csv_ids_labels_calc()
+        csv_ids_labels = {
+            # Cast to string for type checking.
+            str(k): v
+            for k, v in csv_ids_labels_calc().items()
+        }
         ui.update_selectize(
             "groups_selectize",
             label=None,
@@ -205,7 +210,7 @@ def analysis_server(
     @render.ui
     def simulation_card_ui():
         if public_csv_path():
-            row_count = get_csv_row_count(Path(public_csv_path()))
+            row_count_str = str(get_csv_row_count(Path(public_csv_path())))
             return [
                 ui.markdown(
                     f"""
@@ -213,7 +218,7 @@ def analysis_server(
                     it *will be read* to generate previews.
 
                     The confidence interval depends on the number of rows.
-                    Your public CSV has {row_count} rows,
+                    Your public CSV has {row_count_str} rows,
                     but if you believe the private CSV will be
                     much larger or smaller, please update.
                     """
@@ -221,8 +226,8 @@ def analysis_server(
                 ui.input_select(
                     "row_count",
                     "Estimated Rows",
-                    choices=[row_count, "100", "1000", "10000"],
-                    selected=row_count,
+                    choices=[row_count_str, "100", "1000", "10000"],
+                    selected=row_count_str,
                 ),
             ]
         else:

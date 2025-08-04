@@ -19,6 +19,7 @@ from dp_wizard.shiny.components.outputs import (
 )
 from dp_wizard.utils.code_generators import make_privacy_unit_block
 from dp_wizard.utils.csv_helper import read_csv_names
+from dp_wizard.types import ColumnName
 
 
 dataset_panel_id = "dataset_panel"
@@ -104,7 +105,7 @@ def dataset_server(
     initial_private_csv_path: str,
     public_csv_path: reactive.Value[str],
     private_csv_path: reactive.Value[str],
-    column_names: reactive.Value[list[str]],
+    column_names: reactive.Value[list[ColumnName]],
     contributions: reactive.Value[int],
     min_rows: reactive.Value[str],
     max_rows: reactive.Value[str],
