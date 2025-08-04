@@ -21,6 +21,7 @@ from dp_wizard.utils.converters import (
 from dp_wizard.shiny.components.outputs import (
     hide_if,
     info_md_box,
+    demo_help,
 )
 
 
@@ -93,6 +94,7 @@ def results_server(
     session: Session,
     released: reactive.Value[bool],
     in_cloud: bool,
+    is_demo: bool,
     qa_mode: bool,
     public_csv_path: reactive.Value[str],
     private_csv_path: reactive.Value[str],
@@ -141,6 +143,14 @@ def results_server(
                     ),
                     button("HTML", ".html", "file-code", disabled=disabled),
                     p("The same content, but exported as HTML."),
+                    demo_help(
+                        is_demo,
+                        """
+                        Now you can download a notebook for your analysis.
+                        The Jupyter notebook could be used locally or on Colab,
+                        but the HTML version can be viewed in the brower.
+                        """,
+                    ),
                 ),
                 ui.accordion_panel(
                     "Reports",
