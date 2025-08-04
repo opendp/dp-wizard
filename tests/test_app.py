@@ -69,7 +69,7 @@ def test_qa_app(page: Page, qa_app: ShinyAppProc):  # pragma: no cover
 def test_demo_app(page: Page, demo_app: ShinyAppProc):  # pragma: no cover
     page.goto(demo_app.url)
     expect(page).to_have_title("DP Wizard")
-    expect(page.get_by_text("For the demo, we'll imagine")).to_be_visible()
+    expect(page.get_by_text("For the demo, we've provided")).to_be_visible()
 
     # -- Define analysis --
     page.get_by_role("button", name="Define analysis").click()

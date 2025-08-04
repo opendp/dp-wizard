@@ -3,7 +3,6 @@ from typing import Optional
 
 from shiny import ui, reactive, render, Inputs, Outputs, Session
 
-from dp_wizard.shiny.components.outputs import col_widths, demo_help
 from dp_wizard.utils.argparse_helpers import (
     PUBLIC_TEXT,
     PRIVATE_TEXT,
@@ -16,6 +15,7 @@ from dp_wizard.shiny.components.outputs import (
     hide_if,
     info_md_box,
     nav_button,
+    col_widths,
 )
 from dp_wizard.utils.code_generators import make_privacy_unit_block
 from dp_wizard.utils.csv_helper import read_csv_names
