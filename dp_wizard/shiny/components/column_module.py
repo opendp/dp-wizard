@@ -139,7 +139,9 @@ def column_server(
     contributions: reactive.Value[int],
     epsilon: reactive.Value[float],
     row_count: int,
+    groups: reactive.Value[list[str]],
     analysis_types: reactive.Value[dict[str, str]],
+    analysis_errors: reactive.Value[dict[str, bool]],
     lower_bounds: reactive.Value[dict[str, float]],
     upper_bounds: reactive.Value[dict[str, float]],
     bin_counts: reactive.Value[dict[str, int]],
@@ -226,7 +228,10 @@ def column_server(
 
     @render.text
     def card_header():
-        return name
+        groups_str = ", ".join(groups())
+        if not groups_str:
+            return name
+        return f"{name} (grouped by {groups_str})"
 
     @render.ui
     def analysis_info_ui():
@@ -239,7 +244,7 @@ def column_server(
             return ui.input_text(
                 "lower_bound",
                 ["Lower Bound", ui.output_ui("bounds_tooltip_ui")],
-                str(lower_bounds().get(name, 0)),
+                str(lower_bounds().get(name, "")),
                 width=label_width,
             )
 
@@ -247,7 +252,7 @@ def column_server(
             return ui.input_text(
                 "upper_bound",
                 "Upper Bound",
-                str(upper_bounds().get(name, 10)),
+                str(upper_bounds().get(name, "")),
                 width=label_width,
             )
 
@@ -266,7 +271,7 @@ def column_server(
             return ui.input_numeric(
                 "bins",
                 "Number of Candidates",
-                bin_counts().get(name, 10),
+                bin_counts().get(name, 0),
                 width=label_width,
             )
 
@@ -350,6 +355,12 @@ def column_server(
             + get_bin_errors(input.bins())
         )
 
+    @reactive.effect
+    def set_analysis_errors():
+        with reactive.isolate():
+            prev_analysis_errors = analysis_errors()
+        analysis_errors.set({**prev_analysis_errors, name: bool(error_md_calc())})
+
     @render.code
     def column_code():
         return make_column_config_block(
@@ -379,46 +390,45 @@ def column_server(
             ),
         ]
 
-    @render.ui
-    def mean_preview_ui():
-        # accuracy, histogram = accuracy_histogram()
+    def stat_preview_ui():
         if error_md := error_md_calc():
             return error_md_ui(error_md)
+        optional_grouping_message = (
+            # TODO: Show bar chart with fake groups?
+            # https://github.com/opendp/dp-wizard/issues/493#issuecomment-3000774143
+            (
+                """
+                Because the data is grouped, the final release will include a bar chart,
+                where each bar is the value of the statistic for one group.
+                """
+            )
+            if groups()
+            # TODO: Show a bar, even if it's just one bar? Not sure about this.
+            # https://github.com/opendp/dp-wizard/issues/518
+            else ""
+        )
         return [
             ui.p(
-                """
-                Since the mean is just a single number,
+                f"""
+                Since this stat is just a single number,
                 there is not a preview visualization.
+                {optional_grouping_message}
                 """
             ),
             output_code_sample("Column Definition", "column_code"),
         ]
+
+    @render.ui
+    def mean_preview_ui():
+        return stat_preview_ui()
 
     @render.ui
     def median_preview_ui():
-        if error_md := error_md_calc():
-            return error_md_ui(error_md)
-        return [
-            ui.p(
-                """
-                Since the median is just a single number,
-                there is not a preview visualization.
-                """
-            ),
-            output_code_sample("Column Definition", "column_code"),
-        ]
+        return stat_preview_ui()
 
     @render.ui
     def count_preview_ui():
-        return [
-            ui.p(
-                """
-                Since the count is just a single number,
-                there is not a preview visualization.
-                """
-            ),
-            output_code_sample("Column Definition", "column_code"),
-        ]
+        return stat_preview_ui()
 
     @render.data_frame
     def data_frame():

@@ -110,6 +110,7 @@ def analysis_server(
     contributions: reactive.Value[int],
     is_demo: bool,
     analysis_types: reactive.Value[dict[str, str]],
+    analysis_errors: reactive.Value[dict[str, bool]],
     lower_bounds: reactive.Value[dict[str, float]],
     upper_bounds: reactive.Value[dict[str, float]],
     bin_counts: reactive.Value[dict[str, int]],
@@ -119,7 +120,9 @@ def analysis_server(
 ):  # pragma: no cover
     @reactive.calc
     def button_enabled():
-        return bool(weights())
+        at_least_one_column = bool(weights())
+        no_errors = not any(analysis_errors().values())
+        return at_least_one_column and no_errors
 
     @reactive.effect
     def _update_columns():
@@ -255,7 +258,9 @@ def analysis_server(
                 contributions=contributions,
                 epsilon=epsilon,
                 row_count=int(input.row_count()),
+                groups=groups,
                 analysis_types=analysis_types,
+                analysis_errors=analysis_errors,
                 lower_bounds=lower_bounds,
                 upper_bounds=upper_bounds,
                 bin_counts=bin_counts,
