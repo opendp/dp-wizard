@@ -127,7 +127,11 @@ def analysis_server(
 
     @reactive.effect
     def _update_columns():
-        csv_ids_labels = csv_ids_labels_calc()
+        csv_ids_labels = {
+            # Cast to string for type checking.
+            str(k): v
+            for k, v in csv_ids_labels_calc().items()
+        }
         ui.update_selectize(
             "groups_selectize",
             label=None,
@@ -205,7 +209,7 @@ def analysis_server(
     @render.ui
     def simulation_card_ui():
         if public_csv_path():
-            row_count = get_csv_row_count(Path(public_csv_path()))
+            row_count_str = str(get_csv_row_count(Path(public_csv_path())))
             return [
                 ui.markdown(
                     f"""
@@ -213,7 +217,7 @@ def analysis_server(
                     it *will be read* to generate previews.
 
                     The confidence interval depends on the number of rows.
-                    Your public CSV has {row_count} rows,
+                    Your public CSV has {row_count_str} rows,
                     but if you believe the private CSV will be
                     much larger or smaller, please update.
                     """
@@ -221,8 +225,8 @@ def analysis_server(
                 ui.input_select(
                     "row_count",
                     "Estimated Rows",
-                    choices=[row_count, "100", "1000", "10000"],
-                    selected=row_count,
+                    choices=[row_count_str, "100", "1000", "10000"],
+                    selected=row_count_str,
                 ),
             ]
         else:
