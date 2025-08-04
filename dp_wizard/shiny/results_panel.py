@@ -1,29 +1,19 @@
-from pathlib import Path
 import re
+from pathlib import Path
 
-from shiny import ui, render, reactive, Inputs, Outputs, Session, types
 from faicons import icon_svg
 from htmltools.tags import p
+from shiny import Inputs, Outputs, Session, reactive, render, types, ui
 
-from dp_wizard.utils.code_generators import (
-    AnalysisPlan,
-    AnalysisPlanColumn,
-)
+from dp_wizard.shiny.components.outputs import hide_if, info_md_box
+from dp_wizard.types import AnalysisName, ColumnName
+from dp_wizard.utils.code_generators import AnalysisPlan, AnalysisPlanColumn
 from dp_wizard.utils.code_generators.notebook_generator import (
-    NotebookGenerator,
     PLACEHOLDER_CSV_NAME,
+    NotebookGenerator,
 )
 from dp_wizard.utils.code_generators.script_generator import ScriptGenerator
-from dp_wizard.utils.converters import (
-    convert_py_to_nb,
-    convert_nb_to_html,
-)
-from dp_wizard.shiny.components.outputs import (
-    hide_if,
-    info_md_box,
-)
-from dp_wizard.types import AnalysisName, ColumnName
-
+from dp_wizard.utils.converters import convert_nb_to_html, convert_py_to_nb
 
 wait_message = "Please wait."
 

@@ -1,4 +1,5 @@
 import pytest
+
 from dp_wizard.utils.code_template import Template
 
 

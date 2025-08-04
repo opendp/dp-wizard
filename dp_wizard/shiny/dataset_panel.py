@@ -1,26 +1,24 @@
 from pathlib import Path
 from typing import Optional
 
-from shiny import ui, reactive, render, Inputs, Outputs, Session
+from shiny import Inputs, Outputs, Session, reactive, render, ui
 
-from dp_wizard.shiny.components.outputs import col_widths
-from dp_wizard.utils.argparse_helpers import (
-    PUBLIC_TEXT,
-    PRIVATE_TEXT,
-    PUBLIC_PRIVATE_TEXT,
-)
-from dp_wizard.utils.csv_helper import get_csv_names_mismatch
 from dp_wizard.shiny.components.outputs import (
-    output_code_sample,
+    col_widths,
     demo_tooltip,
     hide_if,
     info_md_box,
     nav_button,
+    output_code_sample,
+)
+from dp_wizard.types import ColumnName
+from dp_wizard.utils.argparse_helpers import (
+    PRIVATE_TEXT,
+    PUBLIC_PRIVATE_TEXT,
+    PUBLIC_TEXT,
 )
 from dp_wizard.utils.code_generators import make_privacy_unit_block
-from dp_wizard.utils.csv_helper import read_csv_names
-from dp_wizard.types import ColumnName
-
+from dp_wizard.utils.csv_helper import get_csv_names_mismatch, read_csv_names
 
 dataset_panel_id = "dataset_panel"
 

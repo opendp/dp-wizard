@@ -1,7 +1,6 @@
 from dp_wizard import opendp_version
-from dp_wizard.utils.code_template import Template
 from dp_wizard.types import AnalysisName
-
+from dp_wizard.utils.code_template import Template
 
 name = AnalysisName("Histogram")
 blurb_md = """

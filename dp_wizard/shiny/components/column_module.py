@@ -1,31 +1,29 @@
 from logging import info
 
-from htmltools.tags import details, summary
-from shiny import ui, render, module, reactive, Inputs, Outputs, Session
-from shiny.types import SilentException
 import polars as pl
+from htmltools.tags import details, summary
+from shiny import Inputs, Outputs, Session, module, reactive, render, ui
+from shiny.types import SilentException
 
+from dp_wizard.shiny.components.outputs import (
+    col_widths,
+    demo_tooltip,
+    hide_if,
+    info_md_box,
+    output_code_sample,
+)
+from dp_wizard.types import AnalysisName, ColumnName
+from dp_wizard.utils.code_generators import make_column_config_block
 from dp_wizard.utils.code_generators.analyses import (
+    count,
+    get_analysis_by_name,
     histogram,
     mean,
     median,
-    count,
-    get_analysis_by_name,
 )
-from dp_wizard.utils.dp_helper import make_accuracy_histogram
+from dp_wizard.utils.dp_helper import confidence, make_accuracy_histogram
+from dp_wizard.utils.mock_data import ColumnDef, mock_data
 from dp_wizard.utils.shared import plot_bars
-from dp_wizard.utils.code_generators import make_column_config_block
-from dp_wizard.shiny.components.outputs import (
-    output_code_sample,
-    demo_tooltip,
-    info_md_box,
-    hide_if,
-    col_widths,
-)
-from dp_wizard.utils.dp_helper import confidence
-from dp_wizard.utils.mock_data import mock_data, ColumnDef
-from dp_wizard.types import AnalysisName, ColumnName
-
 
 default_analysis_type = histogram.name
 default_weight = "2"
