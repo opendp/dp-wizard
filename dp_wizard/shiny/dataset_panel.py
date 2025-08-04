@@ -29,14 +29,14 @@ def get_pos_int_error(number_str, minimum=100):
     If the inputs are numeric, I think shiny converts
     any strings that can't be parsed to numbers into None,
     so the "should be a number" errors may not be seen in practice.
-    >>> get_pos_int_error('1')
+    >>> get_pos_int_error('100')
     >>> get_pos_int_error('0')
     'should be greater than 100'
     >>> get_pos_int_error(None)
     'is required'
     >>> get_pos_int_error('')
     'is required'
-    >>> get_pos_int_error('1.1')
+    >>> get_pos_int_error('100.1')
     'should be an integer'
     """
     if number_str is None or number_str == "":
@@ -349,6 +349,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
     def button_enabled():
         return (
             contributions_valid()
+            and not error_md_calc()
             and len(column_names()) > 0
             and (in_cloud or not csv_column_mismatch_calc())
         )
