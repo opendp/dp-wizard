@@ -1,5 +1,6 @@
 from dp_wizard import opendp_version
 from dp_wizard.utils.code_template import Template
+from dp_wizard.utils.code_generators.abstract_generator import AbstractGenerator
 
 
 name = "Mean"
@@ -16,7 +17,10 @@ input_names = [
 has_bins = False
 
 
-def make_query(code_gen, identifier, accuracy_name, stats_name):
+def make_query(
+    code_gen: AbstractGenerator, identifier: str, accuracy_name: str, stats_name: str
+):
+
     return (
         Template("mean_query", __file__)
         .fill_values(

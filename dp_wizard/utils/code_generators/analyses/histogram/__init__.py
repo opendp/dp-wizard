@@ -1,5 +1,6 @@
 from dp_wizard import opendp_version
 from dp_wizard.utils.code_template import Template
+from dp_wizard.utils.code_generators.abstract_generator import AbstractGenerator
 
 
 name = "Histogram"
@@ -17,7 +18,9 @@ input_names = [
 has_bins = True
 
 
-def make_query(code_gen, identifier, accuracy_name, stats_name):
+def make_query(
+    code_gen: AbstractGenerator, identifier: str, accuracy_name: str, stats_name: str
+):
     return (
         Template("histogram_query", __file__)
         .fill_values(
@@ -33,7 +36,9 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
     )
 
 
-def make_output(code_gen, column_name, accuracy_name, stats_name):
+def make_output(
+    code_gen: AbstractGenerator, column_name: str, accuracy_name: str, stats_name: str
+):
     return (
         Template(f"histogram_{code_gen.root_template}_output", __file__)
         .fill_values(
@@ -56,7 +61,7 @@ def make_note():
     )
 
 
-def make_report_kv(name, confidence, identifier):
+def make_report_kv(name: str, confidence: float, identifier: str):
     return (
         Template("histogram_report_kv", __file__)
         .fill_values(
@@ -71,7 +76,9 @@ def make_report_kv(name, confidence, identifier):
     )
 
 
-def make_column_config_block(column_name, lower_bound, upper_bound, bin_count):
+def make_column_config_block(
+    column_name: str, lower_bound: float, upper_bound: float, bin_count: int
+):
     from dp_wizard.utils.code_generators import snake_case
 
     snake_name = snake_case(column_name)
