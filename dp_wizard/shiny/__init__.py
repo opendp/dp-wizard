@@ -171,8 +171,8 @@ def make_server_from_cli_info(cli_info: CLIInfo):
         weights = reactive.value({})
         epsilon = reactive.value(1.0)
         released = reactive.value(False)
-        min_rows = reactive.value(100)
-        max_rows = reactive.value(10_000_000_000)
+        min_rows = reactive.value("")
+        max_rows = reactive.value("")
 
         about_panel.about_server(
             input,

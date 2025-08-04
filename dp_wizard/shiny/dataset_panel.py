@@ -24,14 +24,14 @@ from dp_wizard.utils.csv_helper import read_csv_names
 dataset_panel_id = "dataset_panel"
 
 
-def get_pos_int_error(number_str):
+def get_pos_int_error(number_str, minimum=100):
     """
     If the inputs are numeric, I think shiny converts
     any strings that can't be parsed to numbers into None,
     so the "should be a number" errors may not be seen in practice.
     >>> get_pos_int_error('1')
     >>> get_pos_int_error('0')
-    'should be greater than zero'
+    'should be greater than 100'
     >>> get_pos_int_error(None)
     'is required'
     >>> get_pos_int_error('')
@@ -42,23 +42,23 @@ def get_pos_int_error(number_str):
     if number_str is None or number_str == "":
         return "is required"
     try:
-        number = int(float(number_str))
+        number = int(number_str)
     except (TypeError, ValueError, OverflowError):
         return "should be an integer"
-    if number <= 0:
-        return "should be greater than 0"
+    if number < minimum:
+        return f"should be greater than {minimum}"
     return None
 
 
 def get_row_count_errors(min_rows, max_rows):
     """
-    >>> get_row_count_errors(1, 2)
+    >>> get_row_count_errors(100, 200)
     []
     >>> get_row_count_errors('abc', 'xyz')
-    ['Lower bound should be a number.', 'Upper bound should be a number.']
-    >>> get_row_count_errors(1, None)
+    ['Lower bound should be an integer.', 'Upper bound should be an integer.']
+    >>> get_row_count_errors(100, None)
     ['Upper bound is required.']
-    >>> get_row_count_errors(1, 0)
+    >>> get_row_count_errors(200, 100)
     ['Lower bound should be less than upper bound.']
     """
     messages = []
@@ -106,8 +106,8 @@ def dataset_server(
     private_csv_path: reactive.Value[str],
     column_names: reactive.Value[list[str]],
     contributions: reactive.Value[int],
-    min_rows: reactive.Value[int],
-    max_rows: reactive.Value[int],
+    min_rows: reactive.Value[str],
+    max_rows: reactive.Value[str],
 ):  # pragma: no cover
     @reactive.effect
     @reactive.event(input.public_csv_path)
@@ -413,7 +413,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                     ui.input_text(
                         "min_rows",
                         None,
-                        str(min_rows()),
+                        str(min_rows() or ""),
                     ),
                     [],  # column placeholder
                     col_widths=col_widths,  # type: ignore
@@ -433,7 +433,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                     ui.input_text(
                         "max_rows",
                         None,
-                        str(max_rows()),
+                        str(max_rows() or ""),
                     ),
                     [],  # column placeholder
                     col_widths=col_widths,  # type: ignore
@@ -450,11 +450,8 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             return button
         return [
             button,
-            (
-                "Specify columns and the unit of privacy before proceeding."
-                if in_cloud
-                else "Specify CSV and the unit of privacy before proceeding."
-            ),
+            f"Specify {'columns' if in_cloud else 'CSV'}, unit of privacy, "
+            "and row count bounds before proceeding.",
         ]
 
     @render.code

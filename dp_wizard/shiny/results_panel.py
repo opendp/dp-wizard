@@ -104,8 +104,8 @@ def results_server(
     groups: reactive.Value[list[str]],
     weights: reactive.Value[dict[str, str]],
     epsilon: reactive.Value[float],
-    min_rows: reactive.Value[int],
-    max_rows: reactive.Value[int],
+    min_rows: reactive.Value[str],
+    max_rows: reactive.Value[str],
 ):  # pragma: no cover
 
     @render.ui
@@ -260,8 +260,8 @@ def results_server(
             csv_path=private_csv_path() or public_csv_path() or PLACEHOLDER_CSV_NAME,
             contributions=contributions(),
             epsilon=epsilon(),
-            min_rows=min_rows(),
-            max_rows=max_rows(),
+            min_rows=int(min_rows()),
+            max_rows=int(max_rows()),
             groups=groups(),
             columns=columns,
         )

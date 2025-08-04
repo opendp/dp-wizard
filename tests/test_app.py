@@ -32,6 +32,9 @@ for_the_demo = "For the demo, we'll imagine"
 
 def test_cloud_app(page: Page, cloud_app: ShinyAppProc):  # pragma: no cover
     page.goto(cloud_app.url)
+
+    page.locator("#min_rows").fill("100")
+    page.locator("#max_rows").fill("10000")
     expect(page).to_have_title("DP Wizard")
     expect(page.get_by_text("Choose Public CSV")).not_to_be_visible()
     page.get_by_label("CSV Column Names").fill("a_column")
@@ -60,6 +63,9 @@ def test_cloud_app(page: Page, cloud_app: ShinyAppProc):  # pragma: no cover
 
 def test_qa_app(page: Page, qa_app: ShinyAppProc):  # pragma: no cover
     page.goto(qa_app.url)
+
+    page.locator("#min_rows").fill("100")
+    page.locator("#max_rows").fill("10000")
     page.get_by_role("button", name="Define analysis").click()
 
     page.locator(".selectize-input").nth(0).click()
@@ -75,6 +81,10 @@ def test_qa_app(page: Page, qa_app: ShinyAppProc):  # pragma: no cover
 def test_demo_app(page: Page, demo_app: ShinyAppProc):  # pragma: no cover
     page.goto(demo_app.url)
     expect(page).to_have_title("DP Wizard")
+
+    page.locator("#min_rows").fill("100")
+    page.locator("#max_rows").fill("10000")
+
     expect(page.get_by_text(for_the_demo)).not_to_be_visible()
     page.locator(tooltip).hover()
     expect(page.get_by_text(for_the_demo)).to_be_visible()
@@ -92,6 +102,8 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     # -- Select dataset --
     page.goto(local_app.url)
     expect(page).to_have_title("DP Wizard")
+    page.locator("#min_rows").fill("100")
+    page.locator("#max_rows").fill("10000")
     expect(page.locator(tooltip)).to_have_count(0)
     expect(page.get_by_text(pick_dataset_text)).to_be_visible()
     expect(page.get_by_text(perform_analysis_text)).not_to_be_visible()
@@ -115,15 +127,14 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     # https://github.com/opendp/dp-wizard/issues/221
     page.locator("#contributions").fill("0")
     expect(page.get_by_text("Contributions must be 1 or greater")).to_be_visible()
-    expect(
-        page.get_by_text("Specify CSV and the unit of privacy before proceeding")
-    ).to_be_visible()
+    expected_error = (
+        "Specify CSV, unit of privacy, and row count bounds before proceeding."
+    )
+    expect(page.get_by_text(expected_error)).to_be_visible()
 
     page.locator("#contributions").fill("2")
     expect(page.get_by_text("Contributions must be 1 or greater")).not_to_be_visible()
-    expect(
-        page.get_by_text("Specify CSV and the unit of privacy before proceeding")
-    ).not_to_be_visible()
+    expect(page.get_by_text(expected_error)).not_to_be_visible()
 
     expect(page.locator(".shiny-output-error")).not_to_be_attached()
 
@@ -212,6 +223,8 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     results_requirements_warning = "define your analysis on the previous tab"
 
     page.goto(local_app.url)
+    page.locator("#min_rows").fill("100")
+    page.locator("#max_rows").fill("10000")
     expect(page.get_by_text(dataset_release_warning)).not_to_be_visible()
     page.get_by_role("tab", name="Define Analysis").click()
     expect(page.get_by_text(analysis_requirements_warning)).to_be_visible()
