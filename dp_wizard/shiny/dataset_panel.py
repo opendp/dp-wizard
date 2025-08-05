@@ -19,7 +19,7 @@ from dp_wizard.shiny.components.outputs import (
 )
 from dp_wizard.utils.code_generators import make_privacy_unit_block
 from dp_wizard.utils.csv_helper import read_csv_names
-from dp_wizard.types import ColumnName
+from dp_wizard.types import AppState
 
 
 dataset_panel_id = "dataset_panel"
@@ -49,16 +49,36 @@ def dataset_server(
     input: Inputs,
     output: Outputs,
     session: Session,
-    released: reactive.Value[bool],
-    is_demo: bool,
-    in_cloud: bool,
-    initial_public_csv_path: str,
-    initial_private_csv_path: str,
-    public_csv_path: reactive.Value[str],
-    private_csv_path: reactive.Value[str],
-    column_names: reactive.Value[list[ColumnName]],
-    contributions: reactive.Value[int],
+    state: AppState,
 ):  # pragma: no cover
+    # CLI options:
+    is_demo = state.is_demo
+    in_cloud = state.in_cloud
+
+    # Dataset choices:
+    initial_private_csv_path = state.initial_private_csv_path
+    private_csv_path = state.private_csv_path
+    initial_public_csv_path = state.initial_private_csv_path
+    public_csv_path = state.public_csv_path
+    contributions = state.contributions
+
+    # Analysis choices:
+    column_names = state.column_names
+    # groups = state.groups
+    # epsilon = state.epsilon
+
+    # Per-column choices:
+    # (Note that these are all dicts, with the ColumnName as the key.)
+    # analysis_types = state.analysis_types
+    # lower_bounds = state.lower_bounds
+    # upper_bounds = state.upper_bounds
+    # bin_counts = state.bin_counts
+    # weights = state.weights
+    # analysis_errors = state.analysis_errors
+
+    # Release state:
+    released = state.released
+
     @reactive.effect
     @reactive.event(input.public_csv_path)
     def _on_public_csv_path_change():

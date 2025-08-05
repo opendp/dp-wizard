@@ -22,7 +22,7 @@ from dp_wizard.shiny.components.outputs import (
     hide_if,
     info_md_box,
 )
-from dp_wizard.types import AnalysisName, ColumnName
+from dp_wizard.types import AppState
 
 
 wait_message = "Please wait."
@@ -92,20 +92,36 @@ def results_server(
     input: Inputs,
     output: Outputs,
     session: Session,
-    released: reactive.Value[bool],
-    in_cloud: bool,
-    qa_mode: bool,
-    public_csv_path: reactive.Value[str],
-    private_csv_path: reactive.Value[str],
-    contributions: reactive.Value[int],
-    analysis_types: reactive.Value[dict[ColumnName, AnalysisName]],
-    lower_bounds: reactive.Value[dict[ColumnName, float]],
-    upper_bounds: reactive.Value[dict[ColumnName, float]],
-    bin_counts: reactive.Value[dict[ColumnName, int]],
-    groups: reactive.Value[list[ColumnName]],
-    weights: reactive.Value[dict[ColumnName, str]],
-    epsilon: reactive.Value[float],
+    state: AppState,
 ):  # pragma: no cover
+    # CLI options:
+    # is_demo = state.is_demo
+    in_cloud = state.in_cloud
+    qa_mode = state.qa_mode
+
+    # Dataset choices:
+    # initial_private_csv_path = state.initial_private_csv_path
+    private_csv_path = state.private_csv_path
+    # initial_public_csv_path = state.initial_private_csv_path
+    public_csv_path = state.public_csv_path
+    contributions = state.contributions
+
+    # Analysis choices:
+    # column_names = state.column_names
+    groups = state.groups
+    epsilon = state.epsilon
+
+    # Per-column choices:
+    # (Note that these are all dicts, with the ColumnName as the key.)
+    analysis_types = state.analysis_types
+    lower_bounds = state.lower_bounds
+    upper_bounds = state.upper_bounds
+    bin_counts = state.bin_counts
+    weights = state.weights
+    # analysis_errors = state.analysis_errors
+
+    # Release state:
+    released = state.released
 
     @render.ui
     def results_requirements_warning_ui():
