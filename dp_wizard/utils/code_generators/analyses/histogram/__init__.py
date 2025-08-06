@@ -1,7 +1,7 @@
 from dp_wizard import opendp_version
-from dp_wizard.utils.code_template import Template
+from dp_wizard_templates.code_template import Template
 from dp_wizard.types import AnalysisName
-
+from pathlib import Path
 
 name = AnalysisName("Histogram")
 blurb_md = """
@@ -18,9 +18,12 @@ input_names = [
 has_bins = True
 
 
+root = Path(__file__).parent / "no-tests"
+
+
 def make_query(code_gen, identifier, accuracy_name, stats_name):
     return (
-        Template("histogram_query", __file__)
+        Template("histogram_query", root)
         .fill_values(
             BIN_NAME=f"{identifier}_bin",
             GROUP_NAMES=code_gen.analysis_plan.groups,
@@ -36,7 +39,7 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
 
 def make_output(code_gen, column_name, accuracy_name, stats_name):
     return (
-        Template(f"histogram_{code_gen.root_template}_output", __file__)
+        Template(f"histogram_{code_gen.root_template}_output", root)
         .fill_values(
             COLUMN_NAME=column_name,
             GROUP_NAMES=code_gen.analysis_plan.groups,
@@ -59,7 +62,7 @@ def make_note():
 
 def make_report_kv(name, confidence, identifier):
     return (
-        Template("histogram_report_kv", __file__)
+        Template("histogram_report_kv", root)
         .fill_values(
             NAME=name,
             CONFIDENCE=confidence,
@@ -77,7 +80,7 @@ def make_column_config_block(column_name, lower_bound, upper_bound, bin_count):
 
     snake_name = snake_case(column_name)
     return (
-        Template("histogram_expr", __file__)
+        Template("histogram_expr", root)
         .fill_expressions(
             CUT_LIST_NAME=f"{snake_name}_cut_points",
             BIN_EXPR_NAME=f"{snake_name}_bin_expr",

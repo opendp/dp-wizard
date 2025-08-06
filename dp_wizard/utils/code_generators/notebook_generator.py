@@ -1,5 +1,6 @@
+from dp_wizard_templates.code_template import Template
+
 from dp_wizard.utils.code_generators.abstract_generator import AbstractGenerator
-from dp_wizard.utils.code_template import Template
 from dp_wizard.utils.dp_helper import confidence
 from dp_wizard.types import ColumnIdentifier
 
@@ -7,6 +8,8 @@ from dp_wizard.types import ColumnIdentifier
 from pathlib import Path
 
 PLACEHOLDER_CSV_NAME = "fill-in-correct-path.csv"
+
+root = Path(__file__).parent / "no-tests"
 
 
 class NotebookGenerator(AbstractGenerator):
@@ -60,7 +63,7 @@ class NotebookGenerator(AbstractGenerator):
         )
         tmp_path = Path(__file__).parent.parent.parent / "tmp"
         reports_block = (
-            Template("reports", __file__)
+            Template("reports", root)
             .fill_expressions(
                 OUTPUTS=outputs_expression,
                 COLUMNS={

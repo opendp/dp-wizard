@@ -1,6 +1,8 @@
 from dp_wizard import opendp_version
 from math import gcd
 
+from dp_wizard_templates.code_template import Template
+
 from dp_wizard.utils.code_generators import (
     AnalysisPlan,
     make_column_config_block,
@@ -8,7 +10,6 @@ from dp_wizard.utils.code_generators import (
     make_privacy_unit_block,
 )
 from dp_wizard.utils.code_generators.analyses import histogram
-from dp_wizard.utils.code_template import Template
 from dp_wizard.utils.dp_helper import confidence
 from dp_wizard.types import ColumnIdentifier
 
@@ -19,6 +20,9 @@ import black
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Iterable
+
+
+root = Path(__file__).parent / "no-tests"
 
 
 class AbstractGenerator(ABC):
@@ -53,7 +57,7 @@ class AbstractGenerator(ABC):
             dp.enable_features("contrib")
 
         code = (
-            Template(self.root_template, __file__)
+            Template(self.root_template, root)
             .fill_expressions(
                 TITLE=str(self.analysis_plan),
                 DEPENDENCIES="'opendp[polars]=={opendp_version}' matplotlib",
@@ -209,7 +213,7 @@ class AbstractGenerator(ABC):
             ]
         )
         return (
-            Template("context", __file__)
+            Template("context", root)
             .fill_expressions(
                 MARGINS_LIST=margins_list,
                 EXTRA_COLUMNS=extra_columns,

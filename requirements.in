@@ -4,12 +4,7 @@
 opendp[polars]==0.13.0
 
 # Conversion:
-jupytext
-jupyter-client
-pyyaml
-nbconvert
-ipykernel
-black
+dp-wizard-templates==0.1.0
 # May also require:
 # python -m ipykernel install --name kernel_name --user
 
