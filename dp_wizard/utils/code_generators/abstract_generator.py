@@ -13,10 +13,6 @@ from dp_wizard.utils.code_generators.analyses import histogram
 from dp_wizard.utils.dp_helper import confidence
 from dp_wizard.types import ColumnIdentifier
 
-
-import black
-
-
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Iterable
@@ -74,8 +70,7 @@ class AbstractGenerator(ABC):
             )
             .finish()
         )
-        # Line length determined by PDF rendering.
-        return black.format_str(code, mode=black.Mode(line_length=74))  # type: ignore
+        return code
 
     def _make_margins_list(self, bin_names: Iterable[str], groups: Iterable[str]):
         groups_str = ", ".join(f"'{g}'" for g in groups)
