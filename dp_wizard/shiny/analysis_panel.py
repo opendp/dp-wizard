@@ -20,7 +20,7 @@ from dp_wizard.shiny.components.outputs import (
     info_md_box,
 )
 from dp_wizard.utils.code_generators import make_privacy_loss_block
-from dp_wizard.types import AnalysisName, ColumnName
+from dp_wizard.types import AppState
 
 
 def analysis_ui():
@@ -104,21 +104,36 @@ def analysis_server(
     input: Inputs,
     output: Outputs,
     session: Session,
-    released: reactive.Value[bool],
-    public_csv_path: reactive.Value[str],
-    # private_csv_path is not needed, since we have the column_names.
-    column_names: reactive.Value[list[ColumnName]],
-    contributions: reactive.Value[int],
-    is_demo: bool,
-    analysis_types: reactive.Value[dict[ColumnName, AnalysisName]],
-    analysis_errors: reactive.Value[dict[ColumnName, bool]],
-    lower_bounds: reactive.Value[dict[ColumnName, float]],
-    upper_bounds: reactive.Value[dict[ColumnName, float]],
-    bin_counts: reactive.Value[dict[ColumnName, int]],
-    groups: reactive.Value[list[ColumnName]],
-    weights: reactive.Value[dict[ColumnName, str]],
-    epsilon: reactive.Value[float],
+    state: AppState,
 ):  # pragma: no cover
+    # CLI options:
+    is_demo = state.is_demo
+    # in_cloud = state.in_cloud
+
+    # Dataset choices:
+    # initial_private_csv_path = state.initial_private_csv_path
+    # private_csv_path = state.private_csv_path
+    # initial_public_csv_path = state.initial_private_csv_path
+    public_csv_path = state.public_csv_path
+    contributions = state.contributions
+
+    # Analysis choices:
+    column_names = state.column_names
+    groups = state.groups
+    epsilon = state.epsilon
+
+    # Per-column choices:
+    # (Note that these are all dicts, with the ColumnName as the key.)
+    analysis_types = state.analysis_types
+    lower_bounds = state.lower_bounds
+    upper_bounds = state.upper_bounds
+    bin_counts = state.bin_counts
+    weights = state.weights
+    analysis_errors = state.analysis_errors
+
+    # Release state:
+    released = state.released
+
     @reactive.calc
     def button_enabled():
         at_least_one_column = bool(weights())
