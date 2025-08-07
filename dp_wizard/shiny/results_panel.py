@@ -14,7 +14,7 @@ from dp_wizard.utils.code_generators.notebook_generator import (
     PLACEHOLDER_CSV_NAME,
 )
 from dp_wizard.utils.code_generators.script_generator import ScriptGenerator
-from dp_wizard.utils.converters import (
+from dp_wizard_templates.converters import (
     convert_py_to_nb,
     convert_nb_to_html,
 )
