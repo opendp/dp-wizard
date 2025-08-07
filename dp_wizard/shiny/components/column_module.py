@@ -306,6 +306,7 @@ def column_server(
             Don't look at the data when estimating the bounds!
             In this case, we could limit "grade" to values between 50 and 100.
             """,
+            responsive=False,
         )
 
     @render.ui
@@ -318,6 +319,7 @@ def column_server(
             the same overall privacy guarantee.
             Give "grade" 5 bins.
             """,
+            responsive=False,
         )
 
     @render.ui

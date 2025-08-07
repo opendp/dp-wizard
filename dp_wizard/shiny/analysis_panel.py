@@ -190,6 +190,7 @@ def analysis_server(
             but string values can be used for grouping.
             Select "class_year_str".
             """,
+            responsive=False,
         )
 
     @render.ui
@@ -201,6 +202,7 @@ def analysis_server(
             "grade". With more columns selected,
             each column has a smaller share of the privacy budget.
             """,
+            responsive=False,
         )
 
     @render.ui
@@ -296,6 +298,7 @@ def analysis_server(
                 becomes less noisy, and the confidence intervals become smaller...
                 but increased accuracy risks revealing personal information.
                 """,
+                responsive=False,
             ),
         )
 
