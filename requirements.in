@@ -3,10 +3,8 @@
 # OpenDP:
 opendp[polars]==0.13.0
 
-# Conversion:
-dp-wizard-templates==0.1.0
-# May also require:
-# python -m ipykernel install --name kernel_name --user
+# Templating and notebook generation:
+dp-wizard-templates==0.2.0
 
 # Shiny:
 shiny
