@@ -5,6 +5,7 @@ import re
 from collections import defaultdict
 
 from shiny import ui, reactive, Inputs, Outputs, Session
+from faicons import icon_svg
 
 from dp_wizard.utils.argparse_helpers import CLIInfo
 from dp_wizard.utils.csv_helper import read_csv_names
@@ -25,6 +26,17 @@ app_ui = ui.page_bootstrap(
         analysis_panel.analysis_ui(),
         results_panel.results_ui(),
         ui.nav_spacer(),
+        ui.nav_control(
+            ui.input_switch(
+                "demo_mode",
+                ui.tooltip(
+                    icon_svg("circle-question"),
+                    "Demo mode walks you through a hypothetical example and provides lots of help along the way.",
+                    placement="right",
+                ),
+                width="4em",
+            )
+        ),
         ui.nav_control(ui.input_dark_mode()),
         selected=dataset_panel.dataset_panel_id,
         id="top_level_nav",
