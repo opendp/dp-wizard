@@ -29,6 +29,7 @@ def dataset_ui():
     return ui.nav_panel(
         "Select Dataset",
         ui.output_ui("dataset_release_warning_ui"),
+        ui.output_ui("welcome_ui"),
         ui.output_ui("csv_or_columns_ui"),
         ui.card(
             ui.card_header("Unit of privacy"),
@@ -133,40 +134,54 @@ def dataset_server(
         )
 
     @render.ui
+    def welcome_ui():
+        return (
+            demo_help(
+                is_demo_mode(),
+                """
+                Welcome to **DP Wizard**, from OpenDP.
+
+                DP Wizard makes it easier to get started with
+                differential privacy: You configure a basic analysis
+                interactively, and then download code which
+                demonstrates how to use the
+                [OpenDP Library](https://docs.opendp.org/).
+
+                (If you don't need these extra help messages,
+                turn them off by toggling the switch in the upper right
+                corner of the window.)
+                """,
+            ),
+        )
+
+    @render.ui
     def csv_or_columns_ui():
         if in_cloud:
-            return [
-                ui.card(
-                    ui.card_header("Welcome!"),
-                    ui.markdown(
-                        """
-                        # DP Wizard, from OpenDP
-
-                        DP Wizard makes it easier to get started with
-                        differential privacy: You configure a basic analysis
-                        interactively, and then download code which
-                        demonstrates how to use the
-                        [OpenDP Library](https://docs.opendp.org/).
-
-                        When [installed and run
-                        locally](https://pypi.org/project/dp_wizard/),
-                        DP Wizard allows you to specify a private CSV,
-                        but for the safety of your data, in the cloud
-                        DP Wizard only accepts column names.
-                        """
-                    ),
-                ),
-                ui.card(
-                    ui.card_header("CSV Columns"),
-                    ui.markdown(
-                        """
+            return ui.card(
+                ui.card_header("CSV Columns"),
+                ui.markdown(
+                    """
                         Provide the names of columns you'll use in your analysis,
                         one per line, with no extra punctuation.
                         """
-                    ),
-                    ui.input_text_area("column_names", "CSV Column Names", rows=5),
                 ),
-            ]
+                demo_help(
+                    is_demo_mode(),
+                    """
+                            When [installed and run
+                            locally](https://pypi.org/project/dp_wizard/),
+                            DP Wizard allows you to specify a private and public CSV,
+                            but for the safety of your data, in the cloud
+                            DP Wizard only accepts column names.
+
+                            If you don't have other ideas, we can imagine
+                            a CSV of student quiz grades: Enter `student_id`,
+                            `grade`, and `class_year_str` below, each on
+                            a separate line.
+                            """,
+                ),
+                ui.input_text_area("column_names", "CSV Column Names", rows=5),
+            )
         return (
             ui.card(
                 ui.card_header("Input CSVs"),
@@ -297,9 +312,8 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             demo_help(
                 is_demo_mode(),
                 f"""
-                For the demo, we assume that each student
-                can occur at most {contributions()} times
-                in the CSV.
+                Continuing the quiz grades example, if there were
+                10 quizes over the course of the term, we could enter "10" below.
                 """,
             ),
             ui.layout_columns(

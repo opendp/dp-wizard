@@ -38,7 +38,7 @@ def make_app_ui_from_cli_info(cli_info: CLIInfo):
                         """,
                         placement="right",
                     ),
-                    value=cli_info.is_demo_csv or cli_info.in_cloud,
+                    value=cli_info.get_is_demo_mode(),
                     width="4em",
                 )
             ),
@@ -178,10 +178,10 @@ def make_server_from_cli_info(cli_info: CLIInfo):
         state = AppState(
             # CLI options:
             is_demo_csv=cli_info.is_demo_csv,
-            in_cloud=cli_info.in_cloud,
-            qa_mode=cli_info.qa_mode,
+            in_cloud=cli_info.is_cloud_mode,
+            qa_mode=cli_info.is_qa_mode,
             # Top-level:
-            is_demo_mode=reactive.value(cli_info.is_demo_csv or cli_info.in_cloud),
+            is_demo_mode=reactive.value(cli_info.get_is_demo_mode()),
             # Dataset choices:
             initial_private_csv_path=str(initial_private_csv_path),
             private_csv_path=reactive.value(str(initial_private_csv_path)),

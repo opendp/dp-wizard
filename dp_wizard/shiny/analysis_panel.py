@@ -211,7 +211,8 @@ def analysis_server(
             """
             DP Wizard only supports the analysis of numeric data,
             but string values can be used for grouping.
-            Select "class_year_str".
+            If you are following the class grades example,
+            select `class_year_str`.
             """,
             responsive=False,
         )
@@ -222,7 +223,7 @@ def analysis_server(
             is_demo_mode(),
             """
             Not all columns need analysis. For this demo, just check
-            "grade". With more columns selected,
+            `grade`. With more columns selected,
             each column has a smaller share of the privacy budget.
             """,
             responsive=False,
@@ -230,6 +231,21 @@ def analysis_server(
 
     @render.ui
     def simulation_card_ui():
+        help = (
+            demo_help(
+                is_demo_mode(),
+                """
+            Unlike the other settings on this page,
+            this estimate **is not used** in the final calculation.
+
+            Until you make a release, your CSV will not be
+            read except to determine the names columns,
+            but the number of rows does have implications for the
+            accuracy which DP can provide with a given privacy budget.
+            """,
+                responsive=False,
+            ),
+        )
         if public_csv_path():
             row_count_str = str(get_csv_row_count(Path(public_csv_path())))
             return [
@@ -250,16 +266,12 @@ def analysis_server(
                     choices=[row_count_str, "100", "1000", "10000"],
                     selected=row_count_str,
                 ),
+                help,
             ]
         else:
             return [
                 ui.markdown(
                     """
-                    This simulation will assume a normal distribution
-                    between the specified lower and upper bounds.
-                    Until you make a release, your CSV will not be
-                    read except to determine the columns.
-
                     What is the approximate number of rows in the dataset?
                     This number is only used for the simulation
                     and not the final calculation.
@@ -271,6 +283,7 @@ def analysis_server(
                     choices=["100", "1000", "10000"],
                     selected="100",
                 ),
+                help,
             ]
 
     @render.ui

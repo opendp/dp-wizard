@@ -19,11 +19,13 @@ def output_code_sample(title, name_of_render_function: str):
     )
 
 
-def demo_help(is_demo: bool, text: str, responsive: bool = True):  # pragma: no cover
+def demo_help(
+    is_demo: bool, markdown: str, responsive: bool = True
+):  # pragma: no cover
     if is_demo:
         responsive_classes = "col-md-8 col-lg-6 col-xl-4" if responsive else ""
         return ui.div(
-            small(icon_svg("circle-question"), " ", text),
+            small(icon_svg("circle-question"), ui.markdown(markdown)),
             class_=f"alert alert-info p-2 {responsive_classes}",
         )
 

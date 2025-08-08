@@ -75,10 +75,13 @@ def _get_args():
 
 class CLIInfo(NamedTuple):
     is_demo_csv: bool
-    in_cloud: bool
-    qa_mode: bool
+    is_cloud_mode: bool
+    is_qa_mode: bool
+
+    def get_is_demo_mode(self):
+        return self.is_demo_csv or self.is_cloud_mode
 
 
 def get_cli_info() -> CLIInfo:  # pragma: no cover
     args = _get_args()
-    return CLIInfo(is_demo_csv=args.demo, in_cloud=args.cloud, qa_mode=False)
+    return CLIInfo(is_demo_csv=args.demo, is_cloud_mode=args.cloud, is_qa_mode=False)
