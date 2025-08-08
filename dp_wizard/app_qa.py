@@ -1,16 +1,15 @@
 from shiny import App
 
-from dp_wizard.shiny import app_ui, make_server_from_cli_info
+from dp_wizard.shiny import make_app_ui_from_cli_info, make_server_from_cli_info
 from dp_wizard.utils.argparse_helpers import CLIInfo
 
+cli_info = CLIInfo(
+    is_demo_csv=True,
+    is_cloud_mode=False,
+    is_qa_mode=True,
+)
 
 app = App(
-    app_ui,
-    make_server_from_cli_info(
-        CLIInfo(
-            is_demo=True,
-            in_cloud=False,
-            qa_mode=True,
-        )
-    ),
+    make_app_ui_from_cli_info(cli_info),
+    make_server_from_cli_info(cli_info),
 )

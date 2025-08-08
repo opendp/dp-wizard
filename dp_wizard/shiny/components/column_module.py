@@ -17,7 +17,7 @@ from dp_wizard.utils.shared import plot_bars
 from dp_wizard.utils.code_generators import make_column_config_block
 from dp_wizard.shiny.components.outputs import (
     output_code_sample,
-    demo_tooltip,
+    demo_help,
     info_md_box,
     hide_if,
     col_widths,
@@ -138,7 +138,7 @@ def column_server(
     upper_bounds: reactive.Value[dict[ColumnName, float]],
     bin_counts: reactive.Value[dict[ColumnName, int]],
     weights: reactive.Value[dict[ColumnName, str]],
-    is_demo: bool,
+    is_demo_mode: reactive.Value[bool],
     is_single_column: bool,
 ):  # pragma: no cover
     @reactive.effect
@@ -248,26 +248,32 @@ def column_server(
         def lower_bound_input():
             return ui.input_text(
                 "lower_bound",
-                ["Lower Bound", ui.output_ui("bounds_tooltip_ui")],
+                "Lower Bound",
                 str(lower_bounds().get(name, "")),
                 width=label_width,
             )
 
         def upper_bound_input():
-            return ui.input_text(
-                "upper_bound",
-                "Upper Bound",
-                str(upper_bounds().get(name, "")),
-                width=label_width,
-            )
+            return [
+                ui.input_text(
+                    "upper_bound",
+                    "Upper Bound",
+                    str(upper_bounds().get(name, "")),
+                    width=label_width,
+                ),
+                ui.output_ui("bounds_tooltip_ui"),
+            ]
 
         def bin_count_input():
-            return ui.input_numeric(
-                "bins",
-                ["Number of Bins", ui.output_ui("bins_tooltip_ui")],
-                bin_counts().get(name, 10),
-                width=label_width,
-            )
+            return [
+                ui.input_numeric(
+                    "bins",
+                    "Number of Bins",
+                    bin_counts().get(name, 10),
+                    width=label_width,
+                ),
+                ui.output_ui("bins_tooltip_ui"),
+            ]
 
         def candidate_count_input():
             # Just change the user-visible label,
@@ -303,25 +309,26 @@ def column_server(
 
     @render.ui
     def bounds_tooltip_ui():
-        return demo_tooltip(
-            is_demo,
+        return demo_help(
+            is_demo_mode(),
             """
-            We need to clip our inputs to limit sensitivity.
             Don't look at the data when estimating the bounds!
             In this case, we could limit "grade" to values between 50 and 100.
             """,
+            responsive=False,
         )
 
     @render.ui
     def bins_tooltip_ui():
-        return demo_tooltip(
-            is_demo,
+        return demo_help(
+            is_demo_mode(),
             """
             If you increase the number of bins,
             you'll see that each individual bin becomes noisier to provide
             the same overall privacy guarantee.
             Give "grade" 5 bins.
             """,
+            responsive=False,
         )
 
     @render.ui
@@ -343,8 +350,8 @@ def column_server(
 
     @render.ui
     def weight_tooltip_ui():
-        return demo_tooltip(
-            is_demo,
+        return demo_help(
+            is_demo_mode(),
             """
             You have a finite privacy budget, but you can choose
             how to allocate it. For simplicity, we limit the options here,
