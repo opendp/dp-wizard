@@ -311,7 +311,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             # Without the input label, the tooltip floats way too far the right.
             demo_help(
                 is_demo_mode(),
-                f"""
+                """
                 Continuing the quiz grades example, if there were
                 10 quizes over the course of the term, we could enter "10" below.
                 """,

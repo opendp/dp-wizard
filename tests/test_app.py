@@ -73,7 +73,8 @@ def test_demo_app(page: Page, demo_app: ShinyAppProc):  # pragma: no cover
 
     # -- Define analysis --
     page.get_by_role("button", name="Define analysis").click()
-    expect(page.get_by_text("This simulation will assume")).to_be_visible()
+    expect(page.get_by_text("dataset on the previous tab")).not_to_be_visible()
+    expect(page.get_by_text("string values can be used for grouping")).to_be_visible()
 
 
 def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: no cover
