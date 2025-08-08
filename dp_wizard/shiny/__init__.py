@@ -32,7 +32,10 @@ def make_app_ui_from_cli_info(cli_info: CLIInfo):
                     "demo_mode",
                     ui.tooltip(
                         icon_svg("circle-question"),
-                        "Demo mode walks you through a hypothetical example and provides help along the way.",
+                        """
+                        Demo mode walks you through a hypothetical example
+                        and provides help along the way.
+                        """,
                         placement="right",
                     ),
                     # TODO: Make a function that returns initial UI based on CLI
