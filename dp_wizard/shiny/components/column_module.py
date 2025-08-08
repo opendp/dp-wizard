@@ -249,20 +249,26 @@ def column_server(
             )
 
         def upper_bound_input():
-            return ui.input_text(
-                "upper_bound",
-                "Upper Bound",
-                str(upper_bounds().get(name, "")),
-                width=label_width,
-            )
+            return [
+                ui.input_text(
+                    "upper_bound",
+                    "Upper Bound",
+                    str(upper_bounds().get(name, "")),
+                    width=label_width,
+                ),
+                ui.output_ui("bounds_tooltip_ui"),
+            ]
 
         def bin_count_input():
-            return ui.input_numeric(
-                "bins",
-                "Number of Bins",
-                bin_counts().get(name, 10),
-                width=label_width,
-            )
+            return [
+                ui.input_numeric(
+                    "bins",
+                    "Number of Bins",
+                    bin_counts().get(name, 10),
+                    width=label_width,
+                ),
+                ui.output_ui("bins_tooltip_ui"),
+            ]
 
         def candidate_count_input():
             # Just change the user-visible label,
@@ -286,11 +292,9 @@ def column_server(
         input_names = get_analysis_by_name(name).input_names
         input_functions = [local_variables[input_name] for input_name in input_names]
         with reactive.isolate():
-            inputs = (
-                [ui.output_ui("bounds_tooltip_ui")]
-                + [input_function() for input_function in input_functions]
-                + [ui.output_ui("bins_tooltip_ui"), ui.output_ui("optional_weight_ui")]
-            )
+            inputs = [input_function() for input_function in input_functions] + [
+                ui.output_ui("optional_weight_ui")
+            ]
 
         return ui.layout_columns(
             inputs,
