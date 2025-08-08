@@ -5,7 +5,7 @@ from dp_wizard.utils.argparse_helpers import CLIInfo
 
 
 cli_info = CLIInfo(
-    is_demo=False,
+    is_demo_csv=False,
     in_cloud=True,
     qa_mode=False,
 )
