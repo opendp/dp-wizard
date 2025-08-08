@@ -18,31 +18,34 @@ from dp_wizard.shiny import (
 from dp_wizard.types import AppState
 
 
-app_ui = ui.page_bootstrap(
-    ui.head_content(ui.include_css(Path(__file__).parent / "css" / "styles.css")),
-    ui.navset_tab(
-        about_panel.about_ui(),
-        dataset_panel.dataset_ui(),
-        analysis_panel.analysis_ui(),
-        results_panel.results_ui(),
-        ui.nav_spacer(),
-        ui.nav_control(
-            ui.input_switch(
-                "demo_mode",
-                ui.tooltip(
-                    icon_svg("circle-question"),
-                    "Demo mode walks you through a hypothetical example and provides lots of help along the way.",
-                    placement="right",
-                ),
-                width="4em",
-            )
+def make_app_ui_from_cli_info(cli_info: CLIInfo):
+    return ui.page_bootstrap(
+        ui.head_content(ui.include_css(Path(__file__).parent / "css" / "styles.css")),
+        ui.navset_tab(
+            about_panel.about_ui(),
+            dataset_panel.dataset_ui(),
+            analysis_panel.analysis_ui(),
+            results_panel.results_ui(),
+            ui.nav_spacer(),
+            ui.nav_control(
+                ui.input_switch(
+                    "demo_mode",
+                    ui.tooltip(
+                        icon_svg("circle-question"),
+                        "Demo mode walks you through a hypothetical example and provides help along the way.",
+                        placement="right",
+                    ),
+                    # TODO: Make a function that returns initial UI based on CLI
+                    value=cli_info.is_demo,
+                    width="4em",
+                )
+            ),
+            ui.nav_control(ui.input_dark_mode()),
+            selected=dataset_panel.dataset_panel_id,
+            id="top_level_nav",
         ),
-        ui.nav_control(ui.input_dark_mode()),
-        selected=dataset_panel.dataset_panel_id,
-        id="top_level_nav",
-    ),
-    title="DP Wizard",
-)
+        title="DP Wizard",
+    )
 
 
 def ctrl_c_reminder():  # pragma: no cover
@@ -172,9 +175,11 @@ def make_server_from_cli_info(cli_info: CLIInfo):
 
         state = AppState(
             # CLI options:
-            is_demo=cli_info.is_demo,
+            is_demo_csv=cli_info.is_demo,
             in_cloud=cli_info.in_cloud,
             qa_mode=cli_info.qa_mode,
+            # Top-level:
+            is_demo_mode=reactive.value(cli_info.is_demo),
             # Dataset choices:
             initial_private_csv_path=str(initial_private_csv_path),
             private_csv_path=reactive.value(str(initial_private_csv_path)),
@@ -195,6 +200,11 @@ def make_server_from_cli_info(cli_info: CLIInfo):
             # Release state:
             released=reactive.value(False),
         )
+
+        @reactive.effect
+        @reactive.event(input.demo_mode)
+        def _update_demo_mode():
+            state.is_demo_mode.set(input.demo_mode())
 
         about_panel.about_server(input, output, session)
         dataset_panel.dataset_server(input, output, session, state)

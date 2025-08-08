@@ -109,8 +109,11 @@ def analysis_server(
     state: AppState,
 ):  # pragma: no cover
     # CLI options:
-    is_demo = state.is_demo
+    # is_demo_csv = state.is_demo_csv
     # in_cloud = state.in_cloud
+
+    # Top-lvel:
+    is_demo_mode = state.is_demo_mode
 
     # Dataset choices:
     # initial_private_csv_path = state.initial_private_csv_path
@@ -204,7 +207,7 @@ def analysis_server(
     @render.ui
     def groups_selectize_tooltip_ui():
         return demo_help(
-            is_demo,
+            is_demo_mode(),
             """
             DP Wizard only supports the analysis of numeric data,
             but string values can be used for grouping.
@@ -216,7 +219,7 @@ def analysis_server(
     @render.ui
     def columns_selectize_tooltip_ui():
         return demo_help(
-            is_demo,
+            is_demo_mode(),
             """
             Not all columns need analysis. For this demo, just check
             "grade". With more columns selected,
@@ -289,7 +292,7 @@ def analysis_server(
                 upper_bounds=upper_bounds,
                 bin_counts=bin_counts,
                 weights=weights,
-                is_demo=is_demo,
+                is_demo_mode=is_demo_mode,
                 is_single_column=len(column_ids) == 1,
             )
         return [column_ui(column_id) for column_id in column_ids]
@@ -312,7 +315,7 @@ def analysis_server(
         return tags.label(
             f"Epsilon: {epsilon():0.3} ",
             demo_help(
-                is_demo,
+                is_demo_mode(),
                 """
                 If you set epsilon above one, you'll see that the distribution
                 becomes less noisy, and the confidence intervals become smaller...

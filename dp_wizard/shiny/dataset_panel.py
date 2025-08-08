@@ -53,13 +53,16 @@ def dataset_server(
     state: AppState,
 ):  # pragma: no cover
     # CLI options:
-    is_demo = state.is_demo
+    is_demo_csv = state.is_demo_csv
     in_cloud = state.in_cloud
+
+    # Top-level:
+    is_demo_mode = state.is_demo_mode
 
     # Dataset choices:
     initial_private_csv_path = state.initial_private_csv_path
     private_csv_path = state.private_csv_path
-    initial_public_csv_path = state.initial_private_csv_path
+    initial_public_csv_path = state.initial_public_csv_path
     public_csv_path = state.public_csv_path
     contributions = state.contributions
 
@@ -194,7 +197,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
         #   is renamed to something like "0.csv".
         return [
             demo_help(
-                is_demo,
+                is_demo_csv,
                 """
                 For the demo, we've provided the grades
                 on assignments for a school class.
@@ -292,7 +295,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             ),
             # Without the input label, the tooltip floats way too far the right.
             demo_help(
-                is_demo,
+                is_demo_mode(),
                 f"""
                 For the demo, we assume that each student
                 can occur at most {contributions()} times
@@ -338,7 +341,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
     @render.ui
     def python_tooltip_ui():
         return demo_help(
-            is_demo,
+            is_demo_mode(),
             """
             Along the way, code samples demonstrate
             how the information you provide is used in the

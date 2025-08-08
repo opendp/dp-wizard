@@ -96,9 +96,12 @@ def results_server(
     state: AppState,
 ):  # pragma: no cover
     # CLI options:
-    is_demo = state.is_demo
+    # is_demo_csv = state.is_demo_csv
     in_cloud = state.in_cloud
     qa_mode = state.qa_mode
+
+    # Top-level:
+    is_demo_mode = state.is_demo_mode
 
     # Dataset choices:
     # initial_private_csv_path = state.initial_private_csv_path
@@ -160,7 +163,7 @@ def results_server(
                     button("HTML", ".html", "file-code", disabled=disabled),
                     p("The same content, but exported as HTML."),
                     demo_help(
-                        is_demo,
+                        is_demo_mode(),
                         """
                         Now you can download a notebook for your analysis.
                         The Jupyter notebook could be used locally or on Colab,
