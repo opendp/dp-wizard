@@ -1,5 +1,5 @@
 from math import pow
-from typing import Iterable, Any
+from typing import Iterable
 from pathlib import Path
 
 from htmltools import tags
@@ -20,6 +20,7 @@ from dp_wizard.shiny.components.outputs import (
     info_md_box,
 )
 from dp_wizard.utils.code_generators import make_privacy_loss_block
+from dp_wizard.types import AppState
 
 
 def analysis_ui():
@@ -92,7 +93,7 @@ def analysis_ui():
 
 
 def _cleanup_reactive_dict(
-    reactive_dict: reactive.Value[dict[str, Any]], keys_to_keep: Iterable[str]
+    reactive_dict: reactive.Value[dict], keys_to_keep: Iterable[str]
 ):  # pragma: no cover
     reactive_dict_copy = {**reactive_dict()}
     keys_to_del = set(reactive_dict_copy.keys()) - set(keys_to_keep)
@@ -105,21 +106,36 @@ def analysis_server(
     input: Inputs,
     output: Outputs,
     session: Session,
-    released: reactive.Value[bool],
-    public_csv_path: reactive.Value[str],
-    # private_csv_path is not needed, since we have the column_names.
-    column_names: reactive.Value[list[str]],
-    contributions: reactive.Value[int],
-    is_demo: bool,
-    analysis_types: reactive.Value[dict[str, str]],
-    analysis_errors: reactive.Value[dict[str, bool]],
-    lower_bounds: reactive.Value[dict[str, float]],
-    upper_bounds: reactive.Value[dict[str, float]],
-    bin_counts: reactive.Value[dict[str, int]],
-    groups: reactive.Value[list[str]],
-    weights: reactive.Value[dict[str, str]],
-    epsilon: reactive.Value[float],
+    state: AppState,
 ):  # pragma: no cover
+    # CLI options:
+    is_demo = state.is_demo
+    # in_cloud = state.in_cloud
+
+    # Dataset choices:
+    # initial_private_csv_path = state.initial_private_csv_path
+    # private_csv_path = state.private_csv_path
+    # initial_public_csv_path = state.initial_private_csv_path
+    public_csv_path = state.public_csv_path
+    contributions = state.contributions
+
+    # Analysis choices:
+    column_names = state.column_names
+    groups = state.groups
+    epsilon = state.epsilon
+
+    # Per-column choices:
+    # (Note that these are all dicts, with the ColumnName as the key.)
+    analysis_types = state.analysis_types
+    lower_bounds = state.lower_bounds
+    upper_bounds = state.upper_bounds
+    bin_counts = state.bin_counts
+    weights = state.weights
+    analysis_errors = state.analysis_errors
+
+    # Release state:
+    released = state.released
+
     @reactive.calc
     def button_enabled():
         at_least_one_column = bool(weights())
@@ -128,7 +144,11 @@ def analysis_server(
 
     @reactive.effect
     def _update_columns():
-        csv_ids_labels = csv_ids_labels_calc()
+        csv_ids_labels = {
+            # Cast to string for type checking.
+            str(k): v
+            for k, v in csv_ids_labels_calc().items()
+        }
         ui.update_selectize(
             "groups_selectize",
             label=None,
@@ -208,7 +228,7 @@ def analysis_server(
     @render.ui
     def simulation_card_ui():
         if public_csv_path():
-            row_count = get_csv_row_count(Path(public_csv_path()))
+            row_count_str = str(get_csv_row_count(Path(public_csv_path())))
             return [
                 ui.markdown(
                     f"""
@@ -216,7 +236,7 @@ def analysis_server(
                     it *will be read* to generate previews.
 
                     The confidence interval depends on the number of rows.
-                    Your public CSV has {row_count} rows,
+                    Your public CSV has {row_count_str} rows,
                     but if you believe the private CSV will be
                     much larger or smaller, please update.
                     """
@@ -224,8 +244,8 @@ def analysis_server(
                 ui.input_select(
                     "row_count",
                     "Estimated Rows",
-                    choices=[row_count, "100", "1000", "10000"],
-                    selected=row_count,
+                    choices=[row_count_str, "100", "1000", "10000"],
+                    selected=row_count_str,
                 ),
             ]
         else:

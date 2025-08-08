@@ -29,7 +29,7 @@ def test_make_column_config_block_for_unrecognized():
     with pytest.raises(Exception, match=r"Unrecognized analysis"):
         make_column_config_block(
             name="HW GRADE",
-            analysis_type="Bad AnalysisType!",
+            analysis_name="Bad AnalysisType!",
             lower_bound=0,
             upper_bound=100,
             bin_count=10,
@@ -40,7 +40,7 @@ def test_make_column_config_block_for_count():
     assert (
         make_column_config_block(
             name="HW GRADE",
-            analysis_type=count.name,
+            analysis_name=count.name,
             lower_bound=0,
             upper_bound=0,
             bin_count=0,
@@ -58,7 +58,7 @@ def test_make_column_config_block_for_mean():
     assert (
         make_column_config_block(
             name="HW GRADE",
-            analysis_type=mean.name,
+            analysis_name=mean.name,
             lower_bound=0,
             upper_bound=100,
             bin_count=10,
@@ -80,7 +80,7 @@ def test_make_column_config_block_for_median():
     assert (
         make_column_config_block(
             name="HW GRADE",
-            analysis_type=median.name,
+            analysis_name=median.name,
             lower_bound=0,
             upper_bound=100,
             bin_count=20,
@@ -103,7 +103,7 @@ def test_make_column_config_block_for_histogram():
     assert (
         make_column_config_block(
             name="HW GRADE",
-            analysis_type=histogram.name,
+            analysis_name=histogram.name,
             lower_bound=0,
             upper_bound=100,
             bin_count=10,
@@ -139,28 +139,28 @@ def number_lines(text: str):
 
 
 histogram_plan_column = AnalysisPlanColumn(
-    analysis_type=histogram.name,
+    analysis_name=histogram.name,
     lower_bound=5,
     upper_bound=15,
     bin_count=20,
     weight=4,
 )
 mean_plan_column = AnalysisPlanColumn(
-    analysis_type=mean.name,
+    analysis_name=mean.name,
     lower_bound=5,
     upper_bound=15,
     bin_count=0,  # Unused
     weight=4,
 )
 median_plan_column = AnalysisPlanColumn(
-    analysis_type=median.name,
+    analysis_name=median.name,
     lower_bound=5,
     upper_bound=15,
     bin_count=10,
     weight=4,
 )
 count_plan_column = AnalysisPlanColumn(
-    analysis_type=count.name,
+    analysis_name=count.name,
     lower_bound=0,  # Unused
     upper_bound=0,  # Unused
     bin_count=0,  # Unused
@@ -169,7 +169,7 @@ count_plan_column = AnalysisPlanColumn(
 
 
 def id_for_plan(plan: AnalysisPlan):
-    columns = ", ".join(f"{v[0].analysis_type} of {k}" for k, v in plan.columns.items())
+    columns = ", ".join(f"{v[0].analysis_name} of {k}" for k, v in plan.columns.items())
     description = f"{columns}; grouped by ({', '.join(plan.groups) or 'nothing'})"
     return re.sub(r"\W+", "_", description)  # For selection with "pytest -k substring"
 

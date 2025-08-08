@@ -14,6 +14,7 @@ from dp_wizard.shiny import (
     dataset_panel,
     results_panel,
 )
+from dp_wizard.types import AppState
 
 
 app_ui = ui.page_bootstrap(
@@ -157,77 +158,36 @@ def make_server_from_cli_info(cli_info: CLIInfo):
             initial_private_csv_path = ""
             initial_column_names = []
 
-        contributions = reactive.value(initial_contributions)
-        private_csv_path = reactive.value(str(initial_private_csv_path))
-        column_names = reactive.value(initial_column_names)
-
-        public_csv_path = reactive.value("")
-        analysis_types = reactive.value({})
-        analysis_errors = reactive.value({})
-        lower_bounds = reactive.value({})
-        upper_bounds = reactive.value({})
-        bin_counts = reactive.value({})
-        groups = reactive.value([])
-        weights = reactive.value({})
-        epsilon = reactive.value(1.0)
-        released = reactive.value(False)
-
-        about_panel.about_server(
-            input,
-            output,
-            session,
-        )
-        dataset_panel.dataset_server(
-            input,
-            output,
-            session,
-            released=released,
+        state = AppState(
+            # CLI options:
             is_demo=cli_info.is_demo,
             in_cloud=cli_info.in_cloud,
-            initial_public_csv_path="",
-            initial_private_csv_path=str(initial_private_csv_path),
-            public_csv_path=public_csv_path,
-            private_csv_path=private_csv_path,
-            column_names=column_names,
-            contributions=contributions,
-        )
-        analysis_panel.analysis_server(
-            input,
-            output,
-            session,
-            released=released,
-            is_demo=cli_info.is_demo,
-            public_csv_path=public_csv_path,
-            column_names=column_names,
-            contributions=contributions,
-            analysis_types=analysis_types,
-            analysis_errors=analysis_errors,
-            lower_bounds=lower_bounds,
-            upper_bounds=upper_bounds,
-            bin_counts=bin_counts,
-            groups=groups,
-            weights=weights,
-            epsilon=epsilon,
-        )
-        results_panel.results_server(
-            input,
-            output,
-            session,
-            released=released,
-            in_cloud=cli_info.in_cloud,
-            is_demo=cli_info.is_demo,
             qa_mode=cli_info.qa_mode,
-            public_csv_path=public_csv_path,
-            private_csv_path=private_csv_path,
-            contributions=contributions,
-            analysis_types=analysis_types,
-            lower_bounds=lower_bounds,
-            upper_bounds=upper_bounds,
-            bin_counts=bin_counts,
-            groups=groups,
-            weights=weights,
-            epsilon=epsilon,
+            # Dataset choices:
+            initial_private_csv_path=str(initial_private_csv_path),
+            private_csv_path=reactive.value(str(initial_private_csv_path)),
+            initial_public_csv_path="",
+            public_csv_path=reactive.value(""),
+            contributions=reactive.value(initial_contributions),
+            # Analysis choices:
+            column_names=reactive.value(initial_column_names),
+            groups=reactive.value([]),
+            epsilon=reactive.value(1.0),
+            # Per-column choices:
+            analysis_types=reactive.value({}),
+            lower_bounds=reactive.value({}),
+            upper_bounds=reactive.value({}),
+            bin_counts=reactive.value({}),
+            weights=reactive.value({}),
+            analysis_errors=reactive.value({}),
+            # Release state:
+            released=reactive.value(False),
         )
+
+        about_panel.about_server(input, output, session)
+        dataset_panel.dataset_server(input, output, session, state)
+        analysis_panel.analysis_server(input, output, session, state)
+        results_panel.results_server(input, output, session, state)
         session.on_ended(ctrl_c_reminder)
 
     return server
