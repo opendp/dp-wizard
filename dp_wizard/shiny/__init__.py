@@ -38,8 +38,7 @@ def make_app_ui_from_cli_info(cli_info: CLIInfo):
                         """,
                         placement="right",
                     ),
-                    # TODO: Make a function that returns initial UI based on CLI
-                    value=cli_info.is_demo,
+                    value=cli_info.is_demo or cli_info.in_cloud,
                     width="4em",
                 )
             ),
@@ -182,7 +181,7 @@ def make_server_from_cli_info(cli_info: CLIInfo):
             in_cloud=cli_info.in_cloud,
             qa_mode=cli_info.qa_mode,
             # Top-level:
-            is_demo_mode=reactive.value(cli_info.is_demo),
+            is_demo_mode=reactive.value(cli_info.is_demo or cli_info.in_cloud),
             # Dataset choices:
             initial_private_csv_path=str(initial_private_csv_path),
             private_csv_path=reactive.value(str(initial_private_csv_path)),
