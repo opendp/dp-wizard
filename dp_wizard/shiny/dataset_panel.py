@@ -430,6 +430,23 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                     What is the **maximum row count** of your CSV?
                     """
                 ),
+                demo_help(
+                    is_demo_mode(),
+                    """
+                    If you're unsure, pick a safe value, like the population
+                    of the country under the analysis.
+
+                    This value is used downstream two ways:
+                    - There is a very small probability that data could be
+                      released verbatim. If your dataset is particularly
+                      large, the delta parameter should be increased
+                      correspondingly.
+                    - The floating point numbers used by computers are not the
+                      same as the real numbers of mathematics, and with very
+                      large datasets, this gap accumulates, and more noise is
+                      necessary.
+                    """,
+                ),
                 ui.layout_columns(
                     ui.input_text(
                         "max_rows",
