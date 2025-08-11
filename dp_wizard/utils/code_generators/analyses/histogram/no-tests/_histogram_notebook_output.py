@@ -1,7 +1,6 @@
 # CONFIDENCE_NOTE
-column_name = COLUMN_NAME
 title = (
-    f"DP counts for {column_name}, "
+    f"DP counts for COLUMN_NAME, "
     f"assuming {contributions} contributions per individual"
 )
 

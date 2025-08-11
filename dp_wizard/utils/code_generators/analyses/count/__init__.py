@@ -1,8 +1,9 @@
 from dp_wizard import opendp_version
 from dp_wizard.utils.code_template import Template
+from dp_wizard.types import AnalysisName
 
 
-name = "Count"
+name = AnalysisName("Count")
 blurb_md = """
 DP counts can also be used together with grouping to calculate histograms.
 """

@@ -187,13 +187,10 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     ).to_be_visible()  # Because values are well above the bins.
 
     # Add a second column:
-    # page.get_by_label("blank").check()
-    # TODO: Test is flaky?
-    # expect(page.get_by_text("Weight")).to_have_count(2)
-    # TODO: Setting more inputs without checking for updates
-    # causes recalculations to pile up, and these cause timeouts on CI:
-    # It is still rerendering the graph after hitting "Download Results".
-    # https://github.com/opendp/dp-wizard/issues/116
+    page.locator(".selectize-input").nth(0).click()
+    page.get_by_text(": hw-number").first.click()
+    # Previous setting should not be cleared.
+    expect(page.get_by_role("textbox", name="Upper Bound")).to_have_value("20")
     expect(page.locator(".shiny-output-error")).not_to_be_attached()
 
     # A separate test spends less time on parameter validation

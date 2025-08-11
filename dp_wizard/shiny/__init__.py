@@ -14,6 +14,7 @@ from dp_wizard.shiny import (
     dataset_panel,
     results_panel,
 )
+from dp_wizard.types import ColumnName
 
 
 app_ui = ui.page_bootstrap(
@@ -159,7 +160,9 @@ def make_server_from_cli_info(cli_info: CLIInfo):
 
         contributions = reactive.value(initial_contributions)
         private_csv_path = reactive.value(str(initial_private_csv_path))
-        column_names = reactive.value(initial_column_names)
+        column_names: reactive.Value[list[ColumnName]] = reactive.value(
+            initial_column_names
+        )
 
         public_csv_path = reactive.value("")
         analysis_types = reactive.value({})

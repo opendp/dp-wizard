@@ -24,6 +24,7 @@ from dp_wizard.shiny.components.outputs import (
 )
 from dp_wizard.utils.dp_helper import confidence
 from dp_wizard.utils.mock_data import mock_data, ColumnDef
+from dp_wizard.types import AnalysisName, ColumnName
 
 
 default_analysis_type = histogram.name
@@ -115,16 +116,7 @@ def error_md_ui(markdown):  # pragma: no cover
 def column_ui():  # pragma: no cover
     return ui.card(
         ui.card_header(ui.output_text("card_header")),
-        ui.layout_columns(
-            ui.input_select(
-                "analysis_type",
-                None,
-                [histogram.name, mean.name, median.name, count.name],
-                width=label_width,
-            ),
-            ui.output_ui("analysis_info_ui"),
-            col_widths=col_widths,  # type: ignore
-        ),
+        ui.output_ui("analysis_name_ui"),
         ui.output_ui("analysis_config_ui"),
     )
 
@@ -135,17 +127,17 @@ def column_server(
     output: Outputs,
     session: Session,
     public_csv_path: str,
-    name: str,
+    name: ColumnName,
     contributions: reactive.Value[int],
     epsilon: reactive.Value[float],
     row_count: int,
-    groups: reactive.Value[list[str]],
-    analysis_types: reactive.Value[dict[str, str]],
-    analysis_errors: reactive.Value[dict[str, bool]],
-    lower_bounds: reactive.Value[dict[str, float]],
-    upper_bounds: reactive.Value[dict[str, float]],
-    bin_counts: reactive.Value[dict[str, int]],
-    weights: reactive.Value[dict[str, str]],
+    groups: reactive.Value[list[ColumnName]],
+    analysis_types: reactive.Value[dict[ColumnName, AnalysisName]],
+    analysis_errors: reactive.Value[dict[ColumnName, bool]],
+    lower_bounds: reactive.Value[dict[ColumnName, float]],
+    upper_bounds: reactive.Value[dict[ColumnName, float]],
+    bin_counts: reactive.Value[dict[ColumnName, int]],
+    weights: reactive.Value[dict[ColumnName, str]],
     is_demo: bool,
     is_single_column: bool,
 ):  # pragma: no cover
@@ -234,9 +226,22 @@ def column_server(
         return f"{name} (grouped by {groups_str})"
 
     @render.ui
-    def analysis_info_ui():
-        blurb_md = get_analysis_by_name(input.analysis_type()).blurb_md
-        return ui.markdown(blurb_md)
+    def analysis_name_ui():
+        analysis_name = analysis_types().get(name, histogram.name)
+        blurb_md = get_analysis_by_name(analysis_name).blurb_md
+        return (
+            ui.layout_columns(
+                ui.input_select(
+                    "analysis_type",
+                    None,
+                    [histogram.name, mean.name, median.name, count.name],
+                    width=label_width,
+                    selected=analysis_name,
+                ),
+                ui.markdown(blurb_md),
+                col_widths=col_widths,  # type: ignore
+            ),
+        )
 
     @render.ui
     def analysis_config_ui():
@@ -275,7 +280,7 @@ def column_server(
                 width=label_width,
             )
 
-        name = input.analysis_type()
+        analysis_name = input.analysis_type()
 
         # Had trouble with locals() inside comprehension in Python 3.10.
         # Not sure if this is the exact issue:
@@ -283,7 +288,7 @@ def column_server(
 
         # Fix is just to keep it outside the comprehension.
         local_variables = locals()
-        input_names = get_analysis_by_name(name).input_names
+        input_names = get_analysis_by_name(analysis_name).input_names
         input_functions = [local_variables[input_name] for input_name in input_names]
         with reactive.isolate():
             inputs = [input_function() for input_function in input_functions] + [
@@ -292,7 +297,7 @@ def column_server(
 
         return ui.layout_columns(
             inputs,
-            ui.output_ui(f"{name.lower()}_preview_ui"),
+            ui.output_ui(f"{analysis_name.lower()}_preview_ui"),
             col_widths=col_widths,  # type: ignore
         )
 
@@ -365,7 +370,7 @@ def column_server(
     def column_code():
         return make_column_config_block(
             name=name,
-            analysis_type=input.analysis_type(),
+            analysis_name=input.analysis_type(),
             lower_bound=float(input.lower_bound()),
             upper_bound=float(input.upper_bound()),
             bin_count=int(input.bins()),

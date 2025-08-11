@@ -261,7 +261,7 @@ pyproject-hooks==1.2.0
     # via
     #   build
     #   pip-tools
-pyright==1.1.399
+pyright==1.1.403
     # via -r requirements-dev.in
 pytest==8.3.5
     # via
