@@ -265,7 +265,7 @@ def results_server(
 
     @reactive.calc
     def download_stem() -> str:
-        return "dp-" + re.sub(r"\W+", "-", str(analysis_plan())).lower()
+        return analysis_plan().to_stem()
 
     @reactive.calc
     def notebook_nb():
