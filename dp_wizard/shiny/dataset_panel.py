@@ -3,7 +3,6 @@ from typing import Optional
 
 from shiny import ui, reactive, render, Inputs, Outputs, Session
 
-from dp_wizard.shiny.components.outputs import col_widths
 from dp_wizard.utils.argparse_helpers import (
     PUBLIC_TEXT,
     PRIVATE_TEXT,
@@ -12,14 +11,15 @@ from dp_wizard.utils.argparse_helpers import (
 from dp_wizard.utils.csv_helper import get_csv_names_mismatch
 from dp_wizard.shiny.components.outputs import (
     output_code_sample,
-    demo_tooltip,
+    demo_help,
     hide_if,
     info_md_box,
     nav_button,
+    col_widths,
 )
 from dp_wizard.utils.code_generators import make_privacy_unit_block
 from dp_wizard.utils.csv_helper import read_csv_names
-from dp_wizard.types import ColumnName
+from dp_wizard.types import AppState
 
 
 dataset_panel_id = "dataset_panel"
@@ -51,25 +51,18 @@ def get_pos_int_error(number_str, minimum=100):
     return None
 
 
-def get_row_count_errors(min_rows, max_rows):
+def get_row_count_errors(max_rows):
     """
-    >>> get_row_count_errors(100, 200)
+    >>> get_row_count_errors(100)
     []
-    >>> get_row_count_errors('abc', 'xyz')
-    ['Lower bound should be an integer.', 'Upper bound should be an integer.']
-    >>> get_row_count_errors(100, None)
-    ['Upper bound is required.']
-    >>> get_row_count_errors(200, 100)
-    ['Lower bound should be less than upper bound.']
+    >>> get_row_count_errors('xyz')
+    ['Maximum row count should be an integer.']
+    >>> get_row_count_errors(None)
+    ['Maximum row count is required.']
     """
     messages = []
-    if error := get_pos_int_error(min_rows):
-        messages.append(f"Lower bound {error}.")
     if error := get_pos_int_error(max_rows):
-        messages.append(f"Upper bound {error}.")
-    if not messages:
-        if not (int(min_rows) <= int(max_rows)):
-            messages.append("Lower bound should be less than upper bound.")
+        messages.append(f"Maximum row count {error}.")
     return messages
 
 
@@ -77,6 +70,7 @@ def dataset_ui():
     return ui.nav_panel(
         "Select Dataset",
         ui.output_ui("dataset_release_warning_ui"),
+        ui.output_ui("welcome_ui"),
         ui.output_ui("csv_or_columns_ui"),
         ui.card(
             ui.card_header("Unit of Privacy"),
@@ -84,9 +78,10 @@ def dataset_ui():
             ui.output_ui("input_contributions_ui"),
             ui.output_ui("contributions_validation_ui"),
             output_code_sample(
-                ["Unit of Privacy", ui.output_ui("python_tooltip_ui")],
+                "Unit of Privacy",
                 "unit_of_privacy_python",
             ),
+            ui.output_ui("python_tooltip_ui"),
         ),
         ui.output_ui("row_count_bounds_ui"),
         ui.output_ui("define_analysis_button_ui"),
@@ -98,18 +93,40 @@ def dataset_server(
     input: Inputs,
     output: Outputs,
     session: Session,
-    released: reactive.Value[bool],
-    is_demo: bool,
-    in_cloud: bool,
-    initial_public_csv_path: str,
-    initial_private_csv_path: str,
-    public_csv_path: reactive.Value[str],
-    private_csv_path: reactive.Value[str],
-    column_names: reactive.Value[list[ColumnName]],
-    contributions: reactive.Value[int],
-    min_rows: reactive.Value[str],
-    max_rows: reactive.Value[str],
+    state: AppState,
 ):  # pragma: no cover
+    # CLI options:
+    is_demo_csv = state.is_demo_csv
+    in_cloud = state.in_cloud
+
+    # Top-level:
+    is_demo_mode = state.is_demo_mode
+
+    # Dataset choices:
+    initial_private_csv_path = state.initial_private_csv_path
+    private_csv_path = state.private_csv_path
+    initial_public_csv_path = state.initial_public_csv_path
+    public_csv_path = state.public_csv_path
+    contributions = state.contributions
+    max_rows = state.max_rows
+
+    # Analysis choices:
+    column_names = state.column_names
+    # groups = state.groups
+    # epsilon = state.epsilon
+
+    # Per-column choices:
+    # (Note that these are all dicts, with the ColumnName as the key.)
+    # analysis_types = state.analysis_types
+    # lower_bounds = state.lower_bounds
+    # upper_bounds = state.upper_bounds
+    # bin_counts = state.bin_counts
+    # weights = state.weights
+    # analysis_errors = state.analysis_errors
+
+    # Release state:
+    released = state.released
+
     @reactive.effect
     @reactive.event(input.public_csv_path)
     def _on_public_csv_path_change():
@@ -160,40 +177,54 @@ def dataset_server(
         )
 
     @render.ui
+    def welcome_ui():
+        return (
+            demo_help(
+                is_demo_mode(),
+                """
+                Welcome to **DP Wizard**, from OpenDP.
+
+                DP Wizard makes it easier to get started with
+                differential privacy: You configure a basic analysis
+                interactively, and then download code which
+                demonstrates how to use the
+                [OpenDP Library](https://docs.opendp.org/).
+
+                (If you don't need these extra help messages,
+                turn them off by toggling the switch in the upper right
+                corner of the window.)
+                """,
+            ),
+        )
+
+    @render.ui
     def csv_or_columns_ui():
         if in_cloud:
-            return [
-                ui.card(
-                    ui.card_header("Welcome!"),
-                    ui.markdown(
-                        """
-                        # DP Wizard, from OpenDP
-
-                        DP Wizard makes it easier to get started with
-                        differential privacy: You configure a basic analysis
-                        interactively, and then download code which
-                        demonstrates how to use the
-                        [OpenDP Library](https://docs.opendp.org/).
-
-                        When [installed and run
-                        locally](https://pypi.org/project/dp_wizard/),
-                        DP Wizard allows you to specify a private CSV,
-                        but for the safety of your data, in the cloud
-                        DP Wizard only accepts column names.
-                        """
-                    ),
-                ),
-                ui.card(
-                    ui.card_header("CSV Columns"),
-                    ui.markdown(
-                        """
+            return ui.card(
+                ui.card_header("CSV Columns"),
+                ui.markdown(
+                    """
                         Provide the names of columns you'll use in your analysis,
                         one per line, with no extra punctuation.
                         """
-                    ),
-                    ui.input_text_area("column_names", "CSV Column Names", rows=5),
                 ),
-            ]
+                demo_help(
+                    is_demo_mode(),
+                    """
+                            When [installed and run
+                            locally](https://pypi.org/project/dp_wizard/),
+                            DP Wizard allows you to specify a private and public CSV,
+                            but for the safety of your data, in the cloud
+                            DP Wizard only accepts column names.
+
+                            If you don't have other ideas, we can imagine
+                            a CSV of student quiz grades: Enter `student_id`,
+                            `grade`, and `class_year_str` below, each on
+                            a separate line.
+                            """,
+                ),
+                ui.input_text_area("column_names", "CSV Column Names", rows=5),
+            )
         return (
             ui.card(
                 ui.card_header("Input CSVs"),
@@ -222,27 +253,30 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
         #   and it looks like the file input is unset.
         # - After file upload, the internal copy of the file
         #   is renamed to something like "0.csv".
-        return ui.row(
-            ui.input_file(
-                "private_csv_path",
-                [
-                    "Choose Private CSV ",  # Trailing space looks better.
-                    demo_tooltip(
-                        is_demo,
-                        "For the demo, we'll imagine we have the grades "
-                        "on assignments for a class.",
-                    ),
-                ],
-                accept=[".csv"],
-                placeholder=Path(initial_private_csv_path).name,
+        return [
+            demo_help(
+                is_demo_csv,
+                """
+                For the demo, we've provided the grades
+                on assignments for a school class.
+                You don't need to upload an additional file.
+                """,
             ),
-            ui.input_file(
-                "public_csv_path",
-                "Choose Public CSV",
-                accept=[".csv"],
-                placeholder=Path(initial_public_csv_path).name,
+            ui.row(
+                ui.input_file(
+                    "private_csv_path",
+                    "Choose Private CSV",
+                    accept=[".csv"],
+                    placeholder=Path(initial_private_csv_path).name,
+                ),
+                ui.input_file(
+                    "public_csv_path",
+                    "Choose Public CSV",
+                    accept=[".csv"],
+                    placeholder=Path(initial_public_csv_path).name,
+                ),
             ),
-        )
+        ]
 
     @render.ui
     def csv_column_match_ui():
@@ -317,18 +351,14 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 This is the "unit of privacy" which will be protected.
                 """
             ),
-            # TODO: Add this back when "Make the demo tooltips always-on" is merged.
-            #     https://github.com/opendp/dp-wizard/pull/503
             # Without the input label, the tooltip floats way too far the right.
-            #
-            # demo_tooltip(
-            #     is_demo,
-            #     f"""
-            #     For the demo, we assume that each student
-            #     can occur at most {contributions()} times
-            #     in the dataset.
-            #     """,
-            # ),
+            demo_help(
+                is_demo_mode(),
+                """
+                Continuing the quiz grades example, if there were
+                10 quizes over the course of the term, we could enter "10" below.
+                """,
+            ),
             ui.layout_columns(
                 ui.input_numeric(
                     "contributions",
@@ -369,20 +399,15 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
 
     @render.ui
     def python_tooltip_ui():
-        return demo_tooltip(
-            is_demo,
+        return demo_help(
+            is_demo_mode(),
             """
-            Along the way, code samples will demonstrate
+            Along the way, code samples demonstrate
             how the information you provide is used in the
             OpenDP Library, and at the end you can download
             a notebook for the entire calculation.
             """,
         )
-
-    @reactive.effect
-    @reactive.event(input.min_rows)
-    def _on_min_rows_change():
-        min_rows.set(input.min_rows())
 
     @reactive.effect
     @reactive.event(input.max_rows)
@@ -391,9 +416,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
 
     @reactive.calc
     def error_md_calc():
-        return "\n".join(
-            f"- {error}" for error in get_row_count_errors(min_rows(), max_rows())
-        )
+        return "\n".join(f"- {error}" for error in get_row_count_errors(max_rows()))
 
     @render.ui
     def row_count_bounds_ui():
@@ -401,34 +424,10 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
 
         return (
             ui.card(
-                ui.card_header("Row Count Bounds"),
+                ui.card_header("Row Count"),
                 ui.markdown(
                     """
-                    What is a **lower bound on row count** in your CSV?
-                    The type of differential privacy used by DP Wizard has a
-                    very small, but non-negative probability of releasing
-                    information in the clear. With fewer rows, more noise
-                    needs to be added.
-                    """
-                ),
-                ui.layout_columns(
-                    ui.input_text(
-                        "min_rows",
-                        None,
-                        str(min_rows() or ""),
-                    ),
-                    [],  # column placeholder
-                    col_widths=col_widths,  # type: ignore
-                ),
-                ui.markdown(
-                    """
-                    We also need an **upper bound on row count** in your CSV.
-                    This is more subtle: Floating point numbers on computers
-                    do not have infinite precision. For very large datasets,
-                    this accumulated difference between the "real numbers" of
-                    mathematics and the floating point numbers on computers
-                    makes a difference. This upper bound is used to add enough
-                    noise to account for that difference.
+                    What is the **maximum row count** of your CSV?
                     """
                 ),
                 ui.layout_columns(
@@ -452,8 +451,10 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             return button
         return [
             button,
-            f"Specify {'columns' if in_cloud else 'CSV'}, unit of privacy, "
-            "and row count bounds before proceeding.",
+            f"""
+            Specify {'columns' if in_cloud else 'CSV'}, unit of privacy,
+            and maximum row count before proceeding.
+            """,
         ]
 
     @render.code
