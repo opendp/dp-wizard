@@ -116,7 +116,7 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     page.locator("#contributions").fill("0")
     expect(page.get_by_text("Contributions must be 1 or greater")).to_be_visible()
     expected_error = (
-        "Specify CSV, unit of privacy, and row count bounds before proceeding."
+        "Specify CSV, unit of privacy, and maximum row count before proceeding."
     )
     expect(page.get_by_text(expected_error)).to_be_visible()
 
@@ -208,7 +208,6 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     results_requirements_warning = "define your analysis on the previous tab"
 
     page.goto(local_app.url)
-    page.locator("#min_rows").fill("100")
     page.locator("#max_rows").fill("10000")
     expect(page.get_by_text(dataset_release_warning)).not_to_be_visible()
     page.get_by_role("tab", name="Define Analysis").click()

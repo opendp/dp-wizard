@@ -20,6 +20,7 @@ class AnalysisPlan(NamedTuple):
     ...     csv_path='optional.csv',
     ...     contributions=10,
     ...     epsilon=2.0,
+    ...     max_rows=1000,
     ...     groups=['grouping_col'],
     ...     columns={
     ...         'data_col': [AnalysisPlanColumn('Histogram', 0, 100, 10, 1)]
