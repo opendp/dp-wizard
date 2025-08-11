@@ -1,3 +1,5 @@
+import re
+
 from htmltools.tags import details, summary, small
 from shiny import ui
 from faicons import icon_svg
@@ -24,8 +26,11 @@ def demo_help(
 ):  # pragma: no cover
     if is_demo:
         responsive_classes = "col-md-8 col-lg-6 col-xl-4" if responsive else ""
+        inner_html = small(icon_svg("circle-question"), ui.markdown(markdown))
+        # Move the SVG icon inside the first element:
+        inner_html = re.sub(r"(<svg.+?</svg>)(<.+?>)", r"\2\1&nbsp;", str(inner_html))
         return ui.div(
-            small(icon_svg("circle-question"), ui.markdown(markdown)),
+            small(ui.HTML(inner_html)),
             class_=f"alert alert-info p-2 {responsive_classes}",
         )
 
