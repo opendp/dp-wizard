@@ -23,6 +23,8 @@ def output_code_sample(title, name_of_render_function: str):
 
 def demo_help(is_demo: bool, markdown: str, responsive: bool = True):
     """
+    >>> assert None == demo_help(False, '**Testing** 123')
+
     >>> html = str(demo_help(True, '**Testing** 123'))
     >>> assert '<p><svg' in html
     >>> assert '</svg>&nbsp;<strong>Testing' in html
