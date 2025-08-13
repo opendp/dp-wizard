@@ -1,6 +1,12 @@
-from dp_wizard import opendp_version
+from abc import ABC, abstractmethod
 from math import gcd
+from pathlib import Path
+from typing import Iterable
 
+import black
+
+from dp_wizard import opendp_version
+from dp_wizard.types import ColumnIdentifier
 from dp_wizard.utils.code_generators import (
     AnalysisPlan,
     make_column_config_block,
@@ -10,15 +16,6 @@ from dp_wizard.utils.code_generators import (
 from dp_wizard.utils.code_generators.analyses import histogram
 from dp_wizard.utils.code_template import Template
 from dp_wizard.utils.dp_helper import confidence
-from dp_wizard.types import ColumnIdentifier
-
-
-import black
-
-
-from abc import ABC, abstractmethod
-from pathlib import Path
-from typing import Iterable
 
 
 class AbstractGenerator(ABC):
@@ -44,9 +41,9 @@ class AbstractGenerator(ABC):
 
     def make_py(self):
         def template():
-            import polars as pl  # noqa: F401
-            import opendp.prelude as dp  # noqa: F401
             import matplotlib.pyplot as plt  # noqa: F401
+            import opendp.prelude as dp  # noqa: F401
+            import polars as pl  # noqa: F401
 
             # The OpenDP team is working to vet the core algorithms.
             # Until that is complete we need to opt-in to use these features.

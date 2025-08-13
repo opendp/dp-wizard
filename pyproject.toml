@@ -46,10 +46,12 @@ Home = "https://github.com/opendp/dp-wizard"
 [tool.pyright]
 include = ["dp_wizard"]
 ignore = ["**/no-tests/"]
-
 # TODO: Reenable when OpenDP exports are clean:
 # https://github.com/opendp/opendp/issues/2439
 reportPrivateImportUsage = false
+
+[tool.isort]
+profile = "black"
 
 [project.optional-dependencies]
 app = [

@@ -1,7 +1,6 @@
-from htmltools.tags import details, summary, small
-from shiny import ui
 from faicons import icon_svg
-
+from htmltools.tags import details, small, summary
+from shiny import ui
 
 col_widths = {
     # Controls stay roughly a constant width;

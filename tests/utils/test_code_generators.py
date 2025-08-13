@@ -1,21 +1,21 @@
-from tempfile import NamedTemporaryFile
-import subprocess
-import pytest
 import re
+import subprocess
 from pathlib import Path
+from tempfile import NamedTemporaryFile
+
 import opendp.prelude as dp
+import pytest
 
 from dp_wizard import opendp_version
-from dp_wizard.utils.code_generators.analyses import histogram, mean, median, count
+from dp_wizard.types import AnalysisName, ColumnName
 from dp_wizard.utils.code_generators import (
-    make_column_config_block,
     AnalysisPlan,
     AnalysisPlanColumn,
+    make_column_config_block,
 )
+from dp_wizard.utils.code_generators.analyses import count, histogram, mean, median
 from dp_wizard.utils.code_generators.notebook_generator import NotebookGenerator
 from dp_wizard.utils.code_generators.script_generator import ScriptGenerator
-from dp_wizard.types import AnalysisName, ColumnName
-
 
 python_paths = Path(__file__).parent.parent.parent.glob("dp_wizard/**/*.py")
 

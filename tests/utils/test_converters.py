@@ -1,14 +1,15 @@
+import json
 import re
 from pathlib import Path
+
 import pytest
-import json
+
 from dp_wizard.utils.converters import (
-    convert_py_to_nb,
+    ConversionException,
     _clean_nb,
     convert_nb_to_html,
-    ConversionException,
+    convert_py_to_nb,
 )
-
 
 fixtures_path = Path(__file__).parent.parent / "fixtures"
 
