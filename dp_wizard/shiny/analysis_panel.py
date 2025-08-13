@@ -14,7 +14,7 @@ from dp_wizard.utils.csv_helper import (
 )
 from dp_wizard.shiny.components.outputs import (
     output_code_sample,
-    demo_tooltip,
+    demo_help,
     nav_button,
     hide_if,
     info_md_box,
@@ -34,10 +34,11 @@ def analysis_ui():
                 ui.markdown("Select columns to calculate statistics on."),
                 ui.input_selectize(
                     "columns_selectize",
-                    ["Columns", ui.output_ui("columns_selectize_tooltip_ui")],
+                    "Columns",
                     [],
                     multiple=True,
                 ),
+                ui.output_ui("columns_selectize_tooltip_ui"),
             ),
             ui.card(
                 ui.card_header("Grouping"),
@@ -52,10 +53,11 @@ def analysis_ui():
                 ),
                 ui.input_selectize(
                     "groups_selectize",
-                    ["Group by", ui.output_ui("groups_selectize_tooltip_ui")],
+                    "Group by",
                     [],
                     multiple=True,
                 ),
+                ui.output_ui("groups_selectize_tooltip_ui"),
             ),
             ui.card(
                 ui.card_header("Privacy Budget"),
@@ -107,8 +109,11 @@ def analysis_server(
     state: AppState,
 ):  # pragma: no cover
     # CLI options:
-    is_demo = state.is_demo
+    # is_demo_csv = state.is_demo_csv
     # in_cloud = state.in_cloud
+
+    # Top-lvel:
+    is_demo_mode = state.is_demo_mode
 
     # Dataset choices:
     # initial_private_csv_path = state.initial_private_csv_path
@@ -116,6 +121,7 @@ def analysis_server(
     # initial_public_csv_path = state.initial_private_csv_path
     public_csv_path = state.public_csv_path
     contributions = state.contributions
+    max_rows = state.max_rows
 
     # Analysis choices:
     column_names = state.column_names
@@ -201,28 +207,46 @@ def analysis_server(
 
     @render.ui
     def groups_selectize_tooltip_ui():
-        return demo_tooltip(
-            is_demo,
+        return demo_help(
+            is_demo_mode(),
             """
             DP Wizard only supports the analysis of numeric data,
             but string values can be used for grouping.
-            Select "class_year_str".
+            If you are following the class grades example,
+            select `class_year_str`.
             """,
+            responsive=False,
         )
 
     @render.ui
     def columns_selectize_tooltip_ui():
-        return demo_tooltip(
-            is_demo,
+        return demo_help(
+            is_demo_mode(),
             """
             Not all columns need analysis. For this demo, just check
-            "grade". With more columns selected,
+            `grade`. With more columns selected,
             each column has a smaller share of the privacy budget.
             """,
+            responsive=False,
         )
 
     @render.ui
     def simulation_card_ui():
+        help = (
+            demo_help(
+                is_demo_mode(),
+                """
+            Unlike the other settings on this page,
+            this estimate **is not used** in the final calculation.
+
+            Until you make a release, your CSV will not be
+            read except to determine the names columns,
+            but the number of rows does have implications for the
+            accuracy which DP can provide with a given privacy budget.
+            """,
+                responsive=False,
+            ),
+        )
         if public_csv_path():
             row_count_str = str(get_csv_row_count(Path(public_csv_path())))
             return [
@@ -243,16 +267,12 @@ def analysis_server(
                     choices=[row_count_str, "100", "1000", "10000"],
                     selected=row_count_str,
                 ),
+                help,
             ]
         else:
             return [
                 ui.markdown(
                     """
-                    This simulation will assume a normal distribution
-                    between the specified lower and upper bounds.
-                    Until you make a release, your CSV will not be
-                    read except to determine the columns.
-
                     What is the approximate number of rows in the dataset?
                     This number is only used for the simulation
                     and not the final calculation.
@@ -264,6 +284,7 @@ def analysis_server(
                     choices=["100", "1000", "10000"],
                     selected="100",
                 ),
+                help,
             ]
 
     @render.ui
@@ -285,7 +306,7 @@ def analysis_server(
                 upper_bounds=upper_bounds,
                 bin_counts=bin_counts,
                 weights=weights,
-                is_demo=is_demo,
+                is_demo_mode=is_demo_mode,
                 is_single_column=len(column_ids) == 1,
             )
         return [column_ui(column_id) for column_id in column_ids]
@@ -307,19 +328,20 @@ def analysis_server(
     def epsilon_ui():
         return tags.label(
             f"Epsilon: {epsilon():0.3} ",
-            demo_tooltip(
-                is_demo,
+            demo_help(
+                is_demo_mode(),
                 """
                 If you set epsilon above one, you'll see that the distribution
                 becomes less noisy, and the confidence intervals become smaller...
                 but increased accuracy risks revealing personal information.
                 """,
+                responsive=False,
             ),
         )
 
     @render.code
     def privacy_loss_python():
-        return make_privacy_loss_block(epsilon())
+        return make_privacy_loss_block(epsilon=epsilon(), max_rows=int(max_rows()))
 
     @reactive.effect
     @reactive.event(input.go_to_results)

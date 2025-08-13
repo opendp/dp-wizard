@@ -60,9 +60,12 @@ class ColumnIdentifier(str):
 @dataclass(kw_only=True, frozen=True)
 class AppState:
     # CLI options:
-    is_demo: bool
+    is_demo_csv: bool
     in_cloud: bool
     qa_mode: bool
+
+    # Top-level:
+    is_demo_mode: reactive.Value[bool]
 
     # Dataset choices:
     initial_private_csv_path: str
@@ -70,6 +73,7 @@ class AppState:
     initial_public_csv_path: str
     public_csv_path: reactive.Value[str]
     contributions: reactive.Value[int]
+    max_rows: reactive.Value[str]
 
     # Analysis choices:
     column_names: reactive.Value[list[ColumnName]]

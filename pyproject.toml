@@ -26,6 +26,7 @@ dependencies = [
     "pyyaml",
     "requests>=2.32.4",
     "shiny",
+    "starlette>=0.47.2",
     "tornado>=6.5",
     "urllib3>=2.5.0",
 ]
@@ -45,6 +46,10 @@ Home = "https://github.com/opendp/dp-wizard"
 [tool.pyright]
 include = ["dp_wizard"]
 ignore = ["**/no-tests/"]
+
+# TODO: Reenable when OpenDP exports are clean:
+# https://github.com/opendp/opendp/issues/2439
+reportPrivateImportUsage = false
 
 [project.optional-dependencies]
 app = [
@@ -135,7 +140,7 @@ app = [
     "sniffio==1.3.1",
     "soupsieve==2.6",
     "stack-data==0.6.3",
-    "starlette==0.46.2",
+    "starlette==0.47.2",
     "threadpoolctl==3.6.0",
     "tinycss2==1.4.0",
     "tomli==2.2.1",
