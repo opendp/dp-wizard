@@ -5,6 +5,7 @@ import re
 from collections import defaultdict
 
 from shiny import ui, reactive, Inputs, Outputs, Session
+from faicons import icon_svg
 
 from dp_wizard.utils.argparse_helpers import CLIInfo
 from dp_wizard.utils.csv_helper import read_csv_names
@@ -14,23 +15,39 @@ from dp_wizard.shiny import (
     dataset_panel,
     results_panel,
 )
-from dp_wizard.types import ColumnName
+from dp_wizard.types import AppState
 
 
-app_ui = ui.page_bootstrap(
-    ui.head_content(ui.include_css(Path(__file__).parent / "css" / "styles.css")),
-    ui.navset_tab(
-        about_panel.about_ui(),
-        dataset_panel.dataset_ui(),
-        analysis_panel.analysis_ui(),
-        results_panel.results_ui(),
-        ui.nav_spacer(),
-        ui.nav_control(ui.input_dark_mode()),
-        selected=dataset_panel.dataset_panel_id,
-        id="top_level_nav",
-    ),
-    title="DP Wizard",
-)
+def make_app_ui_from_cli_info(cli_info: CLIInfo):
+    return ui.page_bootstrap(
+        ui.head_content(ui.include_css(Path(__file__).parent / "css" / "styles.css")),
+        ui.navset_tab(
+            about_panel.about_ui(),
+            dataset_panel.dataset_ui(),
+            analysis_panel.analysis_ui(),
+            results_panel.results_ui(),
+            ui.nav_spacer(),
+            ui.nav_control(
+                ui.input_switch(
+                    "demo_mode",
+                    ui.tooltip(
+                        icon_svg("circle-question"),
+                        """
+                        Demo mode walks you through a hypothetical example
+                        and provides help along the way.
+                        """,
+                        placement="right",
+                    ),
+                    value=cli_info.get_is_demo_mode(),
+                    width="4em",
+                )
+            ),
+            ui.nav_control(ui.input_dark_mode()),
+            selected=dataset_panel.dataset_panel_id,
+            id="top_level_nav",
+        ),
+        title="DP Wizard",
+    )
 
 
 def ctrl_c_reminder():  # pragma: no cover
@@ -148,7 +165,7 @@ def make_server_from_cli_info(cli_info: CLIInfo):
     _scan_files_for_input_ids()
 
     def server(input: Inputs, output: Outputs, session: Session):  # pragma: no cover
-        if cli_info.is_demo:
+        if cli_info.is_demo_csv:
             initial_contributions = 10
             initial_private_csv_path = Path(__file__).parent.parent / "tmp" / "demo.csv"
             _make_demo_csv(initial_private_csv_path, initial_contributions)
@@ -158,79 +175,44 @@ def make_server_from_cli_info(cli_info: CLIInfo):
             initial_private_csv_path = ""
             initial_column_names = []
 
-        contributions = reactive.value(initial_contributions)
-        private_csv_path = reactive.value(str(initial_private_csv_path))
-        column_names: reactive.Value[list[ColumnName]] = reactive.value(
-            initial_column_names
-        )
-
-        public_csv_path = reactive.value("")
-        analysis_types = reactive.value({})
-        analysis_errors = reactive.value({})
-        lower_bounds = reactive.value({})
-        upper_bounds = reactive.value({})
-        bin_counts = reactive.value({})
-        groups = reactive.value([])
-        weights = reactive.value({})
-        epsilon = reactive.value(1.0)
-        released = reactive.value(False)
-
-        about_panel.about_server(
-            input,
-            output,
-            session,
-        )
-        dataset_panel.dataset_server(
-            input,
-            output,
-            session,
-            released=released,
-            is_demo=cli_info.is_demo,
-            in_cloud=cli_info.in_cloud,
-            initial_public_csv_path="",
+        state = AppState(
+            # CLI options:
+            is_demo_csv=cli_info.is_demo_csv,
+            in_cloud=cli_info.is_cloud_mode,
+            qa_mode=cli_info.is_qa_mode,
+            # Top-level:
+            is_demo_mode=reactive.value(cli_info.get_is_demo_mode()),
+            # Dataset choices:
             initial_private_csv_path=str(initial_private_csv_path),
-            public_csv_path=public_csv_path,
-            private_csv_path=private_csv_path,
-            column_names=column_names,
-            contributions=contributions,
+            private_csv_path=reactive.value(str(initial_private_csv_path)),
+            initial_public_csv_path="",
+            public_csv_path=reactive.value(""),
+            contributions=reactive.value(initial_contributions),
+            max_rows=reactive.value(""),
+            # Analysis choices:
+            column_names=reactive.value(initial_column_names),
+            groups=reactive.value([]),
+            epsilon=reactive.value(1.0),
+            # Per-column choices:
+            analysis_types=reactive.value({}),
+            lower_bounds=reactive.value({}),
+            upper_bounds=reactive.value({}),
+            bin_counts=reactive.value({}),
+            weights=reactive.value({}),
+            analysis_errors=reactive.value({}),
+            # Release state:
+            released=reactive.value(False),
         )
-        analysis_panel.analysis_server(
-            input,
-            output,
-            session,
-            released=released,
-            is_demo=cli_info.is_demo,
-            public_csv_path=public_csv_path,
-            column_names=column_names,
-            contributions=contributions,
-            analysis_types=analysis_types,
-            analysis_errors=analysis_errors,
-            lower_bounds=lower_bounds,
-            upper_bounds=upper_bounds,
-            bin_counts=bin_counts,
-            groups=groups,
-            weights=weights,
-            epsilon=epsilon,
-        )
-        results_panel.results_server(
-            input,
-            output,
-            session,
-            released=released,
-            in_cloud=cli_info.in_cloud,
-            is_demo=cli_info.is_demo,
-            qa_mode=cli_info.qa_mode,
-            public_csv_path=public_csv_path,
-            private_csv_path=private_csv_path,
-            contributions=contributions,
-            analysis_types=analysis_types,
-            lower_bounds=lower_bounds,
-            upper_bounds=upper_bounds,
-            bin_counts=bin_counts,
-            groups=groups,
-            weights=weights,
-            epsilon=epsilon,
-        )
+
+        @reactive.effect
+        @reactive.event(input.demo_mode)
+        def _update_demo_mode():
+            state.is_demo_mode.set(input.demo_mode())
+
+        about_panel.about_server(input, output, session)
+        dataset_panel.dataset_server(input, output, session, state)
+        analysis_panel.analysis_server(input, output, session, state)
+        results_panel.results_server(input, output, session, state)
         session.on_ended(ctrl_c_reminder)
 
     return server

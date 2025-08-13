@@ -73,10 +73,15 @@ class AbstractGenerator(ABC):
         # Line length determined by PDF rendering.
         return black.format_str(code, mode=black.Mode(line_length=74))  # type: ignore
 
-    def _make_margins_list(self, bin_names: Iterable[str], groups: Iterable[str]):
+    def _make_margins_list(
+        self,
+        bin_names: Iterable[str],
+        groups: Iterable[str],
+        max_rows: int,
+    ):
         import opendp.prelude as dp
 
-        def basic_template(GROUPS, OPENDP_VERSION):
+        def basic_template(GROUPS, OPENDP_VERSION, MAX_ROWS):
             # "max_partition_length" should be a loose upper bound,
             # for example, the size of the total population being sampled.
             # https://docs.opendp.org/en/OPENDP_VERSION/api/python/opendp.extras.polars.html#opendp.extras.polars.Margin.max_partition_length
@@ -87,7 +92,7 @@ class AbstractGenerator(ABC):
             dp.polars.Margin(
                 by=GROUPS,
                 public_info="keys",
-                max_partition_length=1000000,
+                max_partition_length=MAX_ROWS,
                 max_num_partitions=100,
             )
 
@@ -97,7 +102,7 @@ class AbstractGenerator(ABC):
         margins = [
             Template(basic_template)
             .fill_expressions(OPENDP_VERSION=opendp_version)
-            .fill_values(GROUPS=groups)
+            .fill_values(GROUPS=groups, MAX_ROWS=max_rows)
             .finish()
         ] + [
             Template(bin_template)
@@ -198,7 +203,10 @@ class AbstractGenerator(ABC):
         ]
 
         privacy_unit_block = make_privacy_unit_block(self.analysis_plan.contributions)
-        privacy_loss_block = make_privacy_loss_block(self.analysis_plan.epsilon)
+        privacy_loss_block = make_privacy_loss_block(
+            epsilon=self.analysis_plan.epsilon,
+            max_rows=self.analysis_plan.max_rows,
+        )
 
         is_just_histograms = all(
             plan_column[0].analysis_name == histogram.name
@@ -209,8 +217,9 @@ class AbstractGenerator(ABC):
             "[]"
             if is_just_histograms
             else self._make_margins_list(
-                [f"{name}_bin" for name in bin_column_names],
-                self.analysis_plan.groups,
+                bin_names=[f"{name}_bin" for name in bin_column_names],
+                groups=self.analysis_plan.groups,
+                max_rows=self.analysis_plan.max_rows,
             )
         )
         extra_columns = ", ".join(
