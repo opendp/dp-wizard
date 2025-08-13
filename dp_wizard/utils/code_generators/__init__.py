@@ -15,14 +15,34 @@ class AnalysisPlanColumn(NamedTuple):
 
 
 class AnalysisPlan(NamedTuple):
+    """
+    >>> plan = AnalysisPlan(
+    ...     csv_path='optional.csv',
+    ...     contributions=10,
+    ...     epsilon=2.0,
+    ...     max_rows=1000,
+    ...     groups=['grouping_col'],
+    ...     columns={
+    ...         'data_col': [AnalysisPlanColumn('Histogram', 0, 100, 10, 1)]
+    ...     })
+    >>> print(plan)
+    `data_col` Histogram
+    >>> print(plan.to_stem())
+    dp-data_col-histogram
+    """
+
     csv_path: Optional[str]
     contributions: int
     epsilon: float
+    max_rows: int
     groups: list[ColumnName]
     columns: dict[ColumnName, list[AnalysisPlanColumn]]
 
     def __str__(self):
-        return ", ".join(f"{k} {v[0].analysis_name}" for k, v in self.columns.items())
+        return ", ".join(f"`{k}` {v[0].analysis_name}" for k, v in self.columns.items())
+
+    def to_stem(self):
+        return re.sub(r"\W+", "-", f"dp-{self}").lower()
 
 
 # Public functions used to generate code snippets in the UI;
@@ -39,30 +59,30 @@ def make_privacy_unit_block(contributions: int):
     return Template(template).fill_values(CONTRIBUTIONS=contributions).finish()
 
 
-def make_privacy_loss_block(epsilon: float):
+def make_privacy_loss_block(epsilon: float, max_rows: int):
     import opendp.prelude as dp
 
-    def template(EPSILON, OPENDP_VERSION):
+    def template(EPSILON, MAX_ROWS, OPENDP_VERSION):
         privacy_loss = dp.loss_of(  # noqa: F841
             # Your privacy budget is captured in the "epsilon" parameter.
             # Larger values increase the risk that personal data could be reconstructed,
             # so choose the smallest value that gives you the needed accuracy.
             # You can also compare your budget to other projects:
-            # https://registry.oblivious.com/#public-dp
+            # https://registry.opendp.org/
             epsilon=EPSILON,
-            # There are many models of differential privacy.
-            # Pure DP only requires an epsilon parameter.
-            # (δ, ε)-DP is a looser model that tolerates a small chance (δ)
-            # that data may be released in the clear.
-            # Delta should be smaller than 1/(population size).
+            # There are many models of differential privacy. For flexibility,
+            # we here using a model which tolerates a small probability (delta)
+            # that data may be released in the clear. Delta should always be small,
+            # but if the dataset is particularly large,
+            # delta should not be larger than 1/(row count).
             # https://docs.opendp.org/en/OPENDP_VERSION/getting-started/tabular-data/grouping.html#Stable-Keys
-            delta=1e-7,
+            delta=1 / max(1e7, MAX_ROWS),
         )
 
     return (
         Template(template)
         .fill_expressions(OPENDP_VERSION=opendp_version)
-        .fill_values(EPSILON=epsilon)
+        .fill_values(EPSILON=epsilon, MAX_ROWS=max_rows)
         .finish()
     )
 

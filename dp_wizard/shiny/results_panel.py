@@ -21,8 +21,9 @@ from dp_wizard_templates.converters import (
 from dp_wizard.shiny.components.outputs import (
     hide_if,
     info_md_box,
+    demo_help,
 )
-from dp_wizard.types import AnalysisName, ColumnName
+from dp_wizard.types import AppState
 
 
 wait_message = "Please wait."
@@ -92,20 +93,40 @@ def results_server(
     input: Inputs,
     output: Outputs,
     session: Session,
-    released: reactive.Value[bool],
-    in_cloud: bool,
-    qa_mode: bool,
-    public_csv_path: reactive.Value[str],
-    private_csv_path: reactive.Value[str],
-    contributions: reactive.Value[int],
-    analysis_types: reactive.Value[dict[ColumnName, AnalysisName]],
-    lower_bounds: reactive.Value[dict[ColumnName, float]],
-    upper_bounds: reactive.Value[dict[ColumnName, float]],
-    bin_counts: reactive.Value[dict[ColumnName, int]],
-    groups: reactive.Value[list[ColumnName]],
-    weights: reactive.Value[dict[ColumnName, str]],
-    epsilon: reactive.Value[float],
+    state: AppState,
 ):  # pragma: no cover
+    # CLI options:
+    # is_demo_csv = state.is_demo_csv
+    in_cloud = state.in_cloud
+    qa_mode = state.qa_mode
+
+    # Top-level:
+    is_demo_mode = state.is_demo_mode
+
+    # Dataset choices:
+    # initial_private_csv_path = state.initial_private_csv_path
+    private_csv_path = state.private_csv_path
+    # initial_public_csv_path = state.initial_private_csv_path
+    public_csv_path = state.public_csv_path
+    contributions = state.contributions
+    max_rows = state.max_rows
+
+    # Analysis choices:
+    # column_names = state.column_names
+    groups = state.groups
+    epsilon = state.epsilon
+
+    # Per-column choices:
+    # (Note that these are all dicts, with the ColumnName as the key.)
+    analysis_types = state.analysis_types
+    lower_bounds = state.lower_bounds
+    upper_bounds = state.upper_bounds
+    bin_counts = state.bin_counts
+    weights = state.weights
+    # analysis_errors = state.analysis_errors
+
+    # Release state:
+    released = state.released
 
     @render.ui
     def results_requirements_warning_ui():
@@ -142,6 +163,14 @@ def results_server(
                     ),
                     button("HTML", ".html", "file-code", disabled=disabled),
                     p("The same content, but exported as HTML."),
+                    demo_help(
+                        is_demo_mode(),
+                        """
+                        Now you can download a notebook for your analysis.
+                        The Jupyter notebook could be used locally or on Colab,
+                        but the HTML version can be viewed in the brower.
+                        """,
+                    ),
                 ),
                 ui.accordion_panel(
                     "Reports",
@@ -259,13 +288,14 @@ def results_server(
             csv_path=private_csv_path() or public_csv_path() or PLACEHOLDER_CSV_NAME,
             contributions=contributions(),
             epsilon=epsilon(),
+            max_rows=int(max_rows()),
             groups=groups(),
             columns=columns,
         )
 
     @reactive.calc
     def download_stem() -> str:
-        return "dp-" + re.sub(r"\W+", "-", str(analysis_plan())).lower()
+        return analysis_plan().to_stem()
 
     @reactive.calc
     def notebook_nb():
