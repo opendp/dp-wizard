@@ -8,7 +8,7 @@ from shiny import Inputs, Outputs, Session, reactive, render, ui
 from dp_wizard.shiny.components.column_module import column_server, column_ui
 from dp_wizard.shiny.components.inputs import log_slider
 from dp_wizard.shiny.components.outputs import (
-    demo_tooltip,
+    demo_help,
     hide_if,
     info_md_box,
     nav_button,
@@ -34,10 +34,11 @@ def analysis_ui():
                 ui.markdown("Select columns to calculate statistics on."),
                 ui.input_selectize(
                     "columns_selectize",
-                    ["Columns", ui.output_ui("columns_selectize_tooltip_ui")],
+                    "Columns",
                     [],
                     multiple=True,
                 ),
+                ui.output_ui("columns_selectize_tooltip_ui"),
             ),
             ui.card(
                 ui.card_header("Grouping"),
@@ -52,10 +53,11 @@ def analysis_ui():
                 ),
                 ui.input_selectize(
                     "groups_selectize",
-                    ["Group by", ui.output_ui("groups_selectize_tooltip_ui")],
+                    "Group by",
                     [],
                     multiple=True,
                 ),
+                ui.output_ui("groups_selectize_tooltip_ui"),
             ),
             ui.card(
                 ui.card_header("Privacy Budget"),
@@ -186,24 +188,26 @@ def analysis_server(
 
     @render.ui
     def groups_selectize_tooltip_ui():
-        return demo_tooltip(
+        return demo_help(
             is_demo,
             """
             DP Wizard only supports the analysis of numeric data,
             but string values can be used for grouping.
             Select "class_year_str".
             """,
+            responsive=False,
         )
 
     @render.ui
     def columns_selectize_tooltip_ui():
-        return demo_tooltip(
+        return demo_help(
             is_demo,
             """
             Not all columns need analysis. For this demo, just check
             "grade". With more columns selected,
             each column has a smaller share of the privacy budget.
             """,
+            responsive=False,
         )
 
     @render.ui
@@ -292,13 +296,14 @@ def analysis_server(
     def epsilon_ui():
         return tags.label(
             f"Epsilon: {epsilon():0.3} ",
-            demo_tooltip(
+            demo_help(
                 is_demo,
                 """
                 If you set epsilon above one, you'll see that the distribution
                 becomes less noisy, and the confidence intervals become smaller...
                 but increased accuracy risks revealing personal information.
                 """,
+                responsive=False,
             ),
         )
 

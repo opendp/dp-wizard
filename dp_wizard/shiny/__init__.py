@@ -212,6 +212,7 @@ def make_server_from_cli_info(cli_info: CLIInfo):
             session,
             released=released,
             in_cloud=cli_info.in_cloud,
+            is_demo=cli_info.is_demo,
             qa_mode=cli_info.qa_mode,
             public_csv_path=public_csv_path,
             private_csv_path=private_csv_path,

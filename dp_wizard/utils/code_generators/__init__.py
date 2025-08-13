@@ -15,6 +15,21 @@ class AnalysisPlanColumn(NamedTuple):
 
 
 class AnalysisPlan(NamedTuple):
+    """
+    >>> plan = AnalysisPlan(
+    ...     csv_path='optional.csv',
+    ...     contributions=10,
+    ...     epsilon=2.0,
+    ...     groups=['grouping_col'],
+    ...     columns={
+    ...         'data_col': [AnalysisPlanColumn('Histogram', 0, 100, 10, 1)]
+    ...     })
+    >>> print(plan)
+    `data_col` Histogram
+    >>> print(plan.to_stem())
+    dp-data_col-histogram
+    """
+
     csv_path: Optional[str]
     contributions: int
     epsilon: float
@@ -22,7 +37,10 @@ class AnalysisPlan(NamedTuple):
     columns: dict[ColumnName, list[AnalysisPlanColumn]]
 
     def __str__(self):
-        return ", ".join(f"{k} {v[0].analysis_name}" for k, v in self.columns.items())
+        return ", ".join(f"`{k}` {v[0].analysis_name}" for k, v in self.columns.items())
+
+    def to_stem(self):
+        return re.sub(r"\W+", "-", f"dp-{self}").lower()
 
 
 # Public functions used to generate code snippets in the UI;

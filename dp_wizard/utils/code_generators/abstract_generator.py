@@ -53,9 +53,9 @@ class AbstractGenerator(ABC):
             Template(self.root_template, __file__)
             .fill_expressions(
                 TITLE=str(self.analysis_plan),
-                DEPENDENCIES="'opendp[polars]=={opendp_version}' matplotlib",
                 WINDOWS_NOTE="(If installing in the Windows CMD shell, "
-                "use double-quotes instead of single-quotes above.)",
+                "use double-quotes instead of single-quotes below.)",
+                DEPENDENCIES=f"'opendp[polars]=={opendp_version}' matplotlib",
             )
             .fill_blocks(
                 IMPORTS_BLOCK=Template(template).finish(),
@@ -71,27 +71,39 @@ class AbstractGenerator(ABC):
         return black.format_str(code, mode=black.Mode(line_length=74))  # type: ignore
 
     def _make_margins_list(self, bin_names: Iterable[str], groups: Iterable[str]):
-        groups_str = ", ".join(f"'{g}'" for g in groups)
-        margins = (
-            [
-                f"""
+        import opendp.prelude as dp
+
+        def basic_template(GROUPS, OPENDP_VERSION):
             # "max_partition_length" should be a loose upper bound,
             # for example, the size of the total population being sampled.
-            # https://docs.opendp.org/en/{opendp_version}/api/python/opendp.extras.polars.html#opendp.extras.polars.Margin.max_partition_length
+            # https://docs.opendp.org/en/OPENDP_VERSION/api/python/opendp.extras.polars.html#opendp.extras.polars.Margin.max_partition_length
             #
-            # In production, "max_num_partitions" should be set by considering the number
-            # of possible values for each grouping column, and taking their product.
-            dp.polars.Margin(by=[{groups_str}], public_info='keys', max_partition_length=1000000, max_num_partitions=100),
-            """  # noqa: B950 (too long!)
-            ]
-            + [
-                f"dp.polars.Margin(by=['{bin_name}', {groups_str}], "
-                "public_info='keys',),"
-                for bin_name in bin_names
-            ]
-        )
+            # In production, "max_num_partitions" should be set by considering
+            # the number of possible values for each grouping column,
+            # and taking their product.
+            dp.polars.Margin(
+                by=GROUPS,
+                public_info="keys",
+                max_partition_length=1000000,
+                max_num_partitions=100,
+            )
 
-        margins_list = "[" + "".join(margins) + "\n    ]"
+        def bin_template(GROUPS, BIN_NAME):
+            dp.polars.Margin(by=([BIN_NAME] + GROUPS), public_info="keys")
+
+        margins = [
+            Template(basic_template)
+            .fill_expressions(OPENDP_VERSION=opendp_version)
+            .fill_values(GROUPS=groups)
+            .finish()
+        ] + [
+            Template(bin_template)
+            .fill_values(GROUPS=groups, BIN_NAME=bin_name)
+            .finish()
+            for bin_name in bin_names
+        ]
+
+        margins_list = "[" + ", ".join(margins) + "\n    ]"
         return margins_list
 
     @abstractmethod

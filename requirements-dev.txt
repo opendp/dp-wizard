@@ -263,7 +263,7 @@ pyproject-hooks==1.2.0
     # via
     #   build
     #   pip-tools
-pyright==1.1.399
+pyright==1.1.403
     # via -r requirements-dev.in
 pytest==8.3.5
     # via
@@ -328,8 +328,10 @@ soupsieve==2.6
     # via beautifulsoup4
 stack-data==0.6.3
     # via ipython
-starlette==0.46.2
-    # via shiny
+starlette==0.47.2
+    # via
+    #   -r .../dp-wizard/requirements.in
+    #   shiny
 text-unidecode==1.3
     # via python-slugify
 threadpoolctl==3.6.0
@@ -378,6 +380,7 @@ typing-extensions==4.13.2
     #   pyright
     #   referencing
     #   shiny
+    #   starlette
     #   uvicorn
 uc-micro-py==1.0.3
     # via linkify-it-py

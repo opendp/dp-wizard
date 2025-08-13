@@ -5,7 +5,7 @@ from shiny import Inputs, Outputs, Session, reactive, render, ui
 
 from dp_wizard.shiny.components.outputs import (
     col_widths,
-    demo_tooltip,
+    demo_help,
     hide_if,
     info_md_box,
     nav_button,
@@ -34,9 +34,10 @@ def dataset_ui():
             ui.output_ui("input_contributions_ui"),
             ui.output_ui("contributions_validation_ui"),
             output_code_sample(
-                ["Unit of Privacy", ui.output_ui("python_tooltip_ui")],
+                "Unit of Privacy",
                 "unit_of_privacy_python",
             ),
+            ui.output_ui("python_tooltip_ui"),
         ),
         ui.output_ui("define_analysis_button_ui"),
         value="dataset_panel",
@@ -169,27 +170,30 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
         #   and it looks like the file input is unset.
         # - After file upload, the internal copy of the file
         #   is renamed to something like "0.csv".
-        return ui.row(
-            ui.input_file(
-                "private_csv_path",
-                [
-                    "Choose Private CSV ",  # Trailing space looks better.
-                    demo_tooltip(
-                        is_demo,
-                        "For the demo, we'll imagine we have the grades "
-                        "on assignments for a class.",
-                    ),
-                ],
-                accept=[".csv"],
-                placeholder=Path(initial_private_csv_path).name,
+        return [
+            demo_help(
+                is_demo,
+                """
+                For the demo, we've provided the grades
+                on assignments for a school class.
+                You don't need to upload an additional file.
+                """,
             ),
-            ui.input_file(
-                "public_csv_path",
-                "Choose Public CSV",
-                accept=[".csv"],
-                placeholder=Path(initial_public_csv_path).name,
+            ui.row(
+                ui.input_file(
+                    "private_csv_path",
+                    "Choose Private CSV",
+                    accept=[".csv"],
+                    placeholder=Path(initial_private_csv_path).name,
+                ),
+                ui.input_file(
+                    "public_csv_path",
+                    "Choose Public CSV",
+                    accept=[".csv"],
+                    placeholder=Path(initial_public_csv_path).name,
+                ),
             ),
-        )
+        ]
 
     @render.ui
     def csv_column_match_ui():
@@ -264,18 +268,15 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 This is the "unit of privacy" which will be protected.
                 """
             ),
-            # TODO: Add this back when "Make the demo tooltips always-on" is merged.
-            #     https://github.com/opendp/dp-wizard/pull/503
             # Without the input label, the tooltip floats way too far the right.
-            #
-            # demo_tooltip(
-            #     is_demo,
-            #     f"""
-            #     For the demo, we assume that each student
-            #     can occur at most {contributions()} times
-            #     in the dataset.
-            #     """,
-            # ),
+            demo_help(
+                is_demo,
+                f"""
+                For the demo, we assume that each student
+                can occur at most {contributions()} times
+                in the CSV.
+                """,
+            ),
             ui.layout_columns(
                 ui.input_numeric(
                     "contributions",
@@ -283,6 +284,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                     contributions(),
                     min=1,
                 ),
+                [],  # column placeholder
                 col_widths=col_widths,  # type: ignore
             ),
         ]
@@ -314,10 +316,10 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
 
     @render.ui
     def python_tooltip_ui():
-        return demo_tooltip(
+        return demo_help(
             is_demo,
             """
-            Along the way, code samples will demonstrate
+            Along the way, code samples demonstrate
             how the information you provide is used in the
             OpenDP Library, and at the end you can download
             a notebook for the entire calculation.

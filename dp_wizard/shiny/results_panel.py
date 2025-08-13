@@ -5,7 +5,11 @@ from faicons import icon_svg
 from htmltools.tags import p
 from shiny import Inputs, Outputs, Session, reactive, render, types, ui
 
-from dp_wizard.shiny.components.outputs import hide_if, info_md_box
+from dp_wizard.shiny.components.outputs import (
+    demo_help,
+    hide_if,
+    info_md_box,
+)
 from dp_wizard.types import AnalysisName, ColumnName
 from dp_wizard.utils.code_generators import AnalysisPlan, AnalysisPlanColumn
 from dp_wizard.utils.code_generators.notebook_generator import (
@@ -13,7 +17,10 @@ from dp_wizard.utils.code_generators.notebook_generator import (
     NotebookGenerator,
 )
 from dp_wizard.utils.code_generators.script_generator import ScriptGenerator
-from dp_wizard.utils.converters import convert_nb_to_html, convert_py_to_nb
+from dp_wizard.utils.converters import (
+    convert_nb_to_html,
+    convert_py_to_nb,
+)
 
 wait_message = "Please wait."
 
@@ -84,6 +91,7 @@ def results_server(
     session: Session,
     released: reactive.Value[bool],
     in_cloud: bool,
+    is_demo: bool,
     qa_mode: bool,
     public_csv_path: reactive.Value[str],
     private_csv_path: reactive.Value[str],
@@ -132,6 +140,14 @@ def results_server(
                     ),
                     button("HTML", ".html", "file-code", disabled=disabled),
                     p("The same content, but exported as HTML."),
+                    demo_help(
+                        is_demo,
+                        """
+                        Now you can download a notebook for your analysis.
+                        The Jupyter notebook could be used locally or on Colab,
+                        but the HTML version can be viewed in the brower.
+                        """,
+                    ),
                 ),
                 ui.accordion_panel(
                     "Reports",
@@ -255,7 +271,7 @@ def results_server(
 
     @reactive.calc
     def download_stem() -> str:
-        return "dp-" + re.sub(r"\W+", "-", str(analysis_plan())).lower()
+        return analysis_plan().to_stem()
 
     @reactive.calc
     def notebook_nb():
