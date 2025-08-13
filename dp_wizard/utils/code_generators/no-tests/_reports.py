@@ -1,6 +1,7 @@
-from yaml import dump
-from pathlib import Path
 import csv
+from pathlib import Path
+
+from yaml import dump
 
 
 # https://stackoverflow.com/a/6027615/10727889

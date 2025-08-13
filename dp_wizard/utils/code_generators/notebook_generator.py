@@ -1,11 +1,13 @@
+from pathlib import Path
+
 from dp_wizard_templates.code_template import Template
 
-from dp_wizard.utils.code_generators.abstract_generator import AbstractGenerator
-from dp_wizard.utils.dp_helper import confidence
 from dp_wizard.types import ColumnIdentifier
-from dp_wizard.utils.code_generators.abstract_generator import get_template_root
-
-from pathlib import Path
+from dp_wizard.utils.code_generators.abstract_generator import (
+    AbstractGenerator,
+    get_template_root,
+)
+from dp_wizard.utils.dp_helper import confidence
 
 PLACEHOLDER_CSV_NAME = "fill-in-correct-path.csv"
 

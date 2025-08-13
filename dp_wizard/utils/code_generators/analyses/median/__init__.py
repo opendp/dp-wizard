@@ -1,7 +1,7 @@
-from dp_wizard import opendp_version, get_template_root
 from dp_wizard_templates.code_template import Template
-from dp_wizard.types import AnalysisName
 
+from dp_wizard import get_template_root, opendp_version
+from dp_wizard.types import AnalysisName
 
 name = AnalysisName("Median")
 blurb_md = """

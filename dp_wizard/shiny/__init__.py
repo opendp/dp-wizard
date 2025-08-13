@@ -1,14 +1,12 @@
-from pathlib import Path
 import csv
 import random
 import re
 from collections import defaultdict
+from pathlib import Path
 
-from shiny import ui, reactive, Inputs, Outputs, Session
 from faicons import icon_svg
+from shiny import Inputs, Outputs, Session, reactive, ui
 
-from dp_wizard.utils.argparse_helpers import CLIInfo
-from dp_wizard.utils.csv_helper import read_csv_names
 from dp_wizard.shiny import (
     about_panel,
     analysis_panel,
@@ -16,6 +14,8 @@ from dp_wizard.shiny import (
     results_panel,
 )
 from dp_wizard.types import AppState
+from dp_wizard.utils.argparse_helpers import CLIInfo
+from dp_wizard.utils.csv_helper import read_csv_names
 
 
 def make_app_ui_from_cli_info(cli_info: CLIInfo):

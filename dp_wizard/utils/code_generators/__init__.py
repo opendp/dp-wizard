@@ -1,8 +1,9 @@
-from typing import NamedTuple, Optional
 import re
+from typing import NamedTuple, Optional
+
+from dp_wizard_templates.code_template import Template
 
 from dp_wizard import opendp_version
-from dp_wizard_templates.code_template import Template
 from dp_wizard.types import AnalysisName, ColumnName
 
 
