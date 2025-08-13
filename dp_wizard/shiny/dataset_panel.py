@@ -323,6 +323,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                     contributions(),
                     min=1,
                 ),
+                [],  # column placeholder
                 col_widths=col_widths,  # type: ignore
             ),
         ]
