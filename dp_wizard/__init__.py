@@ -8,6 +8,13 @@ __version__ = (Path(__file__).parent / "VERSION").read_text().strip()
 opendp_version = "0.13.0"
 
 
+def get_template_root(path):
+    # We use the same convention everywhere,
+    # but there are separate directories
+    # for each of the analyses.
+    return Path(path).parent / "no-tests"
+
+
 def main():  # pragma: no cover
     import sys
 

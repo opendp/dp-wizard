@@ -1,4 +1,4 @@
-from dp_wizard import opendp_version
+from dp_wizard import opendp_version, get_template_root
 from math import gcd
 
 from dp_wizard_templates.code_template import Template
@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import Iterable
 
 
-root = Path(__file__).parent / "no-tests"
+root = get_template_root(__file__)
 
 
 class AbstractGenerator(ABC):

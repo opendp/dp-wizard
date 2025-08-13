@@ -1,9 +1,8 @@
-from pathlib import Path
-
 from dp_wizard_templates.code_template import Template
 
 from dp_wizard import opendp_version
 from dp_wizard.types import AnalysisName
+from dp_wizard.utils.code_generators.abstract_generator import get_template_root
 
 
 name = AnalysisName("Count")
@@ -14,7 +13,7 @@ input_names = []
 has_bins = False
 
 
-root = Path(__file__).parent / "no-tests"
+root = get_template_root(__file__)
 
 
 def make_query(code_gen, identifier, accuracy_name, stats_name):

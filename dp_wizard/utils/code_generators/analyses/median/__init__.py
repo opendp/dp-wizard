@@ -1,7 +1,7 @@
-from dp_wizard import opendp_version
+from dp_wizard import opendp_version, get_template_root
 from dp_wizard_templates.code_template import Template
 from dp_wizard.types import AnalysisName
-from pathlib import Path
+
 
 name = AnalysisName("Median")
 blurb_md = """
@@ -19,7 +19,7 @@ input_names = [
 has_bins = False
 
 
-root = Path(__file__).parent / "no-tests"
+root = get_template_root(__file__)
 
 
 def make_query(code_gen, identifier, accuracy_name, stats_name):
