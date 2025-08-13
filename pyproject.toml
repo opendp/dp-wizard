@@ -47,6 +47,10 @@ Home = "https://github.com/opendp/dp-wizard"
 include = ["dp_wizard"]
 ignore = ["**/no-tests/"]
 
+# TODO: Reenable when OpenDP exports are clean:
+# https://github.com/opendp/opendp/issues/2439
+reportPrivateImportUsage = false
+
 [project.optional-dependencies]
 app = [
     "anyio==4.9.0",

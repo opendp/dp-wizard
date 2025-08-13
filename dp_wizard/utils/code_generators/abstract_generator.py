@@ -79,27 +79,39 @@ class AbstractGenerator(ABC):
         groups: Iterable[str],
         max_rows: int,
     ):
-        groups_str = ", ".join(f"'{g}'" for g in groups)
-        margins = (
-            [
-                f"""
+        import opendp.prelude as dp
+
+        def basic_template(GROUPS, OPENDP_VERSION, MAX_ROWS):
             # "max_partition_length" should be a loose upper bound,
             # for example, the size of the total population being sampled.
-            # https://docs.opendp.org/en/{opendp_version}/api/python/opendp.extras.polars.html#opendp.extras.polars.Margin.max_partition_length
+            # https://docs.opendp.org/en/OPENDP_VERSION/api/python/opendp.extras.polars.html#opendp.extras.polars.Margin.max_partition_length
             #
-            # In production, "max_num_partitions" should be set by considering the number
-            # of possible values for each grouping column, and taking their product.
-            dp.polars.Margin(by=[{groups_str}], public_info='keys', max_partition_length={max_rows}, max_num_partitions=100),
-            """  # noqa: B950 (too long!)
-            ]
-            + [
-                f"dp.polars.Margin(by=['{bin_name}', {groups_str}], "
-                "public_info='keys',),"
-                for bin_name in bin_names
-            ]
-        )
+            # In production, "max_num_partitions" should be set by considering
+            # the number of possible values for each grouping column,
+            # and taking their product.
+            dp.polars.Margin(
+                by=GROUPS,
+                public_info="keys",
+                max_partition_length=MAX_ROWS,
+                max_num_partitions=100,
+            )
 
-        margins_list = "[" + "".join(margins) + "\n    ]"
+        def bin_template(GROUPS, BIN_NAME):
+            dp.polars.Margin(by=([BIN_NAME] + GROUPS), public_info="keys")
+
+        margins = [
+            Template(basic_template)
+            .fill_expressions(OPENDP_VERSION=opendp_version)
+            .fill_values(GROUPS=groups, MAX_ROWS=max_rows)
+            .finish()
+        ] + [
+            Template(bin_template)
+            .fill_values(GROUPS=groups, BIN_NAME=bin_name)
+            .finish()
+            for bin_name in bin_names
+        ]
+
+        margins_list = "[" + ", ".join(margins) + "\n    ]"
         return margins_list
 
     @abstractmethod
