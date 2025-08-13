@@ -26,10 +26,6 @@ local_app = create_app_fixture(root_path / "dp_wizard/app_local.py")
 qa_app = create_app_fixture(root_path / "dp_wizard/app_qa.py")
 
 
-tooltip = "#private_csv_path-label svg"
-for_the_demo = "For the demo, we'll imagine"
-
-
 def test_cloud_app(page: Page, cloud_app: ShinyAppProc):  # pragma: no cover
     page.goto(cloud_app.url)
     expect(page).to_have_title("DP Wizard")
@@ -73,9 +69,7 @@ def test_qa_app(page: Page, qa_app: ShinyAppProc):  # pragma: no cover
 def test_demo_app(page: Page, demo_app: ShinyAppProc):  # pragma: no cover
     page.goto(demo_app.url)
     expect(page).to_have_title("DP Wizard")
-    expect(page.get_by_text(for_the_demo)).not_to_be_visible()
-    page.locator(tooltip).hover()
-    expect(page.get_by_text(for_the_demo)).to_be_visible()
+    expect(page.get_by_text("For the demo, we've provided")).to_be_visible()
 
     # -- Define analysis --
     page.get_by_role("button", name="Define analysis").click()
@@ -90,7 +84,6 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     # -- Select dataset --
     page.goto(local_app.url)
     expect(page).to_have_title("DP Wizard")
-    expect(page.locator(tooltip)).to_have_count(0)
     expect(page.get_by_text(pick_dataset_text)).to_be_visible()
     expect(page.get_by_text(perform_analysis_text)).not_to_be_visible()
     expect(page.get_by_text(download_results_text)).not_to_be_visible()
