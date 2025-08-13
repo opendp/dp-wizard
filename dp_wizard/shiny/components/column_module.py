@@ -136,7 +136,7 @@ def column_server(
     upper_bounds: reactive.Value[dict[ColumnName, float]],
     bin_counts: reactive.Value[dict[ColumnName, int]],
     weights: reactive.Value[dict[ColumnName, str]],
-    is_demo: bool,
+    is_demo_mode: reactive.Value[bool],
     is_single_column: bool,
 ):  # pragma: no cover
     @reactive.effect
@@ -308,7 +308,7 @@ def column_server(
     @render.ui
     def bounds_tooltip_ui():
         return demo_help(
-            is_demo,
+            is_demo_mode(),
             """
             Don't look at the data when estimating the bounds!
             In this case, we could limit "grade" to values between 50 and 100.
@@ -319,7 +319,7 @@ def column_server(
     @render.ui
     def bins_tooltip_ui():
         return demo_help(
-            is_demo,
+            is_demo_mode(),
             """
             If you increase the number of bins,
             you'll see that each individual bin becomes noisier to provide
@@ -349,7 +349,7 @@ def column_server(
     @render.ui
     def weight_tooltip_ui():
         return demo_help(
-            is_demo,
+            is_demo_mode(),
             """
             You have a finite privacy budget, but you can choose
             how to allocate it. For simplicity, we limit the options here,
