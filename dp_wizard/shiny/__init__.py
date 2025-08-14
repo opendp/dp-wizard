@@ -54,13 +54,13 @@ def ctrl_c_reminder():  # pragma: no cover
     print("Session ended (Press CTRL+C to quit)")
 
 
-def _make_demo_csv(path: Path, contributions):
+def _make_sample_csv(path: Path, contributions):
     """
     >>> import tempfile
     >>> from pathlib import Path
     >>> import csv
     >>> with tempfile.NamedTemporaryFile() as temp:
-    ...     _make_demo_csv(Path(temp.name), 10)
+    ...     _make_sample_csv(Path(temp.name), 10)
     ...     with open(temp.name, newline="") as csv_handle:
     ...         reader = csv.DictReader(csv_handle)
     ...         reader.fieldnames
@@ -72,7 +72,7 @@ def _make_demo_csv(path: Path, contributions):
     dict_values(['100', 'sophomore', '10', '78', '0'])
     """
     random.seed(0)  # So the mock data will be stable across runs.
-    with path.open("w", newline="") as demo_handle:
+    with path.open("w", newline="") as sample_csv_handle:
         fields = [
             "student_id",
             "class_year_str",
@@ -81,7 +81,7 @@ def _make_demo_csv(path: Path, contributions):
             "self_assessment",
         ]
         class_year_map = ["first year", "sophomore", "junior", "senior"]
-        writer = csv.DictWriter(demo_handle, fieldnames=fields)
+        writer = csv.DictWriter(sample_csv_handle, fieldnames=fields)
         writer.writeheader()
         for student_id in range(1, 101):
             class_year = int(_clip(random.gauss(1, 1), 0, 3))
@@ -170,7 +170,7 @@ def make_server_from_cli_info(cli_info: CLIInfo):
             initial_private_csv_path = (
                 Path(__file__).parent.parent / "tmp" / "sample.csv"
             )
-            _make_demo_csv(initial_private_csv_path, initial_contributions)
+            _make_sample_csv(initial_private_csv_path, initial_contributions)
             initial_column_names = read_csv_names(Path(initial_private_csv_path))
         else:
             initial_contributions = 1

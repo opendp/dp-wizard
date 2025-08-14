@@ -7,10 +7,10 @@ from shiny.types import SilentException
 
 from dp_wizard.shiny.components.outputs import (
     col_widths,
-    demo_help,
     hide_if,
     info_md_box,
     output_code_sample,
+    tutorial_box,
 )
 from dp_wizard.types import AnalysisName, ColumnName
 from dp_wizard.utils.code_generators import make_column_config_block
@@ -307,7 +307,7 @@ def column_server(
 
     @render.ui
     def bounds_tooltip_ui():
-        return demo_help(
+        return tutorial_box(
             is_tutorial_mode(),
             """
             Don't look at the data when estimating the bounds!
@@ -319,7 +319,7 @@ def column_server(
 
     @render.ui
     def bins_tooltip_ui():
-        return demo_help(
+        return tutorial_box(
             is_tutorial_mode(),
             """
             If you decrease the number of bins,
@@ -348,7 +348,7 @@ def column_server(
 
     @render.ui
     def weight_tooltip_ui():
-        return demo_help(
+        return tutorial_box(
             is_tutorial_mode(),
             """
             You have a finite privacy budget, but you can choose

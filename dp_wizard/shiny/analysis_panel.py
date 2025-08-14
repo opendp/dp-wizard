@@ -8,11 +8,11 @@ from shiny import Inputs, Outputs, Session, reactive, render, ui
 from dp_wizard.shiny.components.column_module import column_server, column_ui
 from dp_wizard.shiny.components.inputs import log_slider
 from dp_wizard.shiny.components.outputs import (
-    demo_help,
     hide_if,
     info_md_box,
     nav_button,
     output_code_sample,
+    tutorial_box,
 )
 from dp_wizard.types import AppState
 from dp_wizard.utils.code_generators import make_privacy_loss_block
@@ -207,7 +207,7 @@ def analysis_server(
 
     @render.ui
     def groups_selectize_tooltip_ui():
-        return demo_help(
+        return tutorial_box(
             is_tutorial_mode(),
             """
             DP Wizard only supports the analysis of numeric data,
@@ -220,7 +220,7 @@ def analysis_server(
 
     @render.ui
     def columns_selectize_tooltip_ui():
-        return demo_help(
+        return tutorial_box(
             is_tutorial_mode(),
             """
             Not all columns need analysis. If you have a CSV of
@@ -234,7 +234,7 @@ def analysis_server(
     @render.ui
     def simulation_card_ui():
         help = (
-            demo_help(
+            tutorial_box(
                 is_tutorial_mode(),
                 """
             Unlike the other settings on this page,
@@ -329,7 +329,7 @@ def analysis_server(
     def epsilon_ui():
         return tags.label(
             f"Epsilon: {epsilon():0.3} ",
-            demo_help(
+            tutorial_box(
                 is_tutorial_mode(),
                 """
                 If you set epsilon above one, you'll see that the distribution

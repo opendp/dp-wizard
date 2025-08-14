@@ -5,11 +5,11 @@ from shiny import Inputs, Outputs, Session, reactive, render, ui
 
 from dp_wizard.shiny.components.outputs import (
     col_widths,
-    demo_help,
     hide_if,
     info_md_box,
     nav_button,
     output_code_sample,
+    tutorial_box,
 )
 from dp_wizard.types import AppState
 from dp_wizard.utils.argparse_helpers import (
@@ -177,7 +177,7 @@ def dataset_server(
     @render.ui
     def welcome_ui():
         return (
-            demo_help(
+            tutorial_box(
                 is_tutorial_mode(),
                 """
                 Welcome to **DP Wizard**, from OpenDP.
@@ -206,7 +206,7 @@ def dataset_server(
                         one per line, with no extra punctuation.
                         """
                 ),
-                demo_help(
+                tutorial_box(
                     is_tutorial_mode(),
                     """
                             When [installed and run
@@ -252,7 +252,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
         # - After file upload, the internal copy of the file
         #   is renamed to something like "0.csv".
         return [
-            demo_help(
+            tutorial_box(
                 is_tutorial_mode(),
                 (
                     """
@@ -359,7 +359,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 """
             ),
             # Without the input label, the tooltip floats way too far the right.
-            demo_help(
+            tutorial_box(
                 is_tutorial_mode(),
                 """
                 If you had a CSV of student grades,
@@ -407,7 +407,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
 
     @render.ui
     def python_tooltip_ui():
-        return demo_help(
+        return tutorial_box(
             is_tutorial_mode(),
             """
             Along the way, code samples demonstrate
@@ -438,7 +438,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                     What is the **maximum row count** of your CSV?
                     """
                 ),
-                demo_help(
+                tutorial_box(
                     is_tutorial_mode(),
                     """
                     If you're unsure, pick a safe value, like the total

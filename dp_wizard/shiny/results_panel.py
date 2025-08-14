@@ -10,9 +10,9 @@ from htmltools.tags import p
 from shiny import Inputs, Outputs, Session, reactive, render, types, ui
 
 from dp_wizard.shiny.components.outputs import (
-    demo_help,
     hide_if,
     info_md_box,
+    tutorial_box,
 )
 from dp_wizard.types import AppState
 from dp_wizard.utils.code_generators import AnalysisPlan, AnalysisPlanColumn
@@ -159,7 +159,7 @@ def results_server(
                     ),
                     button("HTML", ".html", "file-code", disabled=disabled),
                     p("The same content, but exported as HTML."),
-                    demo_help(
+                    tutorial_box(
                         is_tutorial_mode(),
                         """
                         Now you can download a notebook for your analysis.
@@ -191,7 +191,7 @@ def results_server(
         disabled = not weights()
         return [
             ui.h3("Download Code"),
-            demo_help(
+            tutorial_box(
                 is_tutorial_mode(),
                 (
                     """
