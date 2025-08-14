@@ -98,7 +98,7 @@ def dataset_server(
     in_cloud = state.in_cloud
 
     # Top-level:
-    is_demo_mode = state.is_demo_mode
+    is_tutorial_mode = state.is_tutorial_mode
 
     # Dataset choices:
     initial_private_csv_path = state.initial_private_csv_path
@@ -178,7 +178,7 @@ def dataset_server(
     def welcome_ui():
         return (
             demo_help(
-                is_demo_mode(),
+                is_tutorial_mode(),
                 """
                 Welcome to **DP Wizard**, from OpenDP.
 
@@ -207,7 +207,7 @@ def dataset_server(
                         """
                 ),
                 demo_help(
-                    is_demo_mode(),
+                    is_tutorial_mode(),
                     """
                             When [installed and run
                             locally](https://pypi.org/project/dp_wizard/),
@@ -253,7 +253,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
         #   is renamed to something like "0.csv".
         return [
             demo_help(
-                is_sample_csv and is_demo_mode(),
+                is_sample_csv and is_tutorial_mode(),
                 """
                 For the tutorial, we've provided the grades
                 on assignments for a school class.
@@ -351,7 +351,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             ),
             # Without the input label, the tooltip floats way too far the right.
             demo_help(
-                is_demo_mode(),
+                is_tutorial_mode(),
                 """
                 If you had a CSV of student grades,
                 with 10 assignments over the course of the term,
@@ -399,7 +399,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
     @render.ui
     def python_tooltip_ui():
         return demo_help(
-            is_demo_mode(),
+            is_tutorial_mode(),
             """
             Along the way, code samples demonstrate
             how the information you provide is used in the
@@ -430,7 +430,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                     """
                 ),
                 demo_help(
-                    is_demo_mode(),
+                    is_tutorial_mode(),
                     """
                     If you're unsure, pick a safe value, like the total
                     population of the group being analyzed.

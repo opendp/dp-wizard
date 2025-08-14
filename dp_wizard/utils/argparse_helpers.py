@@ -79,7 +79,7 @@ class CLIInfo(NamedTuple):
     is_cloud_mode: bool
     is_qa_mode: bool
 
-    def get_is_demo_mode(self):
+    def get_is_tutorial_mode(self):
         return self.is_sample_csv or self.is_cloud_mode
 
 

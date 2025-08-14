@@ -97,7 +97,7 @@ def results_server(
     qa_mode = state.qa_mode
 
     # Top-level:
-    is_demo_mode = state.is_demo_mode
+    is_tutorial_mode = state.is_tutorial_mode
 
     # Dataset choices:
     # initial_private_csv_path = state.initial_private_csv_path
@@ -160,7 +160,7 @@ def results_server(
                     button("HTML", ".html", "file-code", disabled=disabled),
                     p("The same content, but exported as HTML."),
                     demo_help(
-                        is_demo_mode(),
+                        is_tutorial_mode(),
                         """
                         Now you can download a notebook for your analysis.
                         The Jupyter notebook could be used locally or on Colab,
@@ -192,7 +192,7 @@ def results_server(
         return [
             ui.h3("Download Code"),
             demo_help(
-                is_demo_mode(),
+                is_tutorial_mode(),
                 (
                     """
                 When [installed and run

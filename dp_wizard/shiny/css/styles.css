@@ -39,9 +39,9 @@ Selectize menus should overflow the containing card.
 .card, .card-body { overflow: visible !important; }
 
 /*
-The demo toggle in the navbar is positioned slightly too high.
+The sample toggle in the navbar is positioned slightly too high.
 */
-.shiny-input-container:has(#demo_mode) {
+.shiny-input-container:has(#tutorial_mode) {
     margin-top: 0.15em;
     margin-bottom: -0.15em;
 }

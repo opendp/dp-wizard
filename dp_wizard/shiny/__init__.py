@@ -29,7 +29,7 @@ def make_app_ui_from_cli_info(cli_info: CLIInfo):
             ui.nav_spacer(),
             ui.nav_control(
                 ui.input_switch(
-                    "demo_mode",
+                    "tutorial_mode",
                     ui.tooltip(
                         icon_svg("circle-question"),
                         """
@@ -38,7 +38,7 @@ def make_app_ui_from_cli_info(cli_info: CLIInfo):
                         """,
                         placement="right",
                     ),
-                    value=cli_info.get_is_demo_mode(),
+                    value=cli_info.get_is_tutorial_mode(),
                     width="4em",
                 )
             ),
@@ -183,7 +183,7 @@ def make_server_from_cli_info(cli_info: CLIInfo):
             in_cloud=cli_info.is_cloud_mode,
             qa_mode=cli_info.is_qa_mode,
             # Top-level:
-            is_demo_mode=reactive.value(cli_info.get_is_demo_mode()),
+            is_tutorial_mode=reactive.value(cli_info.get_is_tutorial_mode()),
             # Dataset choices:
             initial_private_csv_path=str(initial_private_csv_path),
             private_csv_path=reactive.value(str(initial_private_csv_path)),
@@ -207,9 +207,9 @@ def make_server_from_cli_info(cli_info: CLIInfo):
         )
 
         @reactive.effect
-        @reactive.event(input.demo_mode)
-        def _update_demo_mode():
-            state.is_demo_mode.set(input.demo_mode())
+        @reactive.event(input.tutorial_mode)
+        def _update_tutorial_mode():
+            state.is_tutorial_mode.set(input.tutorial_mode())
 
         about_panel.about_server(input, output, session)
         dataset_panel.dataset_server(input, output, session, state)

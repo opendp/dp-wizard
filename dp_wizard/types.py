@@ -65,7 +65,7 @@ class AppState:
     qa_mode: bool
 
     # Top-level:
-    is_demo_mode: reactive.Value[bool]
+    is_tutorial_mode: reactive.Value[bool]
 
     # Dataset choices:
     initial_private_csv_path: str

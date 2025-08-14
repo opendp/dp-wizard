@@ -27,7 +27,7 @@ def test_help():
     root_path = Path(__file__).parent.parent.parent
 
     readme_pypi_md = (root_path / "README-PYPI.md").read_text()
-    assert help in readme_pypi_md, "--help content not in README-PYPI.md"
+    assert help in readme_pypi_md, f"--help content not in README-PYPI.md: {help}"
 
     readme_md = (root_path / "README.md").read_text()
     assert readme_pypi_md in readme_md, "README-PYPI.md content not in README.md"

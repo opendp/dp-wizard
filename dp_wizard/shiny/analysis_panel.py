@@ -113,7 +113,7 @@ def analysis_server(
     # in_cloud = state.in_cloud
 
     # Top-lvel:
-    is_demo_mode = state.is_demo_mode
+    is_tutorial_mode = state.is_tutorial_mode
 
     # Dataset choices:
     # initial_private_csv_path = state.initial_private_csv_path
@@ -208,7 +208,7 @@ def analysis_server(
     @render.ui
     def groups_selectize_tooltip_ui():
         return demo_help(
-            is_demo_mode(),
+            is_tutorial_mode(),
             """
             DP Wizard only supports the analysis of numeric data,
             but string values can be used for grouping.
@@ -221,7 +221,7 @@ def analysis_server(
     @render.ui
     def columns_selectize_tooltip_ui():
         return demo_help(
-            is_demo_mode(),
+            is_tutorial_mode(),
             """
             Not all columns need analysis. If you have a CSV of
             student grades, you could just select `grade`.
@@ -235,7 +235,7 @@ def analysis_server(
     def simulation_card_ui():
         help = (
             demo_help(
-                is_demo_mode(),
+                is_tutorial_mode(),
                 """
             Unlike the other settings on this page,
             this estimate **is not used** in the final calculation.
@@ -307,7 +307,7 @@ def analysis_server(
                 upper_bounds=upper_bounds,
                 bin_counts=bin_counts,
                 weights=weights,
-                is_demo_mode=is_demo_mode,
+                is_tutorial_mode=is_tutorial_mode,
                 is_single_column=len(column_ids) == 1,
             )
         return [column_ui(column_id) for column_id in column_ids]
@@ -330,7 +330,7 @@ def analysis_server(
         return tags.label(
             f"Epsilon: {epsilon():0.3} ",
             demo_help(
-                is_demo_mode(),
+                is_tutorial_mode(),
                 """
                 If you set epsilon above one, you'll see that the distribution
                 becomes less noisy, and the confidence intervals become smaller...

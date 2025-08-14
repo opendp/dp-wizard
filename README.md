@@ -81,13 +81,13 @@ $ python3.10 -m venv .venv
 $ source .venv/bin/activate
 ```
 
-You can now install dependencies, and the application itself, and start a demo:
+You can now install dependencies, and the application itself, and start a tutorial:
 ```shell
 $ pip install -r requirements-dev.txt
 $ pre-commit install
 $ playwright install
 $ pip install --editable .
-$ dp-wizard --demo
+$ dp-wizard --sample
 ```
 
 Your browser should open and connect you to the application.
