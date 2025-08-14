@@ -195,19 +195,21 @@ def results_server(
                 is_tutorial_mode(),
                 (
                     """
-                When [installed and run
-                locally](https://pypi.org/project/dp_wizard/),
-                there are more download options because DP Wizard
-                can read your private CSV and release differentially private statistics.
+                    When [installed and run
+                    locally](https://pypi.org/project/dp_wizard/),
+                    there are more download options because DP Wizard
+                    can read your private CSV and release differentially
+                    private statistics.
 
-                In the cloud, DP Wizard only provides unexecuted notebooks and scripts.
-                """
+                    In the cloud, DP Wizard only provides unexecuted
+                    notebooks and scripts.
+                    """
                     if in_cloud
                     else """
-                Alternatively, you can download a script or unexecuted notebook
-                that demonstrates the steps of your analysis,
-                but does not contain any data or analysis results.
-                """
+                    Alternatively, you can download a script or unexecuted
+                    notebook that demonstrates the steps of your analysis,
+                    but does not contain any data or analysis results.
+                    """
                 ),
             ),
             ui.accordion(
