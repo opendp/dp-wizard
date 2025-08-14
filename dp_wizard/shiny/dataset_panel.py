@@ -253,12 +253,21 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
         #   is renamed to something like "0.csv".
         return [
             demo_help(
-                is_sample_csv and is_tutorial_mode(),
-                """
+                is_tutorial_mode(),
+                (
+                    """
                 For the tutorial, we've provided the grades
                 on assignments for a school class.
                 You don't need to upload an additional file.
-                """,
+                """
+                    if is_sample_csv
+                    else """
+                If you don't have a CSV on hand to work with,
+                quit and restart with `dp-wizard --sample`,
+                and DP Wizard will provide a sample CSV
+                for the tutorial.
+                """
+                ),
             ),
             ui.row(
                 ui.input_file(
