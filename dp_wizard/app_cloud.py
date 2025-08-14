@@ -9,12 +9,6 @@ cli_info = CLIInfo(
     is_qa_mode=False,
 )
 
-cli_info = CLIInfo(
-    is_sample_csv=False,
-    is_cloud_mode=True,
-    is_qa_mode=False,
-)
-
 app = App(
     make_app_ui_from_cli_info(cli_info),
     make_server_from_cli_info(cli_info),
