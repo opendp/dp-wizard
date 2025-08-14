@@ -165,7 +165,7 @@ def make_server_from_cli_info(cli_info: CLIInfo):
     _scan_files_for_input_ids()
 
     def server(input: Inputs, output: Outputs, session: Session):  # pragma: no cover
-        if cli_info.is_demo_csv:
+        if cli_info.is_sample_csv:
             initial_contributions = 10
             initial_private_csv_path = Path(__file__).parent.parent / "tmp" / "demo.csv"
             _make_demo_csv(initial_private_csv_path, initial_contributions)
@@ -177,7 +177,7 @@ def make_server_from_cli_info(cli_info: CLIInfo):
 
         state = AppState(
             # CLI options:
-            is_demo_csv=cli_info.is_demo_csv,
+            is_sample_csv=cli_info.is_sample_csv,
             in_cloud=cli_info.is_cloud_mode,
             qa_mode=cli_info.is_qa_mode,
             # Top-level:

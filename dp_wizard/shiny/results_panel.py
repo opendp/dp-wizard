@@ -92,7 +92,7 @@ def results_server(
     state: AppState,
 ):  # pragma: no cover
     # CLI options:
-    # is_demo_csv = state.is_demo_csv
+    # is_sample_csv = state.is_sample_csv
     in_cloud = state.in_cloud
     qa_mode = state.qa_mode
 
@@ -191,19 +191,22 @@ def results_server(
         disabled = not weights()
         return [
             ui.h3("Download Code"),
-            ui.markdown(
-                """
+            demo_help(
+                is_demo_mode(),
+                (
+                    """
                 When run locally, there are more download options because DP Wizard
                 can read your private CSV and release differentially private statistics.
 
                 In the cloud, DP Wizard only provides unexecuted notebooks and scripts.
                 """
-                if in_cloud
-                else """
+                    if in_cloud
+                    else """
                 Alternatively, you can download a script or unexecuted notebook
                 that demonstrates the steps of your analysis,
                 but does not contain any data or analysis results.
                 """
+                ),
             ),
             ui.accordion(
                 ui.accordion_panel(

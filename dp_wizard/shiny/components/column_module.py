@@ -311,7 +311,8 @@ def column_server(
             is_demo_mode(),
             """
             Don't look at the data when estimating the bounds!
-            In this case, we could limit "grade" to values between 50 and 100.
+            If you have a CSV of student grades,
+            you could limit `grade` to values between 0 and 100.
             """,
             responsive=False,
         )
@@ -321,10 +322,9 @@ def column_server(
         return demo_help(
             is_demo_mode(),
             """
-            If you increase the number of bins,
-            you'll see that each individual bin becomes noisier to provide
-            the same overall privacy guarantee.
-            Give "grade" 5 bins.
+            If you decrease the number of bins,
+            you'll see that each individual bin becomes
+            less noisy.
             """,
             responsive=False,
         )

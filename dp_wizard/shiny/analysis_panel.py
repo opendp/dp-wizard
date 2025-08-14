@@ -109,7 +109,7 @@ def analysis_server(
     state: AppState,
 ):  # pragma: no cover
     # CLI options:
-    # is_demo_csv = state.is_demo_csv
+    # is_sample_csv = state.is_sample_csv
     # in_cloud = state.in_cloud
 
     # Top-lvel:
@@ -212,8 +212,8 @@ def analysis_server(
             """
             DP Wizard only supports the analysis of numeric data,
             but string values can be used for grouping.
-            If you are following the class grades example,
-            select `class_year_str`.
+            If you have a CSV of student grades,
+            you could group by `class_year_str`.
             """,
             responsive=False,
         )
@@ -223,8 +223,9 @@ def analysis_server(
         return demo_help(
             is_demo_mode(),
             """
-            Not all columns need analysis. For this demo, just check
-            `grade`. With more columns selected,
+            Not all columns need analysis. If you have a CSV of
+            student grades, you could just select `grade`.
+            With more columns selected,
             each column has a smaller share of the privacy budget.
             """,
             responsive=False,

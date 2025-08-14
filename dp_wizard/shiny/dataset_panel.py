@@ -94,7 +94,7 @@ def dataset_server(
     state: AppState,
 ):  # pragma: no cover
     # CLI options:
-    is_demo_csv = state.is_demo_csv
+    is_sample_csv = state.is_sample_csv
     in_cloud = state.in_cloud
 
     # Top-level:
@@ -253,7 +253,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
         #   is renamed to something like "0.csv".
         return [
             demo_help(
-                is_demo_csv,
+                is_sample_csv,
                 """
                 For the demo, we've provided the grades
                 on assignments for a school class.
@@ -353,8 +353,9 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             demo_help(
                 is_demo_mode(),
                 """
-                Continuing the quiz grades example, if there were
-                10 quizes over the course of the term, we could enter "10" below.
+                If you had a CSV of student grades,
+                with 10 assignments over the course of the term,
+                you could enter `10` here.
                 """,
             ),
             ui.layout_columns(
@@ -431,8 +432,8 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 demo_help(
                     is_demo_mode(),
                     """
-                    If you're unsure, pick a safe value, like the population
-                    of the country under the analysis.
+                    If you're unsure, pick a safe value, like the total
+                    population of the group being analyzed.
 
                     This value is used downstream two ways:
                     - There is a very small probability that data could be
