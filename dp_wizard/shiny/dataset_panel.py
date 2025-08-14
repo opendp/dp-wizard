@@ -253,9 +253,9 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
         #   is renamed to something like "0.csv".
         return [
             demo_help(
-                is_sample_csv,
+                is_sample_csv and is_demo_mode(),
                 """
-                For the demo, we've provided the grades
+                For the tutorial, we've provided the grades
                 on assignments for a school class.
                 You don't need to upload an additional file.
                 """,

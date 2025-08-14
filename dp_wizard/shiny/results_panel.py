@@ -195,7 +195,9 @@ def results_server(
                 is_demo_mode(),
                 (
                     """
-                When run locally, there are more download options because DP Wizard
+                When [installed and run
+                locally](https://pypi.org/project/dp_wizard/),
+                there are more download options because DP Wizard
                 can read your private CSV and release differentially private statistics.
 
                 In the cloud, DP Wizard only provides unexecuted notebooks and scripts.

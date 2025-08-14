@@ -33,8 +33,8 @@ def make_app_ui_from_cli_info(cli_info: CLIInfo):
                     ui.tooltip(
                         icon_svg("circle-question"),
                         """
-                        Demo mode walks you through a hypothetical example
-                        and provides help along the way.
+                        Tutorial mode walks you through the analysis process
+                        and provides extra help along the way.
                         """,
                         placement="right",
                     ),
@@ -167,7 +167,9 @@ def make_server_from_cli_info(cli_info: CLIInfo):
     def server(input: Inputs, output: Outputs, session: Session):  # pragma: no cover
         if cli_info.is_sample_csv:
             initial_contributions = 10
-            initial_private_csv_path = Path(__file__).parent.parent / "tmp" / "demo.csv"
+            initial_private_csv_path = (
+                Path(__file__).parent.parent / "tmp" / "sample.csv"
+            )
             _make_demo_csv(initial_private_csv_path, initial_contributions)
             initial_column_names = read_csv_names(Path(initial_private_csv_path))
         else:
