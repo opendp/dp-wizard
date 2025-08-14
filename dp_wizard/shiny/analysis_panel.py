@@ -38,7 +38,7 @@ def analysis_ui():
                     [],
                     multiple=True,
                 ),
-                ui.output_ui("columns_selectize_tooltip_ui"),
+                ui.output_ui("columns_selectize_tutorial_ui"),
             ),
             ui.card(
                 ui.card_header("Grouping"),
@@ -57,7 +57,7 @@ def analysis_ui():
                     [],
                     multiple=True,
                 ),
-                ui.output_ui("groups_selectize_tooltip_ui"),
+                ui.output_ui("groups_selectize_tutorial_ui"),
             ),
             ui.card(
                 ui.card_header("Privacy Budget"),
@@ -206,7 +206,7 @@ def analysis_server(
         _cleanup_reactive_dict(weights, column_ids_selected)
 
     @render.ui
-    def groups_selectize_tooltip_ui():
+    def groups_selectize_tutorial_ui():
         return tutorial_box(
             is_tutorial_mode(),
             """
@@ -219,7 +219,7 @@ def analysis_server(
         )
 
     @render.ui
-    def columns_selectize_tooltip_ui():
+    def columns_selectize_tutorial_ui():
         return tutorial_box(
             is_tutorial_mode(),
             """

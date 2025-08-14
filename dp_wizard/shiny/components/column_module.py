@@ -259,7 +259,7 @@ def column_server(
                     str(upper_bounds().get(name, "")),
                     width=label_width,
                 ),
-                ui.output_ui("bounds_tooltip_ui"),
+                ui.output_ui("bounds_tutorial_ui"),
             ]
 
         def bin_count_input():
@@ -270,7 +270,7 @@ def column_server(
                     bin_counts().get(name, 10),
                     width=label_width,
                 ),
-                ui.output_ui("bins_tooltip_ui"),
+                ui.output_ui("bins_tutorial_ui"),
             ]
 
         def candidate_count_input():
@@ -306,7 +306,7 @@ def column_server(
         )
 
     @render.ui
-    def bounds_tooltip_ui():
+    def bounds_tutorial_ui():
         return tutorial_box(
             is_tutorial_mode(),
             """
@@ -318,7 +318,7 @@ def column_server(
         )
 
     @render.ui
-    def bins_tooltip_ui():
+    def bins_tutorial_ui():
         return tutorial_box(
             is_tutorial_mode(),
             """
@@ -335,7 +335,7 @@ def column_server(
             is_single_column,
             ui.input_select(
                 "weight",
-                ["Weight", ui.output_ui("weight_tooltip_ui")],
+                ["Weight", ui.output_ui("weight_tutorial_ui")],
                 choices={
                     "1": "Less accurate",
                     default_weight: "Default",
@@ -347,7 +347,7 @@ def column_server(
         )
 
     @render.ui
-    def weight_tooltip_ui():
+    def weight_tutorial_ui():
         return tutorial_box(
             is_tutorial_mode(),
             """

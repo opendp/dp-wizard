@@ -79,7 +79,7 @@ def dataset_ui():
                 "Unit of Privacy",
                 "unit_of_privacy_python",
             ),
-            ui.output_ui("python_tooltip_ui"),
+            ui.output_ui("python_tutorial_ui"),
         ),
         ui.output_ui("row_count_bounds_ui"),
         ui.output_ui("define_analysis_button_ui"),
@@ -358,7 +358,6 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 This is the "unit of privacy" which will be protected.
                 """
             ),
-            # Without the input label, the tooltip floats way too far the right.
             tutorial_box(
                 is_tutorial_mode(),
                 """
@@ -406,7 +405,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
         )
 
     @render.ui
-    def python_tooltip_ui():
+    def python_tutorial_ui():
         return tutorial_box(
             is_tutorial_mode(),
             """
