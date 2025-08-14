@@ -1,28 +1,67 @@
 from pathlib import Path
 from typing import Optional
 
-from shiny import ui, reactive, render, Inputs, Outputs, Session
+from shiny import Inputs, Outputs, Session, reactive, render, ui
 
-from dp_wizard.utils.argparse_helpers import (
-    PUBLIC_TEXT,
-    PRIVATE_TEXT,
-    PUBLIC_PRIVATE_TEXT,
-)
-from dp_wizard.utils.csv_helper import get_csv_names_mismatch
 from dp_wizard.shiny.components.outputs import (
-    output_code_sample,
+    col_widths,
     demo_help,
     hide_if,
     info_md_box,
     nav_button,
-    col_widths,
+    output_code_sample,
+)
+from dp_wizard.types import AppState
+from dp_wizard.utils.argparse_helpers import (
+    PRIVATE_TEXT,
+    PUBLIC_PRIVATE_TEXT,
+    PUBLIC_TEXT,
 )
 from dp_wizard.utils.code_generators import make_privacy_unit_block
-from dp_wizard.utils.csv_helper import read_csv_names
-from dp_wizard.types import AppState
-
+from dp_wizard.utils.csv_helper import get_csv_names_mismatch, read_csv_names
 
 dataset_panel_id = "dataset_panel"
+
+
+def get_pos_int_error(number_str, minimum=100):
+    """
+    If the inputs are numeric, I think shiny converts
+    any strings that can't be parsed to numbers into None,
+    so the "should be a number" errors may not be seen in practice.
+    >>> get_pos_int_error('100')
+    >>> get_pos_int_error('0')
+    'should be greater than 100'
+    >>> get_pos_int_error(None)
+    'is required'
+    >>> get_pos_int_error('')
+    'is required'
+    >>> get_pos_int_error('100.1')
+    'should be an integer'
+    """
+    if number_str is None or number_str == "":
+        return "is required"
+    try:
+        number = int(number_str)
+    except (TypeError, ValueError, OverflowError):
+        return "should be an integer"
+    if number < minimum:
+        return f"should be greater than {minimum}"
+    return None
+
+
+def get_row_count_errors(max_rows):
+    """
+    >>> get_row_count_errors(100)
+    []
+    >>> get_row_count_errors('xyz')
+    ['Maximum row count should be an integer.']
+    >>> get_row_count_errors(None)
+    ['Maximum row count is required.']
+    """
+    messages = []
+    if error := get_pos_int_error(max_rows):
+        messages.append(f"Maximum row count {error}.")
+    return messages
 
 
 def dataset_ui():
@@ -32,7 +71,7 @@ def dataset_ui():
         ui.output_ui("welcome_ui"),
         ui.output_ui("csv_or_columns_ui"),
         ui.card(
-            ui.card_header("Unit of privacy"),
+            ui.card_header("Unit of Privacy"),
             ui.output_ui("input_entity_ui"),
             ui.output_ui("input_contributions_ui"),
             ui.output_ui("contributions_validation_ui"),
@@ -42,6 +81,7 @@ def dataset_ui():
             ),
             ui.output_ui("python_tooltip_ui"),
         ),
+        ui.output_ui("row_count_bounds_ui"),
         ui.output_ui("define_analysis_button_ui"),
         value="dataset_panel",
     )
@@ -66,6 +106,7 @@ def dataset_server(
     initial_public_csv_path = state.initial_public_csv_path
     public_csv_path = state.public_csv_path
     contributions = state.contributions
+    max_rows = state.max_rows
 
     # Analysis choices:
     column_names = state.column_names
@@ -278,7 +319,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
         return [
             ui.markdown(
                 """
-                First, what is the entity whose privacy you want to protect?
+                First, what is the **entity** whose privacy you want to protect?
                 """
             ),
             ui.layout_columns(
@@ -304,7 +345,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
         return [
             ui.markdown(
                 f"""
-                How many rows of the CSV can each {entity} contribute to?
+                How many **rows** of the CSV can each {entity} contribute to?
                 This is the "unit of privacy" which will be protected.
                 """
             ),
@@ -323,7 +364,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                     contributions(),
                     min=1,
                 ),
-                [],  # column placeholder
+                [],  # Column placeholder
                 col_widths=col_widths,  # type: ignore
             ),
         ]
@@ -337,6 +378,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
     def button_enabled():
         return (
             contributions_valid()
+            and not error_md_calc()
             and len(column_names()) > 0
             and (in_cloud or not csv_column_mismatch_calc())
         )
@@ -365,6 +407,57 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             """,
         )
 
+    @reactive.effect
+    @reactive.event(input.max_rows)
+    def _on_max_rows_change():
+        max_rows.set(input.max_rows())
+
+    @reactive.calc
+    def error_md_calc():
+        return "\n".join(f"- {error}" for error in get_row_count_errors(max_rows()))
+
+    @render.ui
+    def row_count_bounds_ui():
+        error_md = error_md_calc()
+
+        return (
+            ui.card(
+                ui.card_header("Row Count"),
+                ui.markdown(
+                    """
+                    What is the **maximum row count** of your CSV?
+                    """
+                ),
+                demo_help(
+                    is_demo_mode(),
+                    """
+                    If you're unsure, pick a safe value, like the population
+                    of the country under the analysis.
+
+                    This value is used downstream two ways:
+                    - There is a very small probability that data could be
+                      released verbatim. If your dataset is particularly
+                      large, the delta parameter should be increased
+                      correspondingly.
+                    - The floating point numbers used by computers are not the
+                      same as the real numbers of mathematics, and with very
+                      large datasets, this gap accumulates, and more noise is
+                      necessary.
+                    """,
+                ),
+                ui.layout_columns(
+                    ui.input_text(
+                        "max_rows",
+                        None,
+                        str(max_rows() or ""),
+                    ),
+                    [],  # column placeholder
+                    col_widths=col_widths,  # type: ignore
+                ),
+                info_md_box(error_md) if error_md else [],
+            ),
+        )
+
     @render.ui
     def define_analysis_button_ui():
         enabled = button_enabled()
@@ -373,11 +466,10 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             return button
         return [
             button,
-            (
-                "Specify columns and the unit of privacy before proceeding."
-                if in_cloud
-                else "Specify CSV and the unit of privacy before proceeding."
-            ),
+            f"""
+            Specify {'columns' if in_cloud else 'CSV'}, unit of privacy,
+            and maximum row count before proceeding.
+            """,
         ]
 
     @render.code

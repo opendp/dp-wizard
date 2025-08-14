@@ -73,6 +73,7 @@ class AppState:
     initial_public_csv_path: str
     public_csv_path: reactive.Value[str]
     contributions: reactive.Value[int]
+    max_rows: reactive.Value[str]
 
     # Analysis choices:
     column_names: reactive.Value[list[ColumnName]]

@@ -1,6 +1,12 @@
-from dp_wizard import opendp_version
+from abc import ABC, abstractmethod
 from math import gcd
+from pathlib import Path
+from typing import Iterable
 
+import black
+
+from dp_wizard import opendp_version
+from dp_wizard.types import ColumnIdentifier
 from dp_wizard.utils.code_generators import (
     AnalysisPlan,
     make_column_config_block,
@@ -10,15 +16,6 @@ from dp_wizard.utils.code_generators import (
 from dp_wizard.utils.code_generators.analyses import histogram
 from dp_wizard.utils.code_template import Template
 from dp_wizard.utils.dp_helper import confidence
-from dp_wizard.types import ColumnIdentifier
-
-
-import black
-
-
-from abc import ABC, abstractmethod
-from pathlib import Path
-from typing import Iterable
 
 
 class AbstractGenerator(ABC):
@@ -44,9 +41,9 @@ class AbstractGenerator(ABC):
 
     def make_py(self):
         def template():
-            import polars as pl  # noqa: F401
-            import opendp.prelude as dp  # noqa: F401
             import matplotlib.pyplot as plt  # noqa: F401
+            import opendp.prelude as dp  # noqa: F401
+            import polars as pl  # noqa: F401
 
             # The OpenDP team is working to vet the core algorithms.
             # Until that is complete we need to opt-in to use these features.
@@ -73,28 +70,45 @@ class AbstractGenerator(ABC):
         # Line length determined by PDF rendering.
         return black.format_str(code, mode=black.Mode(line_length=74))  # type: ignore
 
-    def _make_margins_list(self, bin_names: Iterable[str], groups: Iterable[str]):
-        groups_str = ", ".join(f"'{g}'" for g in groups)
-        margins = (
-            [
-                f"""
+    def _make_margins_list(
+        self,
+        bin_names: Iterable[str],
+        groups: Iterable[str],
+        max_rows: int,
+    ):
+        import opendp.prelude as dp
+
+        def basic_template(GROUPS, OPENDP_VERSION, MAX_ROWS):
             # "max_partition_length" should be a loose upper bound,
             # for example, the size of the total population being sampled.
-            # https://docs.opendp.org/en/{opendp_version}/api/python/opendp.extras.polars.html#opendp.extras.polars.Margin.max_partition_length
+            # https://docs.opendp.org/en/OPENDP_VERSION/api/python/opendp.extras.polars.html#opendp.extras.polars.Margin.max_partition_length
             #
-            # In production, "max_num_partitions" should be set by considering the number
-            # of possible values for each grouping column, and taking their product.
-            dp.polars.Margin(by=[{groups_str}], public_info='keys', max_partition_length=1000000, max_num_partitions=100),
-            """  # noqa: B950 (too long!)
-            ]
-            + [
-                f"dp.polars.Margin(by=['{bin_name}', {groups_str}], "
-                "public_info='keys',),"
-                for bin_name in bin_names
-            ]
-        )
+            # In production, "max_num_partitions" should be set by considering
+            # the number of possible values for each grouping column,
+            # and taking their product.
+            dp.polars.Margin(
+                by=GROUPS,
+                public_info="keys",
+                max_partition_length=MAX_ROWS,
+                max_num_partitions=100,
+            )
 
-        margins_list = "[" + "".join(margins) + "\n    ]"
+        def bin_template(GROUPS, BIN_NAME):
+            dp.polars.Margin(by=([BIN_NAME] + GROUPS), public_info="keys")
+
+        margins = [
+            Template(basic_template)
+            .fill_expressions(OPENDP_VERSION=opendp_version)
+            .fill_values(GROUPS=groups, MAX_ROWS=max_rows)
+            .finish()
+        ] + [
+            Template(bin_template)
+            .fill_values(GROUPS=groups, BIN_NAME=bin_name)
+            .finish()
+            for bin_name in bin_names
+        ]
+
+        margins_list = "[" + ", ".join(margins) + "\n    ]"
         return margins_list
 
     @abstractmethod
@@ -186,7 +200,10 @@ class AbstractGenerator(ABC):
         ]
 
         privacy_unit_block = make_privacy_unit_block(self.analysis_plan.contributions)
-        privacy_loss_block = make_privacy_loss_block(self.analysis_plan.epsilon)
+        privacy_loss_block = make_privacy_loss_block(
+            epsilon=self.analysis_plan.epsilon,
+            max_rows=self.analysis_plan.max_rows,
+        )
 
         is_just_histograms = all(
             plan_column[0].analysis_name == histogram.name
@@ -197,8 +214,9 @@ class AbstractGenerator(ABC):
             "[]"
             if is_just_histograms
             else self._make_margins_list(
-                [f"{name}_bin" for name in bin_column_names],
-                self.analysis_plan.groups,
+                bin_names=[f"{name}_bin" for name in bin_column_names],
+                groups=self.analysis_plan.groups,
+                max_rows=self.analysis_plan.max_rows,
             )
         )
         extra_columns = ", ".join(

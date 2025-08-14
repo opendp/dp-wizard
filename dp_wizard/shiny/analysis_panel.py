@@ -1,26 +1,26 @@
 from math import pow
-from typing import Iterable
 from pathlib import Path
+from typing import Iterable
 
 from htmltools import tags
-from shiny import ui, reactive, render, Inputs, Outputs, Session
+from shiny import Inputs, Outputs, Session, reactive, render, ui
 
+from dp_wizard.shiny.components.column_module import column_server, column_ui
 from dp_wizard.shiny.components.inputs import log_slider
-from dp_wizard.shiny.components.column_module import column_ui, column_server
-from dp_wizard.utils.csv_helper import (
-    id_names_dict_from_names,
-    id_labels_dict_from_names,
-    get_csv_row_count,
-)
 from dp_wizard.shiny.components.outputs import (
-    output_code_sample,
     demo_help,
-    nav_button,
     hide_if,
     info_md_box,
+    nav_button,
+    output_code_sample,
 )
-from dp_wizard.utils.code_generators import make_privacy_loss_block
 from dp_wizard.types import AppState
+from dp_wizard.utils.code_generators import make_privacy_loss_block
+from dp_wizard.utils.csv_helper import (
+    get_csv_row_count,
+    id_labels_dict_from_names,
+    id_names_dict_from_names,
+)
 
 
 def analysis_ui():
@@ -121,6 +121,7 @@ def analysis_server(
     # initial_public_csv_path = state.initial_private_csv_path
     public_csv_path = state.public_csv_path
     contributions = state.contributions
+    max_rows = state.max_rows
 
     # Analysis choices:
     column_names = state.column_names
@@ -340,7 +341,7 @@ def analysis_server(
 
     @render.code
     def privacy_loss_python():
-        return make_privacy_loss_block(epsilon())
+        return make_privacy_loss_block(epsilon=epsilon(), max_rows=int(max_rows()))
 
     @reactive.effect
     @reactive.event(input.go_to_results)

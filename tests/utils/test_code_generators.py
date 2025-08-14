@@ -1,20 +1,21 @@
-from tempfile import NamedTemporaryFile
-import subprocess
-import pytest
 import re
+import subprocess
 from pathlib import Path
+from tempfile import NamedTemporaryFile
+
 import opendp.prelude as dp
+import pytest
 
 from dp_wizard import opendp_version
-from dp_wizard.utils.code_generators.analyses import histogram, mean, median, count
+from dp_wizard.types import AnalysisName, ColumnName
 from dp_wizard.utils.code_generators import (
-    make_column_config_block,
     AnalysisPlan,
     AnalysisPlanColumn,
+    make_column_config_block,
 )
+from dp_wizard.utils.code_generators.analyses import count, histogram, mean, median
 from dp_wizard.utils.code_generators.notebook_generator import NotebookGenerator
 from dp_wizard.utils.code_generators.script_generator import ScriptGenerator
-
 
 python_paths = Path(__file__).parent.parent.parent.glob("dp_wizard/**/*.py")
 
@@ -29,7 +30,7 @@ def test_make_column_config_block_for_unrecognized():
     with pytest.raises(Exception, match=r"Unrecognized analysis"):
         make_column_config_block(
             name="HW GRADE",
-            analysis_name="Bad AnalysisType!",
+            analysis_name=AnalysisName("Bad AnalysisType!"),
             lower_bound=0,
             upper_bound=100,
             bin_count=10,
@@ -181,21 +182,22 @@ plans = [
         contributions=contributions,
         csv_path=abc_csv,
         epsilon=1,
+        max_rows=100_000,
     )
     for contributions in [1, 10]
     for groups in [[], ["A"]]
     for columns in [
         # Single:
-        {"B": [histogram_plan_column]},
-        {"B": [mean_plan_column]},
-        {"B": [median_plan_column]},
-        {"B": [count_plan_column]},
+        {ColumnName("B"): [histogram_plan_column]},
+        {ColumnName("B"): [mean_plan_column]},
+        {ColumnName("B"): [median_plan_column]},
+        {ColumnName("B"): [count_plan_column]},
         # Multiple:
         {
-            "B": [histogram_plan_column],
-            "C": [mean_plan_column],
-            "D": [median_plan_column],
-            "E": [count_plan_column],
+            ColumnName("B"): [histogram_plan_column],
+            ColumnName("C"): [mean_plan_column],
+            ColumnName("D"): [median_plan_column],
+            ColumnName("E"): [count_plan_column],
         },
     ]
 ]
