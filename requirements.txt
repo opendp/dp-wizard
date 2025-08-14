@@ -23,7 +23,7 @@ attrs==25.3.0
 beautifulsoup4==4.13.4
     # via nbconvert
 black==25.1.0
-    # via -r requirements.in
+    # via dp-wizard-templates
 bleach[css]==6.2.0
     # via nbconvert
 certifi==2025.4.26
@@ -49,6 +49,8 @@ defusedxml==0.7.1
     # via nbconvert
 deprecated==1.2.18
     # via opendp
+dp-wizard-templates==0.2.0
+    # via -r requirements.in
 exceptiongroup==1.3.0
     # via
     #   anyio
@@ -72,7 +74,7 @@ idna==3.10
     #   anyio
     #   requests
 ipykernel==6.29.5
-    # via -r requirements.in
+    # via dp-wizard-templates
 ipython==8.35.0
     # via ipykernel
 jedi==0.19.2
@@ -87,7 +89,7 @@ jsonschema-specifications==2024.10.1
     # via jsonschema
 jupyter-client==8.6.3
     # via
-    #   -r requirements.in
+    #   dp-wizard-templates
     #   ipykernel
     #   nbclient
 jupyter-core==5.7.2
@@ -100,7 +102,7 @@ jupyter-core==5.7.2
 jupyterlab-pygments==0.3.0
     # via nbconvert
 jupytext==1.17.0
-    # via -r requirements.in
+    # via dp-wizard-templates
 kiwisolver==1.4.8
     # via matplotlib
 linkify-it-py==2.0.3
@@ -135,7 +137,7 @@ narwhals==1.35.0
 nbclient==0.10.2
     # via nbconvert
 nbconvert==7.16.6
-    # via -r requirements.in
+    # via dp-wizard-templates
 nbformat==5.10.4
     # via
     #   jupytext
@@ -208,9 +210,7 @@ python-dateutil==2.9.0.post0
 python-multipart==0.0.20
     # via shiny
 pyyaml==6.0.2
-    # via
-    #   -r requirements.in
-    #   jupytext
+    # via jupytext
 pyzmq==26.4.0
     # via
     #   ipykernel

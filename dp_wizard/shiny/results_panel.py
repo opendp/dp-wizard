@@ -1,6 +1,10 @@
 import re
 from pathlib import Path
 
+from dp_wizard_templates.converters import (
+    convert_nb_to_html,
+    convert_py_to_nb,
+)
 from faicons import icon_svg
 from htmltools.tags import p
 from shiny import Inputs, Outputs, Session, reactive, render, types, ui
@@ -17,10 +21,6 @@ from dp_wizard.utils.code_generators.notebook_generator import (
     NotebookGenerator,
 )
 from dp_wizard.utils.code_generators.script_generator import ScriptGenerator
-from dp_wizard.utils.converters import (
-    convert_nb_to_html,
-    convert_py_to_nb,
-)
 
 wait_message = "Please wait."
 

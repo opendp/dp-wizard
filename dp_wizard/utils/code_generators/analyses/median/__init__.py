@@ -1,6 +1,7 @@
-from dp_wizard import opendp_version
+from dp_wizard_templates.code_template import Template
+
+from dp_wizard import get_template_root, opendp_version
 from dp_wizard.types import AnalysisName
-from dp_wizard.utils.code_template import Template
 
 name = AnalysisName("Median")
 blurb_md = """
@@ -18,9 +19,12 @@ input_names = [
 has_bins = False
 
 
+root = get_template_root(__file__)
+
+
 def make_query(code_gen, identifier, accuracy_name, stats_name):
     return (  # pragma: no cover
-        Template("median_query", __file__)
+        Template("median_query", root)
         .fill_values(
             GROUP_NAMES=code_gen.analysis_plan.groups,
         )
@@ -35,7 +39,7 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
 
 def make_output(code_gen, column_name, accuracy_name, stats_name):
     return (
-        Template(f"median_{code_gen.root_template}_output", __file__)
+        Template(f"median_{code_gen.root_template}_output", root)
         .fill_expressions(
             COLUMN_NAME=column_name,
             STATS_NAME=stats_name,
@@ -50,7 +54,7 @@ def make_note():
 
 def make_report_kv(name, confidence, identifier):
     return (
-        Template("median_report_kv", __file__)
+        Template("median_report_kv", root)
         .fill_values(
             NAME=name,
         )
@@ -66,7 +70,7 @@ def make_column_config_block(column_name, lower_bound, upper_bound, bin_count):
 
     snake_name = snake_case(column_name)
     return (
-        Template("median_expr", __file__)
+        Template("median_expr", root)
         .fill_expressions(
             EXPR_NAME=f"{snake_name}_expr",
             OPENDP_VERSION=opendp_version,
