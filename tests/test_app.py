@@ -18,7 +18,7 @@ if bp in Path(__file__).read_text():
     )
 
 root_path = Path(__file__).parent.parent
-demo_app = create_app_fixture(root_path / "dp_wizard/app_demo.py")
+sample_app = create_app_fixture(root_path / "dp_wizard/app_sample.py")
 cloud_app = create_app_fixture(root_path / "dp_wizard/app_cloud.py")
 local_app = create_app_fixture(root_path / "dp_wizard/app_local.py")
 qa_app = create_app_fixture(root_path / "dp_wizard/app_qa.py")
@@ -70,8 +70,8 @@ def test_qa_app(page: Page, qa_app: ShinyAppProc):  # pragma: no cover
     expect(page.get_by_text('raise Exception("qa_mode!")')).to_be_visible()
 
 
-def test_demo_app(page: Page, demo_app: ShinyAppProc):  # pragma: no cover
-    page.goto(demo_app.url)
+def test_sample_app(page: Page, sample_app: ShinyAppProc):  # pragma: no cover
+    page.goto(sample_app.url)
     expect(page).to_have_title("DP Wizard")
 
     page.locator("#max_rows").fill("10000")

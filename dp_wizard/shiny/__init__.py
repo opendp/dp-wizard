@@ -29,16 +29,16 @@ def make_app_ui_from_cli_info(cli_info: CLIInfo):
             ui.nav_spacer(),
             ui.nav_control(
                 ui.input_switch(
-                    "demo_mode",
+                    "tutorial_mode",
                     ui.tooltip(
                         icon_svg("circle-question"),
                         """
-                        Demo mode walks you through a hypothetical example
-                        and provides help along the way.
+                        Tutorial mode walks you through the analysis process
+                        and provides extra help along the way.
                         """,
                         placement="right",
                     ),
-                    value=cli_info.get_is_demo_mode(),
+                    value=cli_info.get_is_tutorial_mode(),
                     width="4em",
                 )
             ),
@@ -54,13 +54,13 @@ def ctrl_c_reminder():  # pragma: no cover
     print("Session ended (Press CTRL+C to quit)")
 
 
-def _make_demo_csv(path: Path, contributions):
+def _make_sample_csv(path: Path, contributions):
     """
     >>> import tempfile
     >>> from pathlib import Path
     >>> import csv
     >>> with tempfile.NamedTemporaryFile() as temp:
-    ...     _make_demo_csv(Path(temp.name), 10)
+    ...     _make_sample_csv(Path(temp.name), 10)
     ...     with open(temp.name, newline="") as csv_handle:
     ...         reader = csv.DictReader(csv_handle)
     ...         reader.fieldnames
@@ -72,7 +72,7 @@ def _make_demo_csv(path: Path, contributions):
     dict_values(['100', 'sophomore', '10', '78', '0'])
     """
     random.seed(0)  # So the mock data will be stable across runs.
-    with path.open("w", newline="") as demo_handle:
+    with path.open("w", newline="") as sample_csv_handle:
         fields = [
             "student_id",
             "class_year_str",
@@ -81,7 +81,7 @@ def _make_demo_csv(path: Path, contributions):
             "self_assessment",
         ]
         class_year_map = ["first year", "sophomore", "junior", "senior"]
-        writer = csv.DictWriter(demo_handle, fieldnames=fields)
+        writer = csv.DictWriter(sample_csv_handle, fieldnames=fields)
         writer.writeheader()
         for student_id in range(1, 101):
             class_year = int(_clip(random.gauss(1, 1), 0, 3))
@@ -165,10 +165,12 @@ def make_server_from_cli_info(cli_info: CLIInfo):
     _scan_files_for_input_ids()
 
     def server(input: Inputs, output: Outputs, session: Session):  # pragma: no cover
-        if cli_info.is_demo_csv:
+        if cli_info.is_sample_csv:
             initial_contributions = 10
-            initial_private_csv_path = Path(__file__).parent.parent / "tmp" / "demo.csv"
-            _make_demo_csv(initial_private_csv_path, initial_contributions)
+            initial_private_csv_path = (
+                Path(__file__).parent.parent / "tmp" / "sample.csv"
+            )
+            _make_sample_csv(initial_private_csv_path, initial_contributions)
             initial_column_names = read_csv_names(Path(initial_private_csv_path))
         else:
             initial_contributions = 1
@@ -177,11 +179,11 @@ def make_server_from_cli_info(cli_info: CLIInfo):
 
         state = AppState(
             # CLI options:
-            is_demo_csv=cli_info.is_demo_csv,
+            is_sample_csv=cli_info.is_sample_csv,
             in_cloud=cli_info.is_cloud_mode,
             qa_mode=cli_info.is_qa_mode,
             # Top-level:
-            is_demo_mode=reactive.value(cli_info.get_is_demo_mode()),
+            is_tutorial_mode=reactive.value(cli_info.get_is_tutorial_mode()),
             # Dataset choices:
             initial_private_csv_path=str(initial_private_csv_path),
             private_csv_path=reactive.value(str(initial_private_csv_path)),
@@ -205,9 +207,9 @@ def make_server_from_cli_info(cli_info: CLIInfo):
         )
 
         @reactive.effect
-        @reactive.event(input.demo_mode)
-        def _update_demo_mode():
-            state.is_demo_mode.set(input.demo_mode())
+        @reactive.event(input.tutorial_mode)
+        def _update_tutorial_mode():
+            state.is_tutorial_mode.set(input.tutorial_mode())
 
         about_panel.about_server(input, output, session)
         dataset_panel.dataset_server(input, output, session, state)

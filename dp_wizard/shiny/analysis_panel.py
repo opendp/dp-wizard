@@ -8,11 +8,11 @@ from shiny import Inputs, Outputs, Session, reactive, render, ui
 from dp_wizard.shiny.components.column_module import column_server, column_ui
 from dp_wizard.shiny.components.inputs import log_slider
 from dp_wizard.shiny.components.outputs import (
-    demo_help,
     hide_if,
     info_md_box,
     nav_button,
     output_code_sample,
+    tutorial_box,
 )
 from dp_wizard.types import AppState
 from dp_wizard.utils.code_generators import make_privacy_loss_block
@@ -38,7 +38,7 @@ def analysis_ui():
                     [],
                     multiple=True,
                 ),
-                ui.output_ui("columns_selectize_tooltip_ui"),
+                ui.output_ui("columns_selectize_tutorial_ui"),
             ),
             ui.card(
                 ui.card_header("Grouping"),
@@ -57,7 +57,7 @@ def analysis_ui():
                     [],
                     multiple=True,
                 ),
-                ui.output_ui("groups_selectize_tooltip_ui"),
+                ui.output_ui("groups_selectize_tutorial_ui"),
             ),
             ui.card(
                 ui.card_header("Privacy Budget"),
@@ -109,11 +109,11 @@ def analysis_server(
     state: AppState,
 ):  # pragma: no cover
     # CLI options:
-    # is_demo_csv = state.is_demo_csv
+    # is_sample_csv = state.is_sample_csv
     # in_cloud = state.in_cloud
 
     # Top-lvel:
-    is_demo_mode = state.is_demo_mode
+    is_tutorial_mode = state.is_tutorial_mode
 
     # Dataset choices:
     # initial_private_csv_path = state.initial_private_csv_path
@@ -206,25 +206,26 @@ def analysis_server(
         _cleanup_reactive_dict(weights, column_ids_selected)
 
     @render.ui
-    def groups_selectize_tooltip_ui():
-        return demo_help(
-            is_demo_mode(),
+    def groups_selectize_tutorial_ui():
+        return tutorial_box(
+            is_tutorial_mode(),
             """
             DP Wizard only supports the analysis of numeric data,
             but string values can be used for grouping.
-            If you are following the class grades example,
-            select `class_year_str`.
+            If you have a CSV of student grades,
+            you could group by `class_year_str`.
             """,
             responsive=False,
         )
 
     @render.ui
-    def columns_selectize_tooltip_ui():
-        return demo_help(
-            is_demo_mode(),
+    def columns_selectize_tutorial_ui():
+        return tutorial_box(
+            is_tutorial_mode(),
             """
-            Not all columns need analysis. For this demo, just check
-            `grade`. With more columns selected,
+            Not all columns need analysis. If you have a CSV of
+            student grades, you could just select `grade`.
+            With more columns selected,
             each column has a smaller share of the privacy budget.
             """,
             responsive=False,
@@ -233,8 +234,8 @@ def analysis_server(
     @render.ui
     def simulation_card_ui():
         help = (
-            demo_help(
-                is_demo_mode(),
+            tutorial_box(
+                is_tutorial_mode(),
                 """
             Unlike the other settings on this page,
             this estimate **is not used** in the final calculation.
@@ -306,7 +307,7 @@ def analysis_server(
                 upper_bounds=upper_bounds,
                 bin_counts=bin_counts,
                 weights=weights,
-                is_demo_mode=is_demo_mode,
+                is_tutorial_mode=is_tutorial_mode,
                 is_single_column=len(column_ids) == 1,
             )
         return [column_ui(column_id) for column_id in column_ids]
@@ -328,8 +329,8 @@ def analysis_server(
     def epsilon_ui():
         return tags.label(
             f"Epsilon: {epsilon():0.3} ",
-            demo_help(
-                is_demo_mode(),
+            tutorial_box(
+                is_tutorial_mode(),
                 """
                 If you set epsilon above one, you'll see that the distribution
                 becomes less noisy, and the confidence intervals become smaller...

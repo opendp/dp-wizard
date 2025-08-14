@@ -7,10 +7,10 @@ from shiny.types import SilentException
 
 from dp_wizard.shiny.components.outputs import (
     col_widths,
-    demo_help,
     hide_if,
     info_md_box,
     output_code_sample,
+    tutorial_box,
 )
 from dp_wizard.types import AnalysisName, ColumnName
 from dp_wizard.utils.code_generators import make_column_config_block
@@ -136,7 +136,7 @@ def column_server(
     upper_bounds: reactive.Value[dict[ColumnName, float]],
     bin_counts: reactive.Value[dict[ColumnName, int]],
     weights: reactive.Value[dict[ColumnName, str]],
-    is_demo_mode: reactive.Value[bool],
+    is_tutorial_mode: reactive.Value[bool],
     is_single_column: bool,
 ):  # pragma: no cover
     @reactive.effect
@@ -259,7 +259,7 @@ def column_server(
                     str(upper_bounds().get(name, "")),
                     width=label_width,
                 ),
-                ui.output_ui("bounds_tooltip_ui"),
+                ui.output_ui("bounds_tutorial_ui"),
             ]
 
         def bin_count_input():
@@ -270,7 +270,7 @@ def column_server(
                     bin_counts().get(name, 10),
                     width=label_width,
                 ),
-                ui.output_ui("bins_tooltip_ui"),
+                ui.output_ui("bins_tutorial_ui"),
             ]
 
         def candidate_count_input():
@@ -306,25 +306,25 @@ def column_server(
         )
 
     @render.ui
-    def bounds_tooltip_ui():
-        return demo_help(
-            is_demo_mode(),
+    def bounds_tutorial_ui():
+        return tutorial_box(
+            is_tutorial_mode(),
             """
             Don't look at the data when estimating the bounds!
-            In this case, we could limit "grade" to values between 50 and 100.
+            If you have a CSV of student grades,
+            you could limit `grade` to values between 0 and 100.
             """,
             responsive=False,
         )
 
     @render.ui
-    def bins_tooltip_ui():
-        return demo_help(
-            is_demo_mode(),
+    def bins_tutorial_ui():
+        return tutorial_box(
+            is_tutorial_mode(),
             """
-            If you increase the number of bins,
-            you'll see that each individual bin becomes noisier to provide
-            the same overall privacy guarantee.
-            Give "grade" 5 bins.
+            If you decrease the number of bins,
+            you'll see that each individual bin becomes
+            less noisy.
             """,
             responsive=False,
         )
@@ -335,7 +335,7 @@ def column_server(
             is_single_column,
             ui.input_select(
                 "weight",
-                ["Weight", ui.output_ui("weight_tooltip_ui")],
+                ["Weight", ui.output_ui("weight_tutorial_ui")],
                 choices={
                     "1": "Less accurate",
                     default_weight: "Default",
@@ -347,9 +347,9 @@ def column_server(
         )
 
     @render.ui
-    def weight_tooltip_ui():
-        return demo_help(
-            is_demo_mode(),
+    def weight_tutorial_ui():
+        return tutorial_box(
+            is_tutorial_mode(),
             """
             You have a finite privacy budget, but you can choose
             how to allocate it. For simplicity, we limit the options here,
