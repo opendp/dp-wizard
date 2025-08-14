@@ -202,24 +202,24 @@ def dataset_server(
                 ui.card_header("CSV Columns"),
                 ui.markdown(
                     """
-                        Provide the names of columns you'll use in your analysis,
-                        one per line, with no extra punctuation.
-                        """
+                    Provide the names of columns you'll use in your analysis,
+                    one per line, with no extra punctuation.
+                    """
                 ),
                 tutorial_box(
                     is_tutorial_mode(),
                     """
-                            When [installed and run
-                            locally](https://pypi.org/project/dp_wizard/),
-                            DP Wizard allows you to specify a private and public CSV,
-                            but for the safety of your data, in the cloud
-                            DP Wizard only accepts column names.
+                    When [installed and run
+                    locally](https://pypi.org/project/dp_wizard/),
+                    DP Wizard allows you to specify a private and public CSV,
+                    but for the safety of your data, in the cloud
+                    DP Wizard only accepts column names.
 
-                            If you don't have other ideas, we can imagine
-                            a CSV of student quiz grades: Enter `student_id`,
-                            `grade`, and `class_year_str` below, each on
-                            a separate line.
-                            """,
+                    If you don't have other ideas, we can imagine
+                    a CSV of student quiz grades: Enter `student_id`,
+                    `grade`, and `class_year_str` below, each on
+                    a separate line.
+                    """,
                 ),
                 ui.input_text_area("column_names", "CSV Column Names", rows=5),
             )
@@ -256,17 +256,17 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 is_tutorial_mode(),
                 (
                     """
-                For the tutorial, we've provided the grades
-                on assignments for a school class.
-                You don't need to upload an additional file.
-                """
+                    For the tutorial, we've provided the grades
+                    on assignments for a school class.
+                    You don't need to upload an additional file.
+                    """
                     if is_sample_csv
                     else """
-                If you don't have a CSV on hand to work with,
-                quit and restart with `dp-wizard --sample`,
-                and DP Wizard will provide a sample CSV
-                for the tutorial.
-                """
+                    If you don't have a CSV on hand to work with,
+                    quit and restart with `dp-wizard --sample`,
+                    and DP Wizard will provide a sample CSV
+                    for the tutorial.
+                    """
                 ),
             ),
             ui.row(
