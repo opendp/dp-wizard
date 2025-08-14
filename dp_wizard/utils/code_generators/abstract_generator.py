@@ -3,9 +3,9 @@ from math import gcd
 from pathlib import Path
 from typing import Iterable
 
-import black
+from dp_wizard_templates.code_template import Template
 
-from dp_wizard import opendp_version
+from dp_wizard import get_template_root, opendp_version
 from dp_wizard.types import ColumnIdentifier
 from dp_wizard.utils.code_generators import (
     AnalysisPlan,
@@ -14,8 +14,9 @@ from dp_wizard.utils.code_generators import (
     make_privacy_unit_block,
 )
 from dp_wizard.utils.code_generators.analyses import histogram
-from dp_wizard.utils.code_template import Template
 from dp_wizard.utils.dp_helper import confidence
+
+root = get_template_root(__file__)
 
 
 class AbstractGenerator(ABC):
@@ -50,7 +51,7 @@ class AbstractGenerator(ABC):
             dp.enable_features("contrib")
 
         code = (
-            Template(self.root_template, __file__)
+            Template(self.root_template, root)
             .fill_expressions(
                 TITLE=str(self.analysis_plan),
                 WINDOWS_NOTE="(If installing in the Windows CMD shell, "
@@ -67,8 +68,7 @@ class AbstractGenerator(ABC):
             )
             .finish()
         )
-        # Line length determined by PDF rendering.
-        return black.format_str(code, mode=black.Mode(line_length=74))  # type: ignore
+        return code
 
     def _make_margins_list(
         self,
@@ -227,7 +227,7 @@ class AbstractGenerator(ABC):
             ]
         )
         return (
-            Template("context", __file__)
+            Template("context", root)
             .fill_expressions(
                 MARGINS_LIST=margins_list,
                 EXTRA_COLUMNS=extra_columns,
