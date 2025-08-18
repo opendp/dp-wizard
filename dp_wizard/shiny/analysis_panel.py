@@ -109,7 +109,7 @@ def analysis_server(
     state: AppState,
 ):  # pragma: no cover
     # CLI options:
-    # is_sample_csv = state.is_sample_csv
+    is_sample_csv = state.is_sample_csv
     # in_cloud = state.in_cloud
 
     # Top-lvel:
@@ -212,8 +212,11 @@ def analysis_server(
             """
             DP Wizard only supports the analysis of numeric data,
             but string values can be used for grouping.
-            If you have a CSV of student grades,
-            you could group by `class_year_str`.
+            """,
+            is_sample_csv,
+            """
+            With `sample.csv` you can select `class_year_str`
+            to group results by class year.
             """,
             responsive=False,
         )
@@ -223,10 +226,16 @@ def analysis_server(
         return tutorial_box(
             is_tutorial_mode(),
             """
-            Not all columns need analysis. If you have a CSV of
-            student grades, you could just select `grade`.
-            With more columns selected,
-            each column has a smaller share of the privacy budget.
+            For each column you select here, a panel will appear below
+            where you can configure the analysis for the column.
+            Note that with more columns selected,
+            each column has a smaller share of the privacy budget,
+            and the accurace of results will go decline.
+            """,
+            is_sample_csv,
+            """
+            Not all columns need analysis.
+            With `sample.csv`, you could just select `grade`.
             """,
             responsive=False,
         )
@@ -237,14 +246,14 @@ def analysis_server(
             tutorial_box(
                 is_tutorial_mode(),
                 """
-            Unlike the other settings on this page,
-            this estimate **is not used** in the final calculation.
+                Unlike the other settings on this page,
+                this estimate **is not used** in the final calculation.
 
-            Until you make a release, your CSV will not be
-            read except to determine the names columns,
-            but the number of rows does have implications for the
-            accuracy which DP can provide with a given privacy budget.
-            """,
+                Until you make a release, your CSV will not be
+                read except to determine the names columns,
+                but the number of rows does have implications for the
+                accuracy which DP can provide with a given privacy budget.
+                """,
                 responsive=False,
             ),
         )
@@ -308,6 +317,7 @@ def analysis_server(
                 bin_counts=bin_counts,
                 weights=weights,
                 is_tutorial_mode=is_tutorial_mode,
+                is_sample_csv=is_sample_csv,
                 is_single_column=len(column_ids) == 1,
             )
         return [column_ui(column_id) for column_id in column_ids]

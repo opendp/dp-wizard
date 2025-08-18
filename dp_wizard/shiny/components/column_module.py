@@ -137,6 +137,7 @@ def column_server(
     bin_counts: reactive.Value[dict[ColumnName, int]],
     weights: reactive.Value[dict[ColumnName, str]],
     is_tutorial_mode: reactive.Value[bool],
+    is_sample_csv: bool,
     is_single_column: bool,
 ):  # pragma: no cover
     @reactive.effect
@@ -310,8 +311,13 @@ def column_server(
         return tutorial_box(
             is_tutorial_mode(),
             """
-            Don't look at the data when estimating the bounds!
-            If you have a CSV of student grades,
+            Interpreting differential privacy strictly,
+            we should try never to look directly at the data,
+            even to set bounds! This can be hard.
+            """,
+            is_sample_csv,
+            """
+            Given what we know _a priori_ about grading scales,
             you could limit `grade` to values between 0 and 100.
             """,
             responsive=False,

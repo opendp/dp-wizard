@@ -20,7 +20,13 @@ def output_code_sample(title, name_of_render_function: str):
     )
 
 
-def tutorial_box(is_tutorial: bool, markdown: str, responsive: bool = True):
+def tutorial_box(
+    is_tutorial: bool,
+    markdown: str,
+    show_extra: bool = False,
+    extra_markdown: str = "",
+    responsive: bool = True,
+):
     """
     >>> assert None == tutorial_box(False, '**Testing** 123')
 
@@ -31,7 +37,10 @@ def tutorial_box(is_tutorial: bool, markdown: str, responsive: bool = True):
     """
     if is_tutorial:
         responsive_classes = "col-md-8 col-lg-6 col-xl-4" if responsive else ""
-        inner_html = small(icon_svg("circle-question"), ui.markdown(markdown))
+        inner_html = small(
+            icon_svg("circle-question"),
+            ui.markdown(f"{markdown}\n\n{extra_markdown if show_extra else ''}"),
+        )
         # Move the SVG icon inside the first element:
         inner_html = re.sub(r"(<svg.+?</svg>)(<.+?>)", r"\2\1&nbsp;", str(inner_html))
         return ui.div(

@@ -217,8 +217,8 @@ def dataset_server(
 
                     If you don't have other ideas, we can imagine
                     a CSV of student quiz grades: Enter `student_id`,
-                    `grade`, and `class_year_str` below, each on
-                    a separate line.
+                    `quiz_id`, `grade`, and `class_year_str` below,
+                    each on a separate line.
                     """,
                 ),
                 ui.input_text_area("column_names", "CSV Column Names", rows=5),
@@ -257,7 +257,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 (
                     """
                     For the tutorial, we've provided the grades
-                    on assignments for a school class.
+                    on assignments for a school class in `sample.csv`.
                     You don't need to upload an additional file.
                     """
                     if is_sample_csv
@@ -361,9 +361,15 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             tutorial_box(
                 is_tutorial_mode(),
                 """
-                If you had a CSV of student grades,
-                with 10 assignments over the course of the term,
-                you could enter `10` here.
+                A larger number here will add more noise
+                to the released statistics, to ensure that
+                the contribution of any single individual is masked.
+                """,
+                is_sample_csv,
+                """
+                The `sample.csv` simulates 10 assignments
+                over the course of the term for each student,
+                so enter `10` here.
                 """,
             ),
             ui.layout_columns(
@@ -406,13 +412,26 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
 
     @render.ui
     def python_tutorial_ui():
+        cloud_extra_markdown = (
+            """
+            Because this instance of DP Wizard is running in the cloud,
+            we don't allow private data to be uploaded.
+            When run locally, DP Wizard can also run an analysis
+            on your data and return results,
+            and not just an unexecuted notebook.
+            """
+            if in_cloud
+            else ""
+        )
         return tutorial_box(
             is_tutorial_mode(),
-            """
+            f"""
             Along the way, code samples demonstrate
             how the information you provide is used in the
             OpenDP Library, and at the end you can download
             a notebook for the entire calculation.
+
+            {cloud_extra_markdown}
             """,
         )
 
