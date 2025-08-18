@@ -143,6 +143,14 @@ def results_server(
         disabled = not weights()
         return [
             ui.h3("Download Results"),
+            tutorial_box(
+                is_tutorial_mode(),
+                """
+                Now you can download a notebook for your analysis.
+                The Jupyter notebook could be used locally or on Colab,
+                but the HTML version can be viewed in the brower.
+                """,
+            ),
             ui.p("You can now make a differentially private release of your data."),
             # Find more icons on Font Awesome: https://fontawesome.com/search?ic=free
             ui.accordion(
@@ -159,14 +167,6 @@ def results_server(
                     ),
                     button("HTML", ".html", "file-code", disabled=disabled),
                     p("The same content, but exported as HTML."),
-                    tutorial_box(
-                        is_tutorial_mode(),
-                        """
-                        Now you can download a notebook for your analysis.
-                        The Jupyter notebook could be used locally or on Colab,
-                        but the HTML version can be viewed in the brower.
-                        """,
-                    ),
                 ),
                 ui.accordion_panel(
                     "Reports",
