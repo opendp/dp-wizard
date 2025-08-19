@@ -31,7 +31,7 @@ def _get_arg_parser():
         description="DP Wizard makes it easier to get started with "
         "Differential Privacy.",
         epilog=f"""
-Unless you have set "--demo" or "--cloud", you will specify a CSV
+Unless you have set "--sample" or "--cloud", you will specify a CSV
 inside the application.
 
 Provide a "Private CSV" {PRIVATE_TEXT}
@@ -43,9 +43,10 @@ Provide both {PUBLIC_PRIVATE_TEXT}
     )
     group = parser.add_mutually_exclusive_group()
     group.add_argument(
-        "--demo",
+        "--sample",
         action="store_true",
-        help="Use generated fake CSV for a quick demo",
+        help="Generate a sample CSV: "
+        "See how DP Wizard works without providing your own data",
     )
     group.add_argument(
         "--cloud",
@@ -58,7 +59,7 @@ Provide both {PUBLIC_PRIVATE_TEXT}
 def _get_args():
     """
     >>> _get_args()
-    Namespace(demo=False, cloud=False)
+    Namespace(sample=False, cloud=False)
     """
     arg_parser = _get_arg_parser()
 
@@ -74,14 +75,16 @@ def _get_args():
 
 
 class CLIInfo(NamedTuple):
-    is_demo_csv: bool
+    is_sample_csv: bool
     is_cloud_mode: bool
     is_qa_mode: bool
 
-    def get_is_demo_mode(self):
-        return self.is_demo_csv or self.is_cloud_mode
+    def get_is_tutorial_mode(self):
+        return self.is_sample_csv or self.is_cloud_mode
 
 
 def get_cli_info() -> CLIInfo:  # pragma: no cover
     args = _get_args()
-    return CLIInfo(is_demo_csv=args.demo, is_cloud_mode=args.cloud, is_qa_mode=False)
+    return CLIInfo(
+        is_sample_csv=args.sample, is_cloud_mode=args.cloud, is_qa_mode=False
+    )

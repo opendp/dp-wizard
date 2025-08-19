@@ -4,7 +4,7 @@ from dp_wizard.shiny import make_app_ui_from_cli_info, make_server_from_cli_info
 from dp_wizard.utils.argparse_helpers import CLIInfo
 
 cli_info = CLIInfo(
-    is_demo_csv=False,
+    is_sample_csv=False,
     is_cloud_mode=True,
     is_qa_mode=False,
 )

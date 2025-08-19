@@ -7,10 +7,10 @@ from shiny.types import SilentException
 
 from dp_wizard.shiny.components.outputs import (
     col_widths,
-    demo_help,
     hide_if,
     info_md_box,
     output_code_sample,
+    tutorial_box,
 )
 from dp_wizard.types import AnalysisName, ColumnName
 from dp_wizard.utils.code_generators import make_column_config_block
@@ -136,7 +136,8 @@ def column_server(
     upper_bounds: reactive.Value[dict[ColumnName, float]],
     bin_counts: reactive.Value[dict[ColumnName, int]],
     weights: reactive.Value[dict[ColumnName, str]],
-    is_demo_mode: reactive.Value[bool],
+    is_tutorial_mode: reactive.Value[bool],
+    is_sample_csv: bool,
     is_single_column: bool,
 ):  # pragma: no cover
     @reactive.effect
@@ -252,15 +253,14 @@ def column_server(
             )
 
         def upper_bound_input():
-            return [
+            return (
                 ui.input_text(
                     "upper_bound",
                     "Upper Bound",
                     str(upper_bounds().get(name, "")),
                     width=label_width,
                 ),
-                ui.output_ui("bounds_tooltip_ui"),
-            ]
+            )
 
         def bin_count_input():
             return [
@@ -270,7 +270,7 @@ def column_server(
                     bin_counts().get(name, 10),
                     width=label_width,
                 ),
-                ui.output_ui("bins_tooltip_ui"),
+                ui.output_ui("bins_tutorial_ui"),
             ]
 
         def candidate_count_input():
@@ -301,30 +301,37 @@ def column_server(
 
         return ui.layout_columns(
             inputs,
-            ui.output_ui(f"{analysis_name.lower()}_preview_ui"),
+            [
+                ui.output_ui("bounds_tutorial_ui"),
+                ui.output_ui(f"{analysis_name.lower()}_preview_ui"),
+            ],
             col_widths=col_widths,  # type: ignore
         )
 
     @render.ui
-    def bounds_tooltip_ui():
-        return demo_help(
-            is_demo_mode(),
+    def bounds_tutorial_ui():
+        return tutorial_box(
+            is_tutorial_mode(),
             """
-            Don't look at the data when estimating the bounds!
-            In this case, we could limit "grade" to values between 50 and 100.
+            Interpreting differential privacy strictly,
+            we should try never to look directly at the data,
+            even to set bounds! This can be hard.
             """,
-            responsive=False,
+            is_sample_csv,
+            """
+            Given what we know _a priori_ about grading scales,
+            you could limit `grade` to values between 0 and 100.
+            """,
         )
 
     @render.ui
-    def bins_tooltip_ui():
-        return demo_help(
-            is_demo_mode(),
+    def bins_tutorial_ui():
+        return tutorial_box(
+            is_tutorial_mode(),
             """
-            If you increase the number of bins,
-            you'll see that each individual bin becomes noisier to provide
-            the same overall privacy guarantee.
-            Give "grade" 5 bins.
+            If you decrease the number of bins,
+            you'll see that each individual bin becomes
+            less noisy.
             """,
             responsive=False,
         )
@@ -335,7 +342,7 @@ def column_server(
             is_single_column,
             ui.input_select(
                 "weight",
-                ["Weight", ui.output_ui("weight_tooltip_ui")],
+                ["Weight", ui.output_ui("weight_tutorial_ui")],
                 choices={
                     "1": "Less accurate",
                     default_weight: "Default",
@@ -347,9 +354,9 @@ def column_server(
         )
 
     @render.ui
-    def weight_tooltip_ui():
-        return demo_help(
-            is_demo_mode(),
+    def weight_tutorial_ui():
+        return tutorial_box(
+            is_tutorial_mode(),
             """
             You have a finite privacy budget, but you can choose
             how to allocate it. For simplicity, we limit the options here,

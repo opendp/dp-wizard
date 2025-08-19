@@ -5,11 +5,11 @@ from shiny import Inputs, Outputs, Session, reactive, render, ui
 
 from dp_wizard.shiny.components.outputs import (
     col_widths,
-    demo_help,
     hide_if,
     info_md_box,
     nav_button,
     output_code_sample,
+    tutorial_box,
 )
 from dp_wizard.types import AppState
 from dp_wizard.utils.argparse_helpers import (
@@ -79,7 +79,7 @@ def dataset_ui():
                 "Unit of Privacy",
                 "unit_of_privacy_python",
             ),
-            ui.output_ui("python_tooltip_ui"),
+            ui.output_ui("python_tutorial_ui"),
         ),
         ui.output_ui("row_count_bounds_ui"),
         ui.output_ui("define_analysis_button_ui"),
@@ -94,11 +94,11 @@ def dataset_server(
     state: AppState,
 ):  # pragma: no cover
     # CLI options:
-    is_demo_csv = state.is_demo_csv
+    is_sample_csv = state.is_sample_csv
     in_cloud = state.in_cloud
 
     # Top-level:
-    is_demo_mode = state.is_demo_mode
+    is_tutorial_mode = state.is_tutorial_mode
 
     # Dataset choices:
     initial_private_csv_path = state.initial_private_csv_path
@@ -177,8 +177,8 @@ def dataset_server(
     @render.ui
     def welcome_ui():
         return (
-            demo_help(
-                is_demo_mode(),
+            tutorial_box(
+                is_tutorial_mode(),
                 """
                 Welcome to **DP Wizard**, from OpenDP.
 
@@ -202,24 +202,24 @@ def dataset_server(
                 ui.card_header("CSV Columns"),
                 ui.markdown(
                     """
-                        Provide the names of columns you'll use in your analysis,
-                        one per line, with no extra punctuation.
-                        """
-                ),
-                demo_help(
-                    is_demo_mode(),
+                    Provide the names of columns you'll use in your analysis,
+                    one per line, with no extra punctuation.
                     """
-                            When [installed and run
-                            locally](https://pypi.org/project/dp_wizard/),
-                            DP Wizard allows you to specify a private and public CSV,
-                            but for the safety of your data, in the cloud
-                            DP Wizard only accepts column names.
+                ),
+                tutorial_box(
+                    is_tutorial_mode(),
+                    """
+                    When [installed and run
+                    locally](https://pypi.org/project/dp_wizard/),
+                    DP Wizard allows you to specify a private and public CSV,
+                    but for the safety of your data, in the cloud
+                    DP Wizard only accepts column names.
 
-                            If you don't have other ideas, we can imagine
-                            a CSV of student quiz grades: Enter `student_id`,
-                            `grade`, and `class_year_str` below, each on
-                            a separate line.
-                            """,
+                    If you don't have other ideas, we can imagine
+                    a CSV of student quiz grades: Enter `student_id`,
+                    `quiz_id`, `grade`, and `class_year_str` below,
+                    each on a separate line.
+                    """,
                 ),
                 ui.input_text_area("column_names", "CSV Column Names", rows=5),
             )
@@ -252,13 +252,22 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
         # - After file upload, the internal copy of the file
         #   is renamed to something like "0.csv".
         return [
-            demo_help(
-                is_demo_csv,
-                """
-                For the demo, we've provided the grades
-                on assignments for a school class.
-                You don't need to upload an additional file.
-                """,
+            tutorial_box(
+                is_tutorial_mode(),
+                (
+                    """
+                    For the tutorial, we've provided the grades
+                    on assignments for a school class in `sample.csv`.
+                    You don't need to upload an additional file.
+                    """
+                    if is_sample_csv
+                    else """
+                    If you don't have a CSV on hand to work with,
+                    quit and restart with `dp-wizard --sample`,
+                    and DP Wizard will provide a sample CSV
+                    for the tutorial.
+                    """
+                ),
             ),
             ui.row(
                 ui.input_file(
@@ -349,12 +358,18 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 This is the "unit of privacy" which will be protected.
                 """
             ),
-            # Without the input label, the tooltip floats way too far the right.
-            demo_help(
-                is_demo_mode(),
+            tutorial_box(
+                is_tutorial_mode(),
                 """
-                Continuing the quiz grades example, if there were
-                10 quizes over the course of the term, we could enter "10" below.
+                A larger number here will add more noise
+                to the released statistics, to ensure that
+                the contribution of any single individual is masked.
+                """,
+                is_sample_csv,
+                """
+                The `sample.csv` simulates 10 assignments
+                over the course of the term for each student,
+                so enter `10` here.
                 """,
             ),
             ui.layout_columns(
@@ -396,14 +411,27 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
         )
 
     @render.ui
-    def python_tooltip_ui():
-        return demo_help(
-            is_demo_mode(),
+    def python_tutorial_ui():
+        cloud_extra_markdown = (
             """
+            Because this instance of DP Wizard is running in the cloud,
+            we don't allow private data to be uploaded.
+            When run locally, DP Wizard can also run an analysis
+            on your data and return results,
+            and not just an unexecuted notebook.
+            """
+            if in_cloud
+            else ""
+        )
+        return tutorial_box(
+            is_tutorial_mode(),
+            f"""
             Along the way, code samples demonstrate
             how the information you provide is used in the
             OpenDP Library, and at the end you can download
             a notebook for the entire calculation.
+
+            {cloud_extra_markdown}
             """,
         )
 
@@ -428,11 +456,11 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                     What is the **maximum row count** of your CSV?
                     """
                 ),
-                demo_help(
-                    is_demo_mode(),
+                tutorial_box(
+                    is_tutorial_mode(),
                     """
-                    If you're unsure, pick a safe value, like the population
-                    of the country under the analysis.
+                    If you're unsure, pick a safe value, like the total
+                    population of the group being analyzed.
 
                     This value is used downstream two ways:
                     - There is a very small probability that data could be

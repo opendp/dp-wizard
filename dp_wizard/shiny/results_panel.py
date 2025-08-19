@@ -10,9 +10,9 @@ from htmltools.tags import p
 from shiny import Inputs, Outputs, Session, reactive, render, types, ui
 
 from dp_wizard.shiny.components.outputs import (
-    demo_help,
     hide_if,
     info_md_box,
+    tutorial_box,
 )
 from dp_wizard.types import AppState
 from dp_wizard.utils.code_generators import AnalysisPlan, AnalysisPlanColumn
@@ -92,12 +92,12 @@ def results_server(
     state: AppState,
 ):  # pragma: no cover
     # CLI options:
-    # is_demo_csv = state.is_demo_csv
+    # is_sample_csv = state.is_sample_csv
     in_cloud = state.in_cloud
     qa_mode = state.qa_mode
 
     # Top-level:
-    is_demo_mode = state.is_demo_mode
+    is_tutorial_mode = state.is_tutorial_mode
 
     # Dataset choices:
     # initial_private_csv_path = state.initial_private_csv_path
@@ -143,6 +143,14 @@ def results_server(
         disabled = not weights()
         return [
             ui.h3("Download Results"),
+            tutorial_box(
+                is_tutorial_mode(),
+                """
+                Now you can download a notebook for your analysis.
+                The Jupyter notebook could be used locally or on Colab,
+                but the HTML version can be viewed in the brower.
+                """,
+            ),
             ui.p("You can now make a differentially private release of your data."),
             # Find more icons on Font Awesome: https://fontawesome.com/search?ic=free
             ui.accordion(
@@ -159,14 +167,6 @@ def results_server(
                     ),
                     button("HTML", ".html", "file-code", disabled=disabled),
                     p("The same content, but exported as HTML."),
-                    demo_help(
-                        is_demo_mode(),
-                        """
-                        Now you can download a notebook for your analysis.
-                        The Jupyter notebook could be used locally or on Colab,
-                        but the HTML version can be viewed in the brower.
-                        """,
-                    ),
                 ),
                 ui.accordion_panel(
                     "Reports",
@@ -191,19 +191,26 @@ def results_server(
         disabled = not weights()
         return [
             ui.h3("Download Code"),
-            ui.markdown(
-                """
-                When run locally, there are more download options because DP Wizard
-                can read your private CSV and release differentially private statistics.
+            tutorial_box(
+                is_tutorial_mode(),
+                (
+                    """
+                    When [installed and run
+                    locally](https://pypi.org/project/dp_wizard/),
+                    there are more download options because DP Wizard
+                    can read your private CSV and release differentially
+                    private statistics.
 
-                In the cloud, DP Wizard only provides unexecuted notebooks and scripts.
-                """
-                if in_cloud
-                else """
-                Alternatively, you can download a script or unexecuted notebook
-                that demonstrates the steps of your analysis,
-                but does not contain any data or analysis results.
-                """
+                    In the cloud, DP Wizard only provides unexecuted
+                    notebooks and scripts.
+                    """
+                    if in_cloud
+                    else """
+                    Alternatively, you can download a script or unexecuted
+                    notebook that demonstrates the steps of your analysis,
+                    but does not contain any data or analysis results.
+                    """
+                ),
             ),
             ui.accordion(
                 ui.accordion_panel(
