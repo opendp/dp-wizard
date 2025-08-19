@@ -1,5 +1,7 @@
 # CHANGELOG
 
+## 0.4.1
+
 Highlights:
 
 - Expand the tutorial notes, and allow them to be toggled on and off [#503](https://github.com/opendp/dp-wizard/pull/503), [#571](https://github.com/opendp/dp-wizard/pull/571)
