@@ -1,5 +1,51 @@
 # CHANGELOG
 
+## 0.4.1
+
+Highlights:
+
+- Expand the tutorial notes, and allow them to be toggled on and off [#503](https://github.com/opendp/dp-wizard/pull/503), [#571](https://github.com/opendp/dp-wizard/pull/571)
+- Factor out [dp-wizard-templates](https://github.com/opendp/dp-wizard-templates) [#569](https://github.com/opendp/dp-wizard/pull/569)
+- Light mode / dark mode toggle [#482](https://github.com/opendp/dp-wizard/pull/482)
+- Unit of privacy: Add another step to help the user think about the kind of entity being protected [#525](https://github.com/opendp/dp-wizard/pull/525)
+- Bug fix: Changing epsilon will not reset columns [#508](https://github.com/opendp/dp-wizard/pull/508)
+
+Also includes:
+
+- Add isort as precommit [#565](https://github.com/opendp/dp-wizard/pull/565)
+- Consolidate state [#566](https://github.com/opendp/dp-wizard/pull/566)
+- Add row count bounds [#559](https://github.com/opendp/dp-wizard/pull/559)
+- Cleanup margin code gen [#568](https://github.com/opendp/dp-wizard/pull/568)
+- Upgrade starlette [#557](https://github.com/opendp/dp-wizard/pull/557)
+- add backticks; Move utility function into class [#551](https://github.com/opendp/dp-wizard/pull/551)
+- add a placholder, so both inputs are the same width [#558](https://github.com/opendp/dp-wizard/pull/558)
+- Misc. small notebook text fixes [#554](https://github.com/opendp/dp-wizard/pull/554)
+- upgrade pyright [#555](https://github.com/opendp/dp-wizard/pull/555)
+- Stronger typing: `AnalysisName` and `ColumnName` [#541](https://github.com/opendp/dp-wizard/pull/541)
+- Add note about "dp.median" in generated code [#522](https://github.com/opendp/dp-wizard/pull/522)
+- better docs about quoting for Windows users [#505](https://github.com/opendp/dp-wizard/pull/505)
+- Analysis inputs empty by default [#502](https://github.com/opendp/dp-wizard/pull/502)
+- Add note about grouping in panel titles [#509](https://github.com/opendp/dp-wizard/pull/509)
+- inline playwright helper functions [#512](https://github.com/opendp/dp-wizard/pull/512)
+- Remove unneeded "else"s [#520](https://github.com/opendp/dp-wizard/pull/520)
+- make has_bins a property [#527](https://github.com/opendp/dp-wizard/pull/527)
+- upgrade dependencies to resolve dependabot warnings [#529](https://github.com/opendp/dp-wizard/pull/529)
+- Check that IDs match on startup [#530](https://github.com/opendp/dp-wizard/pull/530)
+- Pin doc links [#516](https://github.com/opendp/dp-wizard/pull/516)
+- add a mini-toc [#504](https://github.com/opendp/dp-wizard/pull/504)
+- explain weights [#524](https://github.com/opendp/dp-wizard/pull/524)
+- make the analysis_panel logic match the results_panel logic [#514](https://github.com/opendp/dp-wizard/pull/514)
+- pass contributions as reactive [#517](https://github.com/opendp/dp-wizard/pull/517)
+- Suppport count queries [#454](https://github.com/opendp/dp-wizard/pull/454)
+- Use function templates for short blocks [#414](https://github.com/opendp/dp-wizard/pull/414)
+- validate number of bins; generate dummy CSV when running in cloud mode [#489](https://github.com/opendp/dp-wizard/pull/489)
+- Update dependencies with security warnings [#478](https://github.com/opendp/dp-wizard/pull/478)
+- one dependency per line in toml makes diffs easier to read [#449](https://github.com/opendp/dp-wizard/pull/449)
+- Just add a comment about endpoint inclusion [#445](https://github.com/opendp/dp-wizard/pull/445)
+- Explain use of jupyter lab template [#484](https://github.com/opendp/dp-wizard/pull/484)
+- Release process: Pull out highlights [#477](https://github.com/opendp/dp-wizard/pull/477)
+- Note about "None" for string valued columns [#441](https://github.com/opendp/dp-wizard/pull/441)
+
 ## 0.4.0
 
 Highlights:
