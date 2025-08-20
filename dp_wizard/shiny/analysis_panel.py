@@ -21,6 +21,7 @@ from dp_wizard.utils.csv_helper import (
     id_labels_dict_from_names,
     id_names_dict_from_names,
 )
+from dp_wizard.utils.shared import round_2
 
 
 def analysis_ui():
@@ -100,6 +101,26 @@ def _cleanup_reactive_dict(
     for key in keys_to_del:
         del reactive_dict_copy[key]
     reactive_dict.set(reactive_dict_copy)
+
+
+def _trunc_pow(exponent):
+    """
+    The output should be roughly exponential,
+    but should also be round numbers,
+    so it doesn't seem too arbitrary to the user.
+    >>> _trunc_pow(-1)
+    0.1
+    >>> _trunc_pow(-0.5)
+    0.3
+    >>> _trunc_pow(0)
+    1.0
+    >>> _trunc_pow(0.5)
+    3.0
+    >>> _trunc_pow(1)
+    10.0
+    """
+    number = pow(10, exponent)
+    return float(f"{number:.2g}" if abs(exponent) < 0.5 else f"{number:.1g}")
 
 
 def analysis_server(
@@ -333,12 +354,12 @@ def analysis_server(
     @reactive.effect
     @reactive.event(input.log_epsilon_slider)
     def _set_epsilon():
-        epsilon.set(pow(10, input.log_epsilon_slider()))
+        epsilon.set(_trunc_pow(input.log_epsilon_slider()))
 
     @render.ui
     def epsilon_ui():
         return tags.label(
-            f"Epsilon: {epsilon():0.3} ",
+            f"Epsilon: {epsilon()} ",
             tutorial_box(
                 is_tutorial_mode(),
                 """
