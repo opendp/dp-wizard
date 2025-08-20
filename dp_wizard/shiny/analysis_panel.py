@@ -21,7 +21,6 @@ from dp_wizard.utils.csv_helper import (
     id_labels_dict_from_names,
     id_names_dict_from_names,
 )
-from dp_wizard.utils.shared import round_2
 
 
 def analysis_ui():
