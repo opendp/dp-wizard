@@ -191,12 +191,15 @@ class AbstractGenerator(ABC):
 
     def _make_partial_context(self):
 
-        from dp_wizard.utils.code_generators.analyses import get_analysis_by_name
+        from dp_wizard.utils.code_generators.analyses import (
+            get_analysis_by_name,
+            has_bins,
+        )
 
         bin_column_names = [
             ColumnIdentifier(name)
             for name, plan in self.analysis_plan.columns.items()
-            if get_analysis_by_name(plan[0].analysis_name).has_bins
+            if has_bins(get_analysis_by_name(plan[0].analysis_name))
         ]
 
         privacy_unit_block = make_privacy_unit_block(self.analysis_plan.contributions)
@@ -223,7 +226,7 @@ class AbstractGenerator(ABC):
             [
                 f"{ColumnIdentifier(name)}_bin_expr"
                 for name, plan in self.analysis_plan.columns.items()
-                if get_analysis_by_name(plan[0].analysis_name).has_bins
+                if has_bins(get_analysis_by_name(plan[0].analysis_name))
             ]
         )
         return (

@@ -16,8 +16,6 @@ input_names = [
     "upper_bound_input",
     "candidate_count_input",
 ]
-has_bins = False
-has_bounds = True
 
 
 root = get_template_root(__file__)

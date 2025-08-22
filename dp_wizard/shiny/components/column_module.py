@@ -17,6 +17,7 @@ from dp_wizard.utils.code_generators import make_column_config_block
 from dp_wizard.utils.code_generators.analyses import (
     count,
     get_analysis_by_name,
+    has_bounds,
     histogram,
     mean,
     median,
@@ -368,7 +369,7 @@ def column_server(
     def error_md_calc():
         bound_errors = (
             get_bound_errors(input.lower_bound(), input.upper_bound())
-            if get_analysis_by_name(input.analysis_type()).has_bounds
+            if has_bounds(get_analysis_by_name(input.analysis_type()))
             else []
         )
 

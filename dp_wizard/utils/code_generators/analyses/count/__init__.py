@@ -9,8 +9,6 @@ blurb_md = """
 DP counts can also be used together with grouping to calculate histograms.
 """
 input_names = []
-has_bins = False
-has_bounds = False
 
 
 root = get_template_root(__file__)

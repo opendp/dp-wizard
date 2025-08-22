@@ -14,12 +14,6 @@ class Analysis(Protocol):  # pragma: no cover
     @property
     def input_names(self) -> list[str]: ...
 
-    @property
-    def has_bins(self) -> bool: ...
-
-    @property
-    def has_bounds(self) -> bool: ...
-
     @staticmethod
     def make_query(
         code_gen: AbstractGenerator,
@@ -70,3 +64,12 @@ def get_analysis_by_name(name: AnalysisName) -> Analysis:  # pragma: no cover
             return count
         case _:
             raise Exception("Unrecognized analysis")
+
+
+# These might be redone as methods on a superclass:
+def has_bins(analysis: Analysis) -> bool:
+    return any("count_input" in name for name in analysis.input_names)
+
+
+def has_bounds(analysis: Analysis) -> bool:
+    return any("bound_input" in name for name in analysis.input_names)
