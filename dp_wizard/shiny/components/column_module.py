@@ -366,10 +366,14 @@ def column_server(
 
     @reactive.calc
     def error_md_calc():
+        bound_errors = (
+            get_bound_errors(input.lower_bound(), input.upper_bound())
+            if get_analysis_by_name(input.analysis_type()).has_bounds
+            else []
+        )
+
         return "\n".join(
-            f"- {error}"
-            for error in get_bound_errors(input.lower_bound(), input.upper_bound())
-            + get_bin_errors(input.bins())
+            f"- {error}" for error in bound_errors + get_bin_errors(input.bins())
         )
 
     @reactive.effect

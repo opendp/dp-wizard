@@ -17,6 +17,9 @@ class Analysis(Protocol):  # pragma: no cover
     @property
     def has_bins(self) -> bool: ...
 
+    @property
+    def has_bounds(self) -> bool: ...
+
     @staticmethod
     def make_query(
         code_gen: AbstractGenerator,
