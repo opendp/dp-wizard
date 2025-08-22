@@ -5,6 +5,7 @@ from typing import Iterable
 from htmltools import tags
 from shiny import Inputs, Outputs, Session, reactive, render, ui
 
+from dp_wizard import registry_url
 from dp_wizard.shiny.components.column_module import column_server, column_ui
 from dp_wizard.shiny.components.inputs import log_slider
 from dp_wizard.shiny.components.outputs import (
@@ -62,13 +63,13 @@ def analysis_ui():
             ui.card(
                 ui.card_header("Privacy Budget"),
                 ui.markdown(
-                    """
+                    f"""
                     What is your privacy budget for this release?
                     Many factors including the sensitivity of your data,
                     the frequency of DP releases,
                     and the regulatory landscape can be considered.
                     Consider how your budget compares to that of
-                    <a href="https://registry.oblivious.com/#public-dp"
+                    <a href="{registry_url}"
                        target="_blank">other projects</a>.
                     """
                 ),

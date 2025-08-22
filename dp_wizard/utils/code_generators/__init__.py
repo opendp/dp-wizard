@@ -3,7 +3,7 @@ from typing import NamedTuple, Optional
 
 from dp_wizard_templates.code_template import Template
 
-from dp_wizard import opendp_version
+from dp_wizard import opendp_version, registry_url
 from dp_wizard.types import AnalysisName, ColumnName
 
 
@@ -63,13 +63,13 @@ def make_privacy_unit_block(contributions: int):
 def make_privacy_loss_block(epsilon: float, max_rows: int):
     import opendp.prelude as dp
 
-    def template(EPSILON, MAX_ROWS, OPENDP_VERSION):
+    def template(EPSILON, MAX_ROWS):
         privacy_loss = dp.loss_of(  # noqa: F841
             # Your privacy budget is captured in the "epsilon" parameter.
             # Larger values increase the risk that personal data could be reconstructed,
             # so choose the smallest value that gives you the needed accuracy.
             # You can also compare your budget to other projects:
-            # https://registry.opendp.org/
+            # REGISTRY_URL
             epsilon=EPSILON,
             # There are many models of differential privacy. For flexibility,
             # we here using a model which tolerates a small probability (delta)
@@ -82,8 +82,14 @@ def make_privacy_loss_block(epsilon: float, max_rows: int):
 
     return (
         Template(template)
-        .fill_expressions(OPENDP_VERSION=opendp_version)
-        .fill_values(EPSILON=epsilon, MAX_ROWS=max_rows)
+        .fill_expressions(
+            OPENDP_VERSION=opendp_version,
+            REGISTRY_URL=registry_url,
+        )
+        .fill_values(
+            EPSILON=epsilon,
+            MAX_ROWS=max_rows,
+        )
         .finish()
     )
 

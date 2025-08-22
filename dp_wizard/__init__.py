@@ -5,6 +5,7 @@ from pathlib import Path
 
 __version__ = (Path(__file__).parent / "VERSION").read_text().strip()
 opendp_version = "0.13.0"
+registry_url = "http://registry.opendp.org/deployments-registry/"
 
 
 def get_template_root(path):
