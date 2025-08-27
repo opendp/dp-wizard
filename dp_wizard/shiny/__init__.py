@@ -17,18 +17,21 @@ from dp_wizard.types import AppState
 from dp_wizard.utils.argparse_helpers import CLIInfo
 from dp_wizard.utils.csv_helper import read_csv_names
 
+assets_path = Path(__file__).parent / "assets"
+assert assets_path.exists()
+
 
 def make_app(cli_info: CLIInfo):
     return App(
-        _make_app_ui(cli_info),
-        _make_server(cli_info),
+        _make_app_ui(cli_info), _make_server(cli_info), static_assets=assets_path
     )
 
 
 def _make_app_ui(cli_info: CLIInfo):
     return ui.page_bootstrap(
         ui.head_content(
-            ui.include_css(Path(__file__).parent / "assets" / "styles.css"),
+            ui.include_css(assets_path / "styles.css"),
+            ui.tags.link(rel="icon", href="favicon.ico"),
         ),
         ui.navset_tab(
             about_panel.about_ui(),
