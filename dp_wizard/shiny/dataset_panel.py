@@ -194,8 +194,8 @@ def dataset_server(
     @render.ui
     def csv_or_columns_ui():
         if in_cloud:
-            return ui.card(
-                ui.card_header("CSV Columns"),
+            title = "CSV Columns"
+            content = [
                 ui.markdown(
                     """
                     Provide the names of columns you'll use in your analysis,
@@ -218,11 +218,10 @@ def dataset_server(
                     """,
                 ),
                 ui.input_text_area("column_names", "CSV Column Names", rows=5),
-                ui.output_ui("python_tutorial_ui"),
-            )
-        return (
-            ui.card(
-                ui.card_header("Input CSVs"),
+            ]
+        else:
+            title = "Input CSVs"
+            content = [
                 ui.markdown(
                     f"""
 Choose **Private CSV** {PRIVATE_TEXT}
@@ -234,9 +233,10 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 ),
                 ui.output_ui("input_files_ui"),
                 ui.output_ui("csv_column_match_ui"),
-                ui.output_ui("python_tutorial_ui"),
-            ),
-        )
+            ]
+
+        content.append(ui.output_ui("python_tutorial_ui"))
+        return ui.card(ui.card_header(title), content)
 
     @render.ui
     def input_files_ui():
