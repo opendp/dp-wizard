@@ -68,7 +68,7 @@ def get_analysis_by_name(name: AnalysisName) -> Analysis:  # pragma: no cover
 
 # These might be redone as methods on a superclass:
 def has_bins(analysis: Analysis) -> bool:
-    return any("count_input" in name for name in analysis.input_names)
+    return any("bin_count_input" in name for name in analysis.input_names)
 
 
 def has_bounds(analysis: Analysis) -> bool:
