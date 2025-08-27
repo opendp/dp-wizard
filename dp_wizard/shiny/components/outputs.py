@@ -14,8 +14,20 @@ col_widths = {
 
 
 def code_sample(title: str, python_block: str):
+    """
+    >>> code_sample('test', 'print("hello, world")')
+    <details>
+      <summary>
+        Code sample: test
+      </summary>
+      <pre><code class="language-python">print(&quot;hello, world&quot;)
+    </code></pre>
+    <BLANKLINE>
+      <script>hljs.highlightAll();</script>
+    </details>
+    """
     # Based on: https://github.com/posit-dev/py-shiny/issues/491
-    # If this is incorporated into Shiny, this could be simplified.
+    # If that is incorporated into Shiny, this could be simplified.
     return details(
         summary(["Code sample: ", title]),
         ui.markdown(f"```python\n{python_block}\n```"),
