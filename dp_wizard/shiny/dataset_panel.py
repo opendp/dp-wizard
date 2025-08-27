@@ -393,7 +393,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
     def button_enabled():
         return (
             contributions_valid()
-            and not error_md_calc()
+            and not get_row_count_errors(max_rows())
             and len(column_names()) > 0
             and (in_cloud or not csv_column_mismatch_calc())
         )
@@ -440,14 +440,14 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
     def _on_max_rows_change():
         max_rows.set(input.max_rows())
 
-    @reactive.calc
-    def error_md_calc():
-        return "\n".join(f"- {error}" for error in get_row_count_errors(max_rows()))
+    @render.ui
+    def optional_row_count_error_ui():
+        error_md = "\n".join(f"- {error}" for error in get_row_count_errors(max_rows()))
+        if error_md:
+            return info_md_box(error_md)
 
     @render.ui
     def row_count_bounds_ui():
-        error_md = error_md_calc()
-
         return (
             ui.card(
                 ui.card_header("Row Count"),
@@ -477,12 +477,11 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                     ui.input_text(
                         "max_rows",
                         None,
-                        str(max_rows() or ""),
                     ),
                     [],  # column placeholder
                     col_widths=col_widths,  # type: ignore
                 ),
-                info_md_box(error_md) if error_md else [],
+                ui.output_ui("optional_row_count_error_ui"),
             ),
         )
 
