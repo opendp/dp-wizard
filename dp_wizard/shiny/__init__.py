@@ -5,7 +5,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from faicons import icon_svg
-from shiny import Inputs, Outputs, Session, reactive, ui
+from shiny import App, Inputs, Outputs, Session, reactive, ui
 
 from dp_wizard.shiny import (
     about_panel,
@@ -18,9 +18,18 @@ from dp_wizard.utils.argparse_helpers import CLIInfo
 from dp_wizard.utils.csv_helper import read_csv_names
 
 
-def make_app_ui_from_cli_info(cli_info: CLIInfo):
+def make_app(cli_info: CLIInfo):
+    return App(
+        _make_app_ui(cli_info),
+        _make_server(cli_info),
+    )
+
+
+def _make_app_ui(cli_info: CLIInfo):
     return ui.page_bootstrap(
-        ui.head_content(ui.include_css(Path(__file__).parent / "css" / "styles.css")),
+        ui.head_content(
+            ui.include_css(Path(__file__).parent / "assets" / "styles.css"),
+        ),
         ui.navset_tab(
             about_panel.about_ui(),
             dataset_panel.dataset_ui(),
@@ -161,7 +170,7 @@ def _scan_files_for_input_ids():
         raise Exception("\n".join(errors))
 
 
-def make_server_from_cli_info(cli_info: CLIInfo):
+def _make_server(cli_info: CLIInfo):
     _scan_files_for_input_ids()
 
     def server(input: Inputs, output: Outputs, session: Session):  # pragma: no cover
