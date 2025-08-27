@@ -68,8 +68,22 @@ def get_analysis_by_name(name: AnalysisName) -> Analysis:  # pragma: no cover
 
 # These might be redone as methods on a superclass:
 def has_bins(analysis: Analysis) -> bool:
+    """
+    >>> from dp_wizard.utils.code_generators.analyses import histogram, median
+    >>> has_bins(histogram)
+    True
+    >>> has_bins(median)
+    False
+    """
     return any("bin_count_input" in name for name in analysis.input_names)
 
 
 def has_bounds(analysis: Analysis) -> bool:
+    """
+    >>> from dp_wizard.utils.code_generators.analyses import count, median
+    >>> has_bounds(count)
+    False
+    >>> has_bounds(median)
+    True
+    """
     return any("bound_input" in name for name in analysis.input_names)
