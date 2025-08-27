@@ -76,7 +76,6 @@ def dataset_ui():
             ui.output_ui("input_contributions_ui"),
             ui.output_ui("contributions_validation_ui"),
             ui.output_ui("unit_of_privacy_python_ui"),
-            ui.output_ui("python_tutorial_ui"),
         ),
         ui.output_ui("row_count_bounds_ui"),
         ui.output_ui("define_analysis_button_ui"),
@@ -219,6 +218,7 @@ def dataset_server(
                     """,
                 ),
                 ui.input_text_area("column_names", "CSV Column Names", rows=5),
+                ui.output_ui("python_tutorial_ui"),
             )
         return (
             ui.card(
@@ -234,6 +234,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 ),
                 ui.output_ui("input_files_ui"),
                 ui.output_ui("csv_column_match_ui"),
+                ui.output_ui("python_tutorial_ui"),
             ),
         )
 
