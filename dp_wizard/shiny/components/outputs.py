@@ -13,50 +13,14 @@ col_widths = {
 }
 
 
-def output_code_sample(title, name_of_render_function: str):
-    # Syntax highlighting proposed as a feature for shiny:
-    # https://github.com/posit-dev/py-shiny/issues/491
-    # If there is progress there, this could be simplified,
-    # and we could removed the vendored highlight.js.
-
-    #     text = ui.output_text(name_of_render_function)
-    #     print(text)
-    #     return details(
-    #         summary(["Code sample: ", title]),
-    #         ui.markdown(
-    #                 f"""```python
-    # {text}
-    # ```
-    # """),
-    #         script("hljs.highlightAll();") # This could be narrowed to just the current element.
-    #     )
-
-    # Doesn't work: div is marked as `data-highlighted="yes"`
-    # but there are no colors: maybe the classes conflict,
-    # Or shiny re-writes the content again?
-    #
-    def container(*args, **kwargs):
-        kwargs["class_"] += " language-python"
-        return (pre(code(*args, **kwargs)),)
-
-    content = ui.output_text(name_of_render_function, container=container)
-    breakpoint()
-    print(content.render())
+def code_sample(title: str, python_block: str):
     return details(
         summary(["Code sample: ", title]),
-        content,
-        script("hljs.highlightAll();"),  # This could be narrowed.
+        ui.markdown(f"```python\n{python_block}\n```"),
+        script(
+            "hljs.highlightAll();"
+        ),  # This could be narrowed to just the current element.
     )
-
-    # This works:
-    #
-    # return ui.HTML("""
-    # <pre><code class="language-python">
-    #     def fake(param):
-    #         print(f"hello? {param}")
-    # </code></pre>
-    # <script>hljs.highlightAll();</script>
-    # """)
 
 
 def tutorial_box(

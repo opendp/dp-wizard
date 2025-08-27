@@ -6,10 +6,10 @@ from shiny import Inputs, Outputs, Session, module, reactive, render, ui
 from shiny.types import SilentException
 
 from dp_wizard.shiny.components.outputs import (
+    code_sample,
     col_widths,
     hide_if,
     info_md_box,
-    output_code_sample,
     tutorial_box,
 )
 from dp_wizard.types import AnalysisName, ColumnName
@@ -380,21 +380,15 @@ def column_server(
 
     @render.ui
     def column_python_ui():
-        block = make_column_config_block(
-            name=name,
-            analysis_name=input.analysis_type(),
-            lower_bound=float(input.lower_bound()),
-            upper_bound=float(input.upper_bound()),
-            bin_count=int(input.bins()),
-        )
-        from htmltools.tags import details, script, summary
-
-        return details(
-            summary(["Code sample: ", "Column Configuration"]),
-            ui.markdown(f"```python\n{block}\n```"),
-            script(
-                "hljs.highlightAll();"
-            ),  # This could be narrowed to just the current element.
+        return code_sample(
+            "Column Configuration",
+            make_column_config_block(
+                name=name,
+                analysis_name=input.analysis_type(),
+                lower_bound=float(input.lower_bound()),
+                upper_bound=float(input.upper_bound()),
+                bin_count=int(input.bins()),
+            ),
         )
 
     @render.ui

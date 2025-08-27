@@ -8,10 +8,10 @@ from shiny import Inputs, Outputs, Session, reactive, render, ui
 from dp_wizard.shiny.components.column_module import column_server, column_ui
 from dp_wizard.shiny.components.inputs import log_slider
 from dp_wizard.shiny.components.outputs import (
+    code_sample,
     hide_if,
     info_md_box,
     nav_button,
-    output_code_sample,
     tutorial_box,
 )
 from dp_wizard.types import AppState
@@ -352,15 +352,9 @@ def analysis_server(
 
     @render.ui
     def privacy_loss_python_ui():
-        block = make_privacy_loss_block(epsilon=epsilon(), max_rows=int(max_rows()))
-        from htmltools.tags import details, script, summary
-
-        return details(
-            summary(["Code sample: ", "Privacy Loss"]),
-            ui.markdown(f"```python\n{block}\n```"),
-            script(
-                "hljs.highlightAll();"
-            ),  # This could be narrowed to just the current element.
+        return code_sample(
+            "Privacy Loss",
+            make_privacy_loss_block(epsilon=epsilon(), max_rows=int(max_rows())),
         )
 
     @reactive.effect

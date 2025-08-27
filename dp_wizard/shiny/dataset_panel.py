@@ -4,11 +4,11 @@ from typing import Optional
 from shiny import Inputs, Outputs, Session, reactive, render, ui
 
 from dp_wizard.shiny.components.outputs import (
+    code_sample,
     col_widths,
     hide_if,
     info_md_box,
     nav_button,
-    output_code_sample,
     tutorial_box,
 )
 from dp_wizard.types import AppState
@@ -499,16 +499,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
 
     @render.ui
     def unit_of_privacy_python_ui():
-        block = make_privacy_unit_block(contributions())
-        from htmltools.tags import details, script, summary
-
-        return details(
-            summary(["Code sample: ", "Unit of Privacy"]),
-            ui.markdown(f"```python\n{block}\n```"),
-            script(
-                "hljs.highlightAll();"
-            ),  # This could be narrowed to just the current element.
-        )
+        return code_sample("Unit of Privacy", make_privacy_unit_block(contributions()))
 
     @reactive.effect
     @reactive.event(input.go_to_analysis)
