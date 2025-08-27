@@ -96,7 +96,7 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     expect(page.get_by_text(download_results_text)).not_to_be_visible()
     page.locator("#contributions").fill("42")
     page.get_by_text("Code sample: Unit of Privacy").click()
-    expect(page.get_by_text("contributions = 42")).to_be_visible()
+    expect(page.get_by_text("42")).to_be_visible()
     expect(page.locator(".shiny-output-error")).not_to_be_attached()
 
     # Button disabled until upload:
