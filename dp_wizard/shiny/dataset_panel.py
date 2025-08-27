@@ -75,10 +75,7 @@ def dataset_ui():
             ui.output_ui("input_entity_ui"),
             ui.output_ui("input_contributions_ui"),
             ui.output_ui("contributions_validation_ui"),
-            output_code_sample(
-                "Unit of Privacy",
-                "unit_of_privacy_python",
-            ),
+            ui.output_ui("unit_of_privacy_python_ui"),
             ui.output_ui("python_tutorial_ui"),
         ),
         ui.output_ui("row_count_bounds_ui"),
@@ -500,9 +497,18 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             """,
         ]
 
-    @render.code
-    def unit_of_privacy_python():
-        return make_privacy_unit_block(contributions())
+    @render.ui
+    def unit_of_privacy_python_ui():
+        block = make_privacy_unit_block(contributions())
+        from htmltools.tags import details, script, summary
+
+        return details(
+            summary(["Code sample: ", "Unit of Privacy"]),
+            ui.markdown(f"```python\n{block}\n```"),
+            script(
+                "hljs.highlightAll();"
+            ),  # This could be narrowed to just the current element.
+        )
 
     @reactive.effect
     @reactive.event(input.go_to_analysis)

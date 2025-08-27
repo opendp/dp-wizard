@@ -378,14 +378,23 @@ def column_server(
             prev_analysis_errors = analysis_errors()
         analysis_errors.set({**prev_analysis_errors, name: bool(error_md_calc())})
 
-    @render.code
-    def column_code():
-        return make_column_config_block(
+    @render.ui
+    def column_python_ui():
+        block = make_column_config_block(
             name=name,
             analysis_name=input.analysis_type(),
             lower_bound=float(input.lower_bound()),
             upper_bound=float(input.upper_bound()),
             bin_count=int(input.bins()),
+        )
+        from htmltools.tags import details, script, summary
+
+        return details(
+            summary(["Code sample: ", "Column Configuration"]),
+            ui.markdown(f"```python\n{block}\n```"),
+            script(
+                "hljs.highlightAll();"
+            ),  # This could be narrowed to just the current element.
         )
 
     @render.ui
@@ -403,7 +412,7 @@ def column_server(
                     summary("Data Table"),
                     ui.output_data_frame("data_frame"),
                 ),
-                output_code_sample("Column Definition", "column_code"),
+                ui.output_ui("column_python_ui"),
             ),
         ]
 
@@ -432,7 +441,7 @@ def column_server(
                 {optional_grouping_message}
                 """
             ),
-            output_code_sample("Column Definition", "column_code"),
+            ui.output_ui("column_python_ui"),
         ]
 
     @render.ui

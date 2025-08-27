@@ -74,7 +74,7 @@ def analysis_ui():
                 ),
                 log_slider("log_epsilon_slider", 0.1, 10.0),
                 ui.output_ui("epsilon_ui"),
-                output_code_sample("Privacy Loss", "privacy_loss_python"),
+                ui.output_ui("privacy_loss_python_ui"),
             ),
             ui.card(
                 ui.card_header("Simulation"),
@@ -350,9 +350,18 @@ def analysis_server(
             ),
         )
 
-    @render.code
-    def privacy_loss_python():
-        return make_privacy_loss_block(epsilon=epsilon(), max_rows=int(max_rows()))
+    @render.ui
+    def privacy_loss_python_ui():
+        block = make_privacy_loss_block(epsilon=epsilon(), max_rows=int(max_rows()))
+        from htmltools.tags import details, script, summary
+
+        return details(
+            summary(["Code sample: ", "Privacy Loss"]),
+            ui.markdown(f"```python\n{block}\n```"),
+            script(
+                "hljs.highlightAll();"
+            ),  # This could be narrowed to just the current element.
+        )
 
     @reactive.effect
     @reactive.event(input.go_to_results)
