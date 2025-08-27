@@ -1,8 +1,10 @@
 from pathlib import Path
 from typing import Optional
 
+from dp_wizard_templates.code_template import Template
 from shiny import Inputs, Outputs, Session, reactive, render, ui
 
+from dp_wizard import opendp_version
 from dp_wizard.shiny.components.outputs import (
     code_sample,
     col_widths,
@@ -235,7 +237,30 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 ui.output_ui("csv_column_match_ui"),
             ]
 
-        content.append(ui.output_ui("python_tutorial_ui"))
+        content += [
+            code_sample(
+                "Context",
+                Template(
+                    "context",
+                    Path(__file__).parent.parent / "utils/code_generators/no-tests",
+                )
+                .fill_values(CSV_PATH="sample.csv")
+                .fill_expressions(
+                    MARGINS_LIST="margins",
+                    EXTRA_COLUMNS="extra_columns",
+                    OPENDP_VERSION=opendp_version,
+                    WEIGHTS="weights",
+                )
+                .fill_blocks(
+                    PRIVACY_UNIT_BLOCK="",
+                    PRIVACY_LOSS_BLOCK="",
+                    OPTIONAL_CSV_BLOCK="# More of these slots will be filled in as you move through DP Wizard.\n",
+                )
+                .finish()
+                .strip(),
+            ),
+            ui.output_ui("python_tutorial_ui"),
+        ]
         return ui.card(ui.card_header(title), content)
 
     @render.ui
