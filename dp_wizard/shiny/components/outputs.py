@@ -1,7 +1,7 @@
 import re
 
 from faicons import icon_svg
-from htmltools.tags import code, details, pre, script, small, summary
+from htmltools.tags import details, script, small, summary
 from shiny import ui
 
 col_widths = {
@@ -14,6 +14,8 @@ col_widths = {
 
 
 def code_sample(title: str, python_block: str):
+    # Based on: https://github.com/posit-dev/py-shiny/issues/491
+    # If this is incorporated into Shiny, this could be simplified.
     return details(
         summary(["Code sample: ", title]),
         ui.markdown(f"```python\n{python_block}\n```"),
