@@ -14,7 +14,6 @@ input_names = [
     "lower_bound_input",
     "upper_bound_input",
 ]
-has_bins = False
 
 
 root = get_template_root(__file__)
