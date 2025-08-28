@@ -30,7 +30,7 @@ def get_pos_int_error(number_str, minimum=100):
     so the "should be a number" errors may not be seen in practice.
     >>> get_pos_int_error('100')
     >>> get_pos_int_error('0')
-    'should be greater than 100'
+    'should be at least 100'
     >>> get_pos_int_error(None)
     'is required'
     >>> get_pos_int_error('')
@@ -45,7 +45,7 @@ def get_pos_int_error(number_str, minimum=100):
     except (TypeError, ValueError, OverflowError):
         return "should be an integer"
     if number < minimum:
-        return f"should be greater than {minimum}"
+        return f"should be at least {minimum}"
     return None
 
 
@@ -69,19 +69,24 @@ def dataset_ui():
         "Select Dataset",
         ui.output_ui("dataset_release_warning_ui"),
         ui.output_ui("welcome_ui"),
-        ui.output_ui("csv_or_columns_ui"),
-        ui.card(
-            ui.card_header("Unit of Privacy"),
-            ui.output_ui("input_entity_ui"),
-            ui.output_ui("input_contributions_ui"),
-            ui.output_ui("contributions_validation_ui"),
-            output_code_sample(
-                "Unit of Privacy",
-                "unit_of_privacy_python",
+        ui.layout_columns(
+            ui.card(
+                ui.card_header("Data Source"),
+                ui.output_ui("csv_or_columns_ui"),
+                ui.output_ui("row_count_bounds_ui"),
             ),
-            ui.output_ui("python_tutorial_ui"),
+            ui.card(
+                ui.card_header("Unit of Privacy"),
+                ui.output_ui("input_entity_ui"),
+                ui.output_ui("input_contributions_ui"),
+                ui.output_ui("contributions_validation_ui"),
+                output_code_sample(
+                    "Unit of Privacy",
+                    "unit_of_privacy_python",
+                ),
+                ui.output_ui("python_tutorial_ui"),
+            ),
         ),
-        ui.output_ui("row_count_bounds_ui"),
         ui.output_ui("define_analysis_button_ui"),
         value="dataset_panel",
     )
@@ -198,8 +203,7 @@ def dataset_server(
     @render.ui
     def csv_or_columns_ui():
         if in_cloud:
-            return ui.card(
-                ui.card_header("CSV Columns"),
+            return [
                 ui.markdown(
                     """
                     Provide the names of columns you'll use in your analysis,
@@ -220,25 +224,23 @@ def dataset_server(
                     `quiz_id`, `grade`, and `class_year_str` below,
                     each on a separate line.
                     """,
+                    responsive=False,
                 ),
                 ui.input_text_area("column_names", "CSV Column Names", rows=5),
-            )
-        return (
-            ui.card(
-                ui.card_header("Input CSVs"),
-                ui.markdown(
-                    f"""
+            ]
+        return [
+            ui.markdown(
+                f"""
 Choose **Private CSV** {PRIVATE_TEXT}
 
 Choose **Public CSV** {PUBLIC_TEXT}
 
 Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
-                    """
-                ),
-                ui.output_ui("input_files_ui"),
-                ui.output_ui("csv_column_match_ui"),
+                """
             ),
-        )
+            ui.output_ui("input_files_ui"),
+            ui.output_ui("csv_column_match_ui"),
+        ]
 
     @render.ui
     def input_files_ui():
@@ -268,6 +270,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                     for the tutorial.
                     """
                 ),
+                responsive=False,
             ),
             ui.row(
                 ui.input_file(
@@ -328,7 +331,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
         return [
             ui.markdown(
                 """
-                First, what is the **entity** whose privacy you want to protect?
+                Next, what is the **entity** whose privacy you want to protect?
                 """
             ),
             ui.layout_columns(
@@ -371,6 +374,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 over the course of the term for each student,
                 so enter `10` here.
                 """,
+                responsive=False,
             ),
             ui.layout_columns(
                 ui.input_numeric(
@@ -433,6 +437,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
 
             {cloud_extra_markdown}
             """,
+            responsive=False,
         )
 
     @reactive.effect
@@ -449,40 +454,35 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
     @render.ui
     def row_count_bounds_ui():
         return (
-            ui.card(
-                ui.card_header("Row Count"),
-                ui.markdown(
-                    """
-                    What is the **maximum row count** of your CSV?
-                    """
-                ),
-                tutorial_box(
-                    is_tutorial_mode(),
-                    """
-                    If you're unsure, pick a safe value, like the total
-                    population of the group being analyzed.
+            ui.markdown("What is the **maximum row count** of your CSV?"),
+            tutorial_box(
+                is_tutorial_mode(),
+                """
+                If you're unsure, pick a safe value, like the total
+                population of the group being analyzed.
 
-                    This value is used downstream two ways:
-                    - There is a very small probability that data could be
-                      released verbatim. If your dataset is particularly
-                      large, the delta parameter should be increased
-                      correspondingly.
-                    - The floating point numbers used by computers are not the
-                      same as the real numbers of mathematics, and with very
-                      large datasets, this gap accumulates, and more noise is
-                      necessary.
-                    """,
-                ),
-                ui.layout_columns(
-                    ui.input_text(
-                        "max_rows",
-                        None,
-                    ),
-                    [],  # column placeholder
-                    col_widths=col_widths,  # type: ignore
-                ),
-                ui.output_ui("optional_row_count_error_ui"),
+                This value is used downstream two ways:
+                - There is a very small probability that data could be
+                    released verbatim. If your dataset is particularly
+                    large, the delta parameter should be increased
+                    correspondingly.
+                - The floating point numbers used by computers are not the
+                    same as the real numbers of mathematics, and with very
+                    large datasets, this gap accumulates, and more noise is
+                    necessary.
+                """,
+                responsive=False,
             ),
+            ui.layout_columns(
+                ui.input_text(
+                    "max_rows",
+                    None,
+                    str(max_rows() or ""),
+                ),
+                [],  # column placeholder
+                col_widths=col_widths,  # type: ignore
+            ),
+            ui.output_ui("optional_row_count_error_ui"),
         )
 
     @render.ui
