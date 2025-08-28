@@ -254,7 +254,10 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 .fill_blocks(
                     PRIVACY_UNIT_BLOCK="",
                     PRIVACY_LOSS_BLOCK="",
-                    OPTIONAL_CSV_BLOCK="# More of these slots will be filled in as you move through DP Wizard.\n",
+                    OPTIONAL_CSV_BLOCK=(
+                        "# More of these slots will be filled in\n"
+                        "# as you move through DP Wizard.\n"
+                    ),
                 )
                 .finish()
                 .strip(),
