@@ -30,7 +30,7 @@ def get_pos_int_error(number_str, minimum=100):
     so the "should be a number" errors may not be seen in practice.
     >>> get_pos_int_error('100')
     >>> get_pos_int_error('0')
-    'should be greater than 100'
+    'should be at least 100'
     >>> get_pos_int_error(None)
     'is required'
     >>> get_pos_int_error('')
@@ -45,7 +45,7 @@ def get_pos_int_error(number_str, minimum=100):
     except (TypeError, ValueError, OverflowError):
         return "should be an integer"
     if number < minimum:
-        return f"should be greater than {minimum}"
+        return f"should be at least {minimum}"
     return None
 
 
@@ -331,7 +331,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
         return [
             ui.markdown(
                 """
-                First, what is the **entity** whose privacy you want to protect?
+                Next, what is the **entity** whose privacy you want to protect?
                 """
             ),
             ui.layout_columns(
@@ -397,7 +397,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
     def button_enabled():
         return (
             contributions_valid()
-            and not error_md_calc()
+            and not get_row_count_errors(max_rows())
             and len(column_names()) > 0
             and (in_cloud or not csv_column_mismatch_calc())
         )
@@ -445,20 +445,16 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
     def _on_max_rows_change():
         max_rows.set(input.max_rows())
 
-    @reactive.calc
-    def error_md_calc():
-        return "\n".join(f"- {error}" for error in get_row_count_errors(max_rows()))
+    @render.ui
+    def optional_row_count_error_ui():
+        error_md = "\n".join(f"- {error}" for error in get_row_count_errors(max_rows()))
+        if error_md:
+            return info_md_box(error_md)
 
     @render.ui
     def row_count_bounds_ui():
-        error_md = error_md_calc()
-
-        return [
-            ui.markdown(
-                """
-                What is the **maximum row count** of your CSV?
-                """
-            ),
+        return (
+            ui.markdown("What is the **maximum row count** of your CSV?"),
             tutorial_box(
                 is_tutorial_mode(),
                 """
@@ -486,8 +482,8 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 [],  # column placeholder
                 col_widths=col_widths,  # type: ignore
             ),
-            info_md_box(error_md) if error_md else [],
-        ]
+            ui.output_ui("optional_row_count_error_ui"),
+        )
 
     @render.ui
     def define_analysis_button_ui():

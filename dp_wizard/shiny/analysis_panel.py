@@ -5,6 +5,7 @@ from typing import Iterable
 from htmltools import tags
 from shiny import Inputs, Outputs, Session, reactive, render, ui
 
+from dp_wizard import registry_url
 from dp_wizard.shiny.components.column_module import column_server, column_ui
 from dp_wizard.shiny.components.inputs import log_slider
 from dp_wizard.shiny.components.outputs import (
@@ -62,13 +63,13 @@ def analysis_ui():
             ui.card(
                 ui.card_header("Privacy Budget"),
                 ui.markdown(
-                    """
+                    f"""
                     What is your privacy budget for this release?
                     Many factors including the sensitivity of your data,
                     the frequency of DP releases,
                     and the regulatory landscape can be considered.
                     Consider how your budget compares to that of
-                    <a href="https://registry.oblivious.com/#public-dp"
+                    <a href="{registry_url}"
                        target="_blank">other projects</a>.
                     """
                 ),
@@ -100,6 +101,26 @@ def _cleanup_reactive_dict(
     for key in keys_to_del:
         del reactive_dict_copy[key]
     reactive_dict.set(reactive_dict_copy)
+
+
+def _trunc_pow(exponent):
+    """
+    The output should be roughly exponential,
+    but should also be round numbers,
+    so it doesn't seem too arbitrary to the user.
+    >>> _trunc_pow(-1)
+    0.1
+    >>> _trunc_pow(-0.5)
+    0.3
+    >>> _trunc_pow(0)
+    1.0
+    >>> _trunc_pow(0.5)
+    3.0
+    >>> _trunc_pow(1)
+    10.0
+    """
+    number = pow(10, exponent)
+    return float(f"{number:.2g}" if abs(exponent) < 0.5 else f"{number:.1g}")
 
 
 def analysis_server(
@@ -333,12 +354,12 @@ def analysis_server(
     @reactive.effect
     @reactive.event(input.log_epsilon_slider)
     def _set_epsilon():
-        epsilon.set(pow(10, input.log_epsilon_slider()))
+        epsilon.set(_trunc_pow(input.log_epsilon_slider()))
 
     @render.ui
     def epsilon_ui():
         return tags.label(
-            f"Epsilon: {epsilon():0.3} ",
+            f"Epsilon: {epsilon()} ",
             tutorial_box(
                 is_tutorial_mode(),
                 """
