@@ -34,7 +34,7 @@ def test_cloud_app(page: Page, cloud_app: ShinyAppProc):  # pragma: no cover
 
     page.get_by_role("button", name="Define analysis").click()
     page.locator(".selectize-input").nth(0).click()
-    page.get_by_text("a_column").click()
+    page.get_by_text("1: a_column").click()
     page.get_by_label("Lower").fill("0")
     page.get_by_label("Upper").fill("10")
 
