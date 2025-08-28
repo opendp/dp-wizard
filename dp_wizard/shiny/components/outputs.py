@@ -34,6 +34,12 @@ def tutorial_box(
     >>> assert '<p><svg' in html
     >>> assert '</svg>&nbsp;<strong>Testing' in html
 
+    >>> empty_column = '<div class="bslib-gap-spacing bslib-grid-item html-fill-container"></div>'
+    >>> assert empty_column in html
+
+    >>> non_responsive = str(tutorial_box(True, '**Testing** 123', responsive=False))
+    >>> assert empty_column not in non_responsive
+
     """
     if is_tutorial:
         inner_html = small(
@@ -45,7 +51,7 @@ def tutorial_box(
         columns: list = [
             ui.div(
                 ui.HTML(inner_html),
-                class_=f"alert alert-info p-2",
+                class_="alert alert-info p-2",
             )
         ]
         if responsive:
