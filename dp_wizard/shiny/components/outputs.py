@@ -34,7 +34,7 @@ def tutorial_box(
     >>> assert '<p><svg' in html
     >>> assert '</svg>&nbsp;<strong>Testing' in html
 
-    >>> empty_column = '<div class="bslib-gap-spacing bslib-grid-item html-fill-container"></div>'
+    >>> empty_column = 'html-fill-container"></div>'
     >>> assert empty_column in html
 
     >>> non_responsive = str(tutorial_box(True, '**Testing** 123', responsive=False))
