@@ -34,7 +34,7 @@ def test_cloud_app(page: Page, cloud_app: ShinyAppProc):  # pragma: no cover
 
     page.get_by_role("button", name="Define analysis").click()
     page.locator(".selectize-input").nth(0).click()
-    page.get_by_text("a_column").click()
+    page.get_by_text("1: a_column").click()
     page.get_by_label("Lower").fill("0")
     page.get_by_label("Upper").fill("10")
 
@@ -94,9 +94,9 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     expect(page.get_by_text(pick_dataset_text)).to_be_visible()
     expect(page.get_by_text(perform_analysis_text)).not_to_be_visible()
     expect(page.get_by_text(download_results_text)).not_to_be_visible()
-    page.locator("#contributions").fill("42")
+    page.locator("#contributions").fill("123")
     page.get_by_text("Code sample: Unit of Privacy").click()
-    expect(page.get_by_text("contributions = 42")).to_be_visible()
+    expect(page.get_by_text("123")).to_have_class("hljs-number")
     expect(page.locator(".shiny-output-error")).not_to_be_attached()
 
     # Button disabled until upload:

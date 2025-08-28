@@ -19,8 +19,13 @@ from dp_wizard.utils.csv_helper import read_csv_names
 
 
 def make_app_ui_from_cli_info(cli_info: CLIInfo):
+    root = Path(__file__).parent
     return ui.page_bootstrap(
-        ui.head_content(ui.include_css(Path(__file__).parent / "css" / "styles.css")),
+        ui.head_content(
+            ui.include_css(root / "css/styles.css"),
+            ui.include_css(root / "vendor/highlight.js/11.11.1/styles/default.min.css"),
+            ui.include_js(root / "vendor/highlight.js/11.11.1/highlight.min.js"),
+        ),
         ui.navset_tab(
             about_panel.about_ui(),
             dataset_panel.dataset_ui(),

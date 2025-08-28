@@ -1,14 +1,16 @@
 from pathlib import Path
 from typing import Optional
 
+from dp_wizard_templates.code_template import Template
 from shiny import Inputs, Outputs, Session, reactive, render, ui
 
+from dp_wizard import opendp_version
 from dp_wizard.shiny.components.outputs import (
+    code_sample,
     col_widths,
     hide_if,
     info_md_box,
     nav_button,
-    output_code_sample,
     tutorial_box,
 )
 from dp_wizard.types import AppState
@@ -75,11 +77,7 @@ def dataset_ui():
             ui.output_ui("input_entity_ui"),
             ui.output_ui("input_contributions_ui"),
             ui.output_ui("contributions_validation_ui"),
-            output_code_sample(
-                "Unit of Privacy",
-                "unit_of_privacy_python",
-            ),
-            ui.output_ui("python_tutorial_ui"),
+            ui.output_ui("unit_of_privacy_python_ui"),
         ),
         ui.output_ui("row_count_bounds_ui"),
         ui.output_ui("define_analysis_button_ui"),
@@ -198,8 +196,8 @@ def dataset_server(
     @render.ui
     def csv_or_columns_ui():
         if in_cloud:
-            return ui.card(
-                ui.card_header("CSV Columns"),
+            title = "CSV Columns"
+            content = [
                 ui.markdown(
                     """
                     Provide the names of columns you'll use in your analysis,
@@ -222,10 +220,10 @@ def dataset_server(
                     """,
                 ),
                 ui.input_text_area("column_names", "CSV Column Names", rows=5),
-            )
-        return (
-            ui.card(
-                ui.card_header("Input CSVs"),
+            ]
+        else:
+            title = "Input CSVs"
+            content = [
                 ui.markdown(
                     f"""
 Choose **Private CSV** {PRIVATE_TEXT}
@@ -237,8 +235,36 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 ),
                 ui.output_ui("input_files_ui"),
                 ui.output_ui("csv_column_match_ui"),
+            ]
+
+        content += [
+            code_sample(
+                "Context",
+                Template(
+                    "context",
+                    Path(__file__).parent.parent / "utils/code_generators/no-tests",
+                )
+                .fill_values(CSV_PATH="sample.csv")
+                .fill_expressions(
+                    MARGINS_LIST="margins",
+                    EXTRA_COLUMNS="extra_columns",
+                    OPENDP_VERSION=opendp_version,
+                    WEIGHTS="weights",
+                )
+                .fill_blocks(
+                    PRIVACY_UNIT_BLOCK="",
+                    PRIVACY_LOSS_BLOCK="",
+                    OPTIONAL_CSV_BLOCK=(
+                        "# More of these slots will be filled in\n"
+                        "# as you move through DP Wizard.\n"
+                    ),
+                )
+                .finish()
+                .strip(),
             ),
-        )
+            ui.output_ui("python_tutorial_ui"),
+        ]
+        return ui.card(ui.card_header(title), content)
 
     @render.ui
     def input_files_ui():
@@ -499,9 +525,9 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             """,
         ]
 
-    @render.code
-    def unit_of_privacy_python():
-        return make_privacy_unit_block(contributions())
+    @render.ui
+    def unit_of_privacy_python_ui():
+        return code_sample("Unit of Privacy", make_privacy_unit_block(contributions()))
 
     @reactive.effect
     @reactive.event(input.go_to_analysis)

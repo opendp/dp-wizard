@@ -1,9 +1,19 @@
+/*
+Add more whitespace.
+*/
 body {
     margin: 2em;
 }
 
 #top_level_nav {
     margin-bottom: 1em;
+}
+
+/*
+Reduce whitespace.
+*/
+code {
+    padding: 0 !important;
 }
 
 /*
