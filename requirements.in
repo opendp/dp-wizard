@@ -1,7 +1,8 @@
 # After making changes here, run scripts/requirements.py.
 
 # OpenDP:
-opendp[mbi]==0.14.0a20250908001  # TODO: Complete upgrade after release.
+# TODO: Complete upgrade after release.
+opendp[mbi]==0.14.0a20250908001
 
 # Templating and notebook generation:
 dp-wizard-templates==0.2.0

@@ -17,7 +17,7 @@ dependencies = [
     "dp-wizard-templates==0.2.0",
     "faicons",
     "matplotlib",
-    "opendp[mbi]==0.14.0a20250908001  # TODO: Complete upgrade after release.",
+    "opendp[mbi]==0.14.0a20250908001",
     "pillow>=11.3.0",
     "requests>=2.32.4",
     "shiny",
