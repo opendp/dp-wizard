@@ -229,7 +229,7 @@ numpy==2.2.4
     #   randomgen
     #   scikit-learn
     #   scipy
-opendp[mbi]==0.14.0a20250908001
+opendp[mbi]==0.14.0
     # via -r .../dp-wizard/requirements.in
 opt-einsum==3.4.0
     # via jax

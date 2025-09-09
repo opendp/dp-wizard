@@ -4,7 +4,7 @@ from logging import warning
 from pathlib import Path
 
 __version__ = (Path(__file__).parent / "VERSION").read_text().strip()
-opendp_version = "0.14.0a20250908001"
+opendp_version = "0.14.0"
 registry_url = "http://registry.opendp.org/deployments-registry/"
 
 
