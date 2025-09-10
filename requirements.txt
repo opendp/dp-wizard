@@ -4,6 +4,10 @@
 #
 #    pip-compile requirements.in
 #
+absl-py==2.3.1
+    # via
+    #   chex
+    #   optax
 anyio==4.9.0
     # via
     #   starlette
@@ -19,6 +23,7 @@ asttokens==3.0.0
 attrs==25.3.0
     # via
     #   jsonschema
+    #   mbi
     #   referencing
 beautifulsoup4==4.13.4
     # via nbconvert
@@ -30,6 +35,10 @@ certifi==2025.4.26
     # via requests
 charset-normalizer==3.4.2
     # via requests
+chex==0.1.90
+    # via
+    #   mbi
+    #   optax
 click==8.1.8
     # via
     #   black
@@ -77,6 +86,17 @@ ipykernel==6.29.5
     # via dp-wizard-templates
 ipython==8.35.0
     # via ipykernel
+jax==0.6.2
+    # via
+    #   chex
+    #   mbi
+    #   optax
+jaxlib==0.6.2
+    # via
+    #   chex
+    #   jax
+    #   mbi
+    #   optax
 jedi==0.19.2
     # via ipython
 jinja2==3.1.6
@@ -122,6 +142,8 @@ matplotlib-inline==0.1.7
     # via
     #   ipykernel
     #   ipython
+mbi==1.0.0
+    # via opendp
 mdit-py-plugins==0.4.2
     # via
     #   jupytext
@@ -130,6 +152,10 @@ mdurl==0.1.2
     # via markdown-it-py
 mistune==3.1.3
     # via nbconvert
+ml-dtypes==0.5.3
+    # via
+    #   jax
+    #   jaxlib
 mypy-extensions==1.1.0
     # via black
 narwhals==1.35.0
@@ -145,16 +171,29 @@ nbformat==5.10.4
     #   nbconvert
 nest-asyncio==1.6.0
     # via ipykernel
+networkx==3.4.2
+    # via mbi
 numpy==2.2.4
     # via
+    #   chex
     #   contourpy
+    #   jax
+    #   jaxlib
     #   matplotlib
+    #   mbi
+    #   ml-dtypes
     #   opendp
+    #   optax
+    #   pandas
     #   randomgen
     #   scikit-learn
     #   scipy
-opendp[polars]==0.13.0
+opendp[mbi]==0.14.0
     # via -r requirements.in
+opt-einsum==3.4.0
+    # via jax
+optax==0.2.5
+    # via mbi
 orjson==3.10.16
     # via shiny
 packaging==24.2
@@ -166,6 +205,8 @@ packaging==24.2
     #   matplotlib
     #   nbconvert
     #   shiny
+pandas==2.3.2
+    # via mbi
 pandocfilters==1.5.1
     # via nbconvert
 parso==0.8.4
@@ -182,7 +223,7 @@ platformdirs==4.3.7
     # via
     #   black
     #   jupyter-core
-polars==1.12.0
+polars==1.32.0
     # via opendp
 prompt-toolkit==3.0.51
     # via
@@ -207,8 +248,11 @@ python-dateutil==2.9.0.post0
     # via
     #   jupyter-client
     #   matplotlib
+    #   pandas
 python-multipart==0.0.20
     # via shiny
+pytz==2025.2
+    # via pandas
 pyyaml==6.0.2
     # via jupytext
 pyzmq==26.4.0
@@ -232,7 +276,11 @@ rpds-py==0.24.0
 scikit-learn==1.6.1
     # via opendp
 scipy==1.15.2
-    # via scikit-learn
+    # via
+    #   jax
+    #   jaxlib
+    #   mbi
+    #   scikit-learn
 shiny==1.4.0
     # via -r requirements.in
 six==1.17.0
@@ -255,6 +303,8 @@ tomli==2.2.1
     # via
     #   black
     #   jupytext
+toolz==1.0.0
+    # via chex
 tornado==6.5.1
     # via
     #   -r requirements.in
@@ -277,6 +327,7 @@ typing-extensions==4.13.2
     #   asgiref
     #   beautifulsoup4
     #   black
+    #   chex
     #   exceptiongroup
     #   htmltools
     #   ipython
@@ -285,6 +336,8 @@ typing-extensions==4.13.2
     #   shiny
     #   starlette
     #   uvicorn
+tzdata==2025.2
+    # via pandas
 uc-micro-py==1.0.3
     # via linkify-it-py
 urllib3==2.5.0

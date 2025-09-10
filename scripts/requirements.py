@@ -38,8 +38,8 @@ def pip_compile_install(file_name):  # pragma: no cover
 
 def parse_requirements(file_name):
     """
-    >>> parse_requirements("requirements.txt")[0]
-    'anyio==...'
+    >>> print(parse_requirements("requirements.txt"))
+    [...opendp...]
     """
     cwd_root()
     lines = Path(file_name).read_text().splitlines()
@@ -54,7 +54,8 @@ def to_toml_array(file_name):
 
     >>> print(dumps(to_toml_array("requirements.txt")))
     [
-        "anyio==...",
+    ...
+        "opendp[...]==...",
     ...
     ]
     """

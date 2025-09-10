@@ -56,7 +56,7 @@ class AbstractGenerator(ABC):
                 TITLE=str(self.analysis_plan),
                 WINDOWS_NOTE="(If installing in the Windows CMD shell, "
                 "use double-quotes instead of single-quotes below.)",
-                DEPENDENCIES=f"'opendp[polars]=={opendp_version}' matplotlib",
+                DEPENDENCIES=f"'opendp[mbi]=={opendp_version}' matplotlib",
             )
             .fill_blocks(
                 IMPORTS_BLOCK=Template(template).finish(),
@@ -83,18 +83,18 @@ class AbstractGenerator(ABC):
             # for example, the size of the total population being sampled.
             # https://docs.opendp.org/en/OPENDP_VERSION/api/python/opendp.extras.polars.html#opendp.extras.polars.Margin.max_partition_length
             #
-            # In production, "max_num_partitions" should be set by considering
+            # In production, "max_groups" should be set by considering
             # the number of possible values for each grouping column,
             # and taking their product.
             dp.polars.Margin(
                 by=GROUPS,
-                public_info="keys",
-                max_partition_length=MAX_ROWS,
-                max_num_partitions=100,
+                invariant="keys",
+                max_length=MAX_ROWS,
+                max_groups=100,
             )
 
         def bin_template(GROUPS, BIN_NAME):
-            dp.polars.Margin(by=([BIN_NAME] + GROUPS), public_info="keys")
+            dp.polars.Margin(by=([BIN_NAME] + GROUPS), invariant="keys")
 
         margins = [
             Template(basic_template)

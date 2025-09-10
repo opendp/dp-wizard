@@ -80,8 +80,8 @@ def make_accuracy_histogram(
         margins=[
             dp.polars.Margin(  # type: ignore
                 by=["bin"],
-                max_partition_length=row_count,
-                public_info="keys",
+                max_length=row_count,
+                invariant="keys",
             ),
         ],
     )
