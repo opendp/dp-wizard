@@ -2,7 +2,7 @@ from dp_wizard.utils.code_generators.abstract_generator import AbstractGenerator
 
 
 class ScriptGenerator(AbstractGenerator):
-    def _get_root_template(self):
+    def _get_notebook_or_script(self):
         return "script"
 
     def _make_columns(self):

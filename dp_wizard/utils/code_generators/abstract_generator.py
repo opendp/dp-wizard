@@ -23,8 +23,16 @@ class AbstractGenerator(ABC):
     def __init__(self, analysis_plan: AnalysisPlan):
         self.analysis_plan = analysis_plan
 
+    def _get_synth_or_stats(self) -> str:
+        return "synth" if self.analysis_plan.is_synthetic_data else "stats"
+
+    @abstractmethod
+    def _get_notebook_or_script(self) -> str: ...  # pragma: no cover
+
     def _get_root_template(self) -> str:
-        return "placeholder"
+        adj = self._get_synth_or_stats()
+        noun = self._get_notebook_or_script()
+        return f"{adj}_{noun}"
 
     @abstractmethod
     def _make_context(self) -> str: ...  # pragma: no cover

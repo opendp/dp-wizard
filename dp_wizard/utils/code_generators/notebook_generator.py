@@ -15,7 +15,7 @@ root = get_template_root(__file__)
 
 
 class NotebookGenerator(AbstractGenerator):
-    def _get_root_template(self):
+    def _get_notebook_or_script(self):
         return "notebook"
 
     def _make_context(self):

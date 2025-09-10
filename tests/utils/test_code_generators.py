@@ -211,6 +211,15 @@ def test_make_notebook(plan):
     print(number_lines(notebook))
     globals = {}
     exec(notebook, globals)
+
+    # Close plots to avoid this warning:
+    # > RuntimeWarning: More than 20 figures have been opened.
+    # > Figures created through the pyplot interface (`matplotlib.pyplot.figure`)
+    # > are retained until explicitly closed and may consume too much memory.
+    import matplotlib.pyplot as plt
+
+    plt.close("all")
+
     assert isinstance(globals["context"], dp.Context)
 
 

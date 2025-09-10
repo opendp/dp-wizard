@@ -37,7 +37,7 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
 
 def make_output(code_gen, column_name, accuracy_name, stats_name):
     return (
-        Template(f"mean_{code_gen._get_root_template()}_output", root)
+        Template(f"mean_{code_gen._get_notebook_or_script()}_output", root)
         .fill_expressions(
             COLUMN_NAME=column_name,
             STATS_NAME=stats_name,
