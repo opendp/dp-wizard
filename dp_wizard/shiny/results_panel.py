@@ -123,7 +123,7 @@ def results_server(
     # analysis_errors = state.analysis_errors
 
     # Release state:
-    synthetic_data = state.synthetic_data
+    is_synthetic_data = state.synthetic_data
     released = state.released
 
     @render.ui
@@ -293,7 +293,7 @@ def results_server(
     @reactive.effect
     @reactive.event(input.is_synthetic_data)
     def _on_is_synthetic_data_change():
-        synthetic_data.set(input.is_synthetic_data())
+        is_synthetic_data.set(input.is_synthetic_data())
 
     @reactive.calc
     def analysis_plan() -> AnalysisPlan:
@@ -313,6 +313,7 @@ def results_server(
             for col in weights().keys()
         }
         return AnalysisPlan(
+            is_synthetic_data=is_synthetic_data(),
             # Prefer private CSV, if available:
             csv_path=private_csv_path() or public_csv_path() or PLACEHOLDER_CSV_NAME,
             contributions=contributions(),

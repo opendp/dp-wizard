@@ -18,6 +18,7 @@ class AnalysisPlanColumn(NamedTuple):
 class AnalysisPlan(NamedTuple):
     """
     >>> plan = AnalysisPlan(
+    ...     is_synthetic_data=False,
     ...     csv_path='optional.csv',
     ...     contributions=10,
     ...     epsilon=2.0,
@@ -32,6 +33,7 @@ class AnalysisPlan(NamedTuple):
     dp-data_col-histogram
     """
 
+    is_synthetic_data: bool
     csv_path: Optional[str]
     contributions: int
     epsilon: float

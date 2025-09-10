@@ -177,6 +177,7 @@ def id_for_plan(plan: AnalysisPlan):
 
 plans = [
     AnalysisPlan(
+        is_synthetic_data=is_synthetic_data,
         groups=groups,
         columns=columns,
         contributions=contributions,
@@ -184,6 +185,7 @@ plans = [
         epsilon=1,
         max_rows=100_000,
     )
+    for is_synthetic_data in [True, False]
     for contributions in [1, 10]
     for groups in [[], ["A"]]
     for columns in [
