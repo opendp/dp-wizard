@@ -206,7 +206,7 @@ def _make_server(cli_info: CLIInfo):
             initial_public_csv_path="",
             public_csv_path=reactive.value(""),
             contributions=reactive.value(initial_contributions),
-            max_rows=reactive.value(""),
+            max_rows=reactive.value("0"),
             # Analysis choices:
             column_names=reactive.value(initial_column_names),
             groups=reactive.value([]),
