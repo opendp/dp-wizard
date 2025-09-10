@@ -26,6 +26,12 @@ class AbstractGenerator(ABC):
     def _get_synth_or_stats(self) -> str:
         return "synth" if self.analysis_plan.is_synthetic_data else "stats"
 
+    def _get_extra(self) -> str:
+        # Notebooks shouldn't depend on mbi if they don't need it.
+        # (DP Wizard itself will require mbi, because it needs
+        # to be able to execute both kinds of notebooks.)
+        return "mbi" if self.analysis_plan.is_synthetic_data else "polars"
+
     @abstractmethod
     def _get_notebook_or_script(self) -> str: ...  # pragma: no cover
 
@@ -59,13 +65,15 @@ class AbstractGenerator(ABC):
             # Until that is complete we need to opt-in to use these features.
             dp.enable_features("contrib")
 
+        extra = self._get_extra()
+
         code = (
             Template(self._get_root_template(), root)
             .fill_expressions(
                 TITLE=str(self.analysis_plan),
                 WINDOWS_NOTE="(If installing in the Windows CMD shell, "
                 "use double-quotes instead of single-quotes below.)",
-                DEPENDENCIES=f"'opendp[mbi]=={opendp_version}' matplotlib",
+                DEPENDENCIES=f"'opendp[{extra}]=={opendp_version}' matplotlib",
             )
             .fill_blocks(
                 IMPORTS_BLOCK=Template(template).finish(),
