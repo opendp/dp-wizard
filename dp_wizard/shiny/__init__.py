@@ -30,10 +30,12 @@ def make_app(cli_info: CLIInfo):
 
 
 def _make_app_ui(cli_info: CLIInfo):
+    root = Path(__file__).parent
     return ui.page_bootstrap(
         ui.head_content(
-            ui.include_css(_assets_path / "styles.css"),
-            ui.tags.link(rel="icon", href="favicon.ico"),
+            ui.include_css(root / "assets/styles.css"),
+            ui.include_css(root / "vendor/highlight.js/11.11.1/styles/default.min.css"),
+            ui.include_js(root / "vendor/highlight.js/11.11.1/highlight.min.js"),
         ),
         ui.navset_tab(
             about_panel.about_ui(),
@@ -204,7 +206,7 @@ def _make_server(cli_info: CLIInfo):
             initial_public_csv_path="",
             public_csv_path=reactive.value(""),
             contributions=reactive.value(initial_contributions),
-            max_rows=reactive.value(""),
+            max_rows=reactive.value("0"),
             # Analysis choices:
             column_names=reactive.value(initial_column_names),
             groups=reactive.value([]),

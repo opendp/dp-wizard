@@ -6,10 +6,10 @@ from shiny import Inputs, Outputs, Session, module, reactive, render, ui
 from shiny.types import SilentException
 
 from dp_wizard.shiny.components.outputs import (
+    code_sample,
     col_widths,
     hide_if,
     info_md_box,
-    output_code_sample,
     tutorial_box,
 )
 from dp_wizard.types import AnalysisName, ColumnName
@@ -383,14 +383,17 @@ def column_server(
             prev_analysis_errors = analysis_errors()
         analysis_errors.set({**prev_analysis_errors, name: bool(error_md_calc())})
 
-    @render.code
-    def column_code():
-        return make_column_config_block(
-            name=name,
-            analysis_name=input.analysis_type(),
-            lower_bound=float(input.lower_bound()),
-            upper_bound=float(input.upper_bound()),
-            bin_count=int(input.bins()),
+    @render.ui
+    def column_python_ui():
+        return code_sample(
+            "Column Configuration",
+            make_column_config_block(
+                name=name,
+                analysis_name=input.analysis_type(),
+                lower_bound=float(input.lower_bound()),
+                upper_bound=float(input.upper_bound()),
+                bin_count=int(input.bins()),
+            ),
         )
 
     @render.ui
@@ -408,7 +411,7 @@ def column_server(
                     summary("Data Table"),
                     ui.output_data_frame("data_frame"),
                 ),
-                output_code_sample("Column Definition", "column_code"),
+                ui.output_ui("column_python_ui"),
             ),
         ]
 
@@ -437,7 +440,7 @@ def column_server(
                 {optional_grouping_message}
                 """
             ),
-            output_code_sample("Column Definition", "column_code"),
+            ui.output_ui("column_python_ui"),
         ]
 
     @render.ui

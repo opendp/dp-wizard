@@ -1,7 +1,7 @@
 import re
 
 from faicons import icon_svg
-from htmltools.tags import details, small, summary
+from htmltools.tags import details, script, small, summary
 from shiny import ui
 
 col_widths = {
@@ -13,10 +13,27 @@ col_widths = {
 }
 
 
-def output_code_sample(title, name_of_render_function: str):
+def code_sample(title: str, python_block: str):
+    """
+    >>> code_sample('test', 'print("hello, world")')
+    <details>
+      <summary>
+        Code sample: test
+      </summary>
+      <pre><code class="language-python">print(&quot;hello, world&quot;)
+    </code></pre>
+    <BLANKLINE>
+      <script>hljs.highlightAll();</script>
+    </details>
+    """
+    # Based on: https://github.com/posit-dev/py-shiny/issues/491
+    # If that is incorporated into Shiny, this could be simplified.
     return details(
         summary(["Code sample: ", title]),
-        ui.output_code(name_of_render_function),
+        ui.markdown(f"```python\n{python_block}\n```"),
+        script(
+            "hljs.highlightAll();"
+        ),  # This could be narrowed to just the current element.
     )
 
 
