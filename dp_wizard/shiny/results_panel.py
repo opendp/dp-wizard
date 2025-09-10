@@ -122,6 +122,7 @@ def results_server(
     # analysis_errors = state.analysis_errors
 
     # Release state:
+    synthetic_data = state.synthetic_data
     released = state.released
 
     @render.ui
@@ -152,6 +153,20 @@ def results_server(
                 """,
             ),
             ui.p("You can now make a differentially private release of your data."),
+            ui.input_checkbox("is_synthetic_data", "Release synthetic data", False),
+            tutorial_box(
+                is_tutorial_mode(),
+                """
+                For a synthetic data release, your privacy budget is used to
+                discover the distributions of values within the selected columns,
+                and the correlations between columns.
+
+                Synthetic data will be less accurate that calculating the desired
+                statistics directly, but if you are new to differential privacy,
+                or not sure exactly what analyses will be required, it can be easier
+                to work with.
+                """,
+            ),
             # Find more icons on Font Awesome: https://fontawesome.com/search?ic=free
             ui.accordion(
                 ui.accordion_panel(
@@ -268,6 +283,11 @@ def results_server(
                 open=None if in_cloud else False,
             ),
         ]
+
+    @reactive.effect
+    @reactive.event(input.is_synthetic_data)
+    def _on_is_synthetic_data_change():
+        synthetic_data.set(input.is_synthetic_data())
 
     @reactive.calc
     def analysis_plan() -> AnalysisPlan:

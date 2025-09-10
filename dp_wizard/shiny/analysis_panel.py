@@ -159,6 +159,7 @@ def analysis_server(
     analysis_errors = state.analysis_errors
 
     # Release state:
+    # synthetic_data = state.synthetic_data
     released = state.released
 
     @reactive.calc
