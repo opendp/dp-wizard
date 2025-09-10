@@ -79,6 +79,7 @@ def results_ui():  # pragma: no cover
     return ui.nav_panel(
         "Download Results",
         ui.output_ui("results_requirements_warning_ui"),
+        ui.output_ui("synthetic_data_ui"),
         ui.output_ui("download_results_ui"),
         ui.output_ui("download_code_ui"),
         value="results_panel",
@@ -138,6 +139,25 @@ def results_server(
         )
 
     @render.ui
+    def synthetic_data_ui():
+        return [
+            ui.input_checkbox("is_synthetic_data", "Release synthetic data", False),
+            tutorial_box(
+                is_tutorial_mode(),
+                """
+                For a synthetic data release, your privacy budget is used to
+                discover the distributions of values within the selected columns,
+                and the correlations between columns.
+
+                Synthetic data will be less accurate that calculating the desired
+                statistics directly, but if you are new to differential privacy,
+                or not sure exactly what analyses will be required, it can be easier
+                to work with.
+                """,
+            ),
+        ]
+
+    @render.ui
     def download_results_ui():
         if in_cloud:
             return None
@@ -153,20 +173,6 @@ def results_server(
                 """,
             ),
             ui.p("You can now make a differentially private release of your data."),
-            ui.input_checkbox("is_synthetic_data", "Release synthetic data", False),
-            tutorial_box(
-                is_tutorial_mode(),
-                """
-                For a synthetic data release, your privacy budget is used to
-                discover the distributions of values within the selected columns,
-                and the correlations between columns.
-
-                Synthetic data will be less accurate that calculating the desired
-                statistics directly, but if you are new to differential privacy,
-                or not sure exactly what analyses will be required, it can be easier
-                to work with.
-                """,
-            ),
             # Find more icons on Font Awesome: https://fontawesome.com/search?ic=free
             ui.accordion(
                 ui.accordion_panel(
