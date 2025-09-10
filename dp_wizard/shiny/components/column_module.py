@@ -17,6 +17,7 @@ from dp_wizard.utils.code_generators import make_column_config_block
 from dp_wizard.utils.code_generators.analyses import (
     count,
     get_analysis_by_name,
+    has_bounds,
     histogram,
     mean,
     median,
@@ -366,10 +367,14 @@ def column_server(
 
     @reactive.calc
     def error_md_calc():
+        bound_errors = (
+            get_bound_errors(input.lower_bound(), input.upper_bound())
+            if has_bounds(get_analysis_by_name(input.analysis_type()))
+            else []
+        )
+
         return "\n".join(
-            f"- {error}"
-            for error in get_bound_errors(input.lower_bound(), input.upper_bound())
-            + get_bin_errors(input.bins())
+            f"- {error}" for error in bound_errors + get_bin_errors(input.bins())
         )
 
     @reactive.effect

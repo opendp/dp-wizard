@@ -5,7 +5,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from faicons import icon_svg
-from shiny import Inputs, Outputs, Session, reactive, ui
+from shiny import App, Inputs, Outputs, Session, reactive, ui
 
 from dp_wizard.shiny import (
     about_panel,
@@ -17,12 +17,23 @@ from dp_wizard.types import AppState
 from dp_wizard.utils.argparse_helpers import CLIInfo
 from dp_wizard.utils.csv_helper import read_csv_names
 
+_assets_path = Path(__file__).parent / "assets"
+assert _assets_path.exists()
 
-def make_app_ui_from_cli_info(cli_info: CLIInfo):
+
+def make_app(cli_info: CLIInfo):
+    return App(
+        _make_app_ui(cli_info),
+        _make_server(cli_info),
+        static_assets=_assets_path,
+    )
+
+
+def _make_app_ui(cli_info: CLIInfo):
     root = Path(__file__).parent
     return ui.page_bootstrap(
         ui.head_content(
-            ui.include_css(root / "css/styles.css"),
+            ui.include_css(root / "assets/styles.css"),
             ui.include_css(root / "vendor/highlight.js/11.11.1/styles/default.min.css"),
             ui.include_js(root / "vendor/highlight.js/11.11.1/highlight.min.js"),
         ),
@@ -166,7 +177,7 @@ def _scan_files_for_input_ids():
         raise Exception("\n".join(errors))
 
 
-def make_server_from_cli_info(cli_info: CLIInfo):
+def _make_server(cli_info: CLIInfo):
     _scan_files_for_input_ids()
 
     def server(input: Inputs, output: Outputs, session: Session):  # pragma: no cover
