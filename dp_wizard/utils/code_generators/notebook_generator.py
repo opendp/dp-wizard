@@ -15,7 +15,8 @@ root = get_template_root(__file__)
 
 
 class NotebookGenerator(AbstractGenerator):
-    root_template = "notebook"
+    def _get_root_template(self):
+        return "notebook"
 
     def _make_context(self):
         placeholder_csv_content = ",".join(self.analysis_plan.columns)

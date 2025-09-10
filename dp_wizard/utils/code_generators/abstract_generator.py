@@ -20,10 +20,11 @@ root = get_template_root(__file__)
 
 
 class AbstractGenerator(ABC):
-    root_template = "placeholder"
-
     def __init__(self, analysis_plan: AnalysisPlan):
         self.analysis_plan = analysis_plan
+
+    def _get_root_template(self) -> str:
+        return "placeholder"
 
     @abstractmethod
     def _make_context(self) -> str: ...  # pragma: no cover
@@ -51,7 +52,7 @@ class AbstractGenerator(ABC):
             dp.enable_features("contrib")
 
         code = (
-            Template(self.root_template, root)
+            Template(self._get_root_template(), root)
             .fill_expressions(
                 TITLE=str(self.analysis_plan),
                 WINDOWS_NOTE="(If installing in the Windows CMD shell, "
