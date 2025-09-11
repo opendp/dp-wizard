@@ -74,10 +74,10 @@ def make_privacy_loss_block(epsilon: float, max_rows: int):
             # REGISTRY_URL
             epsilon=EPSILON,
             # There are many models of differential privacy. For flexibility,
-            # we here using a model which tolerates a small probability (delta)
+            # we are using a model which tolerates a small probability (delta)
             # that data may be released in the clear. Delta should always be small,
             # but if the dataset is particularly large,
-            # delta should not be larger than 1/(row count).
+            # delta should be at least as small 1/(row count).
             # https://docs.opendp.org/en/OPENDP_VERSION/getting-started/tabular-data/grouping.html#Stable-Keys
             delta=1 / max(1e7, MAX_ROWS),
         )
