@@ -19,10 +19,15 @@ class NotebookGenerator(AbstractGenerator):
         return "notebook"
 
     def _make_stats_context(self):
+        return self._fill_partial_context(self._make_partial_stats_context())
+
+    def _make_synth_context(self):
+        return self._fill_partial_context(self._make_partial_synth_context())
+
+    def _fill_partial_context(self, partial_context):
         placeholder_csv_content = ",".join(self.analysis_plan.columns)
         return (
-            self._make_partial_stats_context()
-            .fill_values(
+            partial_context.fill_values(
                 CSV_PATH=self.analysis_plan.csv_path,
             )
             .fill_blocks(
@@ -55,7 +60,7 @@ class NotebookGenerator(AbstractGenerator):
             name=name, confidence=confidence, identifier=ColumnIdentifier(name)
         )
 
-    def _make_extra_blocks(self):
+    def _make_reports_block(self):
         outputs_expression = (
             "{"
             + ",".join(
@@ -81,4 +86,21 @@ class NotebookGenerator(AbstractGenerator):
             )
             .finish()
         )
-        return {"REPORTS_BLOCK": reports_block}
+        return reports_block
+
+    def _make_extra_blocks(self):
+        extra_blocks = {
+            "REPORTS_BLOCK": self._make_reports_block(),
+        }
+        if self.analysis_plan.is_synthetic_data:
+            extra_blocks |= {
+                "SYNTH_CONTEXT_BLOCK": self._make_synth_context(),
+            }
+        else:
+            extra_blocks |= {
+                "STATS_CONTEXT_BLOCK": self._make_stats_context(),
+                "COLUMNS_BLOCK": self._make_columns(),
+                "QUERIES_BLOCK": self._make_queries(),
+            }
+
+        return extra_blocks

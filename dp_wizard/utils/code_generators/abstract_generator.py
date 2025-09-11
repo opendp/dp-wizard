@@ -43,8 +43,8 @@ class AbstractGenerator(ABC):
     @abstractmethod
     def _make_stats_context(self) -> str: ...  # pragma: no cover
 
-    def _make_extra_blocks(self):
-        return {}
+    @abstractmethod
+    def _make_extra_blocks(self) -> dict[str, str]: ...  # pragma: no cover
 
     def _make_python_cell(self, block) -> str:
         """
@@ -78,9 +78,6 @@ class AbstractGenerator(ABC):
             .fill_blocks(
                 IMPORTS_BLOCK=Template(template).finish(),
                 UTILS_BLOCK=(Path(__file__).parent.parent / "shared.py").read_text(),
-                COLUMNS_BLOCK=self._make_columns(),
-                STATS_CONTEXT_BLOCK=self._make_stats_context(),
-                QUERIES_BLOCK=self._make_queries(),
                 **self._make_extra_blocks(),
             )
             .finish()
@@ -250,6 +247,27 @@ class AbstractGenerator(ABC):
                 EXTRA_COLUMNS=extra_columns,
                 OPENDP_VERSION=opendp_version,
                 WEIGHTS=self._make_weights_expression(),
+            )
+            .fill_blocks(
+                PRIVACY_UNIT_BLOCK=privacy_unit_block,
+                PRIVACY_LOSS_BLOCK=privacy_loss_block,
+            )
+        )
+
+    def _make_partial_synth_context(self):
+        # TODO: Clean up copy-paste between this and _make_partial_stats_context.
+
+        from dp_wizard.utils.code_generators.analyses import get_analysis_by_name
+
+        privacy_unit_block = make_privacy_unit_block(self.analysis_plan.contributions)
+        privacy_loss_block = make_privacy_loss_block(
+            epsilon=self.analysis_plan.epsilon,
+            max_rows=self.analysis_plan.max_rows,
+        )
+        return (
+            Template("synth_context", root)
+            .fill_expressions(
+                OPENDP_VERSION=opendp_version,
             )
             .fill_blocks(
                 PRIVACY_UNIT_BLOCK=privacy_unit_block,
