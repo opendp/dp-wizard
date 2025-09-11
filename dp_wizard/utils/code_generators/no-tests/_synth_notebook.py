@@ -44,9 +44,10 @@ SYNTH_CONTEXT_BLOCK
 #
 # ## Results
 #
-# Finally, we run the queries and plot the results.
+# Finally, we release a contingency table, and then generate synthetic data
+# from the contingency table
 
-QUERIES_BLOCK
+SYNTH_QUERY_BLOCK
 
 # If we try to run more queries at this point, it will error. Once the privacy budget
 # is consumed, the library prevents you from running any more queries.
