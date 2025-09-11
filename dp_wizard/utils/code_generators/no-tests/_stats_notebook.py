@@ -40,7 +40,7 @@ COLUMNS_BLOCK
 # and set the weight for each query under that overall budget.
 
 # +
-CONTEXT_BLOCK
+STATS_CONTEXT_BLOCK
 # -
 
 # A note on `utf8-lossy`: CSVs can use different "character encodings" to

@@ -170,8 +170,11 @@ count_plan_column = AnalysisPlanColumn(
 
 
 def id_for_plan(plan: AnalysisPlan):
+    ss = "Synthetic data" if plan.is_synthetic_data else "Statistics"
     columns = ", ".join(f"{v[0].analysis_name} of {k}" for k, v in plan.columns.items())
-    description = f"{columns}; grouped by ({', '.join(plan.groups) or 'nothing'})"
+    description = (
+        f"{ss} for {columns}; grouped by ({', '.join(plan.groups) or 'nothing'})"
+    )
     return re.sub(r"\W+", "_", description)  # For selection with "pytest -k substring"
 
 
@@ -220,7 +223,7 @@ def test_make_notebook(plan):
 
     plt.close("all")
 
-    assert isinstance(globals["context"], dp.Context)
+    assert isinstance(globals["stats_context"], dp.Context)
 
 
 @pytest.mark.parametrize("plan", plans, ids=id_for_plan)

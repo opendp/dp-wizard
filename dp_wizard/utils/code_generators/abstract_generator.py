@@ -41,7 +41,7 @@ class AbstractGenerator(ABC):
         return f"{adj}_{noun}"
 
     @abstractmethod
-    def _make_context(self) -> str: ...  # pragma: no cover
+    def _make_stats_context(self) -> str: ...  # pragma: no cover
 
     def _make_extra_blocks(self):
         return {}
@@ -79,7 +79,7 @@ class AbstractGenerator(ABC):
                 IMPORTS_BLOCK=Template(template).finish(),
                 UTILS_BLOCK=(Path(__file__).parent.parent / "shared.py").read_text(),
                 COLUMNS_BLOCK=self._make_columns(),
-                CONTEXT_BLOCK=self._make_context(),
+                STATS_CONTEXT_BLOCK=self._make_stats_context(),
                 QUERIES_BLOCK=self._make_queries(),
                 **self._make_extra_blocks(),
             )
@@ -206,7 +206,7 @@ class AbstractGenerator(ABC):
             + "]"
         )
 
-    def _make_partial_context(self):
+    def _make_partial_stats_context(self):
 
         from dp_wizard.utils.code_generators.analyses import get_analysis_by_name
 
@@ -244,7 +244,7 @@ class AbstractGenerator(ABC):
             ]
         )
         return (
-            Template("context", root)
+            Template("stats_context", root)
             .fill_expressions(
                 MARGINS_LIST=margins_list,
                 EXTRA_COLUMNS=extra_columns,

@@ -18,10 +18,10 @@ class NotebookGenerator(AbstractGenerator):
     def _get_notebook_or_script(self):
         return "notebook"
 
-    def _make_context(self):
+    def _make_stats_context(self):
         placeholder_csv_content = ",".join(self.analysis_plan.columns)
         return (
-            self._make_partial_context()
+            self._make_partial_stats_context()
             .fill_values(
                 CSV_PATH=self.analysis_plan.csv_path,
             )

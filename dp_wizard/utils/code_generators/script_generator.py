@@ -12,9 +12,9 @@ class ScriptGenerator(AbstractGenerator):
             for name, block in column_config_dict.items()
         )
 
-    def _make_context(self):
+    def _make_stats_context(self):
         return (
-            self._make_partial_context()
+            self._make_partial_stats_context()
             .fill_expressions(CSV_PATH="csv_path")
             .fill_blocks(OPTIONAL_CSV_BLOCK="")
             .finish()
