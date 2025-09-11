@@ -43,7 +43,7 @@ class ScriptGenerator(AbstractGenerator):
             extra_blocks |= {
                 "STATS_CONTEXT_BLOCK": self._make_stats_context(),
                 "COLUMNS_BLOCK": self._make_columns(),
-                "QUERIES_BLOCK": self._make_queries(),
+                "STATS_QUERIES_BLOCK": self._make_stats_queries(),
             }
 
         return extra_blocks

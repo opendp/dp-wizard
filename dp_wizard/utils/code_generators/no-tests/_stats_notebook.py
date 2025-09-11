@@ -54,7 +54,7 @@ STATS_CONTEXT_BLOCK
 #
 # Finally, we run the queries and plot the results.
 
-QUERIES_BLOCK
+STATS_QUERIES_BLOCK
 
 # If we try to run more queries at this point, it will error. Once the privacy budget
 # is consumed, the library prevents you from running any more queries.
@@ -63,5 +63,5 @@ QUERIES_BLOCK
 # The code below produces a summary report.
 
 # +
-REPORTS_BLOCK
+STATS_REPORTS_BLOCK
 # -

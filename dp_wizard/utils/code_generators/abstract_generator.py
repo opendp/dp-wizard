@@ -143,7 +143,7 @@ class AbstractGenerator(ABC):
     def _make_confidence_note(self):
         return f"{int(confidence * 100)}% confidence interval"
 
-    def _make_queries(self):
+    def _make_stats_queries(self):
         to_return = [
             self._make_python_cell(
                 f"confidence = {confidence} # {self._make_confidence_note()}"

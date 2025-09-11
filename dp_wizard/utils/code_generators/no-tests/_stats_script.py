@@ -34,4 +34,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
     stats_context, contributions = get_stats_context_contributions(csv_path=args.csv)
 
-    QUERIES_BLOCK
+    STATS_QUERIES_BLOCK

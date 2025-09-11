@@ -32,15 +32,23 @@ class NotebookGenerator(AbstractGenerator):
                 .contingency_table(
                     cuts=CUTS,
                     # If you know the possible values for particular columns,
-                    # supply them here to use your privacy budget more efficiently.
+                    # supply them here to use your privacy budget more efficiently:
                     # keys={"your_column": ["known_value"]},
                 )
             )
             contingency_table = synth_query.release()
-            synthetic_data = contingency_table.synthesize()
+            import warnings
+
+            with warnings.catch_warnings():
+                warnings.simplefilter(action="ignore", category=FutureWarning)
+                synthetic_data = contingency_table.synthesize()
             synthetic_data  # type: ignore
 
-        return Template(template).finish()
+        return (
+            Template(template)
+            .fill_values(COLUMNS=list(self.analysis_plan.columns.keys()), CUTS={})
+            .finish()
+        )
 
     def _fill_partial_context(self, partial_context):
         placeholder_csv_content = ",".join(self.analysis_plan.columns)
@@ -78,7 +86,7 @@ class NotebookGenerator(AbstractGenerator):
             name=name, confidence=confidence, identifier=ColumnIdentifier(name)
         )
 
-    def _make_reports_block(self):
+    def _make_stats_reports_block(self):
         outputs_expression = (
             "{"
             + ",".join(
@@ -106,20 +114,21 @@ class NotebookGenerator(AbstractGenerator):
         )
         return reports_block
 
+    def _make_synth_reports_block(self):
+        # TODO
+        return "# TODO: Synthetic data reports"
+
     def _make_extra_blocks(self):
-        extra_blocks = {
-            "REPORTS_BLOCK": self._make_reports_block(),
-        }
         if self.analysis_plan.is_synthetic_data:
-            extra_blocks |= {
+            return {
                 "SYNTH_CONTEXT_BLOCK": self._make_synth_context(),
                 "SYNTH_QUERY_BLOCK": self._make_synth_query(),
+                "SYNTH_REPORTS_BLOCK": self._make_synth_reports_block(),
             }
         else:
-            extra_blocks |= {
-                "STATS_CONTEXT_BLOCK": self._make_stats_context(),
+            return {
                 "COLUMNS_BLOCK": self._make_columns(),
-                "QUERIES_BLOCK": self._make_queries(),
+                "STATS_CONTEXT_BLOCK": self._make_stats_context(),
+                "STATS_QUERIES_BLOCK": self._make_stats_queries(),
+                "STATS_REPORTS_BLOCK": self._make_stats_reports_block(),
             }
-
-        return extra_blocks

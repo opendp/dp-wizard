@@ -56,5 +56,5 @@ SYNTH_QUERY_BLOCK
 # The code below produces a summary report.
 
 # +
-REPORTS_BLOCK
+SYNTH_REPORTS_BLOCK
 # -

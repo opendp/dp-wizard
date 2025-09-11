@@ -34,4 +34,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
     synth_context, contributions = get_synth_context_contributions(csv_path=args.csv)
 
-    QUERIES_BLOCK
+    STATS_QUERIES_BLOCK

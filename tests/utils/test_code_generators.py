@@ -223,7 +223,8 @@ def test_make_notebook(plan):
 
     plt.close("all")
 
-    assert isinstance(globals["stats_context"], dp.Context)
+    context_global = "synth_context" if plan.is_synthetic_data else "stats_context"
+    assert isinstance(globals[context_global], dp.Context)
 
 
 @pytest.mark.parametrize("plan", plans, ids=id_for_plan)
