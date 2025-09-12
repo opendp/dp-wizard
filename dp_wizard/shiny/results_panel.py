@@ -141,20 +141,19 @@ def results_server(
     @render.ui
     def synthetic_data_ui():
         return [
-            ui.input_checkbox("is_synthetic_data", "Release synthetic data", False),
-            tutorial_box(
-                is_tutorial_mode(),
+            ui.markdown(
                 """
-                For a synthetic data release, your privacy budget is used to
-                discover the distributions of values within the selected columns,
-                and the correlations between columns.
+                Your can select either plain statistics
+                or synthetic data for your results.
 
-                Synthetic data will be less accurate that calculating the desired
-                statistics directly, but if you are new to differential privacy,
-                or not sure exactly what analyses will be required, it can be easier
-                to work with.
-                """,
+                With synthetic data, your privacy budget is used to
+                infer the distributions of values within the selected columns,
+                and the correlations between columns.
+                This is less accurate than calculating the desired
+                statistics directly, but can be easier to work with.
+                """
             ),
+            ui.input_checkbox("is_synthetic_data", "Release synthetic data", False),
         ]
 
     @render.ui
@@ -172,7 +171,6 @@ def results_server(
                 but the HTML version can be viewed in the brower.
                 """,
             ),
-            ui.p("You can now make a differentially private release of your data."),
             # Find more icons on Font Awesome: https://fontawesome.com/search?ic=free
             ui.accordion(
                 ui.accordion_panel(
