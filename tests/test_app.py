@@ -264,7 +264,7 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
             page.get_by_text(link_text).click()
 
         download_name = download_info.value.suggested_filename
-        assert download_name.startswith("dp-")
+        assert download_name.startswith("dp_")
         assert "grade-histogram" in download_name
         assert download_name.endswith(ext)
 

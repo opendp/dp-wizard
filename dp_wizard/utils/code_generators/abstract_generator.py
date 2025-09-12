@@ -9,16 +9,19 @@ from dp_wizard import get_template_root, opendp_version
 from dp_wizard.types import ColumnIdentifier
 from dp_wizard.utils.code_generators import (
     AnalysisPlan,
-    make_approx_privacy_loss_block,
     make_column_config_block,
+    make_privacy_loss_block,
     make_privacy_unit_block,
-    make_pure_privacy_loss_block,
 )
-from dp_wizard.utils.code_generators.analyses import histogram, mean, median
+from dp_wizard.utils.code_generators.analyses import count, histogram
 from dp_wizard.utils.dp_helper import confidence
 from dp_wizard.utils.shared import make_cut_points
 
 root = get_template_root(__file__)
+
+
+def _analysis_has_bounds(analysis) -> bool:
+    return analysis.analysis_name != count.name
 
 
 class AbstractGenerator(ABC):
@@ -216,7 +219,8 @@ class AbstractGenerator(ABC):
         ]
 
         privacy_unit_block = make_privacy_unit_block(self.analysis_plan.contributions)
-        privacy_loss_block = make_approx_privacy_loss_block(
+        privacy_loss_block = make_privacy_loss_block(
+            pure=False,
             epsilon=self.analysis_plan.epsilon,
             max_rows=self.analysis_plan.max_rows,
         )
@@ -258,14 +262,15 @@ class AbstractGenerator(ABC):
 
     def _make_partial_synth_context(self):
         privacy_unit_block = make_privacy_unit_block(self.analysis_plan.contributions)
-        # If there are no groups, then we have cuts for all the columns,
-        # and OpenDP requires that pure DP be used for contingency tables.
-        privacy_loss_function = (
-            make_approx_privacy_loss_block
-            if self.analysis_plan.is_synthetic_data and self.analysis_plan.groups
-            else make_pure_privacy_loss_block
-        )
-        privacy_loss_block = privacy_loss_function(
+        # If there are no groups and all analyses have bounds (so we have cut points),
+        # then OpenDP requires that pure DP be used for contingency tables.
+
+        privacy_loss_block = make_privacy_loss_block(
+            pure=not self.analysis_plan.groups
+            and all(
+                _analysis_has_bounds(analyses[0])
+                for analyses in self.analysis_plan.columns.values()
+            ),
             epsilon=self.analysis_plan.epsilon,
             max_rows=self.analysis_plan.max_rows,
         )
@@ -323,8 +328,7 @@ class AbstractGenerator(ABC):
                 }
             )
             for (k, v) in self.analysis_plan.columns.items()
-            # All the analyses with bounds:
-            if v[0].analysis_name in [histogram.name, median.name, mean.name]
+            if _analysis_has_bounds(v[0])
         }
         return (
             Template(template)

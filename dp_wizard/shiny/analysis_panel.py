@@ -16,7 +16,7 @@ from dp_wizard.shiny.components.outputs import (
     tutorial_box,
 )
 from dp_wizard.types import AppState
-from dp_wizard.utils.code_generators import make_approx_privacy_loss_block
+from dp_wizard.utils.code_generators import make_privacy_loss_block
 from dp_wizard.utils.csv_helper import (
     get_csv_row_count,
     id_labels_dict_from_names,
@@ -374,8 +374,10 @@ def analysis_server(
 
     @render.code
     def privacy_loss_python():
-        return make_approx_privacy_loss_block(
-            epsilon=epsilon(), max_rows=int(max_rows())
+        return make_privacy_loss_block(
+            pure=False,
+            epsilon=epsilon(),
+            max_rows=int(max_rows()),
         )
 
     @reactive.effect
