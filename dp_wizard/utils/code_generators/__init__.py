@@ -28,9 +28,9 @@ class AnalysisPlan(NamedTuple):
     ...         'data_col': [AnalysisPlanColumn('Histogram', 0, 100, 10, 1)]
     ...     })
     >>> print(plan)
-    `data_col` Histogram
+    DP Statistics for `data_col`
     >>> print(plan.to_stem())
-    dp-data_col-histogram
+    dp_statistics_for_data_col
     """
 
     is_synthetic_data: bool
@@ -42,10 +42,13 @@ class AnalysisPlan(NamedTuple):
     columns: dict[ColumnName, list[AnalysisPlanColumn]]
 
     def __str__(self):
-        return ", ".join(f"`{k}` {v[0].analysis_name}" for k, v in self.columns.items())
+        main = "DP Synthetic Data" if self.is_synthetic_data else "DP Statistics"
+
+        columns = ", ".join(f"`{k}`" for k in self.columns.keys())
+        return f"{main} for {columns}"
 
     def to_stem(self):
-        return re.sub(r"\W+", "-", f"dp-{self}").lower()
+        return re.sub(r"\W+", " ", str(self)).strip().replace(" ", "_").lower()
 
 
 # Public functions used to generate code snippets in the UI;
