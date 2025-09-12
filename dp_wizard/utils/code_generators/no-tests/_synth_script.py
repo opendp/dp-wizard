@@ -33,4 +33,6 @@ if __name__ == "__main__":
     synth_context, contributions = get_synth_context_contributions(csv_path=args.csv)
 
     SYNTH_QUERY_BLOCK
-    print(synthetic_data)
+    import sys
+
+    synthetic_data.write_csv(sys.stdout)
