@@ -85,7 +85,7 @@ def make_pure_privacy_loss_block(epsilon: float, max_rows: int):
             # If your columns did match your cuts dict,
             # you would also need to provide a very small "delta" value.
             # https://docs.opendp.org/en/OPENDP_VERSION/getting-started/tabular-data/grouping.html#Stable-Keys
-            # delta=1 / max(1e7, MAX_ROWS),
+            delta=0,  # or 1 / max(1e7, MAX_ROWS),
         )
 
     return (
