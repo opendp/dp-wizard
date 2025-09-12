@@ -65,7 +65,44 @@ def make_privacy_unit_block(contributions: int):
     return Template(template).fill_values(CONTRIBUTIONS=contributions).finish()
 
 
-def make_privacy_loss_block(epsilon: float, max_rows: int):
+def make_pure_privacy_loss_block(epsilon: float, max_rows: int):
+    """
+    Comments in the generated code reference synthetic data generation (cuts dict),
+    so don't use this in stats code!
+    """
+    # TODO: Clean up the copy-paste between these two functions,
+    # Maybe add a "pure" boolean kwarg?
+    import opendp.prelude as dp
+
+    def template(EPSILON, MAX_ROWS):
+        privacy_loss = dp.loss_of(  # noqa: F841
+            # Your privacy budget is captured in the "epsilon" parameter.
+            # Larger values increase the risk that personal data could be reconstructed,
+            # so choose the smallest value that gives you the needed accuracy.
+            # You can also compare your budget to other projects:
+            # REGISTRY_URL
+            epsilon=EPSILON,
+            # If your columns did match your cuts dict,
+            # you would also need to provide a very small "delta" value.
+            # https://docs.opendp.org/en/OPENDP_VERSION/getting-started/tabular-data/grouping.html#Stable-Keys
+            # delta=1 / max(1e7, MAX_ROWS),
+        )
+
+    return (
+        Template(template)
+        .fill_expressions(
+            OPENDP_VERSION=opendp_version,
+            REGISTRY_URL=registry_url,
+        )
+        .fill_values(
+            EPSILON=epsilon,
+            MAX_ROWS=max_rows,
+        )
+        .finish()
+    )
+
+
+def make_approx_privacy_loss_block(epsilon: float, max_rows: int):
     import opendp.prelude as dp
 
     def template(EPSILON, MAX_ROWS):
@@ -80,7 +117,7 @@ def make_privacy_loss_block(epsilon: float, max_rows: int):
             # we are using a model which tolerates a small probability (delta)
             # that data may be released in the clear. Delta should always be small,
             # but if the dataset is particularly large,
-            # delta should be at least as small 1/(row count).
+            # delta should be at least as small as 1/(row count).
             # https://docs.opendp.org/en/OPENDP_VERSION/getting-started/tabular-data/grouping.html#Stable-Keys
             delta=1 / max(1e7, MAX_ROWS),
         )

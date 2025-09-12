@@ -9,12 +9,14 @@ from dp_wizard import get_template_root, opendp_version
 from dp_wizard.types import ColumnIdentifier
 from dp_wizard.utils.code_generators import (
     AnalysisPlan,
+    make_approx_privacy_loss_block,
     make_column_config_block,
-    make_privacy_loss_block,
     make_privacy_unit_block,
+    make_pure_privacy_loss_block,
 )
-from dp_wizard.utils.code_generators.analyses import histogram
+from dp_wizard.utils.code_generators.analyses import histogram, mean, median
 from dp_wizard.utils.dp_helper import confidence
+from dp_wizard.utils.shared import make_cut_points
 
 root = get_template_root(__file__)
 
@@ -214,7 +216,7 @@ class AbstractGenerator(ABC):
         ]
 
         privacy_unit_block = make_privacy_unit_block(self.analysis_plan.contributions)
-        privacy_loss_block = make_privacy_loss_block(
+        privacy_loss_block = make_approx_privacy_loss_block(
             epsilon=self.analysis_plan.epsilon,
             max_rows=self.analysis_plan.max_rows,
         )
@@ -256,7 +258,14 @@ class AbstractGenerator(ABC):
 
     def _make_partial_synth_context(self):
         privacy_unit_block = make_privacy_unit_block(self.analysis_plan.contributions)
-        privacy_loss_block = make_privacy_loss_block(
+        # If there are no groups, then we have cuts for all the columns,
+        # and OpenDP requires that pure DP be used.
+        privacy_loss_function = (
+            make_approx_privacy_loss_block
+            if self.analysis_plan.groups
+            else make_pure_privacy_loss_block
+        )
+        privacy_loss_block = privacy_loss_function(
             epsilon=self.analysis_plan.epsilon,
             max_rows=self.analysis_plan.max_rows,
         )
@@ -275,8 +284,10 @@ class AbstractGenerator(ABC):
         def template(synth_context, COLUMNS, CUTS):
             synth_query = (
                 synth_context.query()
-                .select(*COLUMNS)
+                .select(COLUMNS)
                 .contingency_table(
+                    # Numeric columns will generally require cut points,
+                    # unless they contain only a few distinct values.
                     cuts=CUTS,
                     # If you know the possible values for particular columns,
                     # supply them here to use your privacy budget more efficiently:
@@ -286,13 +297,48 @@ class AbstractGenerator(ABC):
             contingency_table = synth_query.release()
             import warnings
 
+            # There may be warnings from upstream libraries which we can ignore for now.
+
             with warnings.catch_warnings():
                 warnings.simplefilter(action="ignore", category=FutureWarning)
                 synthetic_data = contingency_table.synthesize()
             synthetic_data  # type: ignore
 
+        # The make_cut_points() call could be moved into generated code,
+        # but that would require more complex templating.
+        cuts = {
+            k: sorted(
+                {
+                    # TODO: Error if float cut points are used with integer data.
+                    # Is an upstream fix possible?
+                    # (Sort the set because we might get int collisions,
+                    # and repeated cut points are also an error.)
+                    int(x)
+                    for x in make_cut_points(
+                        lower_bound=int(v[0].lower_bound),
+                        upper_bound=int(v[0].upper_bound),
+                        # bin_count is not set for mean: default to 10.
+                        bin_count=v[0].bin_count or 10,
+                    )
+                }
+            )
+            for (k, v) in self.analysis_plan.columns.items()
+            # All the analyses with bounds:
+            if v[0].analysis_name in [histogram.name, median.name, mean.name]
+        }
         return (
             Template(template)
-            .fill_values(COLUMNS=list(self.analysis_plan.columns.keys()), CUTS={})
+            .fill_expressions(
+                COLUMNS=", ".join(
+                    repr(k)
+                    for k in (
+                        list(self.analysis_plan.columns.keys())
+                        + self.analysis_plan.groups
+                    )
+                ),
+            )
+            .fill_values(
+                CUTS=cuts,
+            )
             .finish()
         )
