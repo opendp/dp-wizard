@@ -62,7 +62,7 @@ class NotebookGenerator(AbstractGenerator):
 
     def _make_reports_block(self):
         def template(synthetic_data):
-            {
+            {  # noqa: B018: Allow useless dict
                 "columns": synthetic_data.columns,
                 "rows": [list(row) for row in synthetic_data.rows()],
             }  # type: ignore
