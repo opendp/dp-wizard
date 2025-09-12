@@ -69,14 +69,17 @@ def make_privacy_loss_block(pure: bool, epsilon: float, max_rows: int):
     """
     Comments in the *pure* privacy loss block reference synthetic data generation
     ("cuts dict"), so don't use "pure=True" for stats code!
+
+    >>> print('pure DP: ', make_privacy_loss_block(pure=True, epsilon=1, max_rows=1000))
+    pure DP: ...delta=0...
+    >>> print('approx DP: ', make_privacy_loss_block(pure=False, epsilon=1, max_rows=1000))
+    approx DP: ...delta=1 / max...
     """
-    # TODO: Clean up the copy-paste between these two functions!
 
-    def make_pure_privacy_loss_block(epsilon: float, max_rows: int):
-        import opendp.prelude as dp
+    import opendp.prelude as dp
 
-        # TODO: The delta kwarg may change if this is fixed upstream:
-        # https://github.com/opendp/opendp/issues/2526
+    if pure:
+
         def template(EPSILON, MAX_ROWS):
             privacy_loss = dp.loss_of(  # noqa: F841
                 # Your privacy budget is captured in the "epsilon" parameter.
@@ -92,21 +95,7 @@ def make_privacy_loss_block(pure: bool, epsilon: float, max_rows: int):
                 delta=0,  # or 1 / max(1e7, MAX_ROWS),
             )
 
-        return (
-            Template(template)
-            .fill_expressions(
-                OPENDP_VERSION=opendp_version,
-                REGISTRY_URL=registry_url,
-            )
-            .fill_values(
-                EPSILON=epsilon,
-                MAX_ROWS=max_rows,
-            )
-            .finish()
-        )
-
-    def make_approx_privacy_loss_block(epsilon: float, max_rows: int):
-        import opendp.prelude as dp
+    else:
 
         def template(EPSILON, MAX_ROWS):
             privacy_loss = dp.loss_of(  # noqa: F841
@@ -126,23 +115,17 @@ def make_privacy_loss_block(pure: bool, epsilon: float, max_rows: int):
                 delta=1 / max(1e7, MAX_ROWS),
             )
 
-        return (
-            Template(template)
-            .fill_expressions(
-                OPENDP_VERSION=opendp_version,
-                REGISTRY_URL=registry_url,
-            )
-            .fill_values(
-                EPSILON=epsilon,
-                MAX_ROWS=max_rows,
-            )
-            .finish()
-        )
-
     return (
-        make_pure_privacy_loss_block(epsilon, max_rows)
-        if pure
-        else make_approx_privacy_loss_block(epsilon, max_rows)
+        Template(template)
+        .fill_expressions(
+            OPENDP_VERSION=opendp_version,
+            REGISTRY_URL=registry_url,
+        )
+        .fill_values(
+            EPSILON=epsilon,
+            MAX_ROWS=max_rows,
+        )
+        .finish()
     )
 
 
