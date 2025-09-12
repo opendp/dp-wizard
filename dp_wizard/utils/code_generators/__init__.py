@@ -28,9 +28,9 @@ class AnalysisPlan(NamedTuple):
     ...         'data_col': [AnalysisPlanColumn('Histogram', 0, 100, 10, 1)]
     ...     })
     >>> print(plan)
-    DP Statistics for `data_col`
+    DP Statistics for `data_col` grouped by `grouping_col`
     >>> print(plan.to_stem())
-    dp_statistics_for_data_col
+    dp_statistics_for_data_col_grouped_by_grouping_col
     """
 
     is_synthetic_data: bool
@@ -42,10 +42,14 @@ class AnalysisPlan(NamedTuple):
     columns: dict[ColumnName, list[AnalysisPlanColumn]]
 
     def __str__(self):
-        main = "DP Synthetic Data" if self.is_synthetic_data else "DP Statistics"
+        def md_list(names):
+            return ", ".join(f"`{name}`" for name in names)
 
-        columns = ", ".join(f"`{k}`" for k in self.columns.keys())
-        return f"{main} for {columns}"
+        main = "DP Synthetic Data" if self.is_synthetic_data else "DP Statistics"
+        columns = md_list(self.columns.keys())
+        groups = md_list(self.groups)
+        grouped_by = f" grouped by {groups}" if groups else ""
+        return f"{main} for {columns}{grouped_by}"
 
     def to_stem(self):
         return re.sub(r"\W+", " ", str(self)).strip().replace(" ", "_").lower()

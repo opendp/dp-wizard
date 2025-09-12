@@ -60,18 +60,22 @@ class NotebookGenerator(AbstractGenerator):
             name=name, confidence=confidence, identifier=ColumnIdentifier(name)
         )
 
-    def _make_stats_reports_block(self):
+    def _make_reports_block(self):
         outputs_expression = (
-            "{"
-            + ",".join(
-                self._make_report_kv(name, plan[0].analysis_name)
-                for name, plan in self.analysis_plan.columns.items()
+            "{ 'synthetic_data': synthetic_data.to_dict(as_series=False) }"
+            if self.analysis_plan.is_synthetic_data
+            else (
+                "{"
+                + ",".join(
+                    self._make_report_kv(name, plan[0].analysis_name)
+                    for name, plan in self.analysis_plan.columns.items()
+                )
+                + "}"
             )
-            + "}"
         )
         tmp_path = Path(__file__).parent.parent.parent / "tmp"
         reports_block = (
-            Template("reports", root)
+            Template(f"{self._get_synth_or_stats()}_reports", root)
             .fill_expressions(
                 OUTPUTS=outputs_expression,
                 COLUMNS={
@@ -88,21 +92,17 @@ class NotebookGenerator(AbstractGenerator):
         )
         return reports_block
 
-    def _make_synth_reports_block(self):
-        # TODO
-        return "# TODO: Synthetic data reports"
-
     def _make_extra_blocks(self):
         if self.analysis_plan.is_synthetic_data:
             return {
                 "SYNTH_CONTEXT_BLOCK": self._make_synth_context(),
                 "SYNTH_QUERY_BLOCK": self._make_synth_query(),
-                "SYNTH_REPORTS_BLOCK": self._make_synth_reports_block(),
+                "SYNTH_REPORTS_BLOCK": self._make_reports_block(),
             }
         else:
             return {
                 "COLUMNS_BLOCK": self._make_columns(),
                 "STATS_CONTEXT_BLOCK": self._make_stats_context(),
                 "STATS_QUERIES_BLOCK": self._make_stats_queries(),
-                "STATS_REPORTS_BLOCK": self._make_stats_reports_block(),
+                "STATS_REPORTS_BLOCK": self._make_reports_block(),
             }

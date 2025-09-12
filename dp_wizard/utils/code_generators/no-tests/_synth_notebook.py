@@ -51,6 +51,14 @@ SYNTH_QUERY_BLOCK
 
 # If we try to run more queries at this point, it will error. Once the privacy budget
 # is consumed, the library prevents you from running any more queries.
+#
+# If there are lots of null values, it may mean that the OpenDP library was not able to
+# collect enough information to describe your dataset within the privacy budget.
+# You might try:
+# - Increasing your privacy budget
+# - Selecting fewer columns
+# - Filling in the "keys" kwarg
+# - Preprocess to combine keys which occur a small number of times
 
 # # Coda
 # The code below produces a summary report.

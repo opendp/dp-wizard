@@ -202,7 +202,7 @@ def results_server(
                         """
                     ),
                     button("Table", ".csv", "file-csv", disabled=disabled),
-                    p("The same information, but condensed into a two-column CSV."),
+                    p("The same information, but condensed into a CSV."),
                 ),
             ),
         ]
