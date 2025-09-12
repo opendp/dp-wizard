@@ -62,7 +62,7 @@ class NotebookGenerator(AbstractGenerator):
 
     def _make_reports_block(self):
         outputs_expression = (
-            "{ 'synthetic_data': synthetic_data.to_dict(as_series=False) }"
+            "{ 'columns': synthetic_data.columns, 'rows': [list(row) for row in synthetic_data.rows()] }"
             if self.analysis_plan.is_synthetic_data
             else (
                 "{"

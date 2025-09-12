@@ -74,9 +74,15 @@ def make_privacy_loss_block(pure: bool, epsilon: float, max_rows: int):
     Comments in the *pure* privacy loss block reference synthetic data generation
     ("cuts dict"), so don't use "pure=True" for stats code!
 
-    >>> print('pure DP: ', make_privacy_loss_block(pure=True, epsilon=1, max_rows=1000))
+    >>> print(
+    ...     'pure DP: ',
+    ...     make_privacy_loss_block(pure=True, epsilon=1, max_rows=1000)
+    ... )
     pure DP: ...delta=0...
-    >>> print('approx DP: ', make_privacy_loss_block(pure=False, epsilon=1, max_rows=1000))
+    >>> print(
+    ...     'approx DP: ',
+    ...     make_privacy_loss_block(pure=False, epsilon=1, max_rows=1000)
+    ... )
     approx DP: ...delta=1 / max...
     """
 
