@@ -34,16 +34,14 @@ class ScriptGenerator(AbstractGenerator):
         return repr(super()._make_confidence_note())
 
     def _make_extra_blocks(self):
-        extra_blocks = {}
         if self.analysis_plan.is_synthetic_data:
-            extra_blocks |= {
+            return {
                 "SYNTH_CONTEXT_BLOCK": self._make_synth_context(),
+                "SYNTH_QUERY_BLOCK": self._make_synth_query(),
             }
         else:
-            extra_blocks |= {
-                "STATS_CONTEXT_BLOCK": self._make_stats_context(),
+            return {
                 "COLUMNS_BLOCK": self._make_columns(),
+                "STATS_CONTEXT_BLOCK": self._make_stats_context(),
                 "STATS_QUERIES_BLOCK": self._make_stats_queries(),
             }
-
-        return extra_blocks

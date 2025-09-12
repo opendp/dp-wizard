@@ -24,32 +24,6 @@ class NotebookGenerator(AbstractGenerator):
     def _make_synth_context(self):
         return self._fill_partial_context(self._make_partial_synth_context())
 
-    def _make_synth_query(self):
-        def template(synth_context, COLUMNS, CUTS):
-            synth_query = (
-                synth_context.query()
-                .select(*COLUMNS)
-                .contingency_table(
-                    cuts=CUTS,
-                    # If you know the possible values for particular columns,
-                    # supply them here to use your privacy budget more efficiently:
-                    # keys={"your_column": ["known_value"]},
-                )
-            )
-            contingency_table = synth_query.release()
-            import warnings
-
-            with warnings.catch_warnings():
-                warnings.simplefilter(action="ignore", category=FutureWarning)
-                synthetic_data = contingency_table.synthesize()
-            synthetic_data  # type: ignore
-
-        return (
-            Template(template)
-            .fill_values(COLUMNS=list(self.analysis_plan.columns.keys()), CUTS={})
-            .finish()
-        )
-
     def _fill_partial_context(self, partial_context):
         placeholder_csv_content = ",".join(self.analysis_plan.columns)
         return (

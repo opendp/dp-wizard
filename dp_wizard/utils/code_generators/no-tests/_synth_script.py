@@ -16,8 +16,6 @@ IMPORTS_BLOCK
 
 UTILS_BLOCK
 
-COLUMNS_BLOCK
-
 
 def get_synth_context_contributions(csv_path):
     SYNTH_CONTEXT_BLOCK
@@ -34,4 +32,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
     synth_context, contributions = get_synth_context_contributions(csv_path=args.csv)
 
-    STATS_QUERIES_BLOCK
+    SYNTH_QUERY_BLOCK
+    print(synthetic_data)
