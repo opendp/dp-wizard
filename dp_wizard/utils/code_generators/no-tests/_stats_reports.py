@@ -45,7 +45,6 @@ report = {
     "outputs": OUTPUTS,
 }
 
-print(dump(report))
 Path(TXT_REPORT_PATH).write_text(dump(report))
 
 flat_report = flatten_dict(report)
