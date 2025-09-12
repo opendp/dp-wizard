@@ -203,6 +203,7 @@ def make_server_from_cli_info(cli_info: CLIInfo):
             weights=reactive.value({}),
             analysis_errors=reactive.value({}),
             # Release state:
+            synthetic_data=reactive.value(False),
             released=reactive.value(False),
         )
 

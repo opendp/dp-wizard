@@ -159,6 +159,7 @@ def analysis_server(
     analysis_errors = state.analysis_errors
 
     # Release state:
+    # synthetic_data = state.synthetic_data
     released = state.released
 
     @reactive.calc
@@ -373,7 +374,11 @@ def analysis_server(
 
     @render.code
     def privacy_loss_python():
-        return make_privacy_loss_block(epsilon=epsilon(), max_rows=int(max_rows()))
+        return make_privacy_loss_block(
+            pure=False,
+            epsilon=epsilon(),
+            max_rows=int(max_rows()),
+        )
 
     @reactive.effect
     @reactive.event(input.go_to_results)

@@ -40,7 +40,7 @@ def interval_bottom(interval: str):
     >>> interval_bottom("unexpected")
     0.0
     """
-    # Intervals from Polars are always open on the left,
+    # Intervals from Polars default to open on the left,
     # so that's the only case we cover with replace().
     try:
         return float(interval.split(",")[0].replace("(", ""))

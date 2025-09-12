@@ -170,13 +170,17 @@ count_plan_column = AnalysisPlanColumn(
 
 
 def id_for_plan(plan: AnalysisPlan):
+    ss = "Synthetic data" if plan.is_synthetic_data else "Statistics"
     columns = ", ".join(f"{v[0].analysis_name} of {k}" for k, v in plan.columns.items())
-    description = f"{columns}; grouped by ({', '.join(plan.groups) or 'nothing'})"
+    description = (
+        f"{ss} for {columns}; grouped by ({', '.join(plan.groups) or 'nothing'})"
+    )
     return re.sub(r"\W+", "_", description)  # For selection with "pytest -k substring"
 
 
 plans = [
     AnalysisPlan(
+        is_synthetic_data=is_synthetic_data,
         groups=groups,
         columns=columns,
         contributions=contributions,
@@ -184,6 +188,7 @@ plans = [
         epsilon=1,
         max_rows=100_000,
     )
+    for is_synthetic_data in [True, False]
     for contributions in [1, 10]
     for groups in [[], ["A"]]
     for columns in [
@@ -209,7 +214,17 @@ def test_make_notebook(plan):
     print(number_lines(notebook))
     globals = {}
     exec(notebook, globals)
-    assert isinstance(globals["context"], dp.Context)
+
+    # Close plots to avoid this warning:
+    # > RuntimeWarning: More than 20 figures have been opened.
+    # > Figures created through the pyplot interface (`matplotlib.pyplot.figure`)
+    # > are retained until explicitly closed and may consume too much memory.
+    import matplotlib.pyplot as plt
+
+    plt.close("all")
+
+    context_global = "synth_context" if plan.is_synthetic_data else "stats_context"
+    assert isinstance(globals[context_global], dp.Context)
 
 
 @pytest.mark.parametrize("plan", plans, ids=id_for_plan)
