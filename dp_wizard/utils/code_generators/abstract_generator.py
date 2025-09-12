@@ -259,10 +259,10 @@ class AbstractGenerator(ABC):
     def _make_partial_synth_context(self):
         privacy_unit_block = make_privacy_unit_block(self.analysis_plan.contributions)
         # If there are no groups, then we have cuts for all the columns,
-        # and OpenDP requires that pure DP be used.
+        # and OpenDP requires that pure DP be used for contingency tables.
         privacy_loss_function = (
             make_approx_privacy_loss_block
-            if self.analysis_plan.groups
+            if self.analysis_plan.is_synthetic_data and self.analysis_plan.groups
             else make_pure_privacy_loss_block
         )
         privacy_loss_block = privacy_loss_function(
