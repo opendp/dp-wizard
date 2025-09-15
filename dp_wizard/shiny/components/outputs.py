@@ -1,7 +1,7 @@
 import re
 
 from faicons import icon_svg
-from htmltools.tags import details, small, summary
+from htmltools.tags import details, script, small, summary
 from shiny import ui
 
 col_widths = {
@@ -13,10 +13,27 @@ col_widths = {
 }
 
 
-def output_code_sample(title, name_of_render_function: str):
+def code_sample(title: str, python_block: str):
+    """
+    >>> code_sample('test', 'print("hello, world")')
+    <details>
+      <summary>
+        Code sample: test
+      </summary>
+      <pre><code class="language-python">print(&quot;hello, world&quot;)
+    </code></pre>
+    <BLANKLINE>
+      <script>hljs.highlightAll();</script>
+    </details>
+    """
+    # Based on: https://github.com/posit-dev/py-shiny/issues/491
+    # If that is incorporated into Shiny, this could be simplified.
     return details(
         summary(["Code sample: ", title]),
-        ui.output_code(name_of_render_function),
+        ui.markdown(f"```python\n{python_block}\n```"),
+        script(
+            "hljs.highlightAll();"
+        ),  # This could be narrowed to just the current element.
     )
 
 
@@ -34,19 +51,31 @@ def tutorial_box(
     >>> assert '<p><svg' in html
     >>> assert '</svg>&nbsp;<strong>Testing' in html
 
+    >>> empty_column = 'html-fill-container"></div>'
+    >>> assert empty_column in html
+
+    >>> non_responsive = str(tutorial_box(True, '**Testing** 123', responsive=False))
+    >>> assert empty_column not in non_responsive
+
     """
     if is_tutorial:
-        responsive_classes = "col-md-8 col-lg-6 col-xl-4" if responsive else ""
         inner_html = small(
             icon_svg("circle-question"),
             ui.markdown(f"{markdown}\n\n{extra_markdown if show_extra else ''}"),
         )
         # Move the SVG icon inside the first element:
         inner_html = re.sub(r"(<svg.+?</svg>)(<.+?>)", r"\2\1&nbsp;", str(inner_html))
-        return ui.div(
-            small(ui.HTML(inner_html)),
-            class_=f"alert alert-info p-2 {responsive_classes}",
-        )
+        columns: list = [
+            ui.div(
+                ui.HTML(inner_html),
+                class_="alert alert-info p-2",
+            )
+        ]
+        if responsive:
+            # Bootstrap classes ("col-lg-6") don't give us padding for the gutter.
+            # Using columns here makes sure we line up with panels below.
+            columns.append(None)
+        return ui.layout_columns(*columns)
 
 
 def hide_if(condition: bool, el):  # pragma: no cover

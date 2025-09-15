@@ -1,9 +1,28 @@
+/*
+Add more whitespace.
+*/
 body {
     margin: 2em;
 }
 
 #top_level_nav {
     margin-bottom: 1em;
+}
+
+/*
+Reduce whitespace.
+*/
+code {
+    padding: 0 !important;
+}
+
+p:last-of-type {
+    /* Inside tutorial boxes: */
+    margin-bottom: 0;
+}
+ul:last-of-type {
+    /* Lists of errors: */
+    margin-bottom: 0;
 }
 
 /*

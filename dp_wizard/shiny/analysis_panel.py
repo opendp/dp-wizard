@@ -9,10 +9,10 @@ from dp_wizard import registry_url
 from dp_wizard.shiny.components.column_module import column_server, column_ui
 from dp_wizard.shiny.components.inputs import log_slider
 from dp_wizard.shiny.components.outputs import (
+    code_sample,
     hide_if,
     info_md_box,
     nav_button,
-    output_code_sample,
     tutorial_box,
 )
 from dp_wizard.types import AppState
@@ -75,7 +75,7 @@ def analysis_ui():
                 ),
                 log_slider("log_epsilon_slider", 0.1, 10.0),
                 ui.output_ui("epsilon_ui"),
-                output_code_sample("Privacy Loss", "privacy_loss_python"),
+                ui.output_ui("privacy_loss_python_ui"),
             ),
             ui.card(
                 ui.card_header("Simulation"),
@@ -372,12 +372,13 @@ def analysis_server(
             ),
         )
 
-    @render.code
-    def privacy_loss_python():
-        return make_privacy_loss_block(
-            pure=False,
-            epsilon=epsilon(),
-            max_rows=int(max_rows()),
+    @render.ui
+    def privacy_loss_python_ui():
+        return code_sample(
+            "Privacy Loss",
+            make_privacy_loss_block(
+                pure=False, epsilon=epsilon(), max_rows=int(max_rows())
+            ),
         )
 
     @reactive.effect
