@@ -16,6 +16,15 @@ code {
     padding: 0 !important;
 }
 
+p:last-of-type {
+    /* Inside tutorial boxes: */
+    margin-bottom: 0;
+}
+ul:last-of-type {
+    /* Lists of errors: */
+    margin-bottom: 0;
+}
+
 /*
 Improve readability of popover.
 */
