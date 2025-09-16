@@ -33,6 +33,7 @@ def _make_app_ui(cli_info: CLIInfo):
     root = Path(__file__).parent
     return ui.page_bootstrap(
         ui.head_content(
+            ui.tags.link(rel="icon", href="favicon.ico"),
             ui.include_css(root / "assets/styles.css"),
             ui.include_css(root / "vendor/highlight.js/11.11.1/styles/default.min.css"),
             ui.include_js(root / "vendor/highlight.js/11.11.1/highlight.min.js"),
@@ -219,6 +220,7 @@ def _make_server(cli_info: CLIInfo):
             weights=reactive.value({}),
             analysis_errors=reactive.value({}),
             # Release state:
+            synthetic_data=reactive.value(False),
             released=reactive.value(False),
         )
 

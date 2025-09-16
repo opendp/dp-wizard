@@ -13,23 +13,43 @@ from dp_wizard.utils.code_generators import (
     make_privacy_loss_block,
     make_privacy_unit_block,
 )
-from dp_wizard.utils.code_generators.analyses import histogram
+from dp_wizard.utils.code_generators.analyses import count, histogram
 from dp_wizard.utils.dp_helper import confidence
+from dp_wizard.utils.shared import make_cut_points
 
 root = get_template_root(__file__)
 
 
-class AbstractGenerator(ABC):
-    root_template = "placeholder"
+def _analysis_has_bounds(analysis) -> bool:
+    return analysis.analysis_name != count.name
 
+
+class AbstractGenerator(ABC):
     def __init__(self, analysis_plan: AnalysisPlan):
         self.analysis_plan = analysis_plan
 
-    @abstractmethod
-    def _make_context(self) -> str: ...  # pragma: no cover
+    def _get_synth_or_stats(self) -> str:
+        return "synth" if self.analysis_plan.is_synthetic_data else "stats"
 
-    def _make_extra_blocks(self):
-        return {}
+    def _get_extra(self) -> str:
+        # Notebooks shouldn't depend on mbi if they don't need it.
+        # (DP Wizard itself will require mbi, because it needs
+        # to be able to execute both kinds of notebooks.)
+        return "mbi" if self.analysis_plan.is_synthetic_data else "polars"
+
+    @abstractmethod
+    def _get_notebook_or_script(self) -> str: ...  # pragma: no cover
+
+    def _get_root_template(self) -> str:
+        adj = self._get_synth_or_stats()
+        noun = self._get_notebook_or_script()
+        return f"{adj}_{noun}"
+
+    @abstractmethod
+    def _make_stats_context(self) -> str: ...  # pragma: no cover
+
+    @abstractmethod
+    def _make_extra_blocks(self) -> dict[str, str]: ...  # pragma: no cover
 
     def _make_python_cell(self, block) -> str:
         """
@@ -50,20 +70,19 @@ class AbstractGenerator(ABC):
             # Until that is complete we need to opt-in to use these features.
             dp.enable_features("contrib")
 
+        extra = self._get_extra()
+
         code = (
-            Template(self.root_template, root)
+            Template(self._get_root_template(), root)
             .fill_expressions(
                 TITLE=str(self.analysis_plan),
                 WINDOWS_NOTE="(If installing in the Windows CMD shell, "
                 "use double-quotes instead of single-quotes below.)",
-                DEPENDENCIES=f"'opendp[mbi]=={opendp_version}' matplotlib",
+                DEPENDENCIES=f"'opendp[{extra}]=={opendp_version}' matplotlib",
             )
             .fill_blocks(
                 IMPORTS_BLOCK=Template(template).finish(),
                 UTILS_BLOCK=(Path(__file__).parent.parent / "shared.py").read_text(),
-                COLUMNS_BLOCK=self._make_columns(),
-                CONTEXT_BLOCK=self._make_context(),
-                QUERIES_BLOCK=self._make_queries(),
                 **self._make_extra_blocks(),
             )
             .finish()
@@ -129,7 +148,7 @@ class AbstractGenerator(ABC):
     def _make_confidence_note(self):
         return f"{int(confidence * 100)}% confidence interval"
 
-    def _make_queries(self):
+    def _make_stats_queries(self):
         to_return = [
             self._make_python_cell(
                 f"confidence = {confidence} # {self._make_confidence_note()}"
@@ -189,7 +208,7 @@ class AbstractGenerator(ABC):
             + "]"
         )
 
-    def _make_partial_context(self):
+    def _make_partial_stats_context(self):
 
         from dp_wizard.utils.code_generators.analyses import (
             get_analysis_by_name,
@@ -204,6 +223,7 @@ class AbstractGenerator(ABC):
 
         privacy_unit_block = make_privacy_unit_block(self.analysis_plan.contributions)
         privacy_loss_block = make_privacy_loss_block(
+            pure=False,
             epsilon=self.analysis_plan.epsilon,
             max_rows=self.analysis_plan.max_rows,
         )
@@ -230,7 +250,7 @@ class AbstractGenerator(ABC):
             ]
         )
         return (
-            Template("context", root)
+            Template("stats_context", root)
             .fill_expressions(
                 MARGINS_LIST=margins_list,
                 EXTRA_COLUMNS=extra_columns,
@@ -241,4 +261,91 @@ class AbstractGenerator(ABC):
                 PRIVACY_UNIT_BLOCK=privacy_unit_block,
                 PRIVACY_LOSS_BLOCK=privacy_loss_block,
             )
+        )
+
+    def _make_partial_synth_context(self):
+        privacy_unit_block = make_privacy_unit_block(self.analysis_plan.contributions)
+        # If there are no groups and all analyses have bounds (so we have cut points),
+        # then OpenDP requires that pure DP be used for contingency tables.
+
+        privacy_loss_block = make_privacy_loss_block(
+            pure=not self.analysis_plan.groups
+            and all(
+                _analysis_has_bounds(analyses[0])
+                for analyses in self.analysis_plan.columns.values()
+            ),
+            epsilon=self.analysis_plan.epsilon,
+            max_rows=self.analysis_plan.max_rows,
+        )
+        return (
+            Template("synth_context", root)
+            .fill_expressions(
+                OPENDP_VERSION=opendp_version,
+            )
+            .fill_blocks(
+                PRIVACY_UNIT_BLOCK=privacy_unit_block,
+                PRIVACY_LOSS_BLOCK=privacy_loss_block,
+            )
+        )
+
+    def _make_synth_query(self):
+        def template(synth_context, COLUMNS, CUTS):
+            synth_query = (
+                synth_context.query()
+                .select(COLUMNS)
+                .contingency_table(
+                    # Numeric columns will generally require cut points,
+                    # unless they contain only a few distinct values.
+                    cuts=CUTS,
+                    # If you know the possible values for particular columns,
+                    # supply them here to use your privacy budget more efficiently:
+                    # keys={"your_column": ["known_value"]},
+                )
+            )
+            contingency_table = synth_query.release()
+            import warnings
+
+            # There may be warnings from upstream libraries which we can ignore for now.
+
+            with warnings.catch_warnings():
+                warnings.simplefilter(action="ignore", category=FutureWarning)
+                synthetic_data = contingency_table.synthesize()
+            synthetic_data  # type: ignore
+
+        # The make_cut_points() call could be moved into generated code,
+        # but that would require more complex templating.
+        cuts = {
+            k: sorted(
+                {
+                    # TODO: Error if float cut points are used with integer data.
+                    # Is an upstream fix possible?
+                    # (Sort the set because we might get int collisions,
+                    # and repeated cut points are also an error.)
+                    int(x)
+                    for x in make_cut_points(
+                        lower_bound=int(v[0].lower_bound),
+                        upper_bound=int(v[0].upper_bound),
+                        # bin_count is not set for mean: default to 10.
+                        bin_count=v[0].bin_count or 10,
+                    )
+                }
+            )
+            for (k, v) in self.analysis_plan.columns.items()
+            if _analysis_has_bounds(v[0])
+        }
+        return (
+            Template(template)
+            .fill_expressions(
+                COLUMNS=", ".join(
+                    repr(k)
+                    for k in (
+                        list(self.analysis_plan.columns.keys())
+                        + self.analysis_plan.groups
+                    )
+                ),
+            )
+            .fill_values(
+                CUTS=cuts,
+            )
+            .finish()
         )

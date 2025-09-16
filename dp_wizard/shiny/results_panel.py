@@ -79,6 +79,7 @@ def results_ui():  # pragma: no cover
     return ui.nav_panel(
         "Download Results",
         ui.output_ui("results_requirements_warning_ui"),
+        ui.output_ui("synthetic_data_ui"),
         ui.output_ui("download_results_ui"),
         ui.output_ui("download_code_ui"),
         value="results_panel",
@@ -122,6 +123,7 @@ def results_server(
     # analysis_errors = state.analysis_errors
 
     # Release state:
+    is_synthetic_data = state.synthetic_data
     released = state.released
 
     @render.ui
@@ -134,6 +136,25 @@ def results_server(
                 before downloading results.
                 """
             ),
+        )
+
+    @render.ui
+    def synthetic_data_ui():
+        return ui.card(
+            ui.card_header("Statistics or Synthetic Data?"),
+            ui.markdown(
+                """
+                You can generate either differentially private statistics
+                or synthetic data.
+
+                With synthetic data, your privacy budget is used to
+                infer the distributions of values within the selected columns,
+                and the correlations between columns.
+                This is less accurate than calculating the desired
+                statistics directly, but can be easier to work with.
+                """
+            ),
+            ui.input_checkbox("is_synthetic_data", "Release synthetic data", False),
         )
 
     @render.ui
@@ -151,7 +172,6 @@ def results_server(
                 but the HTML version can be viewed in the brower.
                 """,
             ),
-            ui.p("You can now make a differentially private release of your data."),
             # Find more icons on Font Awesome: https://fontawesome.com/search?ic=free
             ui.accordion(
                 ui.accordion_panel(
@@ -181,7 +201,7 @@ def results_server(
                         """
                     ),
                     button("Table", ".csv", "file-csv", disabled=disabled),
-                    p("The same information, but condensed into a two-column CSV."),
+                    p("The same information, but condensed into a CSV."),
                 ),
             ),
         ]
@@ -269,6 +289,11 @@ def results_server(
             ),
         ]
 
+    @reactive.effect
+    @reactive.event(input.is_synthetic_data)
+    def _on_is_synthetic_data_change():
+        is_synthetic_data.set(input.is_synthetic_data())
+
     @reactive.calc
     def analysis_plan() -> AnalysisPlan:
         # weights().keys() will reflect the desired columns:
@@ -287,6 +312,7 @@ def results_server(
             for col in weights().keys()
         }
         return AnalysisPlan(
+            is_synthetic_data=is_synthetic_data(),
             # Prefer private CSV, if available:
             csv_path=private_csv_path() or public_csv_path() or PLACEHOLDER_CSV_NAME,
             contributions=contributions(),

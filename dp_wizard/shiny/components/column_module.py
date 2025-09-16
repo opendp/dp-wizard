@@ -91,17 +91,18 @@ def get_bin_errors(count):
     ['Number should be a number.']
     >>> get_bin_errors("-1")
     ['Number should be a positive integer.']
-    >>> get_bin_errors("1001")
-    ['Number should be less than 1000, just to keep computation from running too long.']
+    >>> get_bin_errors("101")
+    ['Number should be less than 100, just to keep computation from running too long.']
     """
     if error := get_float_error(count):
         return [f"Number {error}."]
     count = int(float(count))
     if count <= 0:
         return ["Number should be a positive integer."]
-    if count > 1000:
+    max_count = 100
+    if count > max_count:
         return [
-            "Number should be less than 1000, "
+            f"Number should be less than {max_count}, "
             "just to keep computation from running too long."
         ]
     return []
@@ -316,7 +317,7 @@ def column_server(
             """
             Interpreting differential privacy strictly,
             we should try never to look directly at the data,
-            even to set bounds! This can be hard.
+            not even to set bounds! This can be hard.
             """,
             is_sample_csv,
             """

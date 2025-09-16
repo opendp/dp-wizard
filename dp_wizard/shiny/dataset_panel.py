@@ -126,6 +126,7 @@ def dataset_server(
     # analysis_errors = state.analysis_errors
 
     # Release state:
+    # synthetic_data = state.synthetic_data
     released = state.released
 
     @reactive.effect
@@ -245,7 +246,9 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             code_sample(
                 "Context",
                 Template(
-                    "context",
+                    # NOTE: If stats vs. synth is moved to the top of the flow,
+                    # then we can show the appropriate template here.
+                    "stats_context",
                     Path(__file__).parent.parent / "utils/code_generators/no-tests",
                 )
                 .fill_values(CSV_PATH="sample.csv")
@@ -505,7 +508,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 ui.input_text(
                     "max_rows",
                     None,
-                    str(max_rows() or ""),
+                    "0",
                 ),
                 [],  # column placeholder
                 col_widths=col_widths,  # type: ignore

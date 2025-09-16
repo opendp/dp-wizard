@@ -15,13 +15,19 @@ root = get_template_root(__file__)
 
 
 class NotebookGenerator(AbstractGenerator):
-    root_template = "notebook"
+    def _get_notebook_or_script(self):
+        return "notebook"
 
-    def _make_context(self):
+    def _make_stats_context(self):
+        return self._fill_partial_context(self._make_partial_stats_context())
+
+    def _make_synth_context(self):
+        return self._fill_partial_context(self._make_partial_synth_context())
+
+    def _fill_partial_context(self, partial_context):
         placeholder_csv_content = ",".join(self.analysis_plan.columns)
         return (
-            self._make_partial_context()
-            .fill_values(
+            partial_context.fill_values(
                 CSV_PATH=self.analysis_plan.csv_path,
             )
             .fill_blocks(
@@ -54,18 +60,28 @@ class NotebookGenerator(AbstractGenerator):
             name=name, confidence=confidence, identifier=ColumnIdentifier(name)
         )
 
-    def _make_extra_blocks(self):
+    def _make_reports_block(self):
+        def template(synthetic_data):
+            {  # noqa: B018: Allow useless dict
+                "columns": synthetic_data.columns,
+                "rows": [list(row) for row in synthetic_data.rows()],
+            }  # type: ignore
+
         outputs_expression = (
-            "{"
-            + ",".join(
-                self._make_report_kv(name, plan[0].analysis_name)
-                for name, plan in self.analysis_plan.columns.items()
+            Template(template).finish()
+            if self.analysis_plan.is_synthetic_data
+            else (
+                "{"
+                + ",".join(
+                    self._make_report_kv(name, plan[0].analysis_name)
+                    for name, plan in self.analysis_plan.columns.items()
+                )
+                + "}"
             )
-            + "}"
         )
         tmp_path = Path(__file__).parent.parent.parent / "tmp"
         reports_block = (
-            Template("reports", root)
+            Template(f"{self._get_synth_or_stats()}_reports", root)
             .fill_expressions(
                 OUTPUTS=outputs_expression,
                 COLUMNS={
@@ -80,4 +96,19 @@ class NotebookGenerator(AbstractGenerator):
             )
             .finish()
         )
-        return {"REPORTS_BLOCK": reports_block}
+        return reports_block
+
+    def _make_extra_blocks(self):
+        if self.analysis_plan.is_synthetic_data:
+            return {
+                "SYNTH_CONTEXT_BLOCK": self._make_synth_context(),
+                "SYNTH_QUERY_BLOCK": self._make_synth_query(),
+                "SYNTH_REPORTS_BLOCK": self._make_reports_block(),
+            }
+        else:
+            return {
+                "COLUMNS_BLOCK": self._make_columns(),
+                "STATS_CONTEXT_BLOCK": self._make_stats_context(),
+                "STATS_QUERIES_BLOCK": self._make_stats_queries(),
+                "STATS_REPORTS_BLOCK": self._make_reports_block(),
+            }

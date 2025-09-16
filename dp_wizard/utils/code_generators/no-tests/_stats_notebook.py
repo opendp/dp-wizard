@@ -40,7 +40,7 @@ COLUMNS_BLOCK
 # and set the weight for each query under that overall budget.
 
 # +
-CONTEXT_BLOCK
+STATS_CONTEXT_BLOCK
 # -
 
 # A note on `utf8-lossy`: CSVs can use different "character encodings" to
@@ -54,7 +54,7 @@ CONTEXT_BLOCK
 #
 # Finally, we run the queries and plot the results.
 
-QUERIES_BLOCK
+STATS_QUERIES_BLOCK
 
 # If we try to run more queries at this point, it will error. Once the privacy budget
 # is consumed, the library prevents you from running any more queries.
@@ -63,5 +63,5 @@ QUERIES_BLOCK
 # The code below produces a summary report.
 
 # +
-REPORTS_BLOCK
+STATS_REPORTS_BLOCK
 # -

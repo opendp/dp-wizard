@@ -18,6 +18,7 @@ class AnalysisPlanColumn(NamedTuple):
 class AnalysisPlan(NamedTuple):
     """
     >>> plan = AnalysisPlan(
+    ...     is_synthetic_data=False,
     ...     csv_path='optional.csv',
     ...     contributions=10,
     ...     epsilon=2.0,
@@ -27,11 +28,12 @@ class AnalysisPlan(NamedTuple):
     ...         'data_col': [AnalysisPlanColumn('Histogram', 0, 100, 10, 1)]
     ...     })
     >>> print(plan)
-    `data_col` Histogram
+    DP Statistics for `data_col` grouped by `grouping_col`
     >>> print(plan.to_stem())
-    dp-data_col-histogram
+    dp_statistics_for_data_col_grouped_by_grouping_col
     """
 
+    is_synthetic_data: bool
     csv_path: Optional[str]
     contributions: int
     epsilon: float
@@ -40,10 +42,17 @@ class AnalysisPlan(NamedTuple):
     columns: dict[ColumnName, list[AnalysisPlanColumn]]
 
     def __str__(self):
-        return ", ".join(f"`{k}` {v[0].analysis_name}" for k, v in self.columns.items())
+        def md_list(names):
+            return ", ".join(f"`{name}`" for name in names)
+
+        main = "DP Synthetic Data" if self.is_synthetic_data else "DP Statistics"
+        columns = md_list(self.columns.keys())
+        groups = md_list(self.groups)
+        grouped_by = f" grouped by {groups}" if groups else ""
+        return f"{main} for {columns}{grouped_by}"
 
     def to_stem(self):
-        return re.sub(r"\W+", "-", f"dp-{self}").lower()
+        return re.sub(r"\W+", " ", str(self)).strip().replace(" ", "_").lower()
 
 
 # Public functions used to generate code snippets in the UI;
@@ -60,25 +69,61 @@ def make_privacy_unit_block(contributions: int):
     return Template(template).fill_values(CONTRIBUTIONS=contributions).finish()
 
 
-def make_privacy_loss_block(epsilon: float, max_rows: int):
+def make_privacy_loss_block(pure: bool, epsilon: float, max_rows: int):
+    """
+    Comments in the *pure* privacy loss block reference synthetic data generation
+    ("cuts dict"), so don't use "pure=True" for stats code!
+
+    >>> print(
+    ...     'pure DP: ',
+    ...     make_privacy_loss_block(pure=True, epsilon=1, max_rows=1000)
+    ... )
+    pure DP: ...delta=0...
+    >>> print(
+    ...     'approx DP: ',
+    ...     make_privacy_loss_block(pure=False, epsilon=1, max_rows=1000)
+    ... )
+    approx DP: ...delta=1 / max...
+    """
+
     import opendp.prelude as dp
 
-    def template(EPSILON, MAX_ROWS):
-        privacy_loss = dp.loss_of(  # noqa: F841
-            # Your privacy budget is captured in the "epsilon" parameter.
-            # Larger values increase the risk that personal data could be reconstructed,
-            # so choose the smallest value that gives you the needed accuracy.
-            # You can also compare your budget to other projects:
-            # REGISTRY_URL
-            epsilon=EPSILON,
-            # There are many models of differential privacy. For flexibility,
-            # we here using a model which tolerates a small probability (delta)
-            # that data may be released in the clear. Delta should always be small,
-            # but if the dataset is particularly large,
-            # delta should not be larger than 1/(row count).
-            # https://docs.opendp.org/en/OPENDP_VERSION/getting-started/tabular-data/grouping.html#Stable-Keys
-            delta=1 / max(1e7, MAX_ROWS),
-        )
+    if pure:
+
+        def template(EPSILON, MAX_ROWS):
+            privacy_loss = dp.loss_of(  # noqa: F841
+                # Your privacy budget is captured in the "epsilon" parameter.
+                # Larger values increase the risk that personal data could be
+                # reconstructed, so choose the smallest value that gives you
+                # the needed accuracy. You can also compare your budget to
+                # other projects:
+                # REGISTRY_URL
+                epsilon=EPSILON,
+                # If your columns don't match your cuts dict,
+                # you will also need to provide a very small "delta" value.
+                # https://docs.opendp.org/en/OPENDP_VERSION/getting-started/tabular-data/grouping.html#Stable-Keys
+                delta=0,  # or 1 / max(1e7, MAX_ROWS),
+            )
+
+    else:
+
+        def template(EPSILON, MAX_ROWS):
+            privacy_loss = dp.loss_of(  # noqa: F841
+                # Your privacy budget is captured in the "epsilon" parameter.
+                # Larger values increase the risk that personal data could be
+                # reconstructed, so choose the smallest value that gives you
+                # the needed accuracy. You can also compare your budget to
+                # other projects:
+                # REGISTRY_URL
+                epsilon=EPSILON,
+                # There are many models of differential privacy. For flexibility,
+                # we are using a model which tolerates a small probability (delta)
+                # that data may be released in the clear. Delta should always be small,
+                # but if the dataset is particularly large,
+                # delta should be at least as small as 1/(row count).
+                # https://docs.opendp.org/en/OPENDP_VERSION/getting-started/tabular-data/grouping.html#Stable-Keys
+                delta=1 / max(1e7, MAX_ROWS),
+            )
 
     return (
         Template(template)

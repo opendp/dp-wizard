@@ -90,4 +90,5 @@ class AppState:
     analysis_errors: reactive.Value[dict[ColumnName, bool]]
 
     # Release state:
+    synthetic_data: reactive.Value[bool]
     released: reactive.Value[bool]
