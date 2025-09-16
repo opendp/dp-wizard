@@ -140,11 +140,12 @@ def results_server(
 
     @render.ui
     def synthetic_data_ui():
-        return [
+        return ui.card(
+            ui.card_header("Statistics or Synthetic Data?"),
             ui.markdown(
                 """
-                You can select either plain statistics
-                or synthetic data for your results.
+                You can generate either differentially private statistics
+                or synthetic data.
 
                 With synthetic data, your privacy budget is used to
                 infer the distributions of values within the selected columns,
@@ -154,7 +155,7 @@ def results_server(
                 """
             ),
             ui.input_checkbox("is_synthetic_data", "Release synthetic data", False),
-        ]
+        )
 
     @render.ui
     def download_results_ui():
