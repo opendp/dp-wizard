@@ -143,7 +143,7 @@ def results_server(
         return [
             ui.markdown(
                 """
-                Your can select either plain statistics
+                You can select either plain statistics
                 or synthetic data for your results.
 
                 With synthetic data, your privacy budget is used to
