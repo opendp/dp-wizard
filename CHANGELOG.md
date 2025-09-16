@@ -1,5 +1,23 @@
 # CHANGELOG
 
+## 0.5.0
+
+Highlights:
+
+- Add synthetic data generation [#588](https://github.com/opendp/dp-wizard/pull/588)
+- upgrade opendp [#585](https://github.com/opendp/dp-wizard/pull/585)
+
+Also includes:
+
+- get rid of extra padding at bottom [#590](https://github.com/opendp/dp-wizard/pull/590)
+- Add python syntax highlights and add Context example [#582](https://github.com/opendp/dp-wizard/pull/582)
+- Add favicon [#583](https://github.com/opendp/dp-wizard/pull/583)
+- Fix: No bounds on count [#578](https://github.com/opendp/dp-wizard/pull/578)
+- change dataset page to two columns [#580](https://github.com/opendp/dp-wizard/pull/580)
+- add a global registry_url [#581](https://github.com/opendp/dp-wizard/pull/581)
+- Round the epsilon values [#575](https://github.com/opendp/dp-wizard/pull/575)
+- Calculated default value causes re-render [#576](https://github.com/opendp/dp-wizard/pull/576)
+
 ## 0.4.1
 
 Highlights:
