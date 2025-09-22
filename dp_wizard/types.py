@@ -11,10 +11,16 @@ class Product(Enum):
 
     @classmethod
     def to_dict(cls):
+        """
+        >>> Product.to_dict()
+        {'1': 'DP Statistics', '2': 'DP Synthetic Data'}
+        """
         return {
-            str(member.value): "DP " + name.replace("_", " ").title()
-            for (name, member) in cls.__members__.items()
+            str(member.value): str(member) for (name, member) in cls.__members__.items()
         }
+
+    def __str__(self):
+        return "DP " + self.name.replace("_", " ").title()
 
 
 class AnalysisName(str):
@@ -87,6 +93,7 @@ class AppState:
     public_csv_path: reactive.Value[str]
     contributions: reactive.Value[int]
     max_rows: reactive.Value[str]
+    initial_product: Product
     product: reactive.Value[Product]
 
     # Analysis choices:

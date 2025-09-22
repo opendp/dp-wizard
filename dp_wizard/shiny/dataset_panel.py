@@ -116,6 +116,7 @@ def dataset_server(
     public_csv_path = state.public_csv_path
     contributions = state.contributions
     max_rows = state.max_rows
+    initial_product = state.initial_product
     product = state.product
 
     # Analysis choices:
@@ -549,16 +550,13 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 """
             ),
             ui.input_radio_buttons(
-                "product",
-                None,
-                Product.to_dict(),
+                "product", None, Product.to_dict(), selected=str(initial_product.value)
             ),
             tutorial_box(
                 is_tutorial_mode(),
                 """
                 Although the underlying OpenDP library is very flexible,
-                DP Wizard offers just a few analysis options:
-
+                DP Wizard offers only a few analysis options:
 
                 - The **DP Statistics** option supports
                   grouping, histograms, mean, median, and count.

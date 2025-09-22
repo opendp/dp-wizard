@@ -194,6 +194,8 @@ def _make_server(cli_info: CLIInfo):
             initial_private_csv_path = ""
             initial_column_names = []
 
+        initial_product = Product.STATISTICS
+
         state = AppState(
             # CLI options:
             is_sample_csv=cli_info.is_sample_csv,
@@ -208,7 +210,8 @@ def _make_server(cli_info: CLIInfo):
             public_csv_path=reactive.value(""),
             contributions=reactive.value(initial_contributions),
             max_rows=reactive.value("0"),
-            product=reactive.value(Product.STATISTICS),
+            initial_product=initial_product,
+            product=reactive.value(initial_product),
             # Analysis choices:
             column_names=reactive.value(initial_column_names),
             groups=reactive.value([]),

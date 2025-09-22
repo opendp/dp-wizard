@@ -14,7 +14,7 @@ from dp_wizard.shiny.components.outputs import (
     info_md_box,
     tutorial_box,
 )
-from dp_wizard.types import AppState, Product
+from dp_wizard.types import AppState
 from dp_wizard.utils.code_generators import AnalysisPlan, AnalysisPlanColumn
 from dp_wizard.utils.code_generators.notebook_generator import (
     PLACEHOLDER_CSV_NAME,
@@ -107,6 +107,7 @@ def results_server(
     public_csv_path = state.public_csv_path
     contributions = state.contributions
     max_rows = state.max_rows
+    # initial_product = state.initial_product
     product = state.product
 
     # Analysis choices:
@@ -288,7 +289,7 @@ def results_server(
             for col in weights().keys()
         }
         return AnalysisPlan(
-            is_synthetic_data=product() == Product.SYNTHETIC_DATA,
+            product=product(),
             # Prefer private CSV, if available:
             csv_path=private_csv_path() or public_csv_path() or PLACEHOLDER_CSV_NAME,
             contributions=contributions(),
