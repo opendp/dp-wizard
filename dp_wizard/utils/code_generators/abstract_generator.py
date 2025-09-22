@@ -87,7 +87,10 @@ class AbstractGenerator(ABC):
             )
             .finish()
         )
-        return code
+        return self._clean_up_py(code)
+
+    def _clean_up_py(self, py: str):
+        return py
 
     def _make_margins_list(
         self,
@@ -310,7 +313,8 @@ class AbstractGenerator(ABC):
             contingency_table.project_melted([COLUMNS])
 
             # Finally, a contingency table can also be used to create sythetic data.
-            # (There may be warnings from upstream libraries which we can ignore for now.)
+            # (There may be warnings from upstream libraries
+            # which we can ignore for now.)
 
             # +
             import warnings

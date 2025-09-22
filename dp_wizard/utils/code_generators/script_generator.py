@@ -1,9 +1,16 @@
+import re
+
 from dp_wizard.utils.code_generators.abstract_generator import AbstractGenerator
 
 
 class ScriptGenerator(AbstractGenerator):
     def _get_notebook_or_script(self):
         return "script"
+
+    def _clean_up_py(self, py: str):
+        # The output is passed through black, so we don't need to overdo this regex.
+        py = re.sub(r"# [+-]", "", py)
+        return py
 
     def _make_columns(self):
         column_config_dict = self._make_column_config_dict()
