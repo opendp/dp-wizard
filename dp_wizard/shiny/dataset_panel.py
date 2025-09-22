@@ -116,6 +116,7 @@ def dataset_server(
     public_csv_path = state.public_csv_path
     contributions = state.contributions
     max_rows = state.max_rows
+    product = state.product
 
     # Analysis choices:
     column_names = state.column_names
@@ -132,7 +133,6 @@ def dataset_server(
     # analysis_errors = state.analysis_errors
 
     # Release state:
-    # synthetic_data = state.synthetic_data
     released = state.released
 
     @reactive.effect
@@ -571,6 +571,11 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 responsive=False,
             ),
         ]
+
+    @reactive.effect
+    @reactive.event(input.product)
+    def _on_product_change():
+        product.set(Product(int(input.product())))
 
     @reactive.effect
     @reactive.event(input.go_to_analysis)

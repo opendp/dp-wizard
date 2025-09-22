@@ -14,7 +14,7 @@ from dp_wizard.shiny.components.outputs import (
     info_md_box,
     tutorial_box,
 )
-from dp_wizard.types import AppState
+from dp_wizard.types import AppState, Product
 from dp_wizard.utils.code_generators import AnalysisPlan, AnalysisPlanColumn
 from dp_wizard.utils.code_generators.notebook_generator import (
     PLACEHOLDER_CSV_NAME,
@@ -107,6 +107,7 @@ def results_server(
     public_csv_path = state.public_csv_path
     contributions = state.contributions
     max_rows = state.max_rows
+    product = state.product
 
     # Analysis choices:
     # column_names = state.column_names
@@ -123,7 +124,6 @@ def results_server(
     # analysis_errors = state.analysis_errors
 
     # Release state:
-    is_synthetic_data = state.synthetic_data
     released = state.released
 
     @render.ui
@@ -136,25 +136,6 @@ def results_server(
                 before downloading results.
                 """
             ),
-        )
-
-    @render.ui
-    def synthetic_data_ui():
-        return ui.card(
-            ui.card_header("Statistics or Synthetic Data?"),
-            ui.markdown(
-                """
-                You can generate either differentially private statistics
-                or synthetic data.
-
-                With synthetic data, your privacy budget is used to
-                infer the distributions of values within the selected columns,
-                and the correlations between columns.
-                This is less accurate than calculating the desired
-                statistics directly, but can be easier to work with.
-                """
-            ),
-            ui.input_checkbox("is_synthetic_data", "Release synthetic data", False),
         )
 
     @render.ui
@@ -289,11 +270,6 @@ def results_server(
             ),
         ]
 
-    @reactive.effect
-    @reactive.event(input.is_synthetic_data)
-    def _on_is_synthetic_data_change():
-        is_synthetic_data.set(input.is_synthetic_data())
-
     @reactive.calc
     def analysis_plan() -> AnalysisPlan:
         # weights().keys() will reflect the desired columns:
@@ -312,7 +288,7 @@ def results_server(
             for col in weights().keys()
         }
         return AnalysisPlan(
-            is_synthetic_data=is_synthetic_data(),
+            is_synthetic_data=product() == Product.SYNTHETIC_DATA,
             # Prefer private CSV, if available:
             csv_path=private_csv_path() or public_csv_path() or PLACEHOLDER_CSV_NAME,
             contributions=contributions(),

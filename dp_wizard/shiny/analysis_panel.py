@@ -143,6 +143,7 @@ def analysis_server(
     public_csv_path = state.public_csv_path
     contributions = state.contributions
     max_rows = state.max_rows
+    # product = state.product
 
     # Analysis choices:
     column_names = state.column_names
@@ -159,7 +160,6 @@ def analysis_server(
     analysis_errors = state.analysis_errors
 
     # Release state:
-    # synthetic_data = state.synthetic_data
     released = state.released
 
     @reactive.calc

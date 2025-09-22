@@ -87,6 +87,7 @@ class AppState:
     public_csv_path: reactive.Value[str]
     contributions: reactive.Value[int]
     max_rows: reactive.Value[str]
+    product: reactive.Value[Product]
 
     # Analysis choices:
     column_names: reactive.Value[list[ColumnName]]
@@ -103,5 +104,4 @@ class AppState:
     analysis_errors: reactive.Value[dict[ColumnName, bool]]
 
     # Release state:
-    synthetic_data: reactive.Value[bool]
     released: reactive.Value[bool]

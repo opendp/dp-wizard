@@ -13,7 +13,7 @@ from dp_wizard.shiny import (
     dataset_panel,
     results_panel,
 )
-from dp_wizard.types import AppState
+from dp_wizard.types import AppState, Product
 from dp_wizard.utils.argparse_helpers import CLIInfo
 from dp_wizard.utils.csv_helper import read_csv_names
 
@@ -208,6 +208,7 @@ def _make_server(cli_info: CLIInfo):
             public_csv_path=reactive.value(""),
             contributions=reactive.value(initial_contributions),
             max_rows=reactive.value("0"),
+            product=reactive.value(Product.STATISTICS),
             # Analysis choices:
             column_names=reactive.value(initial_column_names),
             groups=reactive.value([]),
@@ -220,7 +221,6 @@ def _make_server(cli_info: CLIInfo):
             weights=reactive.value({}),
             analysis_errors=reactive.value({}),
             # Release state:
-            synthetic_data=reactive.value(False),
             released=reactive.value(False),
         )
 
