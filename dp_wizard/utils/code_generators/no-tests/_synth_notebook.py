@@ -44,8 +44,7 @@ SYNTH_CONTEXT_BLOCK
 #
 # ## Results
 #
-# Finally, we release a contingency table, and then generate synthetic data
-# from the contingency table
+# First, we'll release a contingency table.
 
 SYNTH_QUERY_BLOCK
 
@@ -58,7 +57,7 @@ SYNTH_QUERY_BLOCK
 # - Increasing your privacy budget
 # - Selecting fewer columns
 # - Filling in the "keys" kwarg
-# - Preprocess to combine keys which occur a small number of times
+# - Preprocessing to combine keys which occur a small number of times
 
 # # Coda
 # The code below produces a summary report.

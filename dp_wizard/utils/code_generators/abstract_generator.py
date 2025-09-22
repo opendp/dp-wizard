@@ -304,14 +304,22 @@ class AbstractGenerator(ABC):
             )
             contingency_table = synth_query.release()
 
-            # There may be warnings from upstream libraries which we can ignore for now.
+            # A contingency table is a data structure which can give us DP counts
+            # for different combinations of column values.
 
+            contingency_table.project_melted([COLUMNS])
+
+            # Finally, a contingency table can also be used to create sythetic data.
+            # (There may be warnings from upstream libraries which we can ignore for now.)
+
+            # +
             import warnings
 
             with warnings.catch_warnings():
                 warnings.simplefilter(action="ignore", category=FutureWarning)
                 synthetic_data = contingency_table.synthesize()
             synthetic_data  # type: ignore
+            # -
 
         # The make_cut_points() call could be moved into generated code,
         # but that would require more complex templating.
