@@ -303,9 +303,10 @@ class AbstractGenerator(ABC):
                 )
             )
             contingency_table = synth_query.release()
-            import warnings
 
             # There may be warnings from upstream libraries which we can ignore for now.
+
+            import warnings
 
             with warnings.catch_warnings():
                 warnings.simplefilter(action="ignore", category=FutureWarning)
