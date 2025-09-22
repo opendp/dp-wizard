@@ -1,7 +1,20 @@
 import re
 from dataclasses import dataclass
+from enum import Enum, auto
 
 from shiny import reactive
+
+
+class Product(Enum):
+    STATISTICS = auto()
+    SYNTHETIC_DATA = auto()
+
+    @classmethod
+    def to_dict(cls):
+        return {
+            str(member.value): "DP " + name.replace("_", " ").title()
+            for (name, member) in cls.__members__.items()
+        }
 
 
 class AnalysisName(str):

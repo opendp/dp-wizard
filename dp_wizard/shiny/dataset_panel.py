@@ -13,7 +13,7 @@ from dp_wizard.shiny.components.outputs import (
     nav_button,
     tutorial_box,
 )
-from dp_wizard.types import AppState
+from dp_wizard.types import AppState, Product
 from dp_wizard.utils.argparse_helpers import (
     PRIVATE_TEXT,
     PUBLIC_PRIVATE_TEXT,
@@ -77,13 +77,19 @@ def dataset_ui():
                 ui.output_ui("csv_or_columns_ui"),
                 ui.output_ui("row_count_bounds_ui"),
             ),
-            ui.card(
-                ui.card_header("Unit of Privacy"),
-                ui.output_ui("input_entity_ui"),
-                ui.output_ui("input_contributions_ui"),
-                ui.output_ui("contributions_validation_ui"),
-                ui.output_ui("unit_of_privacy_python_ui"),
-            ),
+            [
+                ui.card(
+                    ui.card_header("Unit of Privacy"),
+                    ui.output_ui("input_entity_ui"),
+                    ui.output_ui("input_contributions_ui"),
+                    ui.output_ui("contributions_validation_ui"),
+                    ui.output_ui("unit_of_privacy_python_ui"),
+                ),
+                ui.card(
+                    ui.card_header("Product"),
+                    ui.output_ui("product_ui"),
+                ),
+            ],
         ),
         ui.output_ui("define_analysis_button_ui"),
         value="dataset_panel",
@@ -533,6 +539,38 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
     @render.ui
     def unit_of_privacy_python_ui():
         return code_sample("Unit of Privacy", make_privacy_unit_block(contributions()))
+
+    @render.ui
+    def product_ui():
+        return [
+            ui.markdown(
+                """
+                What kind of analysis do you want to produce?
+                """
+            ),
+            ui.input_radio_buttons(
+                "product",
+                None,
+                Product.to_dict(),
+            ),
+            tutorial_box(
+                is_tutorial_mode(),
+                """
+                Although the underlying OpenDP library is very flexible,
+                DP Wizard offers just a few analysis options:
+
+
+                - The **DP Statistics** option supports
+                  grouping, histograms, mean, median, and count.
+                - With **DP Synthetic Data**, your privacy budget is used
+                  to infer the distributions of values within the
+                  selected columns, and the correlations between columns.
+                  This is less accurate than calculating the desired
+                  statistics directly, but can be easier to work with downstream.
+                """,
+                responsive=False,
+            ),
+        ]
 
     @reactive.effect
     @reactive.event(input.go_to_analysis)
