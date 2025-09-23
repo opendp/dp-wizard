@@ -546,7 +546,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             "Unit of Privacy",
             make_privacy_unit_block(
                 contributions=contributions(),
-                contributions_entity="TODO",
+                contributions_entity=contributions_entity_calc(),
             ),
         )
 
