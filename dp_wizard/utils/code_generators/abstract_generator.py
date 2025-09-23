@@ -267,7 +267,8 @@ class AbstractGenerator(ABC):
 
     def _make_partial_synth_context(self):
         privacy_unit_block = make_privacy_unit_block(
-            contributions=self.analysis_plan.contributions, contributions_entity="TODO"
+            contributions=self.analysis_plan.contributions,
+            contributions_entity=self.analysis_plan.contributions_entity,
         )
         # If there are no groups and all analyses have bounds (so we have cut points),
         # then OpenDP requires that pure DP be used for contingency tables.
