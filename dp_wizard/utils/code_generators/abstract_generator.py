@@ -76,24 +76,24 @@ class AbstractGenerator(ABC):
             Template(self._get_root_template(), root)
             .fill_expressions(
                 TITLE=str(self.analysis_plan),
-                WINDOWS_NOTE="(If installing in the Windows CMD shell, "
-                "use double-quotes instead of single-quotes below.)",
                 DEPENDENCIES=f"'opendp[{extra}]=={opendp_version}' matplotlib",
             )
-            .fill_blocks(
+            .fill_code_blocks(
                 IMPORTS_BLOCK=Template(template).finish(),
                 UTILS_BLOCK=(Path(__file__).parent.parent / "shared.py").read_text(),
                 **self._make_extra_blocks(),
             )
             .fill_comment_blocks(
+                WINDOWS_COMMENT_BLOCK="""
+(If installing in the Windows CMD shell,
+use double-quotes instead of single-quotes below.)""",
                 ENCODING_COMMENT_BLOCK="""
 A note on `utf8-lossy`: CSVs can use different "character encodings" to
-represent characters outside the plain ascii character set, but out of the box
+represent characters outside the ASCII character set, but out-of-the-box
 the Polars library only supports UTF8. Specifying `utf8-lossy` preserves as
 much information as possible, and any unrecognized characters will be replaced
 by "�". If this is not sufficient, you will need to preprocess your data to
-reencode it as UTF8.
-"""
+reencode it as UTF8.""",
             )
             .finish()
         )
@@ -267,7 +267,7 @@ reencode it as UTF8.
                 OPENDP_VERSION=opendp_version,
                 WEIGHTS=self._make_weights_expression(),
             )
-            .fill_blocks(
+            .fill_code_blocks(
                 PRIVACY_UNIT_BLOCK=privacy_unit_block,
                 PRIVACY_LOSS_BLOCK=privacy_loss_block,
             )
@@ -292,7 +292,7 @@ reencode it as UTF8.
             .fill_expressions(
                 OPENDP_VERSION=opendp_version,
             )
-            .fill_blocks(
+            .fill_code_blocks(
                 PRIVACY_UNIT_BLOCK=privacy_unit_block,
                 PRIVACY_LOSS_BLOCK=privacy_loss_block,
             )

@@ -11,7 +11,7 @@
 # ## Prerequisites
 #
 # First install and import the required dependencies:
-# WINDOWS_NOTE
+# WINDOWS_COMMENT_BLOCK
 
 # +
 # %pip install DEPENDENCIES

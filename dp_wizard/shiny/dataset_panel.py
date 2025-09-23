@@ -258,7 +258,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                     OPENDP_VERSION=opendp_version,
                     WEIGHTS="weights",
                 )
-                .fill_blocks(
+                .fill_code_blocks(
                     PRIVACY_UNIT_BLOCK="",
                     PRIVACY_LOSS_BLOCK="",
                     OPTIONAL_CSV_BLOCK=(
