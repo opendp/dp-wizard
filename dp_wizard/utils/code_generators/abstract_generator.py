@@ -85,6 +85,16 @@ class AbstractGenerator(ABC):
                 UTILS_BLOCK=(Path(__file__).parent.parent / "shared.py").read_text(),
                 **self._make_extra_blocks(),
             )
+            .fill_comment_blocks(
+                ENCODING_COMMENT_BLOCK="""
+A note on `utf8-lossy`: CSVs can use different "character encodings" to
+represent characters outside the plain ascii character set, but out of the box
+the Polars library only supports UTF8. Specifying `utf8-lossy` preserves as
+much information as possible, and any unrecognized characters will be replaced
+by "�". If this is not sufficient, you will need to preprocess your data to
+reencode it as UTF8.
+"""
+            )
             .finish()
         )
         return code
