@@ -109,6 +109,7 @@ def dataset_server(
     initial_public_csv_path = state.initial_public_csv_path
     public_csv_path = state.public_csv_path
     contributions = state.contributions
+    contributions_entity = state.contributions_entity
     max_rows = state.max_rows
 
     # Analysis choices:
@@ -383,7 +384,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
 
     @render.ui
     def input_contributions_ui():
-        entity = input.entity()[2:].lower()
+        entity = contributions_entity_calc()
 
         return [
             ui.markdown(
@@ -423,6 +424,15 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
     @reactive.event(input.contributions)
     def _on_contributions_change():
         contributions.set(input.contributions())
+
+    @reactive.effect
+    @reactive.event(input.entity)
+    def _on_contributions_entity_change():
+        contributions_entity.set(contributions_entity_calc())
+
+    @reactive.calc
+    def contributions_entity_calc() -> str:
+        return input.entity()[2:].lower()
 
     @reactive.calc
     def button_enabled():
