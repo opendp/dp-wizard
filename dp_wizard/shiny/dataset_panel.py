@@ -532,7 +532,13 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
 
     @render.ui
     def unit_of_privacy_python_ui():
-        return code_sample("Unit of Privacy", make_privacy_unit_block(contributions()))
+        return code_sample(
+            "Unit of Privacy",
+            make_privacy_unit_block(
+                contributions=contributions(),
+                contributions_entity="TODO",
+            ),
+        )
 
     @reactive.effect
     @reactive.event(input.go_to_analysis)

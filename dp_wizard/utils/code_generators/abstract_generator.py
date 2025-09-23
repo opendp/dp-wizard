@@ -221,7 +221,9 @@ class AbstractGenerator(ABC):
             if has_bins(get_analysis_by_name(plan[0].analysis_name))
         ]
 
-        privacy_unit_block = make_privacy_unit_block(self.analysis_plan.contributions)
+        privacy_unit_block = make_privacy_unit_block(
+            contributions=self.analysis_plan.contributions, contributions_entity="TODO"
+        )
         privacy_loss_block = make_privacy_loss_block(
             pure=False,
             epsilon=self.analysis_plan.epsilon,
@@ -264,7 +266,9 @@ class AbstractGenerator(ABC):
         )
 
     def _make_partial_synth_context(self):
-        privacy_unit_block = make_privacy_unit_block(self.analysis_plan.contributions)
+        privacy_unit_block = make_privacy_unit_block(
+            contributions=self.analysis_plan.contributions, contributions_entity="TODO"
+        )
         # If there are no groups and all analyses have bounds (so we have cut points),
         # then OpenDP requires that pure DP be used for contingency tables.
 

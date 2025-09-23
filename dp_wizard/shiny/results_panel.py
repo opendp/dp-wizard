@@ -316,6 +316,7 @@ def results_server(
             # Prefer private CSV, if available:
             csv_path=private_csv_path() or public_csv_path() or PLACEHOLDER_CSV_NAME,
             contributions=contributions(),
+            contributions_entity="TODO",
             epsilon=epsilon(),
             max_rows=int(max_rows()),
             groups=groups(),
