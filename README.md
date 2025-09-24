@@ -63,7 +63,10 @@ We also welcome PRs, but if you have an idea for a new feature, it may be helpfu
 - DP Wizard isn't trying to do everything: The OpenDP Library is rich, and DP Wizard exposes only a fraction of that functionality so the user isn't overwhelmed by details.
 - DP Wizard tries to model the correct application of differential privacy. For example, while comparing DP results and unnoised statistics can be useful for education, that's not something this application will offer.
 
-With those caveats in mind, feel free to [file a feature request](https://github.com/opendp/dp-wizard/issues/new/choose), or chat with us at our [online office hour](https://harvard.zoom.us/j/98058847683), usually Tuesdays and Thursdays at 11am Eastern.
+With those caveats in mind,
+feel free to [file a feature request](https://github.com/opendp/dp-wizard/issues/new/choose),
+or [email us](mailto:info@opendp.org).
+
 
 ## Development
 
