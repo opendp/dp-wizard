@@ -9,7 +9,14 @@ Choosing tighter bounds will mean less noise added
 to the statistics, but if you pick bounds that
 are too tight, you'll miss the contributions of
 outliers.
+
+Note: While this is fine for taking one DP mean, it does spend some of
+your privacy budget each time to calculate the number of records:
+It is better to do that only once, and then collect DP sums for
+each column of interest.
 """
+# TODO: Wait for https://github.com/opendp/dp-wizard/pull/607,
+# and then factor out the shared comment.
 input_names = [
     "lower_bound_input",
     "upper_bound_input",

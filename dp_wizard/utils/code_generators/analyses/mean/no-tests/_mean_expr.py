@@ -3,7 +3,7 @@
 #
 # Note: While this is fine for taking one DP mean, it does spend some of
 # your privacy budget each time to calculate the number of records:
-# It is better to do that explicitly, and then collect DP sums for
+# It is better to do that only once, and then collect DP sums for
 # each column of interest.
 
 EXPR_NAME = (
