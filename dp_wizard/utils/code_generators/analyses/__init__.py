@@ -51,13 +51,21 @@ class Analysis(Protocol):  # pragma: no cover
 
 def get_analysis_by_name(name: AnalysisName) -> Analysis:  # pragma: no cover
     # Avoid circular import:
-    from dp_wizard.utils.code_generators.analyses import count, histogram, mean, median
+    from dp_wizard.utils.code_generators.analyses import (
+        count,
+        histogram,
+        mean,
+        median,
+        sum,
+    )
 
     match name:
         case histogram.name:
             return histogram
         case mean.name:
             return mean
+        case sum.name:
+            return sum
         case median.name:
             return median
         case count.name:

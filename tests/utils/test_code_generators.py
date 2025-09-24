@@ -13,7 +13,7 @@ from dp_wizard.utils.code_generators import (
     AnalysisPlanColumn,
     make_column_config_block,
 )
-from dp_wizard.utils.code_generators.analyses import count, histogram, mean, median
+from dp_wizard.utils.code_generators.analyses import count, histogram, mean, median, sum
 from dp_wizard.utils.code_generators.notebook_generator import NotebookGenerator
 from dp_wizard.utils.code_generators.script_generator import ScriptGenerator
 
@@ -55,6 +55,28 @@ hw_grade_expr = (
     )
 
 
+def test_make_column_config_block_for_sum():
+    assert (
+        make_column_config_block(
+            name="HW GRADE",
+            analysis_name=sum.name,
+            lower_bound=0,
+            upper_bound=100,
+            bin_count=10,
+        ).strip()
+        == f"""# See the OpenDP Library docs for more on making private sums:
+# https://docs.opendp.org/en/{opendp_version}/getting-started/tabular-data/essential-statistics.html#sum
+
+hw_grade_expr = (
+    pl.col('HW GRADE')
+    .cast(float)
+    .fill_nan(0)
+    .fill_null(0)
+    .dp.sum((0, 100))
+)"""
+    )
+
+
 def test_make_column_config_block_for_mean():
     assert (
         make_column_config_block(
@@ -69,7 +91,7 @@ def test_make_column_config_block_for_mean():
 #
 # Note: While this is fine for taking one DP mean, it does spend some of
 # your privacy budget each time to calculate the number of records:
-# It is better to do that explicitly, and then collect DP sums for
+# It is better to do that only once, and then collect DP sums for
 # each column of interest.
 
 hw_grade_expr = (
@@ -158,6 +180,13 @@ mean_plan_column = AnalysisPlanColumn(
     bin_count=0,  # Unused
     weight=4,
 )
+sum_plan_column = AnalysisPlanColumn(
+    analysis_name=sum.name,
+    lower_bound=5,
+    upper_bound=15,
+    bin_count=0,  # Unused
+    weight=4,
+)
 median_plan_column = AnalysisPlanColumn(
     analysis_name=median.name,
     lower_bound=5,
@@ -200,14 +229,16 @@ plans = [
         # Single:
         {ColumnName("B"): [histogram_plan_column]},
         {ColumnName("B"): [mean_plan_column]},
+        {ColumnName("B"): [sum_plan_column]},
         {ColumnName("B"): [median_plan_column]},
         {ColumnName("B"): [count_plan_column]},
         # Multiple:
         {
             ColumnName("B"): [histogram_plan_column],
             ColumnName("C"): [mean_plan_column],
-            ColumnName("D"): [median_plan_column],
-            ColumnName("E"): [count_plan_column],
+            ColumnName("D"): [sum_plan_column],
+            ColumnName("E"): [median_plan_column],
+            ColumnName("F"): [count_plan_column],
         },
     ]
 ]
