@@ -47,7 +47,7 @@ def test_make_column_config_block_for_count():
             bin_count=0,
         ).strip()
         == f"""# See the OpenDP docs for more on making private counts:
-# https://docs.opendp.org/en/{opendp_version}/getting-started/tabular-data/essential-statistics.html#Count
+# https://docs.opendp.org/en/{opendp_version}/getting-started/tabular-data/essential-statistics.html#count
 
 hw_grade_expr = (
     pl.col('HW GRADE').cast(float).fill_nan(0).fill_null(0).dp.count().alias("count")
@@ -65,7 +65,12 @@ def test_make_column_config_block_for_mean():
             bin_count=10,
         ).strip()
         == f"""# See the OpenDP Library docs for more on making private means:
-# https://docs.opendp.org/en/{opendp_version}/getting-started/tabular-data/essential-statistics.html#Mean
+# https://docs.opendp.org/en/{opendp_version}/getting-started/tabular-data/essential-statistics.html#mean
+#
+# Note: While this is fine for taking one DP mean, it does spend some of
+# your privacy budget each time to calculate the number of records:
+# It is better to do that explicitly, and then collect DP sums for
+# each column of interest.
 
 hw_grade_expr = (
     pl.col('HW GRADE')
@@ -87,7 +92,7 @@ def test_make_column_config_block_for_median():
             bin_count=20,
         ).strip()
         == f"""# See the OpenDP Library docs for more on making private medians and quantiles:
-# https://docs.opendp.org/en/{opendp_version}/getting-started/tabular-data/essential-statistics.html#Median
+# https://docs.opendp.org/en/{opendp_version}/getting-started/tabular-data/essential-statistics.html#median
 
 hw_grade_expr = (
     pl.col('HW GRADE')
