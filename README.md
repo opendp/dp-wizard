@@ -182,12 +182,33 @@ graph TD
 - These are the only the states that matter. Whether PR is a draft or has assignees does not matter.
 - If we need anything more than this, we should consider a paid plan, so that we have access to more workflows.
 
-## Other resources
+
+## News
+
+(See also the [CHANGELOG](CHANGELOG.md).)
+
+2025-09-23: [Blog post for v0.5](https://opendp.org/2025/09/23/announcing-dp-wizard-v0-5/)
 
 2025-08-07: [DP Wizard Templates: Code templates and notebook generation](https://opendp.github.io/dp-wizard-templates/)
 
 2025-05-07: [Slides for 50 minute presentation at 2025 Harvard IT Summit](https://opendp.github.io/harvard-it-summit-2025)
 
+2025-04-14 [Blog post for v0.3](https://opendp.org/2025/04/14/announcing-opendp-library-0-13-and-dp-wizard/)
+
 2025-04-11: [Slides for 5 minute mini-talk on v0.3.0 at ABSURD (Annual Boston Security Usability Research Day)](https://docs.google.com/presentation/d/1g1c5ksG9sN8A_qWW9nFmFFZ6dSCkUAmL6_cUahi3VPA/edit#slide=id.g34c5f4bdc6a_0_0)
 
 2024-12-13: [Blog post for initial release](https://opendp.org/blog/dp-wizard-easy-way-get-started-differential-privacy-and-opendp)
+
+
+## Related projects
+
+There are a number of other projects which offer UIs for differential privacy.
+
+From OpenDP:
+
+- [DP Creator](https://github.com/opendp/dpcreator): An earlier project from OpenDP; Can be integrated with [Dataverse data repositories](https://dataverse.org/).
+- [PSI](https://github.com/opendp/PSI): The first DP UI from OpenDP.
+
+From other groups:
+
+- [PrivSyn](https://github.com/vvv214/privsyn-tabular): Uses AIM for synthentic data generation.
