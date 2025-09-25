@@ -164,7 +164,7 @@ def results_server(
             ui.card_header("Download stem"),
             ui.markdown(
                 """
-                An appropriate extension for the file type of each download is added to this stem.
+                An appropriate extension for each download is added to this stem.
                 """
             ),
             ui.input_text("custom_download_stem", None, download_stem()),
