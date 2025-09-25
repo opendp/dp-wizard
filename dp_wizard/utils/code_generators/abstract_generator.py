@@ -321,8 +321,8 @@ class AbstractGenerator(ABC):
             )
             # -
 
-            # Finally, a contingency table can also be used to create sythetic data
-            # by calling [`synthesize()`](https://docs.opendp.org/en/OPENDP_V_VERSION/api/python/opendp.extras.mbi.html#opendp.extras.mbi.ContingencyTable.synthesize)
+            # Finally, a contingency table can also be used to create synthetic data
+            # by calling [`synthesize()`](https://docs.opendp.org/en/OPENDP_V_VERSION/api/python/opendp.extras.mbi.html#opendp.extras.mbi.ContingencyTable.synthesize).
             # (There may be warnings from upstream libraries
             # which we can ignore for now.)
 
@@ -336,7 +336,8 @@ class AbstractGenerator(ABC):
             # -
 
         # The make_cut_points() call could be moved into generated code,
-        # but that would require more complex templating.
+        # but that would require more complex templating,
+        # and more reliance on helper functions.
         cuts = {
             k: sorted(
                 {
