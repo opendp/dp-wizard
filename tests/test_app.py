@@ -254,6 +254,8 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     page.get_by_text("Unexecuted Notebooks", exact=True).click()
     page.get_by_text("Scripts", exact=True).click()
 
+    expected_stem = "dp_statistics_for_grade_grouped_by_class_year"
+
     for match in matches:
         if not match:
             continue
@@ -264,14 +266,32 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
             page.get_by_text(link_text).click()
 
         download_name = download_info.value.suggested_filename
-        assert download_name.startswith(
-            "dp_statistics_for_grade_grouped_by_class_year.",
-        )
+        assert download_name.startswith(expected_stem)
         assert download_name.endswith(ext)
 
         download_path = download_info.value.path()
         content = download_path.read_bytes()
         assert content  # Could add assertions for different document types.
+
+    # Check that download name can be changed:
+    stem_locator = page.locator("#custom_download_stem")
+    expect(stem_locator).to_have_value(expected_stem)
+    new_stem = "foobar"
+    stem_locator.fill(new_stem)
+    expect(stem_locator).to_have_value(new_stem)
+
+    for match in matches:
+        if not match:
+            continue
+        name = match.group(1)
+        ext = match.group(2)
+        link_text = f"Download {name} ({ext})"
+        with page.expect_download() as download_info:
+            page.get_by_text(link_text).click()
+
+        download_name = download_info.value.suggested_filename
+        assert download_name.startswith(new_stem)
+        assert download_name.endswith(ext)
 
     # -- Define Analysis --
     page.get_by_role("tab", name="Define Analysis").click()
