@@ -101,7 +101,7 @@ def make_privacy_loss_block(pure: bool, epsilon: float, max_rows: int):
                 epsilon=EPSILON,
                 # If your columns don't match your cuts dict,
                 # you will also need to provide a very small "delta" value.
-                # https://docs.opendp.org/en/OPENDP_VERSION/getting-started/tabular-data/grouping.html#Stable-Keys
+                # https://docs.opendp.org/en/OPENDP_V_VERSION/getting-started/tabular-data/grouping.html#Stable-Keys
                 delta=0,  # or 1 / max(1e7, MAX_ROWS),
             )
 
@@ -121,14 +121,14 @@ def make_privacy_loss_block(pure: bool, epsilon: float, max_rows: int):
                 # that data may be released in the clear. Delta should always be small,
                 # but if the dataset is particularly large,
                 # delta should be at least as small as 1/(row count).
-                # https://docs.opendp.org/en/OPENDP_VERSION/getting-started/tabular-data/grouping.html#Stable-Keys
+                # https://docs.opendp.org/en/OPENDP_V_VERSION/getting-started/tabular-data/grouping.html#Stable-Keys
                 delta=1 / max(1e7, MAX_ROWS),
             )
 
     return (
         Template(template)
         .fill_expressions(
-            OPENDP_VERSION=opendp_version,
+            OPENDP_V_VERSION="v{opendp_version}",
             REGISTRY_URL=registry_url,
         )
         .fill_values(

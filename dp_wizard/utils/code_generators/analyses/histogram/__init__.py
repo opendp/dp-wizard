@@ -84,7 +84,7 @@ def make_column_config_block(column_name, lower_bound, upper_bound, bin_count):
         .fill_expressions(
             CUT_LIST_NAME=f"{snake_name}_cut_points",
             BIN_EXPR_NAME=f"{snake_name}_bin_expr",
-            OPENDP_VERSION=opendp_version,
+            OPENDP_V_VERSION="v{opendp_version}",
         )
         .fill_values(
             LOWER_BOUND=lower_bound,

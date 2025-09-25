@@ -255,7 +255,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 .fill_expressions(
                     MARGINS_LIST="margins",
                     EXTRA_COLUMNS="extra_columns",
-                    OPENDP_VERSION=opendp_version,
+                    OPENDP_V_VERSION=f"v{opendp_version}",
                     WEIGHTS="weights",
                 )
                 .fill_blocks(

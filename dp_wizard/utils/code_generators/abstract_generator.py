@@ -100,10 +100,10 @@ class AbstractGenerator(ABC):
     ):
         import opendp.prelude as dp
 
-        def basic_template(GROUPS, OPENDP_VERSION, MAX_ROWS):
+        def basic_template(GROUPS, MAX_ROWS):
             # "max_partition_length" should be a loose upper bound,
             # for example, the size of the total population being sampled.
-            # https://docs.opendp.org/en/OPENDP_VERSION/api/python/opendp.extras.polars.html#opendp.extras.polars.Margin.max_partition_length
+            # https://docs.opendp.org/en/OPENDP_V_VERSION/api/python/opendp.extras.polars.html#opendp.extras.polars.Margin.max_partition_length
             #
             # In production, "max_groups" should be set by considering
             # the number of possible values for each grouping column,
@@ -120,7 +120,7 @@ class AbstractGenerator(ABC):
 
         margins = [
             Template(basic_template)
-            .fill_expressions(OPENDP_VERSION=opendp_version)
+            .fill_expressions(OPENDP_V_VERSION=f"v{opendp_version}")
             .fill_values(GROUPS=groups, MAX_ROWS=max_rows)
             .finish()
         ] + [
@@ -257,7 +257,7 @@ class AbstractGenerator(ABC):
             .fill_expressions(
                 MARGINS_LIST=margins_list,
                 EXTRA_COLUMNS=extra_columns,
-                OPENDP_VERSION=opendp_version,
+                OPENDP_V_VERSION="v{opendp_version}",
                 WEIGHTS=self._make_weights_expression(),
             )
             .fill_blocks(
@@ -283,7 +283,7 @@ class AbstractGenerator(ABC):
         return (
             Template("synth_context", root)
             .fill_expressions(
-                OPENDP_VERSION=opendp_version,
+                OPENDP_V_VERSION="v{opendp_version}",
             )
             .fill_blocks(
                 PRIVACY_UNIT_BLOCK=privacy_unit_block,
@@ -307,12 +307,22 @@ class AbstractGenerator(ABC):
             )
             contingency_table = synth_query.release()
 
-            # A contingency table is a data structure which can give us DP counts
-            # for different combinations of column values.
+            # Calling [`project_melted()`](https://docs.opendp.org/en/OPENDP_V_VERSION/api/python/opendp.extras.mbi.html#opendp.extras.mbi.ContingencyTable.project_melted) returns a dataframe with one row per combination of values.
+            # We'll first check the number of possible rows, to make sure it's not too large:
 
-            contingency_table.project_melted([COLUMNS])
+            # +
+            from math import prod
 
-            # Finally, a contingency table can also be used to create sythetic data.
+            possible_rows = prod([len(v) for v in contingency_table.keys.values()])
+            (
+                contingency_table.project_melted([COLUMNS])
+                if possible_rows < 100_000
+                else "Too big!"
+            )
+            # -
+
+            # Finally, a contingency table can also be used to create sythetic data
+            # by calling [`synthesize()`](https://docs.opendp.org/en/OPENDP_V_VERSION/api/python/opendp.extras.mbi.html#opendp.extras.mbi.ContingencyTable.synthesize)
             # (There may be warnings from upstream libraries
             # which we can ignore for now.)
 
@@ -349,6 +359,7 @@ class AbstractGenerator(ABC):
         return (
             Template(template)
             .fill_expressions(
+                OPENDP_V_VERSION=f"v{opendp_version}",
                 COLUMNS=", ".join(
                     repr(k)
                     for k in (
