@@ -80,7 +80,7 @@ def results_ui():  # pragma: no cover
         "Download Results",
         ui.output_ui("results_requirements_warning_ui"),
         ui.output_ui("synthetic_data_ui"),
-        ui.output_ui("download_name_ui"),
+        ui.output_ui("custom_download_stem_ui"),
         ui.output_ui("download_results_ui"),
         ui.output_ui("download_code_ui"),
         value="results_panel",
@@ -159,15 +159,15 @@ def results_server(
         )
 
     @render.ui
-    def download_name_ui():
+    def custom_download_stem_ui():
         return ui.card(
-            ui.card_header("Download name"),
+            ui.card_header("Download stem"),
             ui.markdown(
                 """
                 An appropriate extension for the file type of each download is added to this stem.
                 """
             ),
-            ui.input_text("download_name", None, "stub"),
+            ui.input_text("custom_download_stem", None, download_stem()),
         )
 
     @render.ui
@@ -369,14 +369,14 @@ def results_server(
         return convert_nb_to_html(notebook_nb_unexecuted())
 
     @render.download(
-        filename=lambda: download_stem() + ".py",
+        filename=lambda: input.custom_download_stem() + ".py",
         media_type="text/x-python",
     )
     async def download_script():
         yield make_download_or_modal_error(ScriptGenerator(analysis_plan()).make_py)
 
     @render.download(
-        filename=lambda: download_stem() + ".ipynb.py",
+        filename=lambda: input.custom_download_stem() + ".ipynb.py",
         media_type="text/x-python",
     )
     async def download_notebook_source():
@@ -385,35 +385,35 @@ def results_server(
             yield NotebookGenerator(analysis_plan()).make_py()
 
     @render.download(
-        filename=lambda: download_stem() + ".ipynb",
+        filename=lambda: input.custom_download_stem() + ".ipynb",
         media_type="application/x-ipynb+json",
     )
     async def download_notebook():
         yield make_download_or_modal_error(notebook_nb)
 
     @render.download(
-        filename=lambda: download_stem() + ".unexecuted.ipynb",
+        filename=lambda: input.custom_download_stem() + ".unexecuted.ipynb",
         media_type="application/x-ipynb+json",
     )
     async def download_notebook_unexecuted():
         yield make_download_or_modal_error(notebook_nb_unexecuted)
 
     @render.download(  # pyright: ignore
-        filename=lambda: download_stem() + ".html",
+        filename=lambda: input.custom_download_stem() + ".html",
         media_type="text/html",
     )
     async def download_html():
         yield make_download_or_modal_error(notebook_html)
 
     @render.download(  # pyright: ignore
-        filename=lambda: download_stem() + ".unexecuted.html",
+        filename=lambda: input.custom_download_stem() + ".unexecuted.html",
         media_type="text/html",
     )
     async def download_html_unexecuted():
         yield make_download_or_modal_error(notebook_html_unexecuted)
 
     @render.download(
-        filename=lambda: download_stem() + ".txt",
+        filename=lambda: input.custom_download_stem() + ".txt",
         media_type="text/plain",
     )
     async def download_report():
@@ -424,7 +424,7 @@ def results_server(
         yield make_download_or_modal_error(make_report)
 
     @render.download(
-        filename=lambda: download_stem() + ".csv",
+        filename=lambda: input.custom_download_stem() + ".csv",
         media_type="text/csv",
     )
     async def download_table():
