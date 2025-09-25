@@ -80,6 +80,7 @@ def results_ui():  # pragma: no cover
         "Download Results",
         ui.output_ui("results_requirements_warning_ui"),
         ui.output_ui("synthetic_data_ui"),
+        ui.output_ui("download_name_ui"),
         ui.output_ui("download_results_ui"),
         ui.output_ui("download_code_ui"),
         value="results_panel",
@@ -155,6 +156,18 @@ def results_server(
                 """
             ),
             ui.input_checkbox("is_synthetic_data", "Release synthetic data", False),
+        )
+
+    @render.ui
+    def download_name_ui():
+        return ui.card(
+            ui.card_header("Download name"),
+            ui.markdown(
+                """
+                An appropriate extension for the file type of each download is added to this stem.
+                """
+            ),
+            ui.input_text("download_name", None, "stub"),
         )
 
     @render.ui
