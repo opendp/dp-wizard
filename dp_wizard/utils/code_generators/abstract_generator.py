@@ -6,7 +6,7 @@ from typing import Iterable
 from dp_wizard_templates.code_template import Template
 
 from dp_wizard import get_template_root, opendp_version
-from dp_wizard.types import ColumnIdentifier
+from dp_wizard.types import ColumnIdentifier, Product
 from dp_wizard.utils.code_generators import (
     AnalysisPlan,
     make_column_config_block,
@@ -29,13 +29,25 @@ class AbstractGenerator(ABC):
         self.analysis_plan = analysis_plan
 
     def _get_synth_or_stats(self) -> str:
-        return "synth" if self.analysis_plan.is_synthetic_data else "stats"
+        match self.analysis_plan.product:
+            case Product.STATISTICS:
+                return "stats"
+            case Product.SYNTHETIC_DATA:
+                return "synth"
+            case _:  # pragma: no cover
+                raise ValueError(self.analysis_plan.product)
 
     def _get_extra(self) -> str:
         # Notebooks shouldn't depend on mbi if they don't need it.
         # (DP Wizard itself will require mbi, because it needs
         # to be able to execute both kinds of notebooks.)
-        return "mbi" if self.analysis_plan.is_synthetic_data else "polars"
+        match self.analysis_plan.product:
+            case Product.STATISTICS:
+                return "polars"
+            case Product.SYNTHETIC_DATA:
+                return "mbi"
+            case _:  # pragma: no cover
+                raise ValueError(self.analysis_plan.product)
 
     @abstractmethod
     def _get_notebook_or_script(self) -> str: ...  # pragma: no cover
