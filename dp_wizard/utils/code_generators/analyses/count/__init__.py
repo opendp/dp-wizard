@@ -64,7 +64,7 @@ def make_column_config_block(column_name, lower_bound, upper_bound, bin_count):
     return (
         Template("count_expr", root)
         .fill_expressions(
-            EXPR_NAME=f"{snake_name}_expr", OPENDP_V_VERSION="v{opendp_version}"
+            EXPR_NAME=f"{snake_name}_expr", OPENDP_V_VERSION=f"v{opendp_version}"
         )
         .fill_values(COLUMN_NAME=column_name)
         .finish()

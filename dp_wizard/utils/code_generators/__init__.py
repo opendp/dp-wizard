@@ -128,7 +128,7 @@ def make_privacy_loss_block(pure: bool, epsilon: float, max_rows: int):
     return (
         Template(template)
         .fill_expressions(
-            OPENDP_V_VERSION="v{opendp_version}",
+            OPENDP_V_VERSION=f"v{opendp_version}",
             REGISTRY_URL=registry_url,
         )
         .fill_values(
