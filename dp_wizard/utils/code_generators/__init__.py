@@ -4,7 +4,7 @@ from typing import NamedTuple, Optional
 from dp_wizard_templates.code_template import Template
 
 from dp_wizard import opendp_version, registry_url
-from dp_wizard.types import AnalysisName, ColumnName
+from dp_wizard.types import AnalysisName, ColumnName, Product
 
 
 class AnalysisPlanColumn(NamedTuple):
@@ -18,7 +18,7 @@ class AnalysisPlanColumn(NamedTuple):
 class AnalysisPlan(NamedTuple):
     """
     >>> plan = AnalysisPlan(
-    ...     is_synthetic_data=False,
+    ...     product=Product.STATISTICS,
     ...     csv_path='optional.csv',
     ...     contributions=10,
     ...     epsilon=2.0,
@@ -33,7 +33,7 @@ class AnalysisPlan(NamedTuple):
     dp_statistics_for_data_col_grouped_by_grouping_col
     """
 
-    is_synthetic_data: bool
+    product: Product
     csv_path: Optional[str]
     contributions: int
     epsilon: float
@@ -45,11 +45,10 @@ class AnalysisPlan(NamedTuple):
         def md_list(names):
             return ", ".join(f"`{name}`" for name in names)
 
-        main = "DP Synthetic Data" if self.is_synthetic_data else "DP Statistics"
         columns = md_list(self.columns.keys())
         groups = md_list(self.groups)
         grouped_by = f" grouped by {groups}" if groups else ""
-        return f"{main} for {columns}{grouped_by}"
+        return f"{self.product} for {columns}{grouped_by}"
 
     def to_stem(self):
         return re.sub(r"\W+", " ", str(self)).strip().replace(" ", "_").lower()

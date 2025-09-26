@@ -6,7 +6,7 @@ https://github.com/opendp/dp-wizard
 """
 
 # Install the following dependencies, if you haven't already:
-# WINDOWS_NOTE
+# WINDOWS_COMMENT_BLOCK
 #
 # $ pip install DEPENDENCIES
 
@@ -21,6 +21,7 @@ COLUMNS_BLOCK
 
 def get_stats_context_contributions(csv_path):
     STATS_CONTEXT_BLOCK
+    # ENCODING_COMMENT_BLOCK
     return stats_context, contributions
 
 

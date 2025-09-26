@@ -1,5 +1,6 @@
 import re
 
+from dp_wizard.types import Product
 from dp_wizard.utils.code_generators.abstract_generator import AbstractGenerator
 
 
@@ -23,7 +24,7 @@ class ScriptGenerator(AbstractGenerator):
         return (
             self._make_partial_stats_context()
             .fill_expressions(CSV_PATH="csv_path")
-            .fill_blocks(OPTIONAL_CSV_BLOCK="")
+            .fill_code_blocks(OPTIONAL_CSV_BLOCK="")
             .finish()
         )
 
@@ -31,7 +32,7 @@ class ScriptGenerator(AbstractGenerator):
         return (
             self._make_partial_synth_context()
             .fill_expressions(CSV_PATH="csv_path")
-            .fill_blocks(OPTIONAL_CSV_BLOCK="")
+            .fill_code_blocks(OPTIONAL_CSV_BLOCK="")
             .finish()
         )
 
@@ -41,14 +42,17 @@ class ScriptGenerator(AbstractGenerator):
         return repr(super()._make_confidence_note())
 
     def _make_extra_blocks(self):
-        if self.analysis_plan.is_synthetic_data:
-            return {
-                "SYNTH_CONTEXT_BLOCK": self._make_synth_context(),
-                "SYNTH_QUERY_BLOCK": self._make_synth_query(),
-            }
-        else:
-            return {
-                "COLUMNS_BLOCK": self._make_columns(),
-                "STATS_CONTEXT_BLOCK": self._make_stats_context(),
-                "STATS_QUERIES_BLOCK": self._make_stats_queries(),
-            }
+        match self.analysis_plan.product:
+            case Product.SYNTHETIC_DATA:
+                return {
+                    "SYNTH_CONTEXT_BLOCK": self._make_synth_context(),
+                    "SYNTH_QUERY_BLOCK": self._make_synth_query(),
+                }
+            case Product.STATISTICS:
+                return {
+                    "COLUMNS_BLOCK": self._make_columns(),
+                    "STATS_CONTEXT_BLOCK": self._make_stats_context(),
+                    "STATS_QUERIES_BLOCK": self._make_stats_queries(),
+                }
+            case _:  # pragma: no cover
+                raise ValueError(self.analysis_plan.product)
