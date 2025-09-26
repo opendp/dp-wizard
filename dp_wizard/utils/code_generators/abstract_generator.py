@@ -109,7 +109,10 @@ reencode it as UTF8.""",
             )
             .finish()
         )
-        return code
+        return self._clean_up_py(code)
+
+    def _clean_up_py(self, py: str):
+        return py
 
     def _make_margins_list(
         self,
@@ -119,10 +122,10 @@ reencode it as UTF8.""",
     ):
         import opendp.prelude as dp
 
-        def basic_template(GROUPS, OPENDP_VERSION, MAX_ROWS):
+        def basic_template(GROUPS, MAX_ROWS):
             # "max_partition_length" should be a loose upper bound,
             # for example, the size of the total population being sampled.
-            # https://docs.opendp.org/en/OPENDP_VERSION/api/python/opendp.extras.polars.html#opendp.extras.polars.Margin.max_partition_length
+            # https://docs.opendp.org/en/OPENDP_V_VERSION/api/python/opendp.extras.polars.html#opendp.extras.polars.Margin.max_partition_length
             #
             # In production, "max_groups" should be set by considering
             # the number of possible values for each grouping column,
@@ -139,7 +142,7 @@ reencode it as UTF8.""",
 
         margins = [
             Template(basic_template)
-            .fill_expressions(OPENDP_VERSION=opendp_version)
+            .fill_expressions(OPENDP_V_VERSION=f"v{opendp_version}")
             .fill_values(GROUPS=groups, MAX_ROWS=max_rows)
             .finish()
         ] + [
@@ -276,7 +279,7 @@ reencode it as UTF8.""",
             .fill_expressions(
                 MARGINS_LIST=margins_list,
                 EXTRA_COLUMNS=extra_columns,
-                OPENDP_VERSION=opendp_version,
+                OPENDP_V_VERSION=f"v{opendp_version}",
                 WEIGHTS=self._make_weights_expression(),
             )
             .fill_code_blocks(
@@ -302,7 +305,7 @@ reencode it as UTF8.""",
         return (
             Template("synth_context", root)
             .fill_expressions(
-                OPENDP_VERSION=opendp_version,
+                OPENDP_V_VERSION=f"v{opendp_version}",
             )
             .fill_code_blocks(
                 PRIVACY_UNIT_BLOCK=privacy_unit_block,
@@ -325,17 +328,42 @@ reencode it as UTF8.""",
                 )
             )
             contingency_table = synth_query.release()
-            import warnings
 
-            # There may be warnings from upstream libraries which we can ignore for now.
+            # Calling
+            # [`project_melted()`](https://docs.opendp.org/en/OPENDP_V_VERSION/api/python/opendp.extras.mbi.html#opendp.extras.mbi.ContingencyTable.project_melted)
+            # returns a dataframe with one row per combination of values.
+            # We'll first check the number of possible rows,
+            # to make sure it's not too large:
+
+            # +
+            from math import prod
+
+            possible_rows = prod([len(v) for v in contingency_table.keys.values()])
+            (
+                contingency_table.project_melted([COLUMNS])
+                if possible_rows < 100_000
+                else "Too big!"
+            )
+            # -
+
+            # Finally, a contingency table can also be used
+            # to create synthetic data by calling
+            # [`synthesize()`](https://docs.opendp.org/en/OPENDP_V_VERSION/api/python/opendp.extras.mbi.html#opendp.extras.mbi.ContingencyTable.synthesize).
+            # (There may be warnings from upstream libraries
+            # which we can ignore for now.)
+
+            # +
+            import warnings
 
             with warnings.catch_warnings():
                 warnings.simplefilter(action="ignore", category=FutureWarning)
                 synthetic_data = contingency_table.synthesize()
             synthetic_data  # type: ignore
+            # -
 
         # The make_cut_points() call could be moved into generated code,
-        # but that would require more complex templating.
+        # but that would require more complex templating,
+        # and more reliance on helper functions.
         cuts = {
             k: sorted(
                 {
@@ -358,6 +386,7 @@ reencode it as UTF8.""",
         return (
             Template(template)
             .fill_expressions(
+                OPENDP_V_VERSION=f"v{opendp_version}",
                 COLUMNS=", ".join(
                     repr(k)
                     for k in (

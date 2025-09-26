@@ -39,8 +39,8 @@ SYNTH_CONTEXT_BLOCK
 #
 # ## Results
 #
-# Finally, we release a contingency table, and then generate synthetic data
-# from the contingency table
+# First, we'll release a contingency table, a data structure which can give us
+# DP counts for different combinations of column values.
 
 SYNTH_QUERY_BLOCK
 
@@ -52,8 +52,9 @@ SYNTH_QUERY_BLOCK
 # You might try:
 # - Increasing your privacy budget
 # - Selecting fewer columns
+# - Selecting fewer cutpoints
 # - Filling in the "keys" kwarg
-# - Preprocess to combine keys which occur a small number of times
+# - Preprocessing to combine keys which occur a small number of times
 
 # # Coda
 # The code below produces a summary report.
