@@ -35,7 +35,7 @@ def test_opendp_pin(rel_path):
         line for line in (root / rel_path).read_text().splitlines() if "opendp[" in line
     ]
     assert all(
-        f"opendp[mbi]=={dp_wizard.opendp_version}" in line for line in opendp_lines
+        [f"opendp[mbi]=={dp_wizard.opendp_version}" in line for line in opendp_lines]
     )
 
 

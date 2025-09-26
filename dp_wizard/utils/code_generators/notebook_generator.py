@@ -30,7 +30,7 @@ class NotebookGenerator(AbstractGenerator):
             partial_context.fill_values(
                 CSV_PATH=self.analysis_plan.csv_path,
             )
-            .fill_blocks(
+            .fill_code_blocks(
                 OPTIONAL_CSV_BLOCK=(
                     "# Write to placeholder CSV so the notebook can still execute:\n"
                     "from pathlib import Path\n"
