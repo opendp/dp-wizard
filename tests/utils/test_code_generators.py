@@ -184,6 +184,7 @@ plans = [
         groups=groups,
         columns=columns,
         contributions=contributions,
+        contributions_entity="Family",
         csv_path=abc_csv,
         epsilon=1,
         max_rows=100_000,

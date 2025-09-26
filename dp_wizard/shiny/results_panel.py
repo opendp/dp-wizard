@@ -106,6 +106,7 @@ def results_server(
     # initial_public_csv_path = state.initial_private_csv_path
     public_csv_path = state.public_csv_path
     contributions = state.contributions
+    contributions_entity = state.contributions_entity
     max_rows = state.max_rows
     # initial_product = state.initial_product
     product = state.product
@@ -293,6 +294,7 @@ def results_server(
             # Prefer private CSV, if available:
             csv_path=private_csv_path() or public_csv_path() or PLACEHOLDER_CSV_NAME,
             contributions=contributions(),
+            contributions_entity=contributions_entity(),
             epsilon=epsilon(),
             max_rows=int(max_rows()),
             groups=groups(),

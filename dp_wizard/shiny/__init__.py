@@ -209,6 +209,7 @@ def _make_server(cli_info: CLIInfo):
             initial_public_csv_path="",
             public_csv_path=reactive.value(""),
             contributions=reactive.value(initial_contributions),
+            contributions_entity=reactive.value("individual"),
             max_rows=reactive.value("0"),
             initial_product=initial_product,
             product=reactive.value(initial_product),

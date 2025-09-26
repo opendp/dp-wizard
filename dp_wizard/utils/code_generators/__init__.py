@@ -21,6 +21,7 @@ class AnalysisPlan(NamedTuple):
     ...     product=Product.STATISTICS,
     ...     csv_path='optional.csv',
     ...     contributions=10,
+    ...     contributions_entity='Family',
     ...     epsilon=2.0,
     ...     max_rows=1000,
     ...     groups=['grouping_col'],
@@ -36,6 +37,7 @@ class AnalysisPlan(NamedTuple):
     product: Product
     csv_path: Optional[str]
     contributions: int
+    contributions_entity: str
     epsilon: float
     max_rows: int
     groups: list[ColumnName]
@@ -58,14 +60,23 @@ class AnalysisPlan(NamedTuple):
 # These do not require an entire analysis plan, so they stand on their own.
 
 
-def make_privacy_unit_block(contributions: int):
+def make_privacy_unit_block(
+    contributions: int,
+    contributions_entity: str,
+):
     import opendp.prelude as dp
 
-    def template(CONTRIBUTIONS):
+    def template(CONTRIBUTIONS, CONTRIBUTIONS_ENTITY):
+        # Each CONTRIBUTIONS_ENTITY can contribute this many rows.
         contributions = CONTRIBUTIONS
         privacy_unit = dp.unit_of(contributions=contributions)  # noqa: F841
 
-    return Template(template).fill_values(CONTRIBUTIONS=contributions).finish()
+    return (
+        Template(template)
+        .fill_values(CONTRIBUTIONS=contributions)
+        .fill_expressions(CONTRIBUTIONS_ENTITY=contributions_entity)
+        .finish()
+    )
 
 
 def make_privacy_loss_block(pure: bool, epsilon: float, max_rows: int):
