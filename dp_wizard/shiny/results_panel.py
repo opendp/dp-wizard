@@ -12,6 +12,7 @@ from shiny import Inputs, Outputs, Session, reactive, render, types, ui
 from dp_wizard.shiny.components.outputs import (
     hide_if,
     info_md_box,
+    only_for_screenreader,
     tutorial_box,
 )
 from dp_wizard.types import AppState
@@ -153,7 +154,11 @@ def results_server(
                 An appropriate extension for each download is added to this stem.
                 """
             ),
-            ui.input_text("custom_download_stem", None, download_stem()),
+            ui.input_text(
+                "custom_download_stem",
+                only_for_screenreader("Download stem"),
+                download_stem(),
+            ),
         )
 
     @reactive.calc

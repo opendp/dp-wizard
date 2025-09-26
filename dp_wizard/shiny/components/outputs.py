@@ -94,3 +94,7 @@ def nav_button(id, label, disabled=False):
         disabled=disabled,
         class_="float-end",
     )
+
+
+def only_for_screenreader(text: str):
+    return ui.span(text, class_="only-for-screenreaders")
