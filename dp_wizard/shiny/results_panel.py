@@ -159,7 +159,7 @@ def results_server(
     @reactive.calc
     def clean_download_stem() -> str:
         stem = input.custom_download_stem()
-        return re.sub(r"[^A-Za-z0-9_.-]", "-", stem)
+        return re.sub(r"[^A-Za-z0-9_.-]", "-", stem)[:255]
 
     @render.ui
     def download_results_ui():

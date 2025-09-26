@@ -276,10 +276,11 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     # Check that download name can be changed:
     stem_locator = page.locator("#custom_download_stem")
     expect(stem_locator).to_have_value(expected_stem)
-    new_stem = "foobar"
+    new_stem = "¡C1ean me!"
     stem_locator.fill(new_stem)
     expect(stem_locator).to_have_value(new_stem)
 
+    new_clean_stem = "-C1ean-me-"
     for match in matches:
         if not match:
             continue
@@ -290,7 +291,7 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
             page.get_by_text(link_text).click()
 
         download_name = download_info.value.suggested_filename
-        assert download_name.startswith(new_stem)
+        assert download_name.startswith(new_clean_stem)
         assert download_name.endswith(ext)
 
     # -- Define Analysis --
