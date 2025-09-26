@@ -179,7 +179,7 @@ graph TD
 ```
 - For `manual` transitions, the status of the issue or PR will need to be updated by hand, either on the issue, or by dragging between columns on the board.
 - For `auto` transitions, some other action (for example, approving a PR) should trigger a [workflow](https://github.com/orgs/opendp/projects/10/workflows).
-- These are the only the states that matter. Whether PR is a draft or has assignees does not matter.
+- These are the only states that matter. Whether PR is a draft or has assignees does not matter.
 - If we need anything more than this, we should consider a paid plan, so that we have access to more workflows.
 
 
@@ -193,7 +193,7 @@ graph TD
 
 2025-05-07: [Slides for 50 minute presentation at 2025 Harvard IT Summit](https://opendp.github.io/harvard-it-summit-2025)
 
-2025-04-14 [Blog post for v0.3](https://opendp.org/2025/04/14/announcing-opendp-library-0-13-and-dp-wizard/)
+2025-04-14: [Blog post for v0.3](https://opendp.org/2025/04/14/announcing-opendp-library-0-13-and-dp-wizard/)
 
 2025-04-11: [Slides for 5 minute mini-talk on v0.3.0 at ABSURD (Annual Boston Security Usability Research Day)](https://docs.google.com/presentation/d/1g1c5ksG9sN8A_qWW9nFmFFZ6dSCkUAmL6_cUahi3VPA/edit#slide=id.g34c5f4bdc6a_0_0)
 
@@ -211,4 +211,4 @@ From OpenDP:
 
 From other groups:
 
-- [PrivSyn](https://github.com/vvv214/privsyn-tabular): Uses AIM for synthentic data generation.
+- [PrivSyn](https://github.com/vvv214/privsyn-tabular): Uses AIM for synthetic data generation.
