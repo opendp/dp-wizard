@@ -6,7 +6,7 @@ from typing import Iterable
 from dp_wizard_templates.code_template import Template
 
 from dp_wizard import get_template_root, opendp_version
-from dp_wizard.types import ColumnIdentifier
+from dp_wizard.types import ColumnIdentifier, Product
 from dp_wizard.utils.code_generators import (
     AnalysisPlan,
     make_column_config_block,
@@ -29,13 +29,25 @@ class AbstractGenerator(ABC):
         self.analysis_plan = analysis_plan
 
     def _get_synth_or_stats(self) -> str:
-        return "synth" if self.analysis_plan.is_synthetic_data else "stats"
+        match self.analysis_plan.product:
+            case Product.STATISTICS:
+                return "stats"
+            case Product.SYNTHETIC_DATA:
+                return "synth"
+            case _:  # pragma: no cover
+                raise ValueError(self.analysis_plan.product)
 
     def _get_extra(self) -> str:
         # Notebooks shouldn't depend on mbi if they don't need it.
         # (DP Wizard itself will require mbi, because it needs
         # to be able to execute both kinds of notebooks.)
-        return "mbi" if self.analysis_plan.is_synthetic_data else "polars"
+        match self.analysis_plan.product:
+            case Product.STATISTICS:
+                return "polars"
+            case Product.SYNTHETIC_DATA:
+                return "mbi"
+            case _:  # pragma: no cover
+                raise ValueError(self.analysis_plan.product)
 
     @abstractmethod
     def _get_notebook_or_script(self) -> str: ...  # pragma: no cover
@@ -76,18 +88,31 @@ class AbstractGenerator(ABC):
             Template(self._get_root_template(), root)
             .fill_expressions(
                 TITLE=str(self.analysis_plan),
-                WINDOWS_NOTE="(If installing in the Windows CMD shell, "
-                "use double-quotes instead of single-quotes below.)",
                 DEPENDENCIES=f"'opendp[{extra}]=={opendp_version}' matplotlib",
             )
-            .fill_blocks(
+            .fill_code_blocks(
                 IMPORTS_BLOCK=Template(template).finish(),
                 UTILS_BLOCK=(Path(__file__).parent.parent / "shared.py").read_text(),
                 **self._make_extra_blocks(),
             )
+            .fill_comment_blocks(
+                WINDOWS_COMMENT_BLOCK="""
+(If installing in the Windows CMD shell,
+use double-quotes instead of single-quotes below.)""",
+                ENCODING_COMMENT_BLOCK="""
+A note on `utf8-lossy`: CSVs can use different "character encodings" to
+represent characters outside the ASCII character set, but out-of-the-box
+the Polars library only supports UTF8. Specifying `utf8-lossy` preserves as
+much information as possible, and any unrecognized characters will be replaced
+by "�". If this is not sufficient, you will need to preprocess your data to
+reencode it as UTF8.""",
+            )
             .finish()
         )
-        return code
+        return self._clean_up_py(code)
+
+    def _clean_up_py(self, py: str):
+        return py
 
     def _make_margins_list(
         self,
@@ -97,10 +122,10 @@ class AbstractGenerator(ABC):
     ):
         import opendp.prelude as dp
 
-        def basic_template(GROUPS, OPENDP_VERSION, MAX_ROWS):
+        def basic_template(GROUPS, MAX_ROWS):
             # "max_partition_length" should be a loose upper bound,
             # for example, the size of the total population being sampled.
-            # https://docs.opendp.org/en/OPENDP_VERSION/api/python/opendp.extras.polars.html#opendp.extras.polars.Margin.max_partition_length
+            # https://docs.opendp.org/en/OPENDP_V_VERSION/api/python/opendp.extras.polars.html#opendp.extras.polars.Margin.max_partition_length
             #
             # In production, "max_groups" should be set by considering
             # the number of possible values for each grouping column,
@@ -117,7 +142,7 @@ class AbstractGenerator(ABC):
 
         margins = [
             Template(basic_template)
-            .fill_expressions(OPENDP_VERSION=opendp_version)
+            .fill_expressions(OPENDP_V_VERSION=f"v{opendp_version}")
             .fill_values(GROUPS=groups, MAX_ROWS=max_rows)
             .finish()
         ] + [
@@ -257,10 +282,10 @@ class AbstractGenerator(ABC):
             .fill_expressions(
                 MARGINS_LIST=margins_list,
                 EXTRA_COLUMNS=extra_columns,
-                OPENDP_VERSION=opendp_version,
+                OPENDP_V_VERSION=f"v{opendp_version}",
                 WEIGHTS=self._make_weights_expression(),
             )
-            .fill_blocks(
+            .fill_code_blocks(
                 PRIVACY_UNIT_BLOCK=privacy_unit_block,
                 PRIVACY_LOSS_BLOCK=privacy_loss_block,
             )
@@ -286,9 +311,9 @@ class AbstractGenerator(ABC):
         return (
             Template("synth_context", root)
             .fill_expressions(
-                OPENDP_VERSION=opendp_version,
+                OPENDP_V_VERSION=f"v{opendp_version}",
             )
-            .fill_blocks(
+            .fill_code_blocks(
                 PRIVACY_UNIT_BLOCK=privacy_unit_block,
                 PRIVACY_LOSS_BLOCK=privacy_loss_block,
             )
@@ -309,17 +334,42 @@ class AbstractGenerator(ABC):
                 )
             )
             contingency_table = synth_query.release()
-            import warnings
 
-            # There may be warnings from upstream libraries which we can ignore for now.
+            # Calling
+            # [`project_melted()`](https://docs.opendp.org/en/OPENDP_V_VERSION/api/python/opendp.extras.mbi.html#opendp.extras.mbi.ContingencyTable.project_melted)
+            # returns a dataframe with one row per combination of values.
+            # We'll first check the number of possible rows,
+            # to make sure it's not too large:
+
+            # +
+            from math import prod
+
+            possible_rows = prod([len(v) for v in contingency_table.keys.values()])
+            (
+                contingency_table.project_melted([COLUMNS])
+                if possible_rows < 100_000
+                else "Too big!"
+            )
+            # -
+
+            # Finally, a contingency table can also be used
+            # to create synthetic data by calling
+            # [`synthesize()`](https://docs.opendp.org/en/OPENDP_V_VERSION/api/python/opendp.extras.mbi.html#opendp.extras.mbi.ContingencyTable.synthesize).
+            # (There may be warnings from upstream libraries
+            # which we can ignore for now.)
+
+            # +
+            import warnings
 
             with warnings.catch_warnings():
                 warnings.simplefilter(action="ignore", category=FutureWarning)
                 synthetic_data = contingency_table.synthesize()
             synthetic_data  # type: ignore
+            # -
 
         # The make_cut_points() call could be moved into generated code,
-        # but that would require more complex templating.
+        # but that would require more complex templating,
+        # and more reliance on helper functions.
         cuts = {
             k: sorted(
                 {
@@ -342,6 +392,7 @@ class AbstractGenerator(ABC):
         return (
             Template(template)
             .fill_expressions(
+                OPENDP_V_VERSION=f"v{opendp_version}",
                 COLUMNS=", ".join(
                     repr(k)
                     for k in (

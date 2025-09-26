@@ -7,7 +7,7 @@ import opendp.prelude as dp
 import pytest
 
 from dp_wizard import opendp_version
-from dp_wizard.types import AnalysisName, ColumnName
+from dp_wizard.types import AnalysisName, ColumnName, Product
 from dp_wizard.utils.code_generators import (
     AnalysisPlan,
     AnalysisPlanColumn,
@@ -47,7 +47,7 @@ def test_make_column_config_block_for_count():
             bin_count=0,
         ).strip()
         == f"""# See the OpenDP docs for more on making private counts:
-# https://docs.opendp.org/en/{opendp_version}/getting-started/tabular-data/essential-statistics.html#Count
+# https://docs.opendp.org/en/v{opendp_version}/getting-started/tabular-data/essential-statistics.html#Count
 
 hw_grade_expr = (
     pl.col('HW GRADE').cast(float).fill_nan(0).fill_null(0).dp.count().alias("count")
@@ -65,7 +65,7 @@ def test_make_column_config_block_for_mean():
             bin_count=10,
         ).strip()
         == f"""# See the OpenDP Library docs for more on making private means:
-# https://docs.opendp.org/en/{opendp_version}/getting-started/tabular-data/essential-statistics.html#Mean
+# https://docs.opendp.org/en/v{opendp_version}/getting-started/tabular-data/essential-statistics.html#Mean
 
 hw_grade_expr = (
     pl.col('HW GRADE')
@@ -87,7 +87,7 @@ def test_make_column_config_block_for_median():
             bin_count=20,
         ).strip()
         == f"""# See the OpenDP Library docs for more on making private medians and quantiles:
-# https://docs.opendp.org/en/{opendp_version}/getting-started/tabular-data/essential-statistics.html#Median
+# https://docs.opendp.org/en/v{opendp_version}/getting-started/tabular-data/essential-statistics.html#Median
 
 hw_grade_expr = (
     pl.col('HW GRADE')
@@ -110,7 +110,7 @@ def test_make_column_config_block_for_histogram():
             bin_count=10,
         ).strip()
         == f"""# See the OpenDP Library docs for more on making private histograms:
-# https://docs.opendp.org/en/{opendp_version}/getting-started/examples/histograms.html
+# https://docs.opendp.org/en/v{opendp_version}/getting-started/examples/histograms.html
 
 # Use the public information to make cut points for 'HW GRADE':
 hw_grade_cut_points = make_cut_points(
@@ -170,17 +170,17 @@ count_plan_column = AnalysisPlanColumn(
 
 
 def id_for_plan(plan: AnalysisPlan):
-    ss = "Synthetic data" if plan.is_synthetic_data else "Statistics"
     columns = ", ".join(f"{v[0].analysis_name} of {k}" for k, v in plan.columns.items())
     description = (
-        f"{ss} for {columns}; grouped by ({', '.join(plan.groups) or 'nothing'})"
+        f"{plan.product} for {columns}; "
+        f"grouped by ({', '.join(plan.groups) or 'nothing'})"
     )
     return re.sub(r"\W+", "_", description)  # For selection with "pytest -k substring"
 
 
 plans = [
     AnalysisPlan(
-        is_synthetic_data=is_synthetic_data,
+        product=product,
         groups=groups,
         columns=columns,
         contributions=contributions,
@@ -189,7 +189,7 @@ plans = [
         epsilon=1,
         max_rows=100_000,
     )
-    for is_synthetic_data in [True, False]
+    for product in Product
     for contributions in [1, 10]
     for groups in [[], ["A"]]
     for columns in [
@@ -224,7 +224,13 @@ def test_make_notebook(plan):
 
     plt.close("all")
 
-    context_global = "synth_context" if plan.is_synthetic_data else "stats_context"
+    match plan.product:
+        case Product.SYNTHETIC_DATA:
+            context_global = "synth_context"
+        case Product.STATISTICS:
+            context_global = "stats_context"
+        case _:  # pragma: no cover
+            raise ValueError(plan.product)
     assert isinstance(globals[context_global], dp.Context)
 
 

@@ -11,7 +11,7 @@
 # ## Prerequisites
 #
 # First install and import the required dependencies:
-# WINDOWS_NOTE
+# WINDOWS_COMMENT_BLOCK
 
 # +
 # %pip install DEPENDENCIES
@@ -43,12 +43,7 @@ COLUMNS_BLOCK
 STATS_CONTEXT_BLOCK
 # -
 
-# A note on `utf8-lossy`: CSVs can use different "character encodings" to
-# represent characters outside the plain ascii character set, but out of the box
-# the Polars library only supports UTF8. Specifying `utf8-lossy` preserves as
-# much information as possible, and any unrecognized characters will be replaced
-# by "�". If this is not sufficient, you will need to preprocess your data to
-# reencode it as UTF8.
+# ENCODING_COMMENT_BLOCK
 #
 # ## Results
 #

@@ -144,6 +144,8 @@ def analysis_server(
     contributions = state.contributions
     # contributions_entity = state.contributions_entity
     max_rows = state.max_rows
+    # initial_product = state.initial_product
+    # product = state.product
 
     # Analysis choices:
     column_names = state.column_names
@@ -160,7 +162,6 @@ def analysis_server(
     analysis_errors = state.analysis_errors
 
     # Release state:
-    # synthetic_data = state.synthetic_data
     released = state.released
 
     @reactive.calc

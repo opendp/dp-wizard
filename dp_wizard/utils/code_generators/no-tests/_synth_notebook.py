@@ -10,7 +10,7 @@
 # ## Prerequisites
 #
 # First install and import the required dependencies:
-# WINDOWS_NOTE
+# WINDOWS_COMMENT_BLOCK
 
 # +
 # %pip install DEPENDENCIES
@@ -35,17 +35,12 @@ UTILS_BLOCK
 SYNTH_CONTEXT_BLOCK
 # -
 
-# A note on `utf8-lossy`: CSVs can use different "character encodings" to
-# represent characters outside the plain ascii character set, but out of the box
-# the Polars library only supports UTF8. Specifying `utf8-lossy` preserves as
-# much information as possible, and any unrecognized characters will be replaced
-# by "�". If this is not sufficient, you will need to preprocess your data to
-# reencode it as UTF8.
+# ENCODING_COMMENT_BLOCK
 #
 # ## Results
 #
-# Finally, we release a contingency table, and then generate synthetic data
-# from the contingency table
+# First, we'll release a contingency table, a data structure which can give us
+# DP counts for different combinations of column values.
 
 SYNTH_QUERY_BLOCK
 
@@ -57,8 +52,9 @@ SYNTH_QUERY_BLOCK
 # You might try:
 # - Increasing your privacy budget
 # - Selecting fewer columns
+# - Selecting fewer cutpoints
 # - Filling in the "keys" kwarg
-# - Preprocess to combine keys which occur a small number of times
+# - Preprocessing to combine keys which occur a small number of times
 
 # # Coda
 # The code below produces a summary report.

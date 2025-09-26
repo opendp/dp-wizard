@@ -6,7 +6,7 @@ https://github.com/opendp/dp-wizard
 """
 
 # Install the following dependencies, if you haven't already:
-# WINDOWS_NOTE
+# WINDOWS_COMMENT_BLOCK
 #
 # $ pip install DEPENDENCIES
 
@@ -19,6 +19,7 @@ UTILS_BLOCK
 
 def get_synth_context_contributions(csv_path):
     SYNTH_CONTEXT_BLOCK
+    # ENCODING_COMMENT_BLOCK
     return synth_context, contributions
 
 

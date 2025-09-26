@@ -4,7 +4,7 @@ from typing import NamedTuple, Optional
 from dp_wizard_templates.code_template import Template
 
 from dp_wizard import opendp_version, registry_url
-from dp_wizard.types import AnalysisName, ColumnName
+from dp_wizard.types import AnalysisName, ColumnName, Product
 
 
 class AnalysisPlanColumn(NamedTuple):
@@ -18,7 +18,7 @@ class AnalysisPlanColumn(NamedTuple):
 class AnalysisPlan(NamedTuple):
     """
     >>> plan = AnalysisPlan(
-    ...     is_synthetic_data=False,
+    ...     product=Product.STATISTICS,
     ...     csv_path='optional.csv',
     ...     contributions=10,
     ...     contributions_entity='Family',
@@ -34,7 +34,7 @@ class AnalysisPlan(NamedTuple):
     dp_statistics_for_data_col_grouped_by_grouping_col
     """
 
-    is_synthetic_data: bool
+    product: Product
     csv_path: Optional[str]
     contributions: int
     contributions_entity: str
@@ -47,11 +47,10 @@ class AnalysisPlan(NamedTuple):
         def md_list(names):
             return ", ".join(f"`{name}`" for name in names)
 
-        main = "DP Synthetic Data" if self.is_synthetic_data else "DP Statistics"
         columns = md_list(self.columns.keys())
         groups = md_list(self.groups)
         grouped_by = f" grouped by {groups}" if groups else ""
-        return f"{main} for {columns}{grouped_by}"
+        return f"{self.product} for {columns}{grouped_by}"
 
     def to_stem(self):
         return re.sub(r"\W+", " ", str(self)).strip().replace(" ", "_").lower()
@@ -112,7 +111,7 @@ def make_privacy_loss_block(pure: bool, epsilon: float, max_rows: int):
                 epsilon=EPSILON,
                 # If your columns don't match your cuts dict,
                 # you will also need to provide a very small "delta" value.
-                # https://docs.opendp.org/en/OPENDP_VERSION/getting-started/tabular-data/grouping.html#Stable-Keys
+                # https://docs.opendp.org/en/OPENDP_V_VERSION/getting-started/tabular-data/grouping.html#Stable-Keys
                 delta=0,  # or 1 / max(1e7, MAX_ROWS),
             )
 
@@ -132,14 +131,14 @@ def make_privacy_loss_block(pure: bool, epsilon: float, max_rows: int):
                 # that data may be released in the clear. Delta should always be small,
                 # but if the dataset is particularly large,
                 # delta should be at least as small as 1/(row count).
-                # https://docs.opendp.org/en/OPENDP_VERSION/getting-started/tabular-data/grouping.html#Stable-Keys
+                # https://docs.opendp.org/en/OPENDP_V_VERSION/getting-started/tabular-data/grouping.html#Stable-Keys
                 delta=1 / max(1e7, MAX_ROWS),
             )
 
     return (
         Template(template)
         .fill_expressions(
-            OPENDP_VERSION=opendp_version,
+            OPENDP_V_VERSION=f"v{opendp_version}",
             REGISTRY_URL=registry_url,
         )
         .fill_values(
