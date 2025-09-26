@@ -222,7 +222,8 @@ class AbstractGenerator(ABC):
         ]
 
         privacy_unit_block = make_privacy_unit_block(
-            contributions=self.analysis_plan.contributions, contributions_entity="TODO"
+            contributions=self.analysis_plan.contributions,
+            contributions_entity=self.analysis_plan.contributions_entity,
         )
         privacy_loss_block = make_privacy_loss_block(
             pure=False,
