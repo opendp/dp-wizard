@@ -3,23 +3,13 @@ from dp_wizard_templates.code_template import Template
 from dp_wizard import get_template_root, opendp_version
 from dp_wizard.types import AnalysisName
 
-name = AnalysisName("Mean")
-mean_comment_block = """
-Note: While this is fine for taking one DP mean, it does spend some of
-your privacy budget each time to calculate the number of records:
-It is better to do that only once, and then collect DP sums for
-each column of interest.
-"""
-blurb_md = f"""
+name = AnalysisName("Sum")
+blurb_md = """
 Choosing tighter bounds will mean less noise added
 to the statistics, but if you pick bounds that
 are too tight, you'll miss the contributions of
 outliers.
-
-{mean_comment_block}
 """
-# TODO: Wait for https://github.com/opendp/dp-wizard/pull/607,
-# and then factor out the shared comment.
 input_names = [
     "lower_bound_input",
     "upper_bound_input",
@@ -31,7 +21,7 @@ root = get_template_root(__file__)
 
 def make_query(code_gen, identifier, accuracy_name, stats_name):
     return (
-        Template("mean_query", root)
+        Template("sum_query", root)
         .fill_values(
             GROUP_NAMES=code_gen.analysis_plan.groups,
         )
@@ -46,7 +36,7 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
 
 def make_output(code_gen, column_name, accuracy_name, stats_name):
     return (
-        Template(f"mean_{code_gen._get_notebook_or_script()}_output", root)
+        Template(f"sum_{code_gen._get_notebook_or_script()}_output", root)
         .fill_expressions(
             COLUMN_NAME=column_name,
             STATS_NAME=stats_name,
@@ -61,7 +51,7 @@ def make_note():
 
 def make_report_kv(name, confidence, identifier):
     return (
-        Template("mean_report_kv", root)
+        Template("sum_report_kv", root)
         .fill_values(
             NAME=name,
         )
@@ -77,7 +67,7 @@ def make_column_config_block(column_name, lower_bound, upper_bound, bin_count):
 
     snake_name = snake_case(column_name)
     return (
-        Template("mean_expr", root)
+        Template("sum_expr", root)
         .fill_expressions(
             EXPR_NAME=f"{snake_name}_expr",
             OPENDP_VERSION=opendp_version,
@@ -86,9 +76,6 @@ def make_column_config_block(column_name, lower_bound, upper_bound, bin_count):
             COLUMN_NAME=column_name,
             LOWER_BOUND=lower_bound,
             UPPER_BOUND=upper_bound,
-        )
-        .fill_comment_blocks(
-            MEAN_COMMENT_BLOCK=mean_comment_block,
         )
         .finish()
     )

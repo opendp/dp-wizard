@@ -228,6 +228,9 @@ def column_server(
 
     @render.ui
     def analysis_name_ui():
+        # Avoid clobbering built-in "sum" at a wider scope
+        from dp_wizard.utils.code_generators.analyses import sum
+
         analysis_name = analysis_types().get(name, histogram.name)
         blurb_md = get_analysis_by_name(analysis_name).blurb_md
         return (
@@ -235,7 +238,7 @@ def column_server(
                 ui.input_select(
                     "analysis_type",
                     None,
-                    [histogram.name, mean.name, median.name, count.name],
+                    [histogram.name, mean.name, sum.name, median.name, count.name],
                     width=label_width,
                     selected=analysis_name,
                 ),
