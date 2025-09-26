@@ -7,7 +7,7 @@ import opendp.prelude as dp
 import pytest
 
 from dp_wizard import opendp_version
-from dp_wizard.types import AnalysisName, ColumnName
+from dp_wizard.types import AnalysisName, ColumnName, Product
 from dp_wizard.utils.code_generators import (
     AnalysisPlan,
     AnalysisPlanColumn,
@@ -204,17 +204,17 @@ count_plan_column = AnalysisPlanColumn(
 
 
 def id_for_plan(plan: AnalysisPlan):
-    ss = "Synthetic data" if plan.is_synthetic_data else "Statistics"
     columns = ", ".join(f"{v[0].analysis_name} of {k}" for k, v in plan.columns.items())
     description = (
-        f"{ss} for {columns}; grouped by ({', '.join(plan.groups) or 'nothing'})"
+        f"{plan.product} for {columns}; "
+        f"grouped by ({', '.join(plan.groups) or 'nothing'})"
     )
     return re.sub(r"\W+", "_", description)  # For selection with "pytest -k substring"
 
 
 plans = [
     AnalysisPlan(
-        is_synthetic_data=is_synthetic_data,
+        product=product,
         groups=groups,
         columns=columns,
         contributions=contributions,
@@ -222,7 +222,7 @@ plans = [
         epsilon=1,
         max_rows=100_000,
     )
-    for is_synthetic_data in [True, False]
+    for product in Product
     for contributions in [1, 10]
     for groups in [[], ["A"]]
     for columns in [
@@ -259,7 +259,13 @@ def test_make_notebook(plan):
 
     plt.close("all")
 
-    context_global = "synth_context" if plan.is_synthetic_data else "stats_context"
+    match plan.product:
+        case Product.SYNTHETIC_DATA:
+            context_global = "synth_context"
+        case Product.STATISTICS:
+            context_global = "stats_context"
+        case _:  # pragma: no cover
+            raise ValueError(plan.product)
     assert isinstance(globals[context_global], dp.Context)
 
 
