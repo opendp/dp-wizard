@@ -49,9 +49,7 @@ def test_make_column_config_block_for_count():
         == f"""# See the OpenDP docs for more on making private counts:
 # https://docs.opendp.org/en/v{opendp_version}/getting-started/tabular-data/essential-statistics.html#Count
 
-hw_grade_expr = (
-    pl.col('HW GRADE').cast(float).dp.count().alias("count")
-)"""
+hw_grade_expr = pl.col('HW GRADE').cast(float).dp.count().alias("count")"""
     )
 
 
@@ -67,11 +65,7 @@ def test_make_column_config_block_for_mean():
         == f"""# See the OpenDP Library docs for more on making private means:
 # https://docs.opendp.org/en/v{opendp_version}/getting-started/tabular-data/essential-statistics.html#Mean
 
-hw_grade_expr = (
-    pl.col('HW GRADE')
-    .cast(float)
-    .dp.mean((0, 100))
-)"""
+hw_grade_expr = pl.col('HW GRADE').cast(float).dp.mean((0, 100))"""
     )
 
 
