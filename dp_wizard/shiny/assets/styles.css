@@ -64,3 +64,22 @@ The tutorial mode toggle in the navbar is positioned slightly too high.
     margin-top: 0.15em;
     margin-bottom: -0.15em;
 }
+
+/*
+Recommended by W3C when content should only be visible to screenreaders.
+https://www.w3.org/WAI/tutorials/forms/labels/#note-on-hiding-elements
+*/
+.only-for-screenreaders {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}
+/* Override the inline-block provided by Shiny: Uses too much space. */
+label:has(.only-for-screenreaders) {
+    display: inline;
+}
