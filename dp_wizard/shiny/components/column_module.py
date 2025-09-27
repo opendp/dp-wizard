@@ -10,6 +10,7 @@ from dp_wizard.shiny.components.outputs import (
     col_widths,
     hide_if,
     info_md_box,
+    only_for_screenreader,
     tutorial_box,
 )
 from dp_wizard.types import AnalysisName, ColumnName
@@ -234,7 +235,7 @@ def column_server(
             ui.layout_columns(
                 ui.input_select(
                     "analysis_type",
-                    None,
+                    only_for_screenreader("Type of analysis"),
                     [histogram.name, mean.name, median.name, count.name],
                     width=label_width,
                     selected=analysis_name,
