@@ -50,7 +50,7 @@ def test_make_column_config_block_for_count():
 # https://docs.opendp.org/en/v{opendp_version}/getting-started/tabular-data/essential-statistics.html#Count
 
 hw_grade_expr = (
-    pl.col('HW GRADE').cast(float).fill_nan(0).fill_null(0).dp.count().alias("count")
+    pl.col('HW GRADE').cast(float).dp.count().alias("count")
 )"""
     )
 
@@ -70,8 +70,6 @@ def test_make_column_config_block_for_mean():
 hw_grade_expr = (
     pl.col('HW GRADE')
     .cast(float)
-    .fill_nan(0)
-    .fill_null(0)
     .dp.mean((0, 100))
 )"""
     )
@@ -92,8 +90,6 @@ def test_make_column_config_block_for_median():
 hw_grade_expr = (
     pl.col('HW GRADE')
     .cast(float)
-    .fill_nan(0)
-    .fill_null(0)
     .dp.quantile(0.5, make_cut_points(0, 100, bin_count=20))
     # Or use "dp.median" which provides 0.5 implicitly.
 )"""  # noqa: B950 (too long!)
