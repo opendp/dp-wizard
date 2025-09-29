@@ -65,7 +65,7 @@ def test_make_column_config_block_for_sum():
             bin_count=10,
         ).strip()
         == f"""# See the OpenDP Library docs for more on making private sums:
-# https://docs.opendp.org/en/{opendp_version}/getting-started/tabular-data/essential-statistics.html#sum
+# https://docs.opendp.org/en/v{opendp_version}/getting-started/tabular-data/essential-statistics.html#sum
 
 hw_grade_expr = (
     pl.col('HW GRADE')

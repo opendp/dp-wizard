@@ -1,5 +1,5 @@
 # See the OpenDP Library docs for more on making private sums:
-# https://docs.opendp.org/en/OPENDP_VERSION/getting-started/tabular-data/essential-statistics.html#sum
+# https://docs.opendp.org/en/OPENDP_V_VERSION/getting-started/tabular-data/essential-statistics.html#sum
 
 EXPR_NAME = (
     pl.col(COLUMN_NAME)
