@@ -20,7 +20,10 @@
 2. **Virtual Environment**: Always create and activate a virtual environment:
    ```bash
    python3.10 -m venv .venv
-   source .venv/bin/activate  # On macOS/Linux
+   # On macOS/Linux:
+   source .venv/bin/activate
+   # On Windows (cmd.exe):
+   .venv\Scripts\activate
    ```
 
 ### Development Dependencies Installation (REQUIRED ORDER)
