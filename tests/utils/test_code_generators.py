@@ -47,7 +47,7 @@ def test_make_column_config_block_for_count():
             bin_count=0,
         ).strip()
         == f"""# See the OpenDP docs for more on making private counts:
-# https://docs.opendp.org/en/{opendp_version}/getting-started/tabular-data/essential-statistics.html#count
+# https://docs.opendp.org/en/v{opendp_version}/getting-started/tabular-data/essential-statistics.html#count
 
 hw_grade_expr = (
     pl.col('HW GRADE').cast(float).fill_nan(0).fill_null(0).dp.count().alias("count")
@@ -87,7 +87,7 @@ def test_make_column_config_block_for_mean():
             bin_count=10,
         ).strip()
         == f"""# See the OpenDP Library docs for more on making private means:
-# https://docs.opendp.org/en/{opendp_version}/getting-started/tabular-data/essential-statistics.html#mean
+# https://docs.opendp.org/en/v{opendp_version}/getting-started/tabular-data/essential-statistics.html#mean
 #
 # Note: While this is fine for taking one DP mean, it does spend some of
 # your privacy budget each time to calculate the number of records:
@@ -114,7 +114,7 @@ def test_make_column_config_block_for_median():
             bin_count=20,
         ).strip()
         == f"""# See the OpenDP Library docs for more on making private medians and quantiles:
-# https://docs.opendp.org/en/{opendp_version}/getting-started/tabular-data/essential-statistics.html#median
+# https://docs.opendp.org/en/v{opendp_version}/getting-started/tabular-data/essential-statistics.html#median
 
 hw_grade_expr = (
     pl.col('HW GRADE')
@@ -137,7 +137,7 @@ def test_make_column_config_block_for_histogram():
             bin_count=10,
         ).strip()
         == f"""# See the OpenDP Library docs for more on making private histograms:
-# https://docs.opendp.org/en/{opendp_version}/getting-started/examples/histograms.html
+# https://docs.opendp.org/en/v{opendp_version}/getting-started/examples/histograms.html
 
 # Use the public information to make cut points for 'HW GRADE':
 hw_grade_cut_points = make_cut_points(
@@ -218,6 +218,7 @@ plans = [
         groups=groups,
         columns=columns,
         contributions=contributions,
+        contributions_entity="Family",
         csv_path=abc_csv,
         epsilon=1,
         max_rows=100_000,

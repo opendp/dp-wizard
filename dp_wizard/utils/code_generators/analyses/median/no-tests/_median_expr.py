@@ -1,5 +1,5 @@
 # See the OpenDP Library docs for more on making private medians and quantiles:
-# https://docs.opendp.org/en/OPENDP_VERSION/getting-started/tabular-data/essential-statistics.html#median
+# https://docs.opendp.org/en/OPENDP_V_VERSION/getting-started/tabular-data/essential-statistics.html#median
 
 EXPR_NAME = (
     pl.col(COLUMN_NAME)

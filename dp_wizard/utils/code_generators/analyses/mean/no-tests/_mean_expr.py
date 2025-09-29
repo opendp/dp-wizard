@@ -1,5 +1,5 @@
 # See the OpenDP Library docs for more on making private means:
-# https://docs.opendp.org/en/OPENDP_VERSION/getting-started/tabular-data/essential-statistics.html#mean
+# https://docs.opendp.org/en/OPENDP_V_VERSION/getting-started/tabular-data/essential-statistics.html#mean
 #
 # MEAN_COMMENT_BLOCK
 
