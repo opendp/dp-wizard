@@ -219,8 +219,10 @@ expected_urls = {
 }
 
 
-@pytest.mark.parametrize("url", expected_urls)
+@pytest.mark.parametrize("url", {url.split("#")[0] for url in expected_urls})
 def test_urls_work(url):
+    # TODO: Check if anchors are present.
+    # https://github.com/opendp/dp-wizard/issues/627
     response = requests.head(url)
     assert response.status_code is 200
 
