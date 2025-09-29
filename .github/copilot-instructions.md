@@ -115,7 +115,7 @@ dp-wizard/
 ├── pyproject.toml          # Package configuration
 ├── requirements*.txt       # Dependency specifications
 ├── .flake8                 # Linting configuration
-├── .pytest.ini            # Pytest configuration
+├── pytest.ini             # Pytest configuration
 ├── .pre-commit-config.yaml # Pre-commit hook configuration
 └── .coveragerc            # Coverage configuration
 ```
