@@ -1,7 +1,7 @@
 import re
 
 from dp_wizard.types import Product
-from dp_wizard.utils.code_generators.abstract_generator import AbstractGenerator
+from dp_wizard.utils.code_generators.base_generators import AbstractGenerator
 
 
 class ScriptGenerator(AbstractGenerator):
