@@ -25,7 +25,7 @@ from dp_wizard.utils.csv_helper import get_csv_names_mismatch, read_csv_names
 dataset_panel_id = "dataset_panel"
 
 
-def get_pos_int_error(number_str, minimum=100):
+def get_pos_int_error(number_str, minimum=100) -> str | None:
     """
     If the inputs are numeric, I think shiny converts
     any strings that can't be parsed to numbers into None,
@@ -51,7 +51,7 @@ def get_pos_int_error(number_str, minimum=100):
     return None
 
 
-def get_row_count_errors(max_rows):
+def get_row_count_errors(max_rows) -> list[str]:
     """
     >>> get_row_count_errors(100)
     []

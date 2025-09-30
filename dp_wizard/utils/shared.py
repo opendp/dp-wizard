@@ -3,7 +3,7 @@
 from polars import DataFrame
 
 
-def round_2(number):
+def round_2(number) -> float:
     """
     >>> round_2(1234)
     1200.0
@@ -13,7 +13,9 @@ def round_2(number):
     return float(f"{number:.2g}")
 
 
-def make_cut_points(lower_bound: float, upper_bound: float, bin_count: int):
+def make_cut_points(
+    lower_bound: float, upper_bound: float, bin_count: int
+) -> list[float]:
     """
     Returns one more cut point than the bin_count,
     with the cut points rounded to two decimal places
@@ -31,7 +33,7 @@ def make_cut_points(lower_bound: float, upper_bound: float, bin_count: int):
     return sorted({round_2(lower_bound + i * bin_width) for i in range(bin_count + 1)})
 
 
-def interval_bottom(interval: str):
+def interval_bottom(interval: str) -> float:
     """
     >>> interval_bottom("(10, 20]")
     10.0
