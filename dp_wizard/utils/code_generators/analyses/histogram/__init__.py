@@ -22,8 +22,21 @@ root = get_template_root(__file__)
 
 
 def make_query(code_gen, identifier, accuracy_name, stats_name):
+    import polars as pl
+
+    def template(BIN_NAME, GROUP_NAMES, stats_context, confidence):
+        groups = [BIN_NAME] + GROUP_NAMES
+        QUERY_NAME = (
+            stats_context.query().group_by(groups).agg(pl.len().dp.noise().alias("count"))  # type: ignore
+        )
+        ACCURACY_NAME = QUERY_NAME.summarize(alpha=1 - confidence)[
+            "accuracy"
+        ].item()  # noqa: F841
+        STATS_NAME = QUERY_NAME.release().collect()
+        STATS_NAME  # type: ignore
+
     return (
-        Template("histogram_query", root)
+        Template(template)
         .fill_values(
             BIN_NAME=f"{identifier}_bin",
             GROUP_NAMES=code_gen.analysis_plan.groups,
