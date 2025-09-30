@@ -185,14 +185,15 @@ all_plans = [
         columns=columns,
         contributions=contributions,
         contributions_entity="Family",
-        truncate_per_group=None,
+        identifier_column=truncation[0],
+        identifier_truncation=truncation[1],
         csv_path=abc_csv,
         epsilon=1,
         max_rows=100_000,
     )
     for product in Product
     for contributions in [1, 10]
-    for truncate_per_group in [None, 10]
+    for truncation in [(None, None), ("F", 10)]
     for groups in [[], ["A"]]
     for columns in [
         # Single:

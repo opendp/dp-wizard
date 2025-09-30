@@ -22,7 +22,8 @@ class AnalysisPlan(NamedTuple):
     ...     csv_path='optional.csv',
     ...     contributions=10,
     ...     contributions_entity='Family',
-    ...     truncate_per_group=None,
+    ...     identifier_column=None,
+    ...     identifier_truncation=None,
     ...     epsilon=2.0,
     ...     max_rows=1000,
     ...     groups=['grouping_col'],
@@ -39,7 +40,8 @@ class AnalysisPlan(NamedTuple):
     csv_path: Optional[str]
     contributions: int
     contributions_entity: str
-    truncate_per_group: int | None
+    identifier_column: str | None
+    identifier_truncation: int | None
     epsilon: float
     max_rows: int
     groups: list[ColumnName]
