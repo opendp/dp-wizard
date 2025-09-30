@@ -193,7 +193,7 @@ all_plans = [
     )
     for product in Product
     for contributions in [1, 10]
-    for truncation in [(None, None), ("F", 10)]
+    for truncation in [(None, None), ("ID", 10)]
     for groups in [[], ["A"]]
     for columns in [
         # Single:

@@ -20,7 +20,11 @@ from dp_wizard.utils.argparse_helpers import (
     PUBLIC_TEXT,
 )
 from dp_wizard.utils.code_generators import make_privacy_unit_block
-from dp_wizard.utils.csv_helper import get_csv_names_mismatch, read_csv_names
+from dp_wizard.utils.csv_helper import (
+    get_csv_names_mismatch,
+    id_labels_dict_from_names,
+    read_csv_names,
+)
 
 dataset_panel_id = "dataset_panel"
 
@@ -81,6 +85,7 @@ def dataset_ui():
                 ui.card(
                     ui.card_header("Unit of Privacy"),
                     ui.output_ui("input_entity_ui"),
+                    ui.output_ui("input_truncation_ui"),
                     ui.output_ui("input_contributions_ui"),
                     ui.output_ui("contributions_validation_ui"),
                     ui.output_ui("unit_of_privacy_python_ui"),
@@ -160,6 +165,23 @@ def dataset_server(
                 for line in input.column_names().splitlines()
                 if (clean := line.strip())
             ]
+        )
+
+    @reactive.calc
+    def csv_ids_labels_calc():
+        return id_labels_dict_from_names(column_names())
+
+    @reactive.effect
+    def _update_columns():
+        csv_ids_labels = {"": "No identifier column"} | {
+            # Cast to string for type checking.
+            str(k): v
+            for k, v in csv_ids_labels_calc().items()
+        }
+        ui.update_select(
+            "identifier_column_select",
+            label=None,
+            choices=csv_ids_labels,
         )
 
     @reactive.calc
@@ -388,6 +410,31 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
     @render.ui
     def entity_info_ui():
         return ui.markdown(entities[input.entity()])
+
+    @render.ui
+    def input_truncation_ui():
+        return [
+            ui.markdown(
+                """
+                Is there an **identifier column** in this CSV which can uniquely
+                identify individuals?
+                """
+            ),
+            tutorial_box(
+                is_tutorial_mode(),
+                """
+                If there is an identifier column, the analysis can be done more efficiently
+                by truncating the contributions from individuals who have and unusually
+                large number of rows.
+                """,
+                responsive=False,
+            ),
+            ui.input_select(
+                "identifier_column_select",
+                None,  # TODO: accessibility
+                [],
+            ),
+        ]
 
     @render.ui
     def input_contributions_ui():
