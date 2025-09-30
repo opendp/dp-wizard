@@ -322,6 +322,7 @@ def results_server(
             csv_path=private_csv_path() or public_csv_path() or PLACEHOLDER_CSV_NAME,
             contributions=contributions(),
             contributions_entity=contributions_entity(),
+            truncate_per_group=None,
             epsilon=epsilon(),
             max_rows=int(max_rows()),
             groups=groups(),

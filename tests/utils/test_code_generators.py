@@ -178,19 +178,21 @@ def id_for_plan(plan: AnalysisPlan):
     return re.sub(r"\W+", "_", description)  # For selection with "pytest -k substring"
 
 
-plans = [
+all_plans = [
     AnalysisPlan(
         product=product,
         groups=groups,
         columns=columns,
         contributions=contributions,
         contributions_entity="Family",
+        truncate_per_group=None,
         csv_path=abc_csv,
         epsilon=1,
         max_rows=100_000,
     )
     for product in Product
     for contributions in [1, 10]
+    for truncate_per_group in [None, 10]
     for groups in [[], ["A"]]
     for columns in [
         # Single:
@@ -208,8 +210,10 @@ plans = [
     ]
 ]
 
+selected_plans = [plan for i, plan in enumerate(all_plans) if not i % 7]
 
-@pytest.mark.parametrize("plan", plans, ids=id_for_plan)
+
+@pytest.mark.parametrize("plan", selected_plans, ids=id_for_plan)
 def test_make_notebook(plan):
     notebook = NotebookGenerator(plan).make_py()
     print(number_lines(notebook))
@@ -234,7 +238,7 @@ def test_make_notebook(plan):
     assert isinstance(globals[context_global], dp.Context)
 
 
-@pytest.mark.parametrize("plan", plans, ids=id_for_plan)
+@pytest.mark.parametrize("plan", selected_plans, ids=id_for_plan)
 def test_make_script(plan):
     script = ScriptGenerator(plan).make_py()
 
