@@ -10,6 +10,7 @@ from shiny import App, Inputs, Outputs, Session, reactive, ui
 from dp_wizard.shiny import (
     about_panel,
     analysis_panel,
+    config,
     dataset_panel,
     results_panel,
 )
@@ -31,6 +32,9 @@ def make_app(cli_info: CLIInfo):
 
 def _make_app_ui(cli_info: CLIInfo):
     root = Path(__file__).parent
+    is_tutorial_mode = config.get_is_tutorial_mode()
+    if is_tutorial_mode is None:
+        is_tutorial_mode = cli_info.get_is_tutorial_mode()
     return ui.page_bootstrap(
         ui.head_content(
             ui.tags.link(rel="icon", href="favicon.ico"),
@@ -55,7 +59,7 @@ def _make_app_ui(cli_info: CLIInfo):
                         """,
                         placement="right",
                     ),
-                    value=cli_info.get_is_tutorial_mode(),
+                    value=is_tutorial_mode,
                     width="4em",
                 )
             ),
@@ -231,7 +235,9 @@ def _make_server(cli_info: CLIInfo):
         @reactive.effect
         @reactive.event(input.tutorial_mode)
         def _update_tutorial_mode():
-            state.is_tutorial_mode.set(input.tutorial_mode())
+            is_tutorial_mode = input.tutorial_mode()
+            state.is_tutorial_mode.set(is_tutorial_mode)
+            config.set_is_tutorial_mode(is_tutorial_mode)
 
         about_panel.about_server(input, output, session)
         dataset_panel.dataset_server(input, output, session, state)
