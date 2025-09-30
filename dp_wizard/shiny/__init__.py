@@ -32,9 +32,14 @@ def make_app(cli_info: CLIInfo):
 
 def _make_app_ui(cli_info: CLIInfo):
     root = Path(__file__).parent
+
     is_tutorial_mode = config.get_is_tutorial_mode()
     if is_tutorial_mode is None:
         is_tutorial_mode = cli_info.get_is_tutorial_mode()
+    is_dark_mode = config.get_is_dark_mode()
+    if is_dark_mode is None:
+        is_dark_mode = False  # No CLI configuration
+
     return ui.page_bootstrap(
         ui.head_content(
             ui.tags.link(rel="icon", href="favicon.ico"),
@@ -63,7 +68,11 @@ def _make_app_ui(cli_info: CLIInfo):
                     width="4em",
                 )
             ),
-            ui.nav_control(ui.input_dark_mode()),
+            ui.nav_control(
+                ui.input_dark_mode(
+                    id="dark_mode", mode="dark" if is_dark_mode else "light"
+                )
+            ),
             selected=dataset_panel.dataset_panel_id,
             id="top_level_nav",
         ),
@@ -238,6 +247,15 @@ def _make_server(cli_info: CLIInfo):
             is_tutorial_mode = input.tutorial_mode()
             state.is_tutorial_mode.set(is_tutorial_mode)
             config.set_is_tutorial_mode(is_tutorial_mode)
+
+        # TODO: Shiny error if this is uncommented:
+        # > includes "input.dark_mode", but there is no "dark_mode" id
+        # @reactive.effect
+        # @reactive.event(input.dark_mode)
+        # def _update_dark_mode():
+        #     is_dark_mode = input.dark_mode()
+        #     # Not set in state: Nothing downstream needs this.
+        #     config.set_is_dark_mode(is_dark_mode)
 
         about_panel.about_server(input, output, session)
         dataset_panel.dataset_server(input, output, session, state)
