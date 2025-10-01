@@ -20,6 +20,7 @@ class Analysis(Protocol):  # pragma: no cover
         identifier: str,
         accuracy_name: str,
         stats_name: str,
+        identifier_identifier: str | None,
     ) -> str: ...
 
     @staticmethod

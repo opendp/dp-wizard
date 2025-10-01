@@ -180,13 +180,19 @@ reencode it as UTF8.""",
             )
         ]
         for column_name in self.analysis_plan.columns.keys():
-            to_return.append(self._make_query(column_name))
+            to_return.append(
+                self._make_query(
+                    column_name=column_name,
+                    identifier_column_name=self.analysis_plan.identifier_column,
+                )
+            )
 
         return "\n".join(to_return)
 
-    def _make_query(self, column_name):
+    def _make_query(self, column_name, identifier_column_name):
         plan = self.analysis_plan.columns[column_name]
         identifier = ColumnIdentifier(column_name)
+        identifier_identifier = ColumnIdentifier(identifier_column_name)
         accuracy_name = f"{identifier}_accuracy"
         stats_name = f"{identifier}_stats"
 
@@ -198,6 +204,7 @@ reencode it as UTF8.""",
             identifier=identifier,
             accuracy_name=accuracy_name,
             stats_name=stats_name,
+            identifier_identifier=identifier_identifier,
         )
         output = analysis.make_output(
             code_gen=self,

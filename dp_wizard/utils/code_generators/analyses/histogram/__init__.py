@@ -21,12 +21,13 @@ input_names = [
 root = get_template_root(__file__)
 
 
-def make_query(code_gen, identifier, accuracy_name, stats_name):
+def make_query(code_gen, identifier, accuracy_name, stats_name, identifier_identifier):
     return (
         Template("histogram_query", root)
         .fill_values(
             BIN_NAME=f"{identifier}_bin",
             GROUP_NAMES=code_gen.analysis_plan.groups,
+            IDENTIFIER_COLUMN=identifier_identifier,
         )
         .fill_expressions(
             QUERY_NAME=f"{identifier}_query",
