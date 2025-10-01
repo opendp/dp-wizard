@@ -90,8 +90,9 @@ def make_privacy_unit_block(
             # We assume each CONTRIBUTIONS_ENTITY has 1 ID;
             # If it could have multiple, increase the value
             # for "contributions".
+            contributions = 1
             privacy_unit = dp.unit_of(  # noqa: F841
-                contributions=1,
+                contributions=contributions,
                 identifier=IDENTIFIER_COLUMN,
             )
 
