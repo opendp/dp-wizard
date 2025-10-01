@@ -171,19 +171,6 @@ def dataset_server(
     def csv_ids_labels_calc():
         return id_labels_dict_from_names(column_names())
 
-    @reactive.effect
-    def _update_columns():
-        csv_ids_labels = {"": "No identifier column"} | {
-            # Cast to string for type checking.
-            str(k): v
-            for k, v in csv_ids_labels_calc().items()
-        }
-        ui.update_select(
-            "identifier_column_select",
-            label=None,
-            choices=csv_ids_labels,
-        )
-
     @reactive.calc
     def csv_column_mismatch_calc() -> Optional[tuple[set, set]]:
         public = public_csv_path()
@@ -413,26 +400,31 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
 
     @render.ui
     def input_truncation_ui():
+        entity = contributions_entity_calc()
+        csv_ids_labels = {"": "No identifier column"} | {
+            # Cast to string for type checking.
+            str(k): v
+            for k, v in csv_ids_labels_calc().items()
+        }
         return [
             ui.markdown(
-                """
+                f"""
                 Is there an **identifier column** in this CSV which can uniquely
-                identify individuals?
+                identify each {entity}?
                 """
             ),
             tutorial_box(
                 is_tutorial_mode(),
                 """
                 If there is an identifier column, the analysis can be done more efficiently
-                by truncating the contributions from individuals who have and unusually
-                large number of rows.
+                by truncating if an unusually large number of rows are contributed.
                 """,
                 responsive=False,
             ),
             ui.input_select(
                 "identifier_column_select",
                 None,  # TODO: accessibility
-                [],
+                csv_ids_labels,
             ),
         ]
 
@@ -440,9 +432,12 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
     def input_contributions_ui():
         entity = contributions_entity_calc()
 
+        id_column = input.identifier_column_select()
+
         return [
             ui.markdown(
                 f"""
+                {id_column}
                 How many **rows** of the CSV can each {entity} contribute to?
                 This is the "unit of privacy" which will be protected.
                 """
