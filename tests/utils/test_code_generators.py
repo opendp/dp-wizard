@@ -129,7 +129,8 @@ hw_grade_bin_expr = (
     )
 
 
-abc_csv = "tests/fixtures/abc.csv"
+# Absolute path so the resulting code can be copy-pasted and run without changes.
+abc_csv = str((Path(__file__).parent.parent / "fixtures/abc.csv").absolute())
 
 
 def number_lines(text: str):
@@ -217,7 +218,7 @@ selected_plans = [plan for i, plan in enumerate(all_plans) if not i % 7]
 @pytest.mark.parametrize("plan", selected_plans, ids=id_for_plan)
 def test_make_notebook(plan):
     notebook = NotebookGenerator(plan).make_py()
-    print(number_lines(notebook))
+    print(number_lines(notebook))  # Test failures will show STDOUT.
     globals = {}
     exec(notebook, globals)
 
@@ -242,6 +243,7 @@ def test_make_notebook(plan):
 @pytest.mark.parametrize("plan", selected_plans, ids=id_for_plan)
 def test_make_script(plan):
     script = ScriptGenerator(plan).make_py()
+    print(number_lines(script))  # Test failures will show STDOUT.
 
     # Make sure jupytext formatting doesn't bleed into the script.
     # https://jupytext.readthedocs.io/en/latest/formats-scripts.html#the-light-format
@@ -253,6 +255,9 @@ def test_make_script(plan):
         fp.flush()
 
         result = subprocess.run(
-            ["python", fp.name, "--csv", abc_csv], capture_output=True
+            ["python", fp.name, "--csv", abc_csv],
+            capture_output=True,
+            text=True,
         )
-        assert result.returncode == 0
+        code = result.returncode
+        assert code == 0, result.stderr
