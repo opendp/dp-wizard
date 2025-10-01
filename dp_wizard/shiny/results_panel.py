@@ -318,6 +318,7 @@ def results_server(
             for col in weights().keys()
         }
 
+        # TODO: Rename for clarity
         if identifier_column() is None:
             contributions_value = contributions()
             identifier_truncation = None

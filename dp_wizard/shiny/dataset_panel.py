@@ -417,8 +417,9 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             tutorial_box(
                 is_tutorial_mode(),
                 """
-                If there is an identifier column, the analysis can be done more efficiently
-                by truncating if an unusually large number of rows are contributed.
+                If there is an identifier column, the analysis can be done
+                more efficiently by truncating if an unusually large number
+                of rows are contributed.
                 """,
                 is_sample_csv,
                 """
@@ -486,6 +487,11 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
     @reactive.event(input.entity)
     def _on_contributions_entity_change():
         contributions_entity.set(contributions_entity_calc())
+
+    @reactive.effect
+    @reactive.event(input.entity)
+    def _on_identifier_column_change():
+        identifier_column.set(input.identifier_column_select())
 
     @reactive.calc
     def contributions_entity_calc() -> str:

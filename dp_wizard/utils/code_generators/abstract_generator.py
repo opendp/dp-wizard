@@ -249,6 +249,7 @@ reencode it as UTF8.""",
         privacy_unit_block = make_privacy_unit_block(
             contributions=self.analysis_plan.contributions,
             contributions_entity=self.analysis_plan.contributions_entity,
+            identifier_column=self.analysis_plan.identifier_column,
         )
         privacy_loss_block = make_privacy_loss_block(
             pure=False,
@@ -295,6 +296,7 @@ reencode it as UTF8.""",
         privacy_unit_block = make_privacy_unit_block(
             contributions=self.analysis_plan.contributions,
             contributions_entity=self.analysis_plan.contributions_entity,
+            identifier_column=self.analysis_plan.identifier_column,
         )
         # If there are no groups and all analyses have bounds (so we have cut points),
         # then OpenDP requires that pure DP be used for contingency tables.

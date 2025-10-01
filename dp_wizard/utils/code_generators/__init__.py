@@ -67,20 +67,40 @@ class AnalysisPlan(NamedTuple):
 def make_privacy_unit_block(
     contributions: int,
     contributions_entity: str,
+    identifier_column: str | None,
 ):
     import opendp.prelude as dp
 
-    def template(CONTRIBUTIONS, CONTRIBUTIONS_ENTITY):
-        # Each CONTRIBUTIONS_ENTITY can contribute this many rows.
-        contributions = CONTRIBUTIONS
-        privacy_unit = dp.unit_of(contributions=contributions)  # noqa: F841
+    if identifier_column is None:
 
-    return (
-        Template(template)
-        .fill_values(CONTRIBUTIONS=contributions)
-        .fill_expressions(CONTRIBUTIONS_ENTITY=contributions_entity)
-        .finish()
-    )
+        def template(CONTRIBUTIONS, CONTRIBUTIONS_ENTITY):
+            # Each CONTRIBUTIONS_ENTITY can contribute this many rows.
+            contributions = CONTRIBUTIONS
+            privacy_unit = dp.unit_of(contributions=contributions)  # noqa: F841
+
+        return (
+            Template(template)
+            .fill_values(CONTRIBUTIONS=contributions)
+            .fill_expressions(CONTRIBUTIONS_ENTITY=contributions_entity)
+            .finish()
+        )
+    else:
+
+        def template(IDENTIFIER_COLUMN, CONTRIBUTIONS_ENTITY):
+            # We assume each CONTRIBUTIONS_ENTITY has 1 ID;
+            # If it could have multiple, increase the value
+            # for "contributions".
+            privacy_unit = dp.unit_of(  # noqa: F841
+                contributions=1,
+                identifier=IDENTIFIER_COLUMN,
+            )
+
+        return (
+            Template(template)
+            .fill_values(CONTRIBUTIONS_ENTITY=contributions_entity)
+            .fill_values(IDENTIFIER_COLUMN=identifier_column)
+            .finish()
+        )
 
 
 def make_privacy_loss_block(pure: bool, epsilon: float, max_rows: int):
