@@ -73,7 +73,7 @@ def make_privacy_unit_block(
 
     if identifier_column is None:
 
-        def template(CONTRIBUTIONS, CONTRIBUTIONS_ENTITY):
+        def template(CONTRIBUTIONS, CONTRIBUTIONS_ENTITY):  # type: ignore
             # Each CONTRIBUTIONS_ENTITY can contribute this many rows.
             contributions = CONTRIBUTIONS
             privacy_unit = dp.unit_of(contributions=contributions)  # noqa: F841

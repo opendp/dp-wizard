@@ -610,6 +610,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             make_privacy_unit_block(
                 contributions=contributions(),
                 contributions_entity=contributions_entity_calc(),
+                identifier_column=identifier_column(),
             ),
         )
 
