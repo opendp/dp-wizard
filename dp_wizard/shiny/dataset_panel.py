@@ -419,6 +419,10 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 If there is an identifier column, the analysis can be done more efficiently
                 by truncating if an unusually large number of rows are contributed.
                 """,
+                is_sample_csv,
+                """
+                The `sample.csv` has a `student_id` column that should be selected here.
+                """,
                 responsive=False,
             ),
             ui.input_select(
@@ -431,13 +435,20 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
     @render.ui
     def input_contributions_ui():
         entity = contributions_entity_calc()
-
         id_column = input.identifier_column_select()
 
+        # The number provided here is actually used differently downstream,
+        # depending on whether there is an id_column,
+        # but having two separate inputs in the UI code would be more confusing.
         return [
             ui.markdown(
                 f"""
-                {id_column}
+                To limit the contribution from any one {entity},
+                after how many rows should contributions be
+                truncated? (Rows are shuffled to minimize bias.)
+                """
+                if id_column
+                else f"""
                 How many **rows** of the CSV can each {entity} contribute to?
                 This is the "unit of privacy" which will be protected.
                 """
@@ -457,15 +468,11 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 """,
                 responsive=False,
             ),
-            ui.layout_columns(
-                ui.input_numeric(
-                    "contributions",
-                    None,
-                    contributions(),
-                    min=1,
-                ),
-                [],  # Column placeholder
-                col_widths=col_widths,  # type: ignore
+            ui.input_numeric(
+                "contributions",
+                None,
+                contributions(),
+                min=1,
             ),
         ]
 
