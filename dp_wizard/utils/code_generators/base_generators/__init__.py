@@ -12,17 +12,11 @@ class AbstractGenerator(StatsGenerator, SynthGenerator):
 
     ```
         NotebookGenerator   ScriptGenerator
-                │                 │
                 └────────┬────────┘
-                         │
                  AbstractGenerator
-                         │
-                ┌-───────┴────────┐
-                │                 │
-        StatsGenerator    SynthGenerator
-                │                 │
+                ┌────────┴────────┐
+        StatsGenerator      SynthGenerator
                 └────────┬────────┘
-                         │
                    BaseGenerator
     ```
     """
