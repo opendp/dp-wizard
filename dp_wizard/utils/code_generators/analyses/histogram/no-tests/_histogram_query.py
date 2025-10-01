@@ -1,7 +1,7 @@
 query = stats_context.query()
 identifier_column = IDENTIFIER_COLUMN
 if identifier_column is not None:
-    query = query.truncate_by_group(10)  # todo: real value
+    query = query.truncate_per_group(10)  # todo: real value
 
 groups = [BIN_NAME] + GROUP_NAMES
 QUERY_NAME = query.group_by(groups).agg(pl.len().dp.noise().alias("count"))
