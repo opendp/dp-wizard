@@ -218,7 +218,13 @@ selected_plans = [plan for i, plan in enumerate(all_plans) if not i % 7]
 @pytest.mark.parametrize("plan", selected_plans, ids=id_for_plan)
 def test_make_notebook(plan):
     notebook = NotebookGenerator(plan).make_py()
-    print(number_lines(notebook))  # Test failures will show STDOUT.
+    # Test failures will show STDOUT.
+    print(number_lines(notebook))
+    print(
+        "To convert to notebook, save as 'debug.py', then run:\n"
+        "$ jupytext --from .py --to .ipynb --output debug.ipynb debug.py"
+    )
+
     globals = {}
     exec(notebook, globals)
 
@@ -243,7 +249,8 @@ def test_make_notebook(plan):
 @pytest.mark.parametrize("plan", selected_plans, ids=id_for_plan)
 def test_make_script(plan):
     script = ScriptGenerator(plan).make_py()
-    print(number_lines(script))  # Test failures will show STDOUT.
+    # Test failures will show STDOUT.
+    print(number_lines(script))
 
     # Make sure jupytext formatting doesn't bleed into the script.
     # https://jupytext.readthedocs.io/en/latest/formats-scripts.html#the-light-format

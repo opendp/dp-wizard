@@ -192,7 +192,7 @@ reencode it as UTF8.""",
     def _make_query(self, column_name, identifier_column_name):
         plan = self.analysis_plan.columns[column_name]
         identifier = ColumnIdentifier(column_name)
-        identifier_identifier = ColumnIdentifier(identifier_column_name)
+        identifier_identifier = identifier_column_name
         accuracy_name = f"{identifier}_accuracy"
         stats_name = f"{identifier}_stats"
 
