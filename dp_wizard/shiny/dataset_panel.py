@@ -121,6 +121,7 @@ def dataset_server(
     public_csv_path = state.public_csv_path
     contributions = state.contributions
     contributions_entity = state.contributions_entity
+    identifier_column = state.identifier_column
     max_rows = state.max_rows
     initial_product = state.initial_product
     product = state.product
