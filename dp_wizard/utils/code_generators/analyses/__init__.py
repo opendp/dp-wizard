@@ -1,7 +1,6 @@
 from typing import Protocol
 
 from dp_wizard.types import AnalysisName
-from dp_wizard.utils.code_generators.abstract_generator import AbstractGenerator
 
 
 class Analysis(Protocol):  # pragma: no cover
@@ -16,16 +15,15 @@ class Analysis(Protocol):  # pragma: no cover
 
     @staticmethod
     def make_query(
-        code_gen: AbstractGenerator,
+        code_gen,
         identifier: str,
         accuracy_name: str,
         stats_name: str,
-        identifier_column_name: str | None,
     ) -> str: ...
 
     @staticmethod
     def make_output(
-        code_gen: AbstractGenerator,
+        code_gen,
         column_name: str,
         accuracy_name: str,
         stats_name: str,

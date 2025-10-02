@@ -1,7 +1,7 @@
 query = stats_context.query()
 identifier_column = IDENTIFIER_COLUMN
 if identifier_column is not None:
-    query = query.truncate_per_group(10)  # todo: real value
+    query = query.truncate_per_group(IDENTIFIER_TRUNCATION)
 
 groups = GROUP_NAMES
 QUERY_NAME = (

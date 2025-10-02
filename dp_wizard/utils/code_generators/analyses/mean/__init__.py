@@ -19,12 +19,13 @@ input_names = [
 root = get_template_root(__file__)
 
 
-def make_query(code_gen, identifier, accuracy_name, stats_name, identifier_column_name):
+def make_query(code_gen, identifier, accuracy_name, stats_name):
     return (
         Template("mean_query", root)
         .fill_values(
             GROUP_NAMES=code_gen.analysis_plan.groups,
-            IDENTIFIER_COLUMN=identifier_column_name,
+            IDENTIFIER_COLUMN=code_gen.analysis_plan.identifier_column or None,
+            IDENTIFIER_TRUNCATION=code_gen.analysis_plan.identifier_truncation or None,
         )
         .fill_expressions(
             QUERY_NAME=f"{identifier}_query",

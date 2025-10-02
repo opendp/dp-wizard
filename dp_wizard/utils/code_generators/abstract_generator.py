@@ -198,31 +198,24 @@ reencode it as UTF8.""",
             )
         ]
         for column_name in self.analysis_plan.columns.keys():
-            to_return.append(
-                self._make_query(
-                    column_name=column_name,
-                    identifier_column_name=self.analysis_plan.identifier_column,
-                )
-            )
+            to_return.append(self._make_query(column_name=column_name))
 
         return "\n".join(to_return)
 
-    def _make_query(self, column_name, identifier_column_name):
+    def _make_query(self, column_name):
         plan = self.analysis_plan.columns[column_name]
-        identifier = ColumnIdentifier(column_name)
-        identifier_column_name = identifier_column_name
-        accuracy_name = f"{identifier}_accuracy"
-        stats_name = f"{identifier}_stats"
+        clean_column_name = ColumnIdentifier(column_name)
+        accuracy_name = f"{clean_column_name}_accuracy"
+        stats_name = f"{clean_column_name}_stats"
 
         from dp_wizard.utils.code_generators.analyses import get_analysis_by_name
 
         analysis = get_analysis_by_name(plan[0].analysis_name)
         query = analysis.make_query(
             code_gen=self,
-            identifier=identifier,
+            identifier=clean_column_name,
             accuracy_name=accuracy_name,
             stats_name=stats_name,
-            identifier_column_name=identifier_column_name,
         )
         output = analysis.make_output(
             code_gen=self,
