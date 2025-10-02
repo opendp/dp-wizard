@@ -87,7 +87,8 @@ def make_privacy_unit_block(
     else:
 
         def template(IDENTIFIER_COLUMN, CONTRIBUTIONS_ENTITY):
-            # We assume each CONTRIBUTIONS_ENTITY has 1 ID;
+            # We assume each CONTRIBUTIONS_ENTITY
+            # has a single value for IDENTIFIER_COLUMN;
             # If it could have multiple, increase the value
             # for "contributions".
             contributions = 1
@@ -98,8 +99,8 @@ def make_privacy_unit_block(
 
         return (
             Template(template)
-            .fill_values(CONTRIBUTIONS_ENTITY=contributions_entity)
             .fill_values(IDENTIFIER_COLUMN=identifier_column)
+            .fill_expressions(CONTRIBUTIONS_ENTITY=contributions_entity)
             .finish()
         )
 

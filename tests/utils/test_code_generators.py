@@ -13,6 +13,7 @@ from dp_wizard.utils.code_generators import (
     AnalysisPlanColumn,
     make_column_config_block,
 )
+from dp_wizard.utils.code_generators.abstract_generator import is_plan_handled
 from dp_wizard.utils.code_generators.analyses import count, histogram, mean, median
 from dp_wizard.utils.code_generators.notebook_generator import NotebookGenerator
 from dp_wizard.utils.code_generators.script_generator import ScriptGenerator
@@ -212,7 +213,11 @@ all_plans = [
     ]
 ]
 
-selected_plans = [plan for i, plan in enumerate(all_plans) if not i % 7]
+mod = 7
+assert len(all_plans) % mod != 0, "Samples should be scattered"
+selected_plans = [
+    plan for i, plan in enumerate(all_plans) if not i % mod and is_plan_handled(plan)
+]
 
 
 @pytest.mark.parametrize("plan", selected_plans, ids=id_for_plan)

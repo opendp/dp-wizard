@@ -24,6 +24,11 @@ def _analysis_has_bounds(analysis) -> bool:
     return analysis.analysis_name != count.name
 
 
+def is_plan_handled(plan: AnalysisPlan) -> bool:
+    # See https://github.com/opendp/opendp/issues/2555
+    return plan.product == Product.STATISTICS or plan.identifier_column is None
+
+
 class AbstractGenerator(ABC):
     def __init__(self, analysis_plan: AnalysisPlan):
         self.analysis_plan = analysis_plan
@@ -73,6 +78,19 @@ class AbstractGenerator(ABC):
         return "".join(f"# {line}\n" for line in comment.splitlines())
 
     def make_py(self):
+        if not is_plan_handled(self.analysis_plan):
+            return """
+            # Synthetic data with identifier trunction is
+            # not currently supported by OpenDP. Comment on
+            # https://github.com/opendp/opendp/issues/2555
+            # if that would be useful for you.
+            #
+            # This message should not be visible within DP Wizard:
+            # Checks earlier in the UI should make this unreachable,
+            # but if that's not the case, please file an issue:
+            # https://github.com/opendp/dp-wizard/issues/new?template=bug-front.md
+            """
+
         def template():
             import matplotlib.pyplot as plt  # noqa: F401
             import opendp.prelude as dp  # noqa: F401
