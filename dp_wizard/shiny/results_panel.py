@@ -319,20 +319,21 @@ def results_server(
         }
 
         # TODO: Rename for clarity
-        if identifier_column() is None:
+        identifier_column_value = identifier_column()
+        if identifier_column_value is None:
             contributions_value = contributions()
-            identifier_truncation = None
+            truncation_value = None
         else:
             contributions_value = 1
-            identifier_truncation = contributions()
+            truncation_value = contributions()
         return AnalysisPlan(
             product=product(),
             # Prefer private CSV, if available:
             csv_path=private_csv_path() or public_csv_path() or PLACEHOLDER_CSV_NAME,
             contributions=contributions_value,
             contributions_entity=contributions_entity(),
-            identifier_column=identifier_column(),
-            identifier_truncation=identifier_truncation,
+            identifier_column=identifier_column_value,
+            identifier_truncation=truncation_value,
             epsilon=epsilon(),
             max_rows=int(max_rows()),
             groups=groups(),

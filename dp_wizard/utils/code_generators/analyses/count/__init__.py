@@ -14,12 +14,12 @@ input_names = []
 root = get_template_root(__file__)
 
 
-def make_query(code_gen, identifier, accuracy_name, stats_name, identifier_identifier):
+def make_query(code_gen, identifier, accuracy_name, stats_name, identifier_column_name):
     return (
         Template("count_query", root)
         .fill_values(
             GROUP_NAMES=code_gen.analysis_plan.groups,
-            IDENTIFIER_COLUMN=identifier_identifier,
+            IDENTIFIER_COLUMN=identifier_column_name,
         )
         .fill_expressions(
             QUERY_NAME=f"{identifier}_query",

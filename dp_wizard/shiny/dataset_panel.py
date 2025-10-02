@@ -447,7 +447,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             ui.markdown(
                 f"""
                 To limit the contribution from any one {entity},
-                after how many rows should contributions be
+                after how many **rows** should contributions be
                 truncated? (Rows are shuffled to minimize bias.)
                 """
                 if id_column

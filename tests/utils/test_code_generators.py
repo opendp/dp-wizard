@@ -214,7 +214,7 @@ all_plans = [
 ]
 
 mod = 7
-assert len(all_plans) % mod != 0, "Samples should be scattered"
+assert len(all_plans) % mod != 0, "Should be relatively prime for even coverage"
 selected_plans = [plan for i, plan in enumerate(all_plans) if not i % mod]
 
 
