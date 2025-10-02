@@ -27,6 +27,8 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
         .fill_values(
             BIN_NAME=f"{identifier}_bin",
             GROUP_NAMES=code_gen.analysis_plan.groups,
+            IDENTIFIER_COLUMN=code_gen.analysis_plan.identifier_column or None,
+            IDENTIFIER_TRUNCATION=code_gen.analysis_plan.identifier_truncation or None,
         )
         .fill_expressions(
             QUERY_NAME=f"{identifier}_query",

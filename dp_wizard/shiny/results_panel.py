@@ -109,6 +109,7 @@ def results_server(
     public_csv_path = state.public_csv_path
     contributions = state.contributions
     contributions_entity = state.contributions_entity
+    identifier_column = state.identifier_column
     max_rows = state.max_rows
     # initial_product = state.initial_product
     product = state.product
@@ -316,12 +317,23 @@ def results_server(
             ]
             for col in weights().keys()
         }
+
+        # TODO: Rename for clarity
+        identifier_column_value = identifier_column()
+        if identifier_column_value is None:
+            contributions_value = contributions()
+            truncation_value = None
+        else:
+            contributions_value = 1
+            truncation_value = contributions()
         return AnalysisPlan(
             product=product(),
             # Prefer private CSV, if available:
             csv_path=private_csv_path() or public_csv_path() or PLACEHOLDER_CSV_NAME,
-            contributions=contributions(),
+            contributions=contributions_value,
             contributions_entity=contributions_entity(),
+            identifier_column=identifier_column_value,
+            identifier_truncation=truncation_value,
             epsilon=epsilon(),
             max_rows=int(max_rows()),
             groups=groups(),

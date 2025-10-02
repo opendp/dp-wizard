@@ -22,6 +22,8 @@ class AnalysisPlan(NamedTuple):
     ...     csv_path='optional.csv',
     ...     contributions=10,
     ...     contributions_entity='Family',
+    ...     identifier_column=None,
+    ...     identifier_truncation=None,
     ...     epsilon=2.0,
     ...     max_rows=1000,
     ...     groups=['grouping_col'],
@@ -38,6 +40,8 @@ class AnalysisPlan(NamedTuple):
     csv_path: Optional[str]
     contributions: int
     contributions_entity: str
+    identifier_column: str | None
+    identifier_truncation: int | None
     epsilon: float
     max_rows: int
     groups: list[ColumnName]
@@ -63,20 +67,42 @@ class AnalysisPlan(NamedTuple):
 def make_privacy_unit_block(
     contributions: int,
     contributions_entity: str,
+    identifier_column: str | None,
 ):
     import opendp.prelude as dp
 
-    def template(CONTRIBUTIONS, CONTRIBUTIONS_ENTITY):
-        # Each CONTRIBUTIONS_ENTITY can contribute this many rows.
-        contributions = CONTRIBUTIONS
-        privacy_unit = dp.unit_of(contributions=contributions)  # noqa: F841
+    if identifier_column is None:
 
-    return (
-        Template(template)
-        .fill_values(CONTRIBUTIONS=contributions)
-        .fill_expressions(CONTRIBUTIONS_ENTITY=contributions_entity)
-        .finish()
-    )
+        def template(CONTRIBUTIONS, CONTRIBUTIONS_ENTITY):  # type: ignore
+            # Each CONTRIBUTIONS_ENTITY can contribute this many rows.
+            contributions = CONTRIBUTIONS
+            privacy_unit = dp.unit_of(contributions=contributions)  # noqa: F841
+
+        return (
+            Template(template)
+            .fill_values(CONTRIBUTIONS=contributions)
+            .fill_expressions(CONTRIBUTIONS_ENTITY=contributions_entity)
+            .finish()
+        )
+    else:
+
+        def template(IDENTIFIER_COLUMN, CONTRIBUTIONS_ENTITY):
+            # We assume each CONTRIBUTIONS_ENTITY
+            # has a single value for IDENTIFIER_COLUMN;
+            # If it could have multiple, increase the value
+            # for "contributions".
+            contributions = 1
+            privacy_unit = dp.unit_of(  # noqa: F841
+                contributions=contributions,
+                identifier=IDENTIFIER_COLUMN,
+            )
+
+        return (
+            Template(template)
+            .fill_values(IDENTIFIER_COLUMN=identifier_column)
+            .fill_expressions(CONTRIBUTIONS_ENTITY=contributions_entity)
+            .finish()
+        )
 
 
 def make_privacy_loss_block(pure: bool, epsilon: float, max_rows: int):
