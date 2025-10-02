@@ -8,14 +8,14 @@ opendp_version = "0.14.1"
 registry_url = "http://registry.opendp.org/deployments-registry/"
 
 
-def get_template_root(path):
+def get_template_root(path) -> Path:
     # We use the same convention everywhere,
     # but there are separate directories
     # for each of the analyses.
     return Path(path).parent / "no-tests"
 
 
-def main():  # pragma: no cover
+def main() -> None:  # pragma: no cover
     import sys
 
     min_version = "3.10"

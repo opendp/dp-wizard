@@ -31,7 +31,7 @@ default_weight = "2"
 label_width = "10em"  # Just wide enough so the text isn't trucated.
 
 
-def get_float_error(number_str):
+def get_float_error(number_str) -> str | None:
     """
     If the inputs are numeric, I think shiny converts
     any strings that can't be parsed to numbers into None,
@@ -56,7 +56,7 @@ def get_float_error(number_str):
     return None
 
 
-def get_bound_errors(lower_bound, upper_bound):
+def get_bound_errors(lower_bound, upper_bound) -> list[str]:
     """
     >>> get_bound_errors(1, 2)
     []
@@ -78,7 +78,7 @@ def get_bound_errors(lower_bound, upper_bound):
     return messages
 
 
-def get_bin_errors(count):
+def get_bin_errors(count) -> list[str]:
     """
     This function might be applied to either histogram bin counts,
     or median candidate counts, so the wording is a little vague.
