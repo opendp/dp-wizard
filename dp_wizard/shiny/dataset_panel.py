@@ -502,6 +502,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
     def button_enabled():
         return (
             contributions_valid()
+            and valid_product_identifier_column()
             and not get_row_count_errors(max_rows())
             and len(column_names()) > 0
             and (in_cloud or not csv_column_mismatch_calc())
@@ -644,12 +645,16 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             ),
         ]
 
-    @render.ui
-    def optional_product_error_ui():
-        if (
+    @reactive.calc
+    def valid_product_identifier_column():
+        return (
             input.product() != str(Product.SYNTHETIC_DATA.value)
             or not input.identifier_column_select()
-        ):
+        )
+
+    @render.ui
+    def optional_product_error_ui():
+        if valid_product_identifier_column():
             return
         return info_md_box(
             """
