@@ -93,6 +93,7 @@ def dataset_ui():
                 ui.card(
                     ui.card_header("Product"),
                     ui.output_ui("product_ui"),
+                    ui.output_ui("optional_product_error_ui"),
                 ),
             ],
         ),
@@ -642,6 +643,22 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 responsive=False,
             ),
         ]
+
+    @render.ui
+    def optional_product_error_ui():
+        if (
+            input.product() != str(Product.SYNTHETIC_DATA.value)
+            or not input.identifier_column_select()
+        ):
+            return
+        return info_md_box(
+            """
+            DP synthetic data with identifier columns
+            is not currently supported. If it would be
+            useful to you, please comment on
+            [this issue](https://github.com/opendp/opendp/issues/2555).
+            """
+        )
 
     @reactive.effect
     @reactive.event(input.product)
