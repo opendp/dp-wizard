@@ -34,7 +34,7 @@ def test_cloud_app(page: Page, cloud_app: ShinyAppProc):  # pragma: no cover
 
     page.get_by_role("button", name="Define analysis").click()
     page.locator(".selectize-input").nth(0).click()
-    page.get_by_text("1: a_column").click()
+    page.get_by_text("1: a_column").locator("visible=true").click()
     page.get_by_label("Lower").fill("0")
     page.get_by_label("Upper").fill("10")
 
@@ -61,7 +61,7 @@ def test_qa_app(page: Page, qa_app: ShinyAppProc):  # pragma: no cover
     page.get_by_role("button", name="Define analysis").click()
 
     page.locator(".selectize-input").nth(0).click()
-    page.get_by_text(": grade").click()
+    page.get_by_text("4: grade").locator("visible=true").click()
     page.get_by_label("Lower").fill("0")
     page.get_by_label("Upper").fill("10")
 
@@ -148,10 +148,10 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
 
     # Pick columns:
     page.locator(".selectize-input").nth(0).click()
-    page.get_by_text(": grade").click()
+    page.get_by_text("6: grade").locator("visible=true").click()
     # Pick grouping:
     page.locator(".selectize-input").nth(1).click()
-    page.get_by_text(": class year").nth(2).click()
+    page.get_by_text("2: class year").locator("visible=true").click()
 
     # Check that default is set correctly:
     # (Explicit "float()" because sometimes returns "10", sometimes "10.0".
@@ -187,7 +187,7 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
 
     # Add a second column:
     page.locator(".selectize-input").nth(0).click()
-    page.get_by_text(": hw-number").first.click()
+    page.get_by_text("5: hw-number").locator("visible=true").click()
     # Previous setting should not be cleared.
     expect(page.get_by_role("textbox", name="Upper Bound")).to_have_value("20")
     expect(page.locator(".shiny-output-error")).not_to_be_attached()
@@ -225,10 +225,10 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
 
     # Pick columns:
     page.locator(".selectize-input").nth(0).click()
-    page.get_by_text(": grade").nth(0).click()
+    page.get_by_text("6: grade").locator("visible=true").click()
     # Pick grouping:
     page.locator(".selectize-input").nth(1).click()
-    page.get_by_text("class year").nth(2).click()
+    page.get_by_text("2: class year").locator("visible=true").click()
     # Fill inputs:
     page.get_by_label("Lower").fill("0")
     page.get_by_label("Upper").fill("10")
