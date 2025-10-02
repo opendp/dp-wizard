@@ -215,9 +215,7 @@ all_plans = [
 
 mod = 7
 assert len(all_plans) % mod != 0, "Samples should be scattered"
-selected_plans = [
-    plan for i, plan in enumerate(all_plans) if not i % mod and is_plan_handled(plan)
-]
+selected_plans = [plan for i, plan in enumerate(all_plans) if not i % mod]
 
 
 @pytest.mark.parametrize("plan", selected_plans, ids=id_for_plan)
@@ -229,6 +227,10 @@ def test_make_notebook(plan):
         "To convert to notebook, save as 'debug.py', then run:\n"
         "$ jupytext --from .py --to .ipynb --output debug.ipynb debug.py"
     )
+
+    if not is_plan_handled(plan):
+        assert "issues/2555" in notebook
+        return
 
     globals = {}
     exec(notebook, globals)
@@ -256,6 +258,10 @@ def test_make_script(plan):
     script = ScriptGenerator(plan).make_py()
     # Test failures will show STDOUT.
     print(number_lines(script))
+
+    if not is_plan_handled(plan):
+        assert "issues/2555" in script
+        return
 
     # Make sure jupytext formatting doesn't bleed into the script.
     # https://jupytext.readthedocs.io/en/latest/formats-scripts.html#the-light-format
