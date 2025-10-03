@@ -11,6 +11,7 @@ from dp_wizard.shiny.components.outputs import (
     hide_if,
     info_md_box,
     nav_button,
+    only_for_screenreader,
     tutorial_box,
 )
 from dp_wizard.types import AppState, Product
@@ -376,7 +377,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             ui.layout_columns(
                 ui.input_select(
                     "entity",
-                    None,
+                    only_for_screenreader("Protect privacy of this entity"),
                     list(entities.keys()),
                     selected="👤 Individual",
                 ),
@@ -418,7 +419,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             ui.layout_columns(
                 ui.input_numeric(
                     "contributions",
-                    None,
+                    only_for_screenreader("Maximum number of rows contributed"),
                     contributions(),
                     min=1,
                 ),
@@ -524,7 +525,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             ui.layout_columns(
                 ui.input_text(
                     "max_rows",
-                    None,
+                    only_for_screenreader("Maximum number of rows in CSV"),
                     "0",
                 ),
                 [],  # column placeholder
@@ -562,11 +563,14 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
         return [
             ui.markdown(
                 """
-                What kind of analysis do you want to produce?
+                What type of analysis do you want?
                 """
             ),
             ui.input_radio_buttons(
-                "product", None, Product.to_dict(), selected=str(initial_product.value)
+                "product",
+                only_for_screenreader("Type of analysis"),
+                Product.to_dict(),
+                selected=str(initial_product.value),
             ),
             tutorial_box(
                 is_tutorial_mode(),
