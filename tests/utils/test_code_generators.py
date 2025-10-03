@@ -5,6 +5,8 @@ from tempfile import NamedTemporaryFile
 
 import opendp.prelude as dp
 import pytest
+import requests
+from dp_wizard_templates.converters import convert_nb_to_html, convert_py_to_nb
 
 from dp_wizard import opendp_version
 from dp_wizard.types import AnalysisName, ColumnName, Product
@@ -199,12 +201,28 @@ plans = [
 ]
 
 
+expected_urls = [
+    "https://docs.opendp.org/",
+    "https://github.com/opendp/dp-wizard",
+    "https://docs.opendp.org/en/v0.14.1/api/python/opendp.extras.mbi.html#opendp.extras.mbi.ContingencyTable.synthesize",
+    "https://docs.opendp.org/en/v0.14.1/api/python/opendp.extras.mbi.html#opendp.extras.mbi.ContingencyTable.project_melted",
+]
+
+
+@pytest.mark.parametrize("url", [url.split("#")[0] for url in expected_urls])
+def test_urls_work(url):
+    # TODO: Check if anchors are present.
+    # https://github.com/opendp/dp-wizard/issues/627
+    response = requests.head(url)
+    assert response.status_code == 200
+
+
 @pytest.mark.parametrize("plan", plans, ids=id_for_plan)
 def test_make_notebook(plan):
-    notebook = NotebookGenerator(plan).make_py()
-    print(number_lines(notebook))
+    notebook_py = NotebookGenerator(plan).make_py()
+    print(number_lines(notebook_py))
     globals = {}
-    exec(notebook, globals)
+    exec(notebook_py, globals)
 
     # Close plots to avoid this warning:
     # > RuntimeWarning: More than 20 figures have been opened.
@@ -222,6 +240,14 @@ def test_make_notebook(plan):
         case _:  # pragma: no cover
             raise ValueError(plan.product)
     assert isinstance(globals[context_global], dp.Context)
+
+    notebook_nb = convert_py_to_nb(notebook_py, "Title placeholder")
+    notebook_html = convert_nb_to_html(notebook_nb)
+    # Parsing HTML with an RE is usually not the right solution,
+    # but since these are generated from the markdown,
+    # BeautifulSoup seems like overkill.
+    urls = set(re.findall(r'<a[^>]+href="(http[^"]+)[^>]+>', notebook_html))
+    assert urls <= set(expected_urls)
 
 
 @pytest.mark.parametrize("plan", plans, ids=id_for_plan)
