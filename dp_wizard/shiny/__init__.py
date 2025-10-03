@@ -147,7 +147,7 @@ def _clip(n: float, lower_bound: float, upper_bound: float) -> float:
 def _scan_text_for_input_ids(text, rel_path, errors):
     """
     >>> text = '''
-    ... ui.input_text("spill")
+    ... ui.input_text("misspelled")
     ... @reactive.event(input.spell)
     ... '''
     >>> rel_path = 'fake/component.py'
@@ -248,14 +248,12 @@ def _make_server(cli_info: CLIInfo):
             state.is_tutorial_mode.set(is_tutorial_mode)
             config.set_is_tutorial_mode(is_tutorial_mode)
 
-        # TODO: Shiny error if this is uncommented:
-        # > includes "input.dark_mode", but there is no "dark_mode" id
-        # @reactive.effect
-        # @reactive.event(input.dark_mode)
-        # def _update_dark_mode():
-        #     is_dark_mode = input.dark_mode()
-        #     # Not set in state: Nothing downstream needs this.
-        #     config.set_is_dark_mode(is_dark_mode)
+        @reactive.effect
+        @reactive.event(input.dark_mode)
+        def _update_dark_mode():
+            dark_mode = input.dark_mode()
+            # Do not set state: Nothing downstream needs this.
+            config.set_is_dark_mode(dark_mode == "dark")
 
         about_panel.about_server(input, output, session)
         dataset_panel.dataset_server(input, output, session, state)
