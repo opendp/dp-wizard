@@ -214,7 +214,7 @@ plans = [
 expected_urls = {
     "https://docs.opendp.org/",
     "https://github.com/opendp/dp-wizard",
-    "https://docs.opendp.org/en/v0.14.1/api/python/opendp.extras.mbi.html#opendp.extras.mbi.ContingencyTable.synthesize"
+    "https://docs.opendp.org/en/v0.14.1/api/python/opendp.extras.mbi.html#opendp.extras.mbi.ContingencyTable.synthesize",
     "https://docs.opendp.org/en/v0.14.1/api/python/opendp.extras.mbi.html#opendp.extras.mbi.ContingencyTable.project_melted",
 }
 
