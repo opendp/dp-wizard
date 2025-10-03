@@ -3,12 +3,14 @@ from typing import NamedTuple
 
 import yaml
 
-_config_path = Path(__file__).parent / ".config.yaml"
-
 
 class _Config(NamedTuple):
     is_tutorial_mode: bool | None
     is_dark_mode: bool | None
+
+
+_config_path = Path(__file__).parent / ".config.yaml"
+_config = _Config(is_tutorial_mode=None, is_dark_mode=None)
 
 
 def _read_config() -> _Config:
@@ -20,7 +22,12 @@ def _read_config() -> _Config:
     return _Config(**config_dict)
 
 
-_config = _read_config()
+def _init_config():
+    global _config
+    _config = _read_config()
+
+
+_init_config()
 
 
 def _write_config():

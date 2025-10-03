@@ -10,11 +10,11 @@ from shiny import App, Inputs, Outputs, Session, reactive, ui
 from dp_wizard.shiny import (
     about_panel,
     analysis_panel,
-    config,
     dataset_panel,
     results_panel,
 )
 from dp_wizard.types import AppState, Product
+from dp_wizard.utils import config
 from dp_wizard.utils.argparse_helpers import CLIInfo
 from dp_wizard.utils.csv_helper import read_csv_names
 
