@@ -201,15 +201,15 @@ plans = [
 ]
 
 
-expected_urls = {
+expected_urls = [
     "https://docs.opendp.org/",
     "https://github.com/opendp/dp-wizard",
     "https://docs.opendp.org/en/v0.14.1/api/python/opendp.extras.mbi.html#opendp.extras.mbi.ContingencyTable.synthesize",
     "https://docs.opendp.org/en/v0.14.1/api/python/opendp.extras.mbi.html#opendp.extras.mbi.ContingencyTable.project_melted",
-}
+]
 
 
-@pytest.mark.parametrize("url", {url.split("#")[0] for url in expected_urls})
+@pytest.mark.parametrize("url", [url.split("#")[0] for url in expected_urls])
 def test_urls_work(url):
     # TODO: Check if anchors are present.
     # https://github.com/opendp/dp-wizard/issues/627
@@ -247,7 +247,7 @@ def test_make_notebook(plan):
     # but since these are generated from the markdown,
     # BeautifulSoup seems like overkill.
     urls = set(re.findall(r'<a[^>]+href="(http[^"]+)[^>]+>', notebook_html))
-    assert urls <= expected_urls
+    assert urls <= set(expected_urls)
 
 
 @pytest.mark.parametrize("plan", plans, ids=id_for_plan)
