@@ -10,21 +10,17 @@ class _Config(NamedTuple):
 
 
 _config_path = Path(__file__).parent / ".config.yaml"
-_config = _Config(is_tutorial_mode=None, is_dark_mode=None)
+_config: _Config
 
 
-def _read_config() -> _Config:
+def _init_config():
     config_yaml = _config_path.read_text() if _config_path.exists() else ""
     config_dict = yaml.safe_load(config_yaml) or {
         "is_tutorial_mode": None,
         "is_dark_mode": None,
     }
-    return _Config(**config_dict)
-
-
-def _init_config():
     global _config
-    _config = _read_config()
+    _config = _Config(**config_dict)
 
 
 _init_config()
