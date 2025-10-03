@@ -29,9 +29,9 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
         QUERY_NAME = (
             stats_context.query().group_by(groups).agg(pl.len().dp.noise().alias("count"))  # type: ignore
         )
-        ACCURACY_NAME = QUERY_NAME.summarize(alpha=1 - confidence)[
+        ACCURACY_NAME = QUERY_NAME.summarize(alpha=1 - confidence)[  # noqa: F841
             "accuracy"
-        ].item()  # noqa: F841
+        ].item()
         STATS_NAME = QUERY_NAME.release().collect()
         STATS_NAME  # type: ignore
 
