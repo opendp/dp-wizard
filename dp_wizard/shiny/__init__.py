@@ -30,15 +30,23 @@ def make_app(cli_info: CLIInfo):
     )
 
 
-def _make_app_ui(cli_info: CLIInfo):
-    root = Path(__file__).parent
-
+def _get_is_tutorial_mode(cli_info) -> bool:
     is_tutorial_mode = config.get_is_tutorial_mode()
     if is_tutorial_mode is None:
-        is_tutorial_mode = cli_info.get_is_tutorial_mode()
+        is_tutorial_mode = cli_info.get_is_tutorial_mode()  # pragma: no cover
+    return is_tutorial_mode
+
+
+def _get_is_dark_mode() -> bool:
     is_dark_mode = config.get_is_dark_mode()
     if is_dark_mode is None:
-        is_dark_mode = False  # No CLI configuration
+        # No CLI configuration
+        is_dark_mode = False  # pragma: no cover
+    return is_dark_mode
+
+
+def _make_app_ui(cli_info: CLIInfo):
+    root = Path(__file__).parent
 
     return ui.page_bootstrap(
         ui.head_content(
@@ -64,13 +72,13 @@ def _make_app_ui(cli_info: CLIInfo):
                         """,
                         placement="right",
                     ),
-                    value=is_tutorial_mode,
+                    value=_get_is_tutorial_mode(cli_info),
                     width="4em",
                 )
             ),
             ui.nav_control(
                 ui.input_dark_mode(
-                    id="dark_mode", mode="dark" if is_dark_mode else "light"
+                    id="dark_mode", mode="dark" if _get_is_dark_mode() else "light"
                 )
             ),
             selected=dataset_panel.dataset_panel_id,
