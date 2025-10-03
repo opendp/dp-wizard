@@ -5,6 +5,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from faicons import icon_svg
+from htmltools import Tag
 from shiny import App, Inputs, Outputs, Session, reactive, ui
 
 from dp_wizard.shiny import (
@@ -22,7 +23,7 @@ _assets_path = Path(__file__).parent / "assets"
 assert _assets_path.exists()
 
 
-def make_app(cli_info: CLIInfo):
+def make_app(cli_info: CLIInfo) -> App:
     return App(
         _make_app_ui(cli_info),
         _make_server(cli_info),
@@ -45,7 +46,7 @@ def _get_is_dark_mode() -> bool:
     return is_dark_mode
 
 
-def _make_app_ui(cli_info: CLIInfo):
+def _make_app_ui(cli_info: CLIInfo) -> Tag:
     root = Path(__file__).parent
 
     return ui.page_bootstrap(
@@ -88,11 +89,11 @@ def _make_app_ui(cli_info: CLIInfo):
     )
 
 
-def ctrl_c_reminder():  # pragma: no cover
+def ctrl_c_reminder() -> None:  # pragma: no cover
     print("Session ended (Press CTRL+C to quit)")
 
 
-def _make_sample_csv(path: Path, contributions):
+def _make_sample_csv(path: Path, contributions) -> None:
     """
     >>> import tempfile
     >>> from pathlib import Path
@@ -152,7 +153,7 @@ def _clip(n: float, lower_bound: float, upper_bound: float) -> float:
     return max(min(n, upper_bound), lower_bound)
 
 
-def _scan_text_for_input_ids(text, rel_path, errors):
+def _scan_text_for_input_ids(text, rel_path, errors) -> None:
     """
     >>> text = '''
     ... ui.input_text("misspelled")
@@ -179,7 +180,7 @@ def _scan_text_for_input_ids(text, rel_path, errors):
             )
 
 
-def _scan_files_for_input_ids():
+def _scan_files_for_input_ids() -> None:
     """
     A really hacky scan of the source code to find IDs with typos.
     There is an issue filed with Shiny, but no comments since May 2024:

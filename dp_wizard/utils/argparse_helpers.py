@@ -25,7 +25,7 @@ visualizations will be made with the public data, but the release will
 be made with private data."""
 
 
-def _get_arg_parser():
+def _get_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description="DP Wizard makes it easier to get started with "
@@ -56,7 +56,7 @@ Provide both {PUBLIC_PRIVATE_TEXT}
     return parser
 
 
-def _get_args():
+def _get_args() -> argparse.Namespace:
     """
     >>> _get_args()
     Namespace(sample=False, cloud=False)
@@ -79,7 +79,7 @@ class CLIInfo(NamedTuple):
     is_cloud_mode: bool
     is_qa_mode: bool
 
-    def get_is_tutorial_mode(self):
+    def get_is_tutorial_mode(self) -> bool:
         return self.is_sample_csv or self.is_cloud_mode  # pragma: no cover
 
 

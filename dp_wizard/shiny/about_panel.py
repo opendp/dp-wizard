@@ -9,7 +9,7 @@ from shiny import Inputs, Outputs, Session, reactive, ui
 from dp_wizard.shiny.components.outputs import nav_button
 
 
-def _run(cmd):
+def _run(cmd) -> str:
     """
     >>> _run("echo hello")
     '    hello'
@@ -24,7 +24,7 @@ def _run(cmd):
     )
 
 
-def _get_info():
+def _get_info() -> str:
     version = (Path(__file__).parent.parent / "VERSION").read_text().strip()
     git_status = _run("git status")
     pip_freeze = _run("pip freeze")
@@ -39,7 +39,7 @@ pip freeze:
     """
 
 
-def _make_issue_url(info):
+def _make_issue_url(info) -> str:
     """
     >>> info = 'A B C'
     >>> query = urllib.parse.urlparse(_make_issue_url(info)).query
