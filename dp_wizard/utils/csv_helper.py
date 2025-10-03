@@ -13,7 +13,9 @@ def read_csv_names(csv_path: Path) -> list[ColumnName]:
     # > Determining the column names of a LazyFrame requires
     # > resolving its schema, which is a potentially expensive operation.
     lf = pl.scan_csv(csv_path)
-    return [ColumnName(name) for name in lf.collect_schema().names() if name]
+    all_names = lf.collect_schema().names()
+    # Exclude columns missing names:
+    return [ColumnName(name) for name in all_names if name.strip() != ""]
 
 
 def get_csv_names_mismatch(
