@@ -80,7 +80,7 @@ class CLIInfo(NamedTuple):
     is_qa_mode: bool
 
     def get_is_tutorial_mode(self) -> bool:
-        return self.is_sample_csv or self.is_cloud_mode
+        return self.is_sample_csv or self.is_cloud_mode  # pragma: no cover
 
 
 def get_cli_info() -> CLIInfo:  # pragma: no cover
