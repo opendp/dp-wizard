@@ -14,8 +14,18 @@ root = get_template_root(__file__)
 
 
 def make_query(code_gen, identifier, accuracy_name, stats_name):
+    def template(GROUP_NAMES, stats_context, EXPR_NAME):
+        groups = GROUP_NAMES
+        QUERY_NAME = (
+            stats_context.query().group_by(groups).agg(EXPR_NAME)
+            if groups
+            else stats_context.query().select(EXPR_NAME)
+        )
+        STATS_NAME = QUERY_NAME.release().collect()
+        STATS_NAME  # type: ignore
+
     return (
-        Template("count_query", root)
+        Template(template)
         .fill_values(
             GROUP_NAMES=code_gen.analysis_plan.groups,
         )

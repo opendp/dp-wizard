@@ -47,7 +47,7 @@ def button(
     return ui.download_button(**kwargs)
 
 
-def _strip_ansi(e):
+def _strip_ansi(e) -> str:
     """
     >>> e = Exception('\x1b[0;31mValueError\x1b[0m: ...')
     >>> _strip_ansi(e)

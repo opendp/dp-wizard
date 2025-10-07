@@ -43,8 +43,8 @@ class AnalysisPlan(NamedTuple):
     groups: list[ColumnName]
     columns: dict[ColumnName, list[AnalysisPlanColumn]]
 
-    def __str__(self):
-        def md_list(names):
+    def __str__(self) -> str:
+        def md_list(names) -> str:
             return ", ".join(f"`{name}`" for name in names)
 
         columns = md_list(self.columns.keys())
@@ -52,7 +52,7 @@ class AnalysisPlan(NamedTuple):
         grouped_by = f" grouped by {groups}" if groups else ""
         return f"{self.product} for {columns}{grouped_by}"
 
-    def to_stem(self):
+    def to_stem(self) -> str:
         return re.sub(r"\W+", " ", str(self)).strip().replace(" ", "_").lower()
 
 
