@@ -22,8 +22,23 @@ root = get_template_root(__file__)
 
 
 def make_query(code_gen, identifier, accuracy_name, stats_name):
+    def template(
+        GROUP_NAMES, stats_context, EXPR_NAME, IDENTIFIER_COLUMN, IDENTIFIER_TRUNCATION
+    ):
+        query = stats_context.query()
+        identifier_column = IDENTIFIER_COLUMN
+        if identifier_column is not None:
+            query = query.truncate_per_group(IDENTIFIER_TRUNCATION)
+
+        groups = GROUP_NAMES
+        QUERY_NAME = (
+            query.group_by(groups).agg(EXPR_NAME) if groups else query.select(EXPR_NAME)
+        )
+        STATS_NAME = QUERY_NAME.release().collect()
+        STATS_NAME  # type: ignore
+
     return (  # pragma: no cover
-        Template("median_query", root)
+        Template(template)
         .fill_values(
             GROUP_NAMES=code_gen.analysis_plan.groups,
             IDENTIFIER_COLUMN=code_gen.analysis_plan.identifier_column or None,

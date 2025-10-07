@@ -103,7 +103,7 @@ def _cleanup_reactive_dict(
     reactive_dict.set(reactive_dict_copy)
 
 
-def _trunc_pow(exponent):
+def _trunc_pow(exponent) -> float:
     """
     The output should be roughly exponential,
     but should also be round numbers,

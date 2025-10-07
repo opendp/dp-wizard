@@ -1,11 +1,12 @@
 from abc import ABC, abstractmethod
+from datetime import datetime
 from math import gcd
 from pathlib import Path
 from typing import Iterable
 
 from dp_wizard_templates.code_template import Template
 
-from dp_wizard import get_template_root, opendp_version
+from dp_wizard import __version__, get_template_root, opendp_version
 from dp_wizard.types import ColumnIdentifier, Product
 from dp_wizard.utils.code_generators import (
     AnalysisPlan,
@@ -107,6 +108,8 @@ class AbstractGenerator(ABC):
             .fill_expressions(
                 TITLE=str(self.analysis_plan),
                 DEPENDENCIES=f"'opendp[{extra}]=={opendp_version}' matplotlib",
+                DP_WIZARD_V_VERSION=f"v{__version__}",
+                DATE_TIME=datetime.now().strftime("%b %d, %Y at %I:%M%p"),
             )
             .fill_code_blocks(
                 IMPORTS_BLOCK=Template(template).finish(),

@@ -9,7 +9,7 @@ class ColumnDef(NamedTuple):
     upper_bound: float
 
 
-def mock_data(column_defs: dict[str, ColumnDef], row_count: int = 1000):
+def mock_data(column_defs: dict[str, ColumnDef], row_count: int = 1000) -> pl.DataFrame:
     """
     Return values from the inverse CDF of a normal distribution,
     so in the preview the only noise is from DP,
