@@ -25,6 +25,11 @@ def _analysis_has_bounds(analysis) -> bool:
     return analysis.analysis_name != count.name
 
 
+def is_plan_handled(plan: AnalysisPlan) -> bool:
+    # See https://github.com/opendp/opendp/issues/2555
+    return plan.product == Product.STATISTICS or plan.identifier_column is None
+
+
 class AbstractGenerator(ABC):
     def __init__(self, analysis_plan: AnalysisPlan):
         self.analysis_plan = analysis_plan
@@ -74,6 +79,19 @@ class AbstractGenerator(ABC):
         return "".join(f"# {line}\n" for line in comment.splitlines())
 
     def make_py(self):
+        if not is_plan_handled(self.analysis_plan):
+            return """
+            # Synthetic data with identifier trunction is
+            # not currently supported by OpenDP. Comment on
+            # https://github.com/opendp/opendp/issues/2555
+            # if that would be useful for you.
+            #
+            # This message should not be visible within DP Wizard:
+            # Checks earlier in the UI should make this unreachable,
+            # but if that's not the case, please file an issue:
+            # https://github.com/opendp/dp-wizard/issues/new?template=bug-front.md
+            """
+
         def template():
             import matplotlib.pyplot as plt  # noqa: F401
             import opendp.prelude as dp  # noqa: F401
@@ -183,22 +201,22 @@ reencode it as UTF8.""",
             )
         ]
         for column_name in self.analysis_plan.columns.keys():
-            to_return.append(self._make_query(column_name))
+            to_return.append(self._make_query(column_name=column_name))
 
         return "\n".join(to_return)
 
     def _make_query(self, column_name):
         plan = self.analysis_plan.columns[column_name]
-        identifier = ColumnIdentifier(column_name)
-        accuracy_name = f"{identifier}_accuracy"
-        stats_name = f"{identifier}_stats"
+        clean_column_name = ColumnIdentifier(column_name)
+        accuracy_name = f"{clean_column_name}_accuracy"
+        stats_name = f"{clean_column_name}_stats"
 
         from dp_wizard.utils.code_generators.analyses import get_analysis_by_name
 
         analysis = get_analysis_by_name(plan[0].analysis_name)
         query = analysis.make_query(
             code_gen=self,
-            identifier=identifier,
+            identifier=clean_column_name,
             accuracy_name=accuracy_name,
             stats_name=stats_name,
         )
@@ -252,6 +270,7 @@ reencode it as UTF8.""",
         privacy_unit_block = make_privacy_unit_block(
             contributions=self.analysis_plan.contributions,
             contributions_entity=self.analysis_plan.contributions_entity,
+            identifier_column=self.analysis_plan.identifier_column,
         )
         privacy_loss_block = make_privacy_loss_block(
             pure=False,
@@ -298,6 +317,7 @@ reencode it as UTF8.""",
         privacy_unit_block = make_privacy_unit_block(
             contributions=self.analysis_plan.contributions,
             contributions_entity=self.analysis_plan.contributions_entity,
+            identifier_column=self.analysis_plan.identifier_column,
         )
         # If there are no groups and all analyses have bounds (so we have cut points),
         # then OpenDP requires that pure DP be used for contingency tables.

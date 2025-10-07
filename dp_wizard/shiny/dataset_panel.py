@@ -21,7 +21,11 @@ from dp_wizard.utils.argparse_helpers import (
     PUBLIC_TEXT,
 )
 from dp_wizard.utils.code_generators import make_privacy_unit_block
-from dp_wizard.utils.csv_helper import get_csv_names_mismatch, read_csv_names
+from dp_wizard.utils.csv_helper import (
+    get_csv_names_mismatch,
+    id_labels_dict_from_names,
+    read_csv_names,
+)
 
 dataset_panel_id = "dataset_panel"
 
@@ -82,6 +86,7 @@ def dataset_ui():
                 ui.card(
                     ui.card_header("Unit of Privacy"),
                     ui.output_ui("input_entity_ui"),
+                    ui.output_ui("input_truncation_ui"),
                     ui.output_ui("input_contributions_ui"),
                     ui.output_ui("contributions_validation_ui"),
                     ui.output_ui("unit_of_privacy_python_ui"),
@@ -89,6 +94,7 @@ def dataset_ui():
                 ui.card(
                     ui.card_header("Product"),
                     ui.output_ui("product_ui"),
+                    ui.output_ui("optional_product_error_ui"),
                 ),
             ],
         ),
@@ -117,6 +123,7 @@ def dataset_server(
     public_csv_path = state.public_csv_path
     contributions = state.contributions
     contributions_entity = state.contributions_entity
+    identifier_column = state.identifier_column
     max_rows = state.max_rows
     initial_product = state.initial_product
     product = state.product
@@ -162,6 +169,10 @@ def dataset_server(
                 if (clean := line.strip())
             ]
         )
+
+    @reactive.calc
+    def csv_ids_labels_calc():
+        return id_labels_dict_from_names(column_names())
 
     @reactive.calc
     def csv_column_mismatch_calc() -> Optional[tuple[set, set]]:
@@ -391,12 +402,57 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
         return ui.markdown(entities[input.entity()])
 
     @render.ui
-    def input_contributions_ui():
+    def input_truncation_ui():
         entity = contributions_entity_calc()
-
+        csv_ids_labels = {"": "No identifier column"} | {
+            # Cast to string for type checking.
+            str(k): v
+            for k, v in csv_ids_labels_calc().items()
+        }
         return [
             ui.markdown(
                 f"""
+                Is there an **identifier column** in this CSV which can uniquely
+                identify each {entity}?
+                """
+            ),
+            tutorial_box(
+                is_tutorial_mode(),
+                """
+                If there is an identifier column, the analysis can be done
+                more efficiently by truncating if an unusually large number
+                of rows are contributed.
+                """,
+                is_sample_csv,
+                """
+                The `sample.csv` has a `student_id` column that should be selected here.
+                """,
+                responsive=False,
+            ),
+            ui.input_select(
+                "identifier_column_select",
+                None,  # TODO: accessibility
+                csv_ids_labels,
+            ),
+        ]
+
+    @render.ui
+    def input_contributions_ui():
+        entity = contributions_entity_calc()
+        id_column = input.identifier_column_select()
+
+        # The number provided here is actually used differently downstream,
+        # depending on whether there is an id_column,
+        # but having two separate inputs in the UI code would be more confusing.
+        return [
+            ui.markdown(
+                f"""
+                To limit the contribution from any one {entity},
+                after how many **rows** should contributions be
+                truncated? (Rows are shuffled to minimize bias.)
+                """
+                if id_column
+                else f"""
                 How many **rows** of the CSV can each {entity} contribute to?
                 This is the "unit of privacy" which will be protected.
                 """
@@ -416,15 +472,11 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 """,
                 responsive=False,
             ),
-            ui.layout_columns(
-                ui.input_numeric(
-                    "contributions",
-                    only_for_screenreader("Maximum number of rows contributed"),
-                    contributions(),
-                    min=1,
-                ),
-                [],  # Column placeholder
-                col_widths=col_widths,  # type: ignore
+            ui.input_numeric(
+                "contributions",
+                only_for_screenreader("Maximum number of rows contributed"),
+                contributions(),
+                min=1,
             ),
         ]
 
@@ -438,6 +490,11 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
     def _on_contributions_entity_change():
         contributions_entity.set(contributions_entity_calc())
 
+    @reactive.effect
+    @reactive.event(input.entity)
+    def _on_identifier_column_change():
+        identifier_column.set(input.identifier_column_select())
+
     @reactive.calc
     def contributions_entity_calc() -> str:
         return input.entity()[2:].lower()
@@ -446,6 +503,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
     def button_enabled():
         return (
             contributions_valid()
+            and valid_product_identifier_column()
             and not get_row_count_errors(max_rows())
             and len(column_names()) > 0
             and (in_cloud or not csv_column_mismatch_calc())
@@ -555,6 +613,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             make_privacy_unit_block(
                 contributions=contributions(),
                 contributions_entity=contributions_entity_calc(),
+                identifier_column=identifier_column(),
             ),
         )
 
@@ -589,6 +648,26 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 responsive=False,
             ),
         ]
+
+    @reactive.calc
+    def valid_product_identifier_column():
+        return (
+            input.product() != str(Product.SYNTHETIC_DATA.value)
+            or not input.identifier_column_select()
+        )
+
+    @render.ui
+    def optional_product_error_ui():
+        if valid_product_identifier_column():
+            return
+        return info_md_box(
+            """
+            DP synthetic data with identifier columns
+            is not currently supported. If it would be
+            useful to you, please comment on
+            [this issue](https://github.com/opendp/opendp/issues/2555).
+            """
+        )
 
     @reactive.effect
     @reactive.event(input.product)

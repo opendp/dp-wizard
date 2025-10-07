@@ -15,12 +15,17 @@ root = get_template_root(__file__)
 
 
 def make_query(code_gen, identifier, accuracy_name, stats_name):
-    def template(GROUP_NAMES, stats_context, EXPR_NAME):
+    def template(
+        GROUP_NAMES, stats_context, EXPR_NAME, IDENTIFIER_COLUMN, IDENTIFIER_TRUNCATION
+    ):
+        query = stats_context.query()
+        identifier_column = IDENTIFIER_COLUMN
+        if identifier_column is not None:
+            query = query.truncate_per_group(IDENTIFIER_TRUNCATION)
+
         groups = GROUP_NAMES
         QUERY_NAME = (
-            stats_context.query().group_by(groups).agg(EXPR_NAME)
-            if groups
-            else stats_context.query().select(EXPR_NAME)
+            query.group_by(groups).agg(EXPR_NAME) if groups else query.select(EXPR_NAME)
         )
         STATS_NAME = QUERY_NAME.release().collect()
         STATS_NAME  # type: ignore
@@ -29,6 +34,8 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
         Template(template)
         .fill_values(
             GROUP_NAMES=code_gen.analysis_plan.groups,
+            IDENTIFIER_COLUMN=code_gen.analysis_plan.identifier_column or None,
+            IDENTIFIER_TRUNCATION=code_gen.analysis_plan.identifier_truncation or None,
         )
         .fill_expressions(
             QUERY_NAME=f"{identifier}_query",

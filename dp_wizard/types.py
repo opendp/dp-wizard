@@ -93,6 +93,7 @@ class AppState:
     public_csv_path: reactive.Value[str]
     contributions: reactive.Value[int]
     contributions_entity: reactive.Value[str]
+    identifier_column: reactive.Value[str | None]
     max_rows: reactive.Value[str]
     initial_product: Product
     product: reactive.Value[Product]
