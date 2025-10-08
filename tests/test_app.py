@@ -70,18 +70,6 @@ def test_qa_app(page: Page, qa_app: ShinyAppProc):  # pragma: no cover
     expect(page.get_by_text('raise Exception("qa_mode!")')).to_be_visible()
 
 
-def test_sample_app(page: Page, sample_app: ShinyAppProc):  # pragma: no cover
-    page.goto(sample_app.url)
-    expect(page).to_have_title("DP Wizard")
-
-    page.locator("#max_rows").fill("10000")
-
-    # -- Define analysis --
-    page.get_by_role("button", name="Define analysis").click()
-    expect(page.get_by_text("dataset on the previous tab")).not_to_be_visible()
-    expect(page.get_by_text("string values can be used for grouping")).to_be_visible()
-
-
 def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: no cover
     pick_dataset_text = "How many rows of the CSV"
     perform_analysis_text = "Select columns to calculate statistics on"

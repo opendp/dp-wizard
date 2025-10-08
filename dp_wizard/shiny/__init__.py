@@ -15,6 +15,7 @@ from dp_wizard.shiny import (
     results_panel,
 )
 from dp_wizard.types import AppState, Product
+from dp_wizard.utils import config
 from dp_wizard.utils.argparse_helpers import CLIInfo
 from dp_wizard.utils.csv_helper import read_csv_names
 
@@ -30,8 +31,24 @@ def make_app(cli_info: CLIInfo) -> App:
     )
 
 
+def _get_is_tutorial_mode(cli_info) -> bool:
+    is_tutorial_mode = config.get_is_tutorial_mode()
+    if is_tutorial_mode is None:
+        is_tutorial_mode = cli_info.get_is_tutorial_mode()  # pragma: no cover
+    return is_tutorial_mode
+
+
+def _get_is_dark_mode() -> bool:
+    is_dark_mode = config.get_is_dark_mode()
+    if is_dark_mode is None:
+        # No CLI configuration
+        is_dark_mode = False  # pragma: no cover
+    return is_dark_mode
+
+
 def _make_app_ui(cli_info: CLIInfo) -> Tag:
     root = Path(__file__).parent
+
     return ui.page_bootstrap(
         ui.head_content(
             ui.tags.link(rel="icon", href="favicon.ico"),
@@ -56,11 +73,15 @@ def _make_app_ui(cli_info: CLIInfo) -> Tag:
                         """,
                         placement="right",
                     ),
-                    value=cli_info.get_is_tutorial_mode(),
+                    value=_get_is_tutorial_mode(cli_info),
                     width="4em",
                 )
             ),
-            ui.nav_control(ui.input_dark_mode()),
+            ui.nav_control(
+                ui.input_dark_mode(
+                    id="dark_mode", mode="dark" if _get_is_dark_mode() else "light"
+                )
+            ),
             selected=dataset_panel.dataset_panel_id,
             id="top_level_nav",
         ),
@@ -135,7 +156,7 @@ def _clip(n: float, lower_bound: float, upper_bound: float) -> float:
 def _scan_text_for_input_ids(text, rel_path, errors) -> None:
     """
     >>> text = '''
-    ... ui.input_text("spill")
+    ... ui.input_text("misspelled")
     ... @reactive.event(input.spell)
     ... '''
     >>> rel_path = 'fake/component.py'
@@ -232,7 +253,16 @@ def _make_server(cli_info: CLIInfo):
         @reactive.effect
         @reactive.event(input.tutorial_mode)
         def _update_tutorial_mode():
-            state.is_tutorial_mode.set(input.tutorial_mode())
+            is_tutorial_mode = input.tutorial_mode()
+            state.is_tutorial_mode.set(is_tutorial_mode)
+            config.set_is_tutorial_mode(is_tutorial_mode)
+
+        @reactive.effect
+        @reactive.event(input.dark_mode)
+        def _update_dark_mode():
+            dark_mode = input.dark_mode()
+            # Do not set state: Nothing downstream needs this.
+            config.set_is_dark_mode(dark_mode == "dark")
 
         about_panel.about_server(input, output, session)
         dataset_panel.dataset_server(input, output, session, state)
