@@ -1,5 +1,30 @@
 # CHANGELOG
 
+## 0.5.1
+
+Highlights:
+
+- Persist tutorial and dark mode settings [#629](https://github.com/opendp/dp-wizard/pull/629)
+- remove references to google forms [#641](https://github.com/opendp/dp-wizard/pull/641)
+- Remove `fill_nan` and `fill_null` [#622](https://github.com/opendp/dp-wizard/pull/622)
+- User can set download name [#618](https://github.com/opendp/dp-wizard/pull/618)
+- Move choice of synthetic data or statistics to the start [#605](https://github.com/opendp/dp-wizard/pull/605)
+
+Also includes:
+
+- fill in labels for screenreaders [#623](https://github.com/opendp/dp-wizard/pull/623)
+- Check links [#628](https://github.com/opendp/dp-wizard/pull/628)
+- exclude columns which are missing headers [#633](https://github.com/opendp/dp-wizard/pull/633)
+- date and version in output [#642](https://github.com/opendp/dp-wizard/pull/642)
+- Inline query templates [#632](https://github.com/opendp/dp-wizard/pull/632)
+- more return types [#634](https://github.com/opendp/dp-wizard/pull/634)
+- link to blog posts and other projects [#611](https://github.com/opendp/dp-wizard/pull/611)
+- Show entity name in generated code [#606](https://github.com/opendp/dp-wizard/pull/606)
+- Demo `project_melted()` [#603](https://github.com/opendp/dp-wizard/pull/603)
+- Use template comments [#607](https://github.com/opendp/dp-wizard/pull/607)
+- Mention synthetic data in readme [#602](https://github.com/opendp/dp-wizard/pull/602)
+- replace zoom with email [#617](https://github.com/opendp/dp-wizard/pull/617)
+
 ## 0.5.0
 
 Highlights:
