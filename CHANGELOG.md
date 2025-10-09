@@ -1,5 +1,7 @@
 # CHANGELOG
 
+## 0.5.1
+
 Highlights:
 
 - Persist tutorial and dark mode settings [#629](https://github.com/opendp/dp-wizard/pull/629)
