@@ -113,7 +113,7 @@ def about_ui():
                 open=False,
             ),
         ),
-        nav_button("go_to_dataset", "Select dataset"),
+        nav_button("go_to_dataset", "Select Dataset"),
         value="about_panel",
     )
 

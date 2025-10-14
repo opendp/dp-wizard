@@ -537,7 +537,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
     @render.ui
     def define_analysis_button_ui():
         enabled = button_enabled()
-        button = nav_button("go_to_analysis", "Define analysis", disabled=not enabled)
+        button = nav_button("go_to_analysis", "Define Analysis", disabled=not enabled)
         if enabled:
             return button
         return [
