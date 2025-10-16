@@ -18,7 +18,7 @@ def code_sample(title: str, python_block: str):
     >>> code_sample('test', 'print("hello, world")')
     <details>
       <summary>
-        Code sample: test
+        Code Sample: test
       </summary>
       <pre><code class="language-python">print(&quot;hello, world&quot;)
     </code></pre>
@@ -29,7 +29,7 @@ def code_sample(title: str, python_block: str):
     # Based on: https://github.com/posit-dev/py-shiny/issues/491
     # If that is incorporated into Shiny, this could be simplified.
     return details(
-        summary(["Code sample: ", title]),
+        summary(["Code Sample: ", title]),
         ui.markdown(f"```python\n{python_block}\n```"),
         script(
             "hljs.highlightAll();"

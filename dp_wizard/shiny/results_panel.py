@@ -149,7 +149,7 @@ def results_server(
     @render.ui
     def custom_download_stem_ui():
         return ui.card(
-            ui.card_header("Download stem"),
+            ui.card_header("Download Stem"),
             ui.markdown(
                 """
                 An appropriate extension for each download is added to this stem.
@@ -157,7 +157,7 @@ def results_server(
             ),
             ui.input_text(
                 "custom_download_stem",
-                only_for_screenreader("Download stem"),
+                only_for_screenreader("Download Stem"),
                 download_stem(),
             ),
         )
