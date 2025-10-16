@@ -29,7 +29,9 @@ attrs==25.3.0
 beautifulsoup4==4.13.4
     # via nbconvert
 black==25.1.0
-    # via dp-wizard-templates
+    # via
+    #   -r requirements-dev.in
+    #   dp-wizard-templates
 bleach[css]==6.2.0
     # via nbconvert
 build==1.2.2.post1
