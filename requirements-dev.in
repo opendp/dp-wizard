@@ -8,6 +8,7 @@ flake8-bugbear
 pre-commit
 tomlkit
 isort
+black
 
 # Testing:
 pytest

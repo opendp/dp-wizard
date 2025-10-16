@@ -32,7 +32,7 @@ def test_cloud_app(page: Page, cloud_app: ShinyAppProc):  # pragma: no cover
     expect(page.get_by_text("Choose Public CSV")).not_to_be_visible()
     page.get_by_label("CSV Column Names").fill("a_column")
 
-    page.get_by_role("button", name="Define analysis").click()
+    page.get_by_role("button", name="Define Analysis").click()
     page.locator(".selectize-input").nth(0).click()
     page.get_by_text("1: a_column").click()
     page.get_by_label("Lower").fill("0")
@@ -58,7 +58,7 @@ def test_qa_app(page: Page, qa_app: ShinyAppProc):  # pragma: no cover
     page.goto(qa_app.url)
 
     page.locator("#max_rows").fill("10000")
-    page.get_by_role("button", name="Define analysis").click()
+    page.get_by_role("button", name="Define Analysis").click()
 
     page.locator(".selectize-input").nth(0).click()
     page.get_by_text(": grade").click()
@@ -75,7 +75,7 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     perform_analysis_text = "Select columns to calculate statistics on"
     download_results_text = "You can now make a differentially private release"
 
-    # -- Select dataset --
+    # -- Select Dataset --
     page.goto(local_app.url)
     expect(page).to_have_title("DP Wizard")
     page.locator("#max_rows").fill("10000")
@@ -83,12 +83,12 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     expect(page.get_by_text(perform_analysis_text)).not_to_be_visible()
     expect(page.get_by_text(download_results_text)).not_to_be_visible()
     page.locator("#contributions").fill("123")
-    page.get_by_text("Code sample: Unit of Privacy").click()
+    page.get_by_text("Code Sample: Unit of Privacy").click()
     expect(page.get_by_text("123")).to_have_class("hljs-number")
     expect(page.locator(".shiny-output-error")).not_to_be_attached()
 
     # Button disabled until upload:
-    define_analysis_button = page.get_by_role("button", name="Define analysis")
+    define_analysis_button = page.get_by_role("button", name="Define Analysis")
     assert define_analysis_button.is_disabled()
 
     # Now upload:
@@ -112,7 +112,7 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
 
     expect(page.locator(".shiny-output-error")).not_to_be_attached()
 
-    # -- Define analysis --
+    # -- Define Analysis --
     define_analysis_button.click()
     expect(page.get_by_text(pick_dataset_text)).not_to_be_visible()
     expect(page.get_by_text(perform_analysis_text)).to_be_visible()
@@ -202,12 +202,12 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     expect(page.get_by_text(results_requirements_warning)).to_be_visible()
     page.get_by_role("tab", name="Select Dataset").click()
 
-    # -- Select dataset --
+    # -- Select Dataset --
     csv_path = Path(__file__).parent / "fixtures" / "fake.csv"
     page.get_by_label("Choose Public CSV").set_input_files(csv_path.resolve())
 
-    # -- Define analysis --
-    page.get_by_role("button", name="Define analysis").click()
+    # -- Define Analysis --
+    page.get_by_role("button", name="Define Analysis").click()
     expect(page.get_by_text(analysis_release_warning)).not_to_be_visible()
     expect(page.get_by_text(analysis_requirements_warning)).not_to_be_visible()
 
