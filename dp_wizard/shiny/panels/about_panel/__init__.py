@@ -25,7 +25,9 @@ def _run(cmd) -> str:
 
 
 def _get_info() -> str:
-    version = (Path(__file__).parent.parent / "VERSION").read_text().strip()
+    version = (
+        (Path(__file__).parent.parent.parent.parent / "VERSION").read_text().strip()
+    )
     git_status = _run("git status")
     pip_freeze = _run("pip freeze")
     return f"""

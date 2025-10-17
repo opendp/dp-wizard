@@ -8,7 +8,7 @@ from faicons import icon_svg
 from htmltools import Tag
 from shiny import App, Inputs, Outputs, Session, reactive, ui
 
-from dp_wizard.shiny import (
+from dp_wizard.shiny.panels import (
     about_panel,
     analysis_panel,
     dataset_panel,
