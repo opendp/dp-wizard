@@ -409,7 +409,7 @@ def results_server(
         def make_report():
             notebook_nb()  # Evaluate just for the side effect of creating report.
             return (
-                Path(__file__).parent.parent.parent / "tmp" / "report.txt"
+                Path(__file__).parent.parent.parent.parent / "tmp" / "report.txt"
             ).read_text()
 
         yield make_download_or_modal_error(make_report)
@@ -422,7 +422,7 @@ def results_server(
         def make_table():
             notebook_nb()  # Evaluate just for the side effect of creating report.
             return (
-                Path(__file__).parent.parent.parent / "tmp" / "report.csv"
+                Path(__file__).parent.parent.parent.parent / "tmp" / "report.csv"
             ).read_text()
 
         yield make_download_or_modal_error(make_table)

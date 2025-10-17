@@ -234,6 +234,7 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
             Path(__file__).parent.parent
             / "dp_wizard"
             / "shiny"
+            / "panels"
             / "results_panel"
             / "__init__.py"
         )
