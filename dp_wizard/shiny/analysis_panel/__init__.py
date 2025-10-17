@@ -6,7 +6,7 @@ from htmltools import tags
 from shiny import Inputs, Outputs, Session, reactive, render, ui
 
 from dp_wizard import registry_url
-from dp_wizard.shiny.components.column_module import column_server, column_ui
+from dp_wizard.shiny.analysis_panel.column_module import column_server, column_ui
 from dp_wizard.shiny.components.inputs import log_slider
 from dp_wizard.shiny.components.outputs import (
     code_sample,
