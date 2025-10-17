@@ -408,7 +408,9 @@ def results_server(
     async def download_report():
         def make_report():
             notebook_nb()  # Evaluate just for the side effect of creating report.
-            return (Path(__file__).parent.parent / "tmp" / "report.txt").read_text()
+            return (
+                Path(__file__).parent.parent.parent / "tmp" / "report.txt"
+            ).read_text()
 
         yield make_download_or_modal_error(make_report)
 
@@ -419,6 +421,8 @@ def results_server(
     async def download_table():
         def make_table():
             notebook_nb()  # Evaluate just for the side effect of creating report.
-            return (Path(__file__).parent.parent / "tmp" / "report.csv").read_text()
+            return (
+                Path(__file__).parent.parent.parent / "tmp" / "report.csv"
+            ).read_text()
 
         yield make_download_or_modal_error(make_table)

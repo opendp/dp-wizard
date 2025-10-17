@@ -258,7 +258,8 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                     # NOTE: If stats vs. synth is moved to the top of the flow,
                     # then we can show the appropriate template here.
                     "stats_context",
-                    Path(__file__).parent.parent / "utils/code_generators/no-tests",
+                    Path(__file__).parent.parent.parent
+                    / "utils/code_generators/no-tests",
                 )
                 .fill_values(CSV_PATH="sample.csv")
                 .fill_expressions(

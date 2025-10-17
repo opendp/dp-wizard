@@ -231,7 +231,11 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     matches = [
         re.search(r'button\("([^"]+)", "([^"]+)"', line)
         for line in (
-            Path(__file__).parent.parent / "dp_wizard" / "shiny" / "results_panel.py"
+            Path(__file__).parent.parent
+            / "dp_wizard"
+            / "shiny"
+            / "results_panel"
+            / "__init__.py"
         )
         .read_text()
         .splitlines()
