@@ -36,7 +36,7 @@ def analysis_ui():
         "Define Analysis",
         ui.output_ui("analysis_requirements_warning_ui"),
         ui.output_ui("analysis_release_warning_ui"),
-        ui.output_ui("dataset_summary_ui"),
+        ui.output_ui("previous_summary_ui"),
         ui.layout_columns(
             ui.card(
                 ui.card_header(columns_icon, "Columns"),
@@ -229,7 +229,7 @@ def analysis_server(
         )
 
     @render.ui
-    def dataset_summary_ui():
+    def previous_summary_ui():
         return dataset_summary(state)
 
     @reactive.effect
