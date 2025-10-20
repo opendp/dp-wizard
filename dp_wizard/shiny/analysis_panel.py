@@ -10,8 +10,11 @@ from dp_wizard.shiny.components.column_module import column_server, column_ui
 from dp_wizard.shiny.components.icons import (
     budget_icon,
     columns_icon,
+    data_source_icon,
     groups_icon,
+    product_icon,
     simulation_icon,
+    unit_of_privacy_icon,
 )
 from dp_wizard.shiny.components.inputs import log_slider
 from dp_wizard.shiny.components.outputs import (
@@ -35,6 +38,7 @@ def analysis_ui():
         "Define Analysis",
         ui.output_ui("analysis_requirements_warning_ui"),
         ui.output_ui("analysis_release_warning_ui"),
+        ui.output_ui("dataset_summary_ui"),
         ui.layout_columns(
             ui.card(
                 ui.card_header(columns_icon, "Columns"),
@@ -144,14 +148,14 @@ def analysis_server(
 
     # Dataset choices:
     # initial_private_csv_path = state.initial_private_csv_path
-    # private_csv_path = state.private_csv_path
+    private_csv_path = state.private_csv_path
     # initial_public_csv_path = state.initial_private_csv_path
     public_csv_path = state.public_csv_path
     contributions = state.contributions
-    # contributions_entity = state.contributions_entity
+    contributions_entity = state.contributions_entity
     max_rows = state.max_rows
     # initial_product = state.initial_product
-    # product = state.product
+    product = state.product
 
     # Analysis choices:
     column_names = state.column_names
@@ -225,6 +229,34 @@ def analysis_server(
                 """
             ),
         )
+
+    @render.ui
+    def dataset_summary_ui():
+        from dp_wizard.shiny.components.icons import (
+            data_source_icon,
+            product_icon,
+            unit_of_privacy_icon,
+        )
+
+        sources = []
+        if private_csv_path():
+            sources.append("Private CSV")
+        if public_csv_path():
+            sources.append("Public CSV")
+        sources_str = ", ".join(sources)
+
+        unit_of_privacy_str = f"{contributions()} rows per {contributions_entity()}"
+
+        product_str = product()
+
+        return [
+            data_source_icon,
+            f"Data Source: {sources_str}",
+            unit_of_privacy_icon,
+            f"Unit of Privacy: {unit_of_privacy_str}",
+            product_icon,
+            f"Product: {product_str}",
+        ]
 
     @reactive.effect
     @reactive.event(input.columns_selectize)
