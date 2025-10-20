@@ -10,11 +10,8 @@ from dp_wizard.shiny.components.column_module import column_server, column_ui
 from dp_wizard.shiny.components.icons import (
     budget_icon,
     columns_icon,
-    data_source_icon,
     groups_icon,
-    product_icon,
     simulation_icon,
-    unit_of_privacy_icon,
 )
 from dp_wizard.shiny.components.inputs import log_slider
 from dp_wizard.shiny.components.outputs import (
@@ -24,6 +21,7 @@ from dp_wizard.shiny.components.outputs import (
     nav_button,
     tutorial_box,
 )
+from dp_wizard.shiny.components.summaries import dataset_summary
 from dp_wizard.types import AppState
 from dp_wizard.utils.code_generators import make_privacy_loss_block
 from dp_wizard.utils.csv_helper import (
@@ -232,36 +230,7 @@ def analysis_server(
 
     @render.ui
     def dataset_summary_ui():
-        from dp_wizard.shiny.components.icons import (
-            data_source_icon,
-            product_icon,
-            unit_of_privacy_icon,
-        )
-
-        sources = []
-        if private_csv_path():
-            sources.append("Private CSV")
-        if public_csv_path():
-            sources.append("Public CSV")
-        sources_str = ", ".join(sources)
-
-        unit_of_privacy_str = f"{contributions()} rows per {contributions_entity()}"
-
-        product_str = product()
-
-        from shiny.ui import tags
-
-        return tags.div(
-            tags.small(
-                data_source_icon,
-                f"Data Source: {sources_str}; ",
-                unit_of_privacy_icon,
-                f"Unit of Privacy: {unit_of_privacy_str}; ",
-                product_icon,
-                f"Product: {product_str}.",
-            ),
-            style="padding: 0 1em 1em 1em; ",
-        )
+        return dataset_summary(state)
 
     @reactive.effect
     @reactive.event(input.columns_selectize)
