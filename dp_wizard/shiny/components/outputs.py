@@ -1,8 +1,9 @@
 import re
 
-from faicons import icon_svg
 from htmltools.tags import details, script, small, summary
 from shiny import ui
+
+from dp_wizard.shiny.components.icons import next_tab_icon, tutorial_icon
 
 col_widths = {
     # Controls stay roughly a constant width;
@@ -60,7 +61,7 @@ def tutorial_box(
     """
     if is_tutorial:
         inner_html = small(
-            icon_svg("circle-question"),
+            tutorial_icon,
             ui.markdown(f"{markdown}\n\n{extra_markdown if show_extra else ''}"),
         )
         # Move the SVG icon inside the first element:
@@ -90,7 +91,7 @@ def info_md_box(markdown):  # pragma: no cover
 def nav_button(id, label, disabled=False):
     return ui.input_action_button(
         id,
-        [ui.tags.span(label, style="padding-right: 1em;"), icon_svg("play")],
+        [ui.tags.span(label, style="padding-right: 1em;"), next_tab_icon],
         disabled=disabled,
         class_="float-end",
     )

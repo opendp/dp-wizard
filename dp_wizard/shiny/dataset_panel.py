@@ -2,10 +2,14 @@ from pathlib import Path
 from typing import Optional
 
 from dp_wizard_templates.code_template import Template
-from faicons import icon_svg
 from shiny import Inputs, Outputs, Session, reactive, render, ui
 
 from dp_wizard import opendp_version
+from dp_wizard.shiny.components.icons import (
+    data_source_icon,
+    product_icon,
+    unit_of_privacy_icon,
+)
 from dp_wizard.shiny.components.outputs import (
     code_sample,
     col_widths,
@@ -75,20 +79,20 @@ def dataset_ui():
         ui.output_ui("welcome_ui"),
         ui.layout_columns(
             ui.card(
-                ui.card_header(icon_svg("file"), "Data Source"),
+                ui.card_header(data_source_icon, "Data Source"),
                 ui.output_ui("csv_or_columns_ui"),
                 ui.output_ui("row_count_bounds_ui"),
             ),
             [
                 ui.card(
-                    ui.card_header(icon_svg("shield-halved"), "Unit of Privacy"),
+                    ui.card_header(unit_of_privacy_icon, "Unit of Privacy"),
                     ui.output_ui("input_entity_ui"),
                     ui.output_ui("input_contributions_ui"),
                     ui.output_ui("contributions_validation_ui"),
                     ui.output_ui("unit_of_privacy_python_ui"),
                 ),
                 ui.card(
-                    ui.card_header(icon_svg("cart-shopping"), "Product"),
+                    ui.card_header(product_icon, "Product"),
                     ui.output_ui("product_ui"),
                 ),
             ],
