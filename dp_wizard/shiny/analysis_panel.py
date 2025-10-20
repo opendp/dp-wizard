@@ -249,14 +249,19 @@ def analysis_server(
 
         product_str = product()
 
-        return [
-            data_source_icon,
-            f"Data Source: {sources_str}",
-            unit_of_privacy_icon,
-            f"Unit of Privacy: {unit_of_privacy_str}",
-            product_icon,
-            f"Product: {product_str}",
-        ]
+        from shiny.ui import tags
+
+        return tags.div(
+            tags.small(
+                data_source_icon,
+                f"Data Source: {sources_str}; ",
+                unit_of_privacy_icon,
+                f"Unit of Privacy: {unit_of_privacy_str}; ",
+                product_icon,
+                f"Product: {product_str}.",
+            ),
+            style="padding: 0 1em 1em 1em; ",
+        )
 
     @reactive.effect
     @reactive.event(input.columns_selectize)
