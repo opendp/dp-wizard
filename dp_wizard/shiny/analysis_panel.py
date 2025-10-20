@@ -2,7 +2,6 @@ from math import pow
 from pathlib import Path
 from typing import Iterable
 
-from htmltools import tags
 from shiny import Inputs, Outputs, Session, reactive, render, ui
 
 from dp_wizard import registry_url
