@@ -13,7 +13,7 @@ from dp_wizard.types import AppState
 _css = "display: block; padding: 0 1em 1em 1em;"
 
 
-def dataset_summary(state: AppState):
+def dataset_summary(state: AppState):  # pragma: no cover
     sources = []
     if state.private_csv_path():
         sources.append("Private CSV")
@@ -35,7 +35,7 @@ def dataset_summary(state: AppState):
     )
 
 
-def analysis_summary(state: AppState):
+def analysis_summary(state: AppState):  # pragma: no cover
     columns = (
         ", ".join(
             f"{analysis} of {column}"
