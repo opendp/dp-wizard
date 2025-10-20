@@ -1,11 +1,16 @@
 from shiny.ui import tags
 
 from dp_wizard.shiny.components.icons import (
+    budget_icon,
+    columns_icon,
     data_source_icon,
+    groups_icon,
     product_icon,
     unit_of_privacy_icon,
 )
 from dp_wizard.types import AppState
+
+_css = "display: block; padding: 0 1em 1em 1em;"
 
 
 def dataset_summary(state: AppState):
@@ -14,22 +19,39 @@ def dataset_summary(state: AppState):
         sources.append("Private CSV")
     if state.public_csv_path():
         sources.append("Public CSV")
-    sources_str = ", ".join(sources)
 
-    unit_of_privacy_str = (
-        f"{state.contributions()} row / {state.contributions_entity()}"
+    unit_of_privacy = f"{state.contributions()} row / {state.contributions_entity()}"
+
+    product = state.product()
+
+    return tags.small(
+        data_source_icon,
+        f"Data Source: {', '.join(sources)}; ",
+        unit_of_privacy_icon,
+        f"Unit of Privacy: {unit_of_privacy}; ",
+        product_icon,
+        f"Product: {product}.",
+        style=_css,
     )
 
-    product_str = state.product()
 
-    return (
-        tags.small(
-            data_source_icon,
-            f"Data Source: {sources_str}; ",
-            unit_of_privacy_icon,
-            f"Unit of Privacy: {unit_of_privacy_str}; ",
-            product_icon,
-            f"Product: {product_str}.",
-            style="display: block; padding: 0 1em 1em 1em;",
-        ),
+def analysis_summary(state: AppState):
+    columns = (
+        ", ".join(
+            f"{analysis} of {column}"
+            for column, analysis in state.analysis_types().items()
+        )
+        or "None"
+    )
+    groups = ", ".join(state.groups()) or "None"
+    budget = state.epsilon()
+
+    return tags.small(
+        columns_icon,
+        f"Columns: {columns}; ",
+        groups_icon,
+        f"Groups: {groups}; ",
+        budget_icon,
+        f"Privacy Budget: {budget} epsilon.",
+        style=_css,
     )

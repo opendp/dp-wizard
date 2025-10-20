@@ -15,7 +15,7 @@ from dp_wizard.shiny.components.outputs import (
     only_for_screenreader,
     tutorial_box,
 )
-from dp_wizard.shiny.components.summaries import dataset_summary
+from dp_wizard.shiny.components.summaries import analysis_summary, dataset_summary
 from dp_wizard.types import AppState
 from dp_wizard.utils.code_generators import AnalysisPlan, AnalysisPlanColumn
 from dp_wizard.utils.code_generators.notebook_generator import (
@@ -145,7 +145,10 @@ def results_server(
 
     @render.ui
     def two_previous_summary_ui():
-        return dataset_summary(state)
+        return [
+            dataset_summary(state),
+            analysis_summary(state),
+        ]
 
     @reactive.calc
     def download_stem() -> str:
