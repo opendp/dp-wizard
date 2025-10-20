@@ -2,6 +2,7 @@ from math import pow
 from pathlib import Path
 from typing import Iterable
 
+from faicons import icon_svg
 from htmltools import tags
 from shiny import Inputs, Outputs, Session, reactive, render, ui
 
@@ -31,7 +32,7 @@ def analysis_ui():
         ui.output_ui("analysis_release_warning_ui"),
         ui.layout_columns(
             ui.card(
-                ui.card_header("Columns"),
+                ui.card_header(icon_svg("table-columns"), "Columns"),
                 ui.markdown("Select columns to calculate statistics on."),
                 ui.input_selectize(
                     "columns_selectize",
@@ -42,7 +43,7 @@ def analysis_ui():
                 ui.output_ui("columns_selectize_tutorial_ui"),
             ),
             ui.card(
-                ui.card_header("Grouping"),
+                ui.card_header(icon_svg("table"), "Grouping"),
                 ui.markdown(
                     """
                     Select columns to group by, or leave empty
@@ -61,7 +62,7 @@ def analysis_ui():
                 ui.output_ui("groups_selectize_tutorial_ui"),
             ),
             ui.card(
-                ui.card_header("Privacy Budget"),
+                ui.card_header(icon_svg("piggy-bank"), "Privacy Budget"),
                 ui.markdown(
                     f"""
                     What is your privacy budget for this release?
@@ -78,7 +79,7 @@ def analysis_ui():
                 ui.output_ui("privacy_loss_python_ui"),
             ),
             ui.card(
-                ui.card_header("Simulation"),
+                ui.card_header(icon_svg("chart-simple"), "Simulation"),
                 ui.output_ui("simulation_card_ui"),
             ),
             col_widths={
