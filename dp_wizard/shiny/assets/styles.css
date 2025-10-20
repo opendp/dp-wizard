@@ -84,7 +84,7 @@ label:has(.only-for-screenreaders) {
     display: inline;
 }
 
-/* Default margin on title icon. */
+/* Increase default margin on title icon. */
 .card-header > .fa {
     margin-right: 0.8em !important;
 }
