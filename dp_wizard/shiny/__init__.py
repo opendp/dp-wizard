@@ -4,7 +4,6 @@ import re
 from collections import defaultdict
 from pathlib import Path
 
-from faicons import icon_svg
 from htmltools import Tag
 from shiny import App, Inputs, Outputs, Session, reactive, ui
 
@@ -14,6 +13,7 @@ from dp_wizard.shiny import (
     dataset_panel,
     results_panel,
 )
+from dp_wizard.shiny.components.icons import tutorial_icon
 from dp_wizard.types import AppState, Product
 from dp_wizard.utils import config
 from dp_wizard.utils.argparse_helpers import CLIInfo
@@ -66,7 +66,7 @@ def _make_app_ui(cli_info: CLIInfo) -> Tag:
                 ui.input_switch(
                     "tutorial_mode",
                     ui.tooltip(
-                        icon_svg("circle-question"),
+                        tutorial_icon,
                         """
                         Tutorial mode walks you through the analysis process
                         and provides extra help along the way.
