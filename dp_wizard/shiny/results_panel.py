@@ -1,25 +1,27 @@
-from pathlib import Path
 import re
+from pathlib import Path
 
-from shiny import ui, render, reactive, Inputs, Outputs, Session, types
+from dp_wizard_templates.converters import (
+    convert_nb_to_html,
+    convert_py_to_nb,
+)
 from faicons import icon_svg
 from htmltools.tags import p
+from shiny import Inputs, Outputs, Session, reactive, render, types, ui
 
-from dp_wizard.utils.code_generators import (
-    AnalysisPlan,
-    AnalysisPlanColumn,
-)
-from dp_wizard.utils.code_generators.notebook_generator import NotebookGenerator
-from dp_wizard.utils.code_generators.script_generator import ScriptGenerator
-from dp_wizard.utils.converters import (
-    convert_py_to_nb,
-    convert_nb_to_html,
-)
 from dp_wizard.shiny.components.outputs import (
     hide_if,
     info_md_box,
+    only_for_screenreader,
+    tutorial_box,
 )
-
+from dp_wizard.types import AppState
+from dp_wizard.utils.code_generators import AnalysisPlan, AnalysisPlanColumn
+from dp_wizard.utils.code_generators.notebook_generator import (
+    PLACEHOLDER_CSV_NAME,
+    NotebookGenerator,
+)
+from dp_wizard.utils.code_generators.script_generator import ScriptGenerator
 
 wait_message = "Please wait."
 
@@ -45,7 +47,7 @@ def button(
     return ui.download_button(**kwargs)
 
 
-def _strip_ansi(e):
+def _strip_ansi(e) -> str:
     """
     >>> e = Exception('\x1b[0;31mValueError\x1b[0m: ...')
     >>> _strip_ansi(e)
@@ -78,6 +80,8 @@ def results_ui():  # pragma: no cover
     return ui.nav_panel(
         "Download Results",
         ui.output_ui("results_requirements_warning_ui"),
+        ui.output_ui("synthetic_data_ui"),
+        ui.output_ui("custom_download_stem_ui"),
         ui.output_ui("download_results_ui"),
         ui.output_ui("download_code_ui"),
         value="results_panel",
@@ -88,20 +92,43 @@ def results_server(
     input: Inputs,
     output: Outputs,
     session: Session,
-    released: reactive.Value[bool],
-    in_cloud: bool,
-    qa_mode: bool,
-    public_csv_path: reactive.Value[str],
-    private_csv_path: reactive.Value[str],
-    contributions: reactive.Value[int],
-    analysis_types: reactive.Value[dict[str, str]],
-    lower_bounds: reactive.Value[dict[str, float]],
-    upper_bounds: reactive.Value[dict[str, float]],
-    bin_counts: reactive.Value[dict[str, int]],
-    groups: reactive.Value[list[str]],
-    weights: reactive.Value[dict[str, str]],
-    epsilon: reactive.Value[float],
+    state: AppState,
 ):  # pragma: no cover
+    # CLI options:
+    # is_sample_csv = state.is_sample_csv
+    in_cloud = state.in_cloud
+    qa_mode = state.qa_mode
+
+    # Top-level:
+    is_tutorial_mode = state.is_tutorial_mode
+
+    # Dataset choices:
+    # initial_private_csv_path = state.initial_private_csv_path
+    private_csv_path = state.private_csv_path
+    # initial_public_csv_path = state.initial_private_csv_path
+    public_csv_path = state.public_csv_path
+    contributions = state.contributions
+    contributions_entity = state.contributions_entity
+    max_rows = state.max_rows
+    # initial_product = state.initial_product
+    product = state.product
+
+    # Analysis choices:
+    # column_names = state.column_names
+    groups = state.groups
+    epsilon = state.epsilon
+
+    # Per-column choices:
+    # (Note that these are all dicts, with the ColumnName as the key.)
+    analysis_types = state.analysis_types
+    lower_bounds = state.lower_bounds
+    upper_bounds = state.upper_bounds
+    bin_counts = state.bin_counts
+    weights = state.weights
+    # analysis_errors = state.analysis_errors
+
+    # Release state:
+    released = state.released
 
     @render.ui
     def results_requirements_warning_ui():
@@ -115,6 +142,31 @@ def results_server(
             ),
         )
 
+    @reactive.calc
+    def download_stem() -> str:
+        return analysis_plan().to_stem()
+
+    @render.ui
+    def custom_download_stem_ui():
+        return ui.card(
+            ui.card_header("Download Stem"),
+            ui.markdown(
+                """
+                An appropriate extension for each download is added to this stem.
+                """
+            ),
+            ui.input_text(
+                "custom_download_stem",
+                only_for_screenreader("Download Stem"),
+                download_stem(),
+            ),
+        )
+
+    @reactive.calc
+    def clean_download_stem() -> str:
+        stem = input.custom_download_stem()
+        return re.sub(r"[^A-Za-z0-9_.-]", "-", stem)[:255]
+
     @render.ui
     def download_results_ui():
         if in_cloud:
@@ -122,7 +174,14 @@ def results_server(
         disabled = not weights()
         return [
             ui.h3("Download Results"),
-            ui.p("You can now make a differentially private release of your data."),
+            tutorial_box(
+                is_tutorial_mode(),
+                """
+                Now you can download a notebook for your analysis.
+                The Jupyter notebook could be used locally or on Colab,
+                but the HTML version can be viewed in the brower.
+                """,
+            ),
             # Find more icons on Font Awesome: https://fontawesome.com/search?ic=free
             ui.accordion(
                 ui.accordion_panel(
@@ -152,7 +211,7 @@ def results_server(
                         """
                     ),
                     button("Table", ".csv", "file-csv", disabled=disabled),
-                    p("The same information, but condensed into a two-column CSV."),
+                    p("The same information, but condensed into a CSV."),
                 ),
             ),
         ]
@@ -162,19 +221,26 @@ def results_server(
         disabled = not weights()
         return [
             ui.h3("Download Code"),
-            ui.markdown(
-                """
-                When run locally, there are more download options because DP Wizard
-                can read your private CSV and release differentially private statistics.
+            tutorial_box(
+                is_tutorial_mode(),
+                (
+                    """
+                    When [installed and run
+                    locally](https://pypi.org/project/dp_wizard/),
+                    there are more download options because DP Wizard
+                    can read your private CSV and release differentially
+                    private statistics.
 
-                In the cloud, DP Wizard only provides unexecuted notebooks and scripts.
-                """
-                if in_cloud
-                else """
-                Alternatively, you can download a script or unexecuted notebook
-                that demonstrates the steps of your analysis,
-                but does not contain any data or analysis results.
-                """
+                    In the cloud, DP Wizard only provides unexecuted
+                    notebooks and scripts.
+                    """
+                    if in_cloud
+                    else """
+                    Alternatively, you can download a script or unexecuted
+                    notebook that demonstrates the steps of your analysis,
+                    but does not contain any data or analysis results.
+                    """
+                ),
             ),
             ui.accordion(
                 ui.accordion_panel(
@@ -241,7 +307,7 @@ def results_server(
         columns = {
             col: [
                 AnalysisPlanColumn(
-                    analysis_type=analysis_types()[col],
+                    analysis_name=analysis_types()[col],
                     lower_bound=lower_bounds()[col],
                     upper_bound=upper_bounds()[col],
                     bin_count=int(bin_counts()[col]),
@@ -251,19 +317,16 @@ def results_server(
             for col in weights().keys()
         }
         return AnalysisPlan(
+            product=product(),
             # Prefer private CSV, if available:
-            csv_path=private_csv_path()
-            or public_csv_path()
-            or "fill-in-correct-path.csv",
+            csv_path=private_csv_path() or public_csv_path() or PLACEHOLDER_CSV_NAME,
             contributions=contributions(),
+            contributions_entity=contributions_entity(),
             epsilon=epsilon(),
+            max_rows=int(max_rows()),
             groups=groups(),
             columns=columns,
         )
-
-    @reactive.calc
-    def download_stem() -> str:
-        return "dp-" + re.sub(r"\W+", "-", str(analysis_plan())).lower()
 
     @reactive.calc
     def notebook_nb():
@@ -295,14 +358,14 @@ def results_server(
         return convert_nb_to_html(notebook_nb_unexecuted())
 
     @render.download(
-        filename=lambda: download_stem() + ".py",
+        filename=lambda: clean_download_stem() + ".py",
         media_type="text/x-python",
     )
     async def download_script():
         yield make_download_or_modal_error(ScriptGenerator(analysis_plan()).make_py)
 
     @render.download(
-        filename=lambda: download_stem() + ".ipynb.py",
+        filename=lambda: clean_download_stem() + ".ipynb.py",
         media_type="text/x-python",
     )
     async def download_notebook_source():
@@ -311,35 +374,35 @@ def results_server(
             yield NotebookGenerator(analysis_plan()).make_py()
 
     @render.download(
-        filename=lambda: download_stem() + ".ipynb",
+        filename=lambda: clean_download_stem() + ".ipynb",
         media_type="application/x-ipynb+json",
     )
     async def download_notebook():
         yield make_download_or_modal_error(notebook_nb)
 
     @render.download(
-        filename=lambda: download_stem() + ".unexecuted.ipynb",
+        filename=lambda: clean_download_stem() + ".unexecuted.ipynb",
         media_type="application/x-ipynb+json",
     )
     async def download_notebook_unexecuted():
         yield make_download_or_modal_error(notebook_nb_unexecuted)
 
     @render.download(  # pyright: ignore
-        filename=lambda: download_stem() + ".html",
+        filename=lambda: clean_download_stem() + ".html",
         media_type="text/html",
     )
     async def download_html():
         yield make_download_or_modal_error(notebook_html)
 
     @render.download(  # pyright: ignore
-        filename=lambda: download_stem() + ".unexecuted.html",
+        filename=lambda: clean_download_stem() + ".unexecuted.html",
         media_type="text/html",
     )
     async def download_html_unexecuted():
         yield make_download_or_modal_error(notebook_html_unexecuted)
 
     @render.download(
-        filename=lambda: download_stem() + ".txt",
+        filename=lambda: clean_download_stem() + ".txt",
         media_type="text/plain",
     )
     async def download_report():
@@ -350,7 +413,7 @@ def results_server(
         yield make_download_or_modal_error(make_report)
 
     @render.download(
-        filename=lambda: download_stem() + ".csv",
+        filename=lambda: clean_download_stem() + ".csv",
         media_type="text/csv",
     )
     async def download_table():

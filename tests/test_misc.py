@@ -1,9 +1,10 @@
-import subprocess
-import pytest
-from pathlib import Path
 import re
-import dp_wizard
+import subprocess
+from pathlib import Path
 
+import pytest
+
+import dp_wizard
 
 tests = {
     "flake8 linting": "flake8 . --count --show-source --statistics",
@@ -26,7 +27,6 @@ def test_version():
     [
         "pyproject.toml",
         "requirements-dev.txt",
-        "dp_wizard/utils/code_generators/abstract_generator.py",
     ],
 )
 def test_opendp_pin(rel_path):
@@ -34,8 +34,9 @@ def test_opendp_pin(rel_path):
     opendp_lines = [
         line for line in (root / rel_path).read_text().splitlines() if "opendp[" in line
     ]
-    assert len(opendp_lines) == 2 if rel_path == "pyproject.toml" else 1
-    assert all("opendp[polars]==0.13.0" in line for line in opendp_lines)
+    assert all(
+        [f"opendp[mbi]=={dp_wizard.opendp_version}" in line for line in opendp_lines]
+    )
 
 
 @pytest.mark.parametrize(

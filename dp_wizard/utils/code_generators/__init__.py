@@ -1,12 +1,14 @@
-from typing import NamedTuple, Optional
 import re
+from typing import NamedTuple, Optional
 
+from dp_wizard_templates.code_template import Template
 
-from dp_wizard.utils.code_template import Template
+from dp_wizard import opendp_version, registry_url
+from dp_wizard.types import AnalysisName, ColumnName, Product
 
 
 class AnalysisPlanColumn(NamedTuple):
-    analysis_type: str
+    analysis_name: AnalysisName
     lower_bound: float
     upper_bound: float
     bin_count: int
@@ -14,42 +16,149 @@ class AnalysisPlanColumn(NamedTuple):
 
 
 class AnalysisPlan(NamedTuple):
+    """
+    >>> plan = AnalysisPlan(
+    ...     product=Product.STATISTICS,
+    ...     csv_path='optional.csv',
+    ...     contributions=10,
+    ...     contributions_entity='Family',
+    ...     epsilon=2.0,
+    ...     max_rows=1000,
+    ...     groups=['grouping_col'],
+    ...     columns={
+    ...         'data_col': [AnalysisPlanColumn('Histogram', 0, 100, 10, 1)]
+    ...     })
+    >>> print(plan)
+    DP Statistics for `data_col` grouped by `grouping_col`
+    >>> print(plan.to_stem())
+    dp_statistics_for_data_col_grouped_by_grouping_col
+    """
+
+    product: Product
     csv_path: Optional[str]
     contributions: int
+    contributions_entity: str
     epsilon: float
-    groups: list[str]
-    columns: dict[str, list[AnalysisPlanColumn]]
+    max_rows: int
+    groups: list[ColumnName]
+    columns: dict[ColumnName, list[AnalysisPlanColumn]]
 
-    def __str__(self):
-        return ", ".join(f"{k} {v[0].analysis_type}" for k, v in self.columns.items())
+    def __str__(self) -> str:
+        def md_list(names) -> str:
+            return ", ".join(f"`{name}`" for name in names)
+
+        columns = md_list(self.columns.keys())
+        groups = md_list(self.groups)
+        grouped_by = f" grouped by {groups}" if groups else ""
+        return f"{self.product} for {columns}{grouped_by}"
+
+    def to_stem(self) -> str:
+        return re.sub(r"\W+", " ", str(self)).strip().replace(" ", "_").lower()
 
 
 # Public functions used to generate code snippets in the UI;
 # These do not require an entire analysis plan, so they stand on their own.
 
 
-def make_privacy_unit_block(contributions: int):
+def make_privacy_unit_block(
+    contributions: int,
+    contributions_entity: str,
+):
+    import opendp.prelude as dp
+
+    def template(CONTRIBUTIONS, CONTRIBUTIONS_ENTITY):
+        # Each CONTRIBUTIONS_ENTITY can contribute this many rows.
+        contributions = CONTRIBUTIONS
+        privacy_unit = dp.unit_of(contributions=contributions)  # noqa: F841
+
     return (
-        Template("privacy_unit", __file__)
+        Template(template)
         .fill_values(CONTRIBUTIONS=contributions)
+        .fill_expressions(CONTRIBUTIONS_ENTITY=contributions_entity)
         .finish()
     )
 
 
-def make_privacy_loss_block(epsilon: float):
-    return Template("privacy_loss", __file__).fill_values(EPSILON=epsilon).finish()
+def make_privacy_loss_block(pure: bool, epsilon: float, max_rows: int):
+    """
+    Comments in the *pure* privacy loss block reference synthetic data generation
+    ("cuts dict"), so don't use "pure=True" for stats code!
+
+    >>> print(
+    ...     'pure DP: ',
+    ...     make_privacy_loss_block(pure=True, epsilon=1, max_rows=1000)
+    ... )
+    pure DP: ...delta=0...
+    >>> print(
+    ...     'approx DP: ',
+    ...     make_privacy_loss_block(pure=False, epsilon=1, max_rows=1000)
+    ... )
+    approx DP: ...delta=1 / max...
+    """
+
+    import opendp.prelude as dp
+
+    if pure:
+
+        def template(EPSILON, MAX_ROWS):
+            privacy_loss = dp.loss_of(  # noqa: F841
+                # Your privacy budget is captured in the "epsilon" parameter.
+                # Larger values increase the risk that personal data could be
+                # reconstructed, so choose the smallest value that gives you
+                # the needed accuracy. You can also compare your budget to
+                # other projects:
+                # REGISTRY_URL
+                epsilon=EPSILON,
+                # If your columns don't match your cuts dict,
+                # you will also need to provide a very small "delta" value.
+                # https://docs.opendp.org/en/OPENDP_V_VERSION/getting-started/tabular-data/grouping.html#Stable-Keys
+                delta=0,  # or 1 / max(1e7, MAX_ROWS),
+            )
+
+    else:
+
+        def template(EPSILON, MAX_ROWS):
+            privacy_loss = dp.loss_of(  # noqa: F841
+                # Your privacy budget is captured in the "epsilon" parameter.
+                # Larger values increase the risk that personal data could be
+                # reconstructed, so choose the smallest value that gives you
+                # the needed accuracy. You can also compare your budget to
+                # other projects:
+                # REGISTRY_URL
+                epsilon=EPSILON,
+                # There are many models of differential privacy. For flexibility,
+                # we are using a model which tolerates a small probability (delta)
+                # that data may be released in the clear. Delta should always be small,
+                # but if the dataset is particularly large,
+                # delta should be at least as small as 1/(row count).
+                # https://docs.opendp.org/en/OPENDP_V_VERSION/getting-started/tabular-data/grouping.html#Stable-Keys
+                delta=1 / max(1e7, MAX_ROWS),
+            )
+
+    return (
+        Template(template)
+        .fill_expressions(
+            OPENDP_V_VERSION=f"v{opendp_version}",
+            REGISTRY_URL=registry_url,
+        )
+        .fill_values(
+            EPSILON=epsilon,
+            MAX_ROWS=max_rows,
+        )
+        .finish()
+    )
 
 
 def make_column_config_block(
     name: str,
-    analysis_type: str,
+    analysis_name: AnalysisName,
     lower_bound: float,
     upper_bound: float,
     bin_count: int,
 ):
     from dp_wizard.utils.code_generators.analyses import get_analysis_by_name
 
-    return get_analysis_by_name(analysis_type).make_column_config_block(
+    return get_analysis_by_name(analysis_name).make_column_config_block(
         column_name=name,
         lower_bound=lower_bound,
         upper_bound=upper_bound,

@@ -1,42 +1,38 @@
 from logging import info
 
-from htmltools.tags import details, summary
-from shiny import ui, render, module, reactive, Inputs, Outputs, Session
-from shiny.types import SilentException
 import polars as pl
+from htmltools.tags import details, summary
+from shiny import Inputs, Outputs, Session, module, reactive, render, ui
+from shiny.types import SilentException
 
+from dp_wizard.shiny.components.outputs import (
+    code_sample,
+    col_widths,
+    hide_if,
+    info_md_box,
+    only_for_screenreader,
+    tutorial_box,
+)
+from dp_wizard.types import AnalysisName, ColumnName
+from dp_wizard.utils.code_generators import make_column_config_block
 from dp_wizard.utils.code_generators.analyses import (
+    count,
+    get_analysis_by_name,
+    has_bounds,
     histogram,
     mean,
     median,
-    get_analysis_by_name,
 )
-from dp_wizard.utils.dp_helper import make_accuracy_histogram
+from dp_wizard.utils.dp_helper import confidence, make_accuracy_histogram
+from dp_wizard.utils.mock_data import ColumnDef, mock_data
 from dp_wizard.utils.shared import plot_bars
-from dp_wizard.utils.code_generators import make_column_config_block
-from dp_wizard.shiny.components.outputs import (
-    output_code_sample,
-    demo_tooltip,
-    info_md_box,
-    hide_if,
-)
-from dp_wizard.utils.dp_helper import confidence
-from dp_wizard.utils.mock_data import mock_data, ColumnDef
-
 
 default_analysis_type = histogram.name
 default_weight = "2"
 label_width = "10em"  # Just wide enough so the text isn't trucated.
-col_widths = {
-    # Controls stay roughly a constant width;
-    # Graph expands to fill space.
-    "sm": [4, 8],
-    "md": [3, 9],
-    "lg": [2, 10],
-}
 
 
-def get_float_error(number_str):
+def get_float_error(number_str) -> str | None:
     """
     If the inputs are numeric, I think shiny converts
     any strings that can't be parsed to numbers into None,
@@ -54,24 +50,23 @@ def get_float_error(number_str):
     """
     if number_str is None or number_str == "":
         return "is required"
-    else:
-        try:
-            int(float(number_str))
-        except (TypeError, ValueError, OverflowError):
-            return "should be a number"
+    try:
+        int(float(number_str))
+    except (TypeError, ValueError, OverflowError):
+        return "should be a number"
     return None
 
 
-def get_bound_error(lower_bound, upper_bound):
+def get_bound_errors(lower_bound, upper_bound) -> list[str]:
     """
-    >>> get_bound_error(1, 2)
-    ''
-    >>> get_bound_error('abc', 'xyz')
-    '- Lower bound should be a number.\\n- Upper bound should be a number.'
-    >>> get_bound_error(1, None)
-    '- Upper bound is required.'
-    >>> get_bound_error(1, 0)
-    '- Lower bound should be less than upper bound.'
+    >>> get_bound_errors(1, 2)
+    []
+    >>> get_bound_errors('abc', 'xyz')
+    ['Lower bound should be a number.', 'Upper bound should be a number.']
+    >>> get_bound_errors(1, None)
+    ['Upper bound is required.']
+    >>> get_bound_errors(1, 0)
+    ['Lower bound should be less than upper bound.']
     """
     messages = []
     if error := get_float_error(lower_bound):
@@ -81,7 +76,37 @@ def get_bound_error(lower_bound, upper_bound):
     if not messages:
         if not (float(lower_bound) < float(upper_bound)):
             messages.append("Lower bound should be less than upper bound.")
-    return "\n".join(f"- {m}" for m in messages)
+    return messages
+
+
+def get_bin_errors(count) -> list[str]:
+    """
+    This function might be applied to either histogram bin counts,
+    or median candidate counts, so the wording is a little vague.
+
+    >>> get_bin_errors("5")
+    []
+    >>> get_bin_errors(None)
+    ['Number is required.']
+    >>> get_bin_errors("abc")
+    ['Number should be a number.']
+    >>> get_bin_errors("-1")
+    ['Number should be a positive integer.']
+    >>> get_bin_errors("101")
+    ['Number should be less than 100, just to keep computation from running too long.']
+    """
+    if error := get_float_error(count):
+        return [f"Number {error}."]
+    count = int(float(count))
+    if count <= 0:
+        return ["Number should be a positive integer."]
+    max_count = 100
+    if count > max_count:
+        return [
+            f"Number should be less than {max_count}, "
+            "just to keep computation from running too long."
+        ]
+    return []
 
 
 def error_md_ui(markdown):  # pragma: no cover
@@ -92,16 +117,7 @@ def error_md_ui(markdown):  # pragma: no cover
 def column_ui():  # pragma: no cover
     return ui.card(
         ui.card_header(ui.output_text("card_header")),
-        ui.layout_columns(
-            ui.input_select(
-                "analysis_type",
-                None,
-                [histogram.name, mean.name, median.name],
-                width=label_width,
-            ),
-            ui.output_ui("analysis_info_ui"),
-            col_widths=col_widths,  # type: ignore
-        ),
+        ui.output_ui("analysis_name_ui"),
         ui.output_ui("analysis_config_ui"),
     )
 
@@ -112,16 +128,19 @@ def column_server(
     output: Outputs,
     session: Session,
     public_csv_path: str,
-    name: str,
-    contributions: int,
-    epsilon: float,
+    name: ColumnName,
+    contributions: reactive.Value[int],
+    epsilon: reactive.Value[float],
     row_count: int,
-    analysis_types: reactive.Value[dict[str, str]],
-    lower_bounds: reactive.Value[dict[str, float]],
-    upper_bounds: reactive.Value[dict[str, float]],
-    bin_counts: reactive.Value[dict[str, int]],
-    weights: reactive.Value[dict[str, str]],
-    is_demo: bool,
+    groups: reactive.Value[list[ColumnName]],
+    analysis_types: reactive.Value[dict[ColumnName, AnalysisName]],
+    analysis_errors: reactive.Value[dict[ColumnName, bool]],
+    lower_bounds: reactive.Value[dict[ColumnName, float]],
+    upper_bounds: reactive.Value[dict[ColumnName, float]],
+    bin_counts: reactive.Value[dict[ColumnName, int]],
+    weights: reactive.Value[dict[ColumnName, str]],
+    is_tutorial_mode: reactive.Value[bool],
+    is_sample_csv: bool,
     is_single_column: bool,
 ):  # pragma: no cover
     @reactive.effect
@@ -183,13 +202,13 @@ def column_server(
         # Mock data only depends on lower and upper bounds, so it could be cached,
         # but I'd guess this is dominated by the DP operations,
         # so not worth optimizing.
-        # TODO: Use real public data, if we have it!
-        if public_csv_path:
-            lf = pl.scan_csv(public_csv_path)
-        else:
-            lf = pl.LazyFrame(
+        lf = (
+            pl.scan_csv(public_csv_path)
+            if public_csv_path
+            else pl.LazyFrame(
                 mock_data({name: ColumnDef(lower_x, upper_x)}, row_count=row_count)
             )
+        )
         return make_accuracy_histogram(
             lf=lf,
             column_name=name,
@@ -197,52 +216,65 @@ def column_server(
             lower_bound=lower_x,
             upper_bound=upper_x,
             bin_count=bin_count,
-            contributions=contributions,
-            weighted_epsilon=epsilon * weight / weights_sum,
+            contributions=contributions(),
+            weighted_epsilon=epsilon() * weight / weights_sum,
         )
 
     @render.text
     def card_header():
-        return name
+        groups_str = ", ".join(groups())
+        if not groups_str:
+            return name
+        return f"{name} (grouped by {groups_str})"
 
     @render.ui
-    def analysis_info_ui():
-        blurb_md = get_analysis_by_name(input.analysis_type()).blurb_md
-        return ui.markdown(blurb_md)
+    def analysis_name_ui():
+        analysis_name = analysis_types().get(name, histogram.name)
+        blurb_md = get_analysis_by_name(analysis_name).blurb_md
+        return (
+            ui.layout_columns(
+                ui.input_select(
+                    "analysis_type",
+                    only_for_screenreader("Type of analysis"),
+                    [histogram.name, mean.name, median.name, count.name],
+                    width=label_width,
+                    selected=analysis_name,
+                ),
+                ui.markdown(blurb_md),
+                col_widths=col_widths,  # type: ignore
+            ),
+        )
 
     @render.ui
     def analysis_config_ui():
-        col_widths = {
-            # Controls stay roughly a constant width;
-            # Graph expands to fill space.
-            "sm": [4, 8],
-            "md": [3, 9],
-            "lg": [2, 10],
-        }
-
         def lower_bound_input():
             return ui.input_text(
                 "lower_bound",
-                ["Lower Bound", ui.output_ui("bounds_tooltip_ui")],
-                str(lower_bounds().get(name, 0)),
+                "Lower Bound",
+                str(lower_bounds().get(name, "")),
                 width=label_width,
             )
 
         def upper_bound_input():
-            return ui.input_text(
-                "upper_bound",
-                "Upper Bound",
-                str(upper_bounds().get(name, 10)),
-                width=label_width,
+            return (
+                ui.input_text(
+                    "upper_bound",
+                    "Upper Bound",
+                    str(upper_bounds().get(name, "")),
+                    width=label_width,
+                ),
             )
 
         def bin_count_input():
-            return ui.input_numeric(
-                "bins",
-                ["Number of Bins", ui.output_ui("bins_tooltip_ui")],
-                bin_counts().get(name, 10),
-                width=label_width,
-            )
+            return [
+                ui.input_numeric(
+                    "bins",
+                    "Number of Bins",
+                    bin_counts().get(name, 10),
+                    width=label_width,
+                ),
+                ui.output_ui("bins_tutorial_ui"),
+            ]
 
         def candidate_count_input():
             # Just change the user-visible label,
@@ -251,11 +283,11 @@ def column_server(
             return ui.input_numeric(
                 "bins",
                 "Number of Candidates",
-                bin_counts().get(name, 10),
+                bin_counts().get(name, 0),
                 width=label_width,
             )
 
-        name = input.analysis_type()
+        analysis_name = input.analysis_type()
 
         # Had trouble with locals() inside comprehension in Python 3.10.
         # Not sure if this is the exact issue:
@@ -263,7 +295,7 @@ def column_server(
 
         # Fix is just to keep it outside the comprehension.
         local_variables = locals()
-        input_names = get_analysis_by_name(name).input_names
+        input_names = get_analysis_by_name(analysis_name).input_names
         input_functions = [local_variables[input_name] for input_name in input_names]
         with reactive.isolate():
             inputs = [input_function() for input_function in input_functions] + [
@@ -272,35 +304,39 @@ def column_server(
 
         return ui.layout_columns(
             inputs,
-            ui.output_ui(f"{name.lower()}_preview_ui"),
+            [
+                ui.output_ui("bounds_tutorial_ui"),
+                ui.output_ui(f"{analysis_name.lower()}_preview_ui"),
+            ],
             col_widths=col_widths,  # type: ignore
         )
 
     @render.ui
-    def bounds_tooltip_ui():
-        return demo_tooltip(
-            is_demo,
+    def bounds_tutorial_ui():
+        return tutorial_box(
+            is_tutorial_mode(),
             """
-            DP requires that we limit the sensitivity to the contributions
-            of any individual. To do this, we need an estimate of the lower
-            and upper bounds for each variable. We should not look at the
-            data when estimating the bounds! In this case, we could imagine
-            that "class year" would vary between 1 and 4, and we could limit
-            "grade" to values between 50 and 100.
+            Interpreting differential privacy strictly,
+            we should try never to look directly at the data,
+            not even to set bounds! This can be hard.
+            """,
+            is_sample_csv,
+            """
+            Given what we know _a priori_ about grading scales,
+            you could limit `grade` to values between 0 and 100.
             """,
         )
 
     @render.ui
-    def bins_tooltip_ui():
-        return demo_tooltip(
-            is_demo,
+    def bins_tutorial_ui():
+        return tutorial_box(
+            is_tutorial_mode(),
             """
-            Different statistics can be measured with DP.
-            This tool provides a histogram. If you increase the number of bins,
-            you'll see that each individual bin becomes noisier to provide
-            the same overall privacy guarantee. For this example, give
-            "class_year" 4 bins and "grade" 5 bins.
+            If you decrease the number of bins,
+            you'll see that each individual bin becomes
+            less noisy.
             """,
+            responsive=False,
         )
 
     @render.ui
@@ -309,7 +345,7 @@ def column_server(
             is_single_column,
             ui.input_select(
                 "weight",
-                ["Weight", ui.output_ui("weight_tooltip_ui")],
+                ["Weight", ui.output_ui("weight_tutorial_ui")],
                 choices={
                     "1": "Less accurate",
                     default_weight: "Default",
@@ -321,9 +357,9 @@ def column_server(
         )
 
     @render.ui
-    def weight_tooltip_ui():
-        return demo_tooltip(
-            is_demo,
+    def weight_tutorial_ui():
+        return tutorial_box(
+            is_tutorial_mode(),
             """
             You have a finite privacy budget, but you can choose
             how to allocate it. For simplicity, we limit the options here,
@@ -333,67 +369,93 @@ def column_server(
 
     @reactive.calc
     def error_md_calc():
-        return get_bound_error(input.lower_bound(), input.upper_bound())
+        bound_errors = (
+            get_bound_errors(input.lower_bound(), input.upper_bound())
+            if has_bounds(get_analysis_by_name(input.analysis_type()))
+            else []
+        )
 
-    @render.code
-    def column_code():
-        return make_column_config_block(
-            name=name,
-            analysis_type=input.analysis_type(),
-            lower_bound=float(input.lower_bound()),
-            upper_bound=float(input.upper_bound()),
-            bin_count=int(input.bins()),
+        return "\n".join(
+            f"- {error}" for error in bound_errors + get_bin_errors(input.bins())
+        )
+
+    @reactive.effect
+    def set_analysis_errors():
+        with reactive.isolate():
+            prev_analysis_errors = analysis_errors()
+        analysis_errors.set({**prev_analysis_errors, name: bool(error_md_calc())})
+
+    @render.ui
+    def column_python_ui():
+        return code_sample(
+            "Column Configuration",
+            make_column_config_block(
+                name=name,
+                analysis_name=input.analysis_type(),
+                lower_bound=float(input.lower_bound()),
+                upper_bound=float(input.upper_bound()),
+                bin_count=int(input.bins()),
+            ),
         )
 
     @render.ui
     def histogram_preview_ui():
         if error_md := error_md_calc():
             return error_md_ui(error_md)
-        else:
-            accuracy, histogram = accuracy_histogram()
-            return [
-                ui.output_plot("histogram_preview_plot", height="300px"),
-                ui.layout_columns(
-                    ui.markdown(
-                        f"The {confidence:.0%} confidence interval is ±{accuracy:.3g}."
-                    ),
-                    details(
-                        summary("Data Table"),
-                        ui.output_data_frame("data_frame"),
-                    ),
-                    output_code_sample("Column Definition", "column_code"),
+        accuracy, histogram = accuracy_histogram()
+        return [
+            ui.output_plot("histogram_preview_plot", height="300px"),
+            ui.layout_columns(
+                ui.markdown(
+                    f"The {confidence:.0%} confidence interval is ±{accuracy:.3g}."
                 ),
-            ]
+                details(
+                    summary("Data Table"),
+                    ui.output_data_frame("data_frame"),
+                ),
+                ui.output_ui("column_python_ui"),
+            ),
+        ]
+
+    def stat_preview_ui():
+        if error_md := error_md_calc():
+            return error_md_ui(error_md)
+        optional_grouping_message = (
+            # TODO: Show bar chart with fake groups?
+            # https://github.com/opendp/dp-wizard/issues/493#issuecomment-3000774143
+            (
+                """
+                Because the data is grouped, the final release will include a bar chart,
+                where each bar is the value of the statistic for one group.
+                """
+            )
+            if groups()
+            # TODO: Show a bar, even if it's just one bar? Not sure about this.
+            # https://github.com/opendp/dp-wizard/issues/518
+            else ""
+        )
+        return [
+            ui.p(
+                f"""
+                Since this stat is just a single number,
+                there is not a preview visualization.
+                {optional_grouping_message}
+                """
+            ),
+            ui.output_ui("column_python_ui"),
+        ]
 
     @render.ui
     def mean_preview_ui():
-        # accuracy, histogram = accuracy_histogram()
-        if error_md := error_md_calc():
-            return error_md_ui(error_md)
-        else:
-            return [
-                ui.p(
-                    """
-                    Since the mean is just a single number,
-                    there is not a preview visualization.
-                    """
-                ),
-                output_code_sample("Column Definition", "column_code"),
-            ]
+        return stat_preview_ui()
 
     @render.ui
     def median_preview_ui():
-        if error_md := error_md_calc():
-            return error_md_ui(error_md)
-        return [
-            ui.p(
-                """
-                Since the median is just a single number,
-                there is not a preview visualization.
-                """
-            ),
-            output_code_sample("Column Definition", "column_code"),
-        ]
+        return stat_preview_ui()
+
+    @render.ui
+    def count_preview_ui():
+        return stat_preview_ui()
 
     @render.data_frame
     def data_frame():
@@ -403,11 +465,12 @@ def column_server(
     @render.plot
     def histogram_preview_plot():
         accuracy, histogram = accuracy_histogram()
-        s = "s" if contributions > 1 else ""
+        contributions_int = contributions()
+        s = "s" if contributions_int > 1 else ""
         title = ", ".join(
             [
                 name if public_csv_path else f"Simulated {name}: normal distribution",
-                f"{contributions} contribution{s} / individual",
+                f"{contributions_int} contribution{s} / individual",
             ]
         )
         return plot_bars(

@@ -1,6 +1,7 @@
-from yaml import dump
-from pathlib import Path
 import csv
+from pathlib import Path
+
+from yaml import dump
 
 
 # https://stackoverflow.com/a/6027615/10727889
@@ -44,7 +45,6 @@ report = {
     "outputs": OUTPUTS,
 }
 
-print(dump(report))
 Path(TXT_REPORT_PATH).write_text(dump(report))
 
 flat_report = flatten_dict(report)

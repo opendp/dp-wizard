@@ -3,15 +3,12 @@
 [![pypi](https://img.shields.io/pypi/v/dp_wizard)](https://pypi.org/project/dp_wizard/)
 
 DP Wizard makes it easier to get started with differential privacy.
+It demonstrates how to calculate DP statistics or create a synthetic dataset from the data you provide.
 
 You can run DP Wizard locally and upload your own CSV,
 or use the [cloud deployment](https://mccalluc-dp-wizard.share.connect.posit.cloud/) and only provide column names to protect your private data.
-In either case, you'll be prompted to describe your privacy budget and the analysis you need, including:
-
-- Grouping
-- DP means, medians, and histograms
-
-With that information, DP Wizard provides
+In either case, you'll be prompted to describe your privacy budget and the analysis you need.
+With that information, DP Wizard provides:
 
 - A Jupyter notebook which demonstrates how to use the [OpenDP Library](https://docs.opendp.org/).
 - A plain Python script.
@@ -23,19 +20,20 @@ DP Wizard requires Python 3.10 or later.
 You can check your current version with `python --version`.
 The exact upgrade process will depend on your environment and operating system.
 
-Install with `pip install dp_wizard[app]` and you can start DP Wizard from the command line.
+Install with `pip install 'dp_wizard[app]'` and you can start DP Wizard from the command line.
 
 ```
-usage: dp-wizard [-h] [--demo | --cloud]
+usage: dp-wizard [-h] [--sample | --cloud]
 
 DP Wizard makes it easier to get started with Differential Privacy.
 
 options:
   -h, --help  show this help message and exit
-  --demo      Use generated fake CSV for a quick demo
+  --sample    Generate a sample CSV: See how DP Wizard works without providing
+              your own data
   --cloud     Prompt for column names instead of CSV upload
 
-Unless you have set "--demo" or "--cloud", you will specify a CSV
+Unless you have set "--sample" or "--cloud", you will specify a CSV
 inside the application.
 
 Provide a "Private CSV" if you only have a private data set, and want to
