@@ -160,7 +160,7 @@ def results_server(
                 """
             ),
             ui.input_text(
-                "download_stem",
+                "custom_download_stem",
                 only_for_screenreader("Download Stem"),
                 download_stem(),
             ),
@@ -170,7 +170,7 @@ def results_server(
                 """
             ),
             ui.input_text_area(
-                "download_note",
+                "custom_download_note",
                 only_for_screenreader("Note to Include"),
                 download_note(),
                 height="6em",
@@ -180,7 +180,7 @@ def results_server(
 
     @reactive.calc
     def clean_download_stem() -> str:
-        stem = input.download_stem()
+        stem = input.custom_download_stem()
         return re.sub(r"[^A-Za-z0-9_.-]", "-", stem)[:255]
 
     @render.ui
@@ -355,14 +355,14 @@ def results_server(
         notebook_py = (
             "raise Exception('qa_mode!')"
             if qa_mode
-            else NotebookGenerator(plan).make_py()
+            else NotebookGenerator(plan, input.custom_download_note()).make_py()
         )
         return convert_py_to_nb(notebook_py, title=str(plan), execute=True)
 
     @reactive.calc
     def notebook_nb_unexecuted():
         plan = analysis_plan()
-        notebook_py = NotebookGenerator(plan).make_py()
+        notebook_py = NotebookGenerator(plan, input.custom_download_note()).make_py()
         return convert_py_to_nb(notebook_py, title=str(plan), execute=False)
 
     @reactive.calc
@@ -378,7 +378,9 @@ def results_server(
         media_type="text/x-python",
     )
     async def download_script():
-        yield make_download_or_modal_error(ScriptGenerator(analysis_plan()).make_py)
+        yield make_download_or_modal_error(
+            ScriptGenerator(analysis_plan(), input.custom_download_note()).make_py
+        )
 
     @render.download(
         filename=lambda: clean_download_stem() + ".ipynb.py",
@@ -387,7 +389,9 @@ def results_server(
     async def download_notebook_source():
         with ui.Progress() as progress:
             progress.set(message=wait_message)
-            yield NotebookGenerator(analysis_plan()).make_py()
+            yield NotebookGenerator(
+                analysis_plan(), input.custom_download_note()
+            ).make_py()
 
     @render.download(
         filename=lambda: clean_download_stem() + ".ipynb",
