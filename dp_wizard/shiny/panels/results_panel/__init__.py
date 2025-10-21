@@ -379,7 +379,10 @@ def results_server(
     )
     async def download_script():
         yield make_download_or_modal_error(
-            ScriptGenerator(analysis_plan(), input.custom_download_note()).make_py
+            ScriptGenerator(
+                analysis_plan(),
+                input.custom_download_note(),
+            ).make_py,
         )
 
     @render.download(
