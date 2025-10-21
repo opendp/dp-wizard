@@ -1,25 +1,27 @@
 from math import pow
-from typing import Iterable, Any
 from pathlib import Path
+from typing import Iterable
 
 from htmltools import tags
-from shiny import ui, reactive, render, Inputs, Outputs, Session
+from shiny import Inputs, Outputs, Session, reactive, render, ui
 
+from dp_wizard import registry_url
+from dp_wizard.shiny.components.column_module import column_server, column_ui
 from dp_wizard.shiny.components.inputs import log_slider
-from dp_wizard.shiny.components.column_module import column_ui, column_server
-from dp_wizard.utils.csv_helper import (
-    id_names_dict_from_names,
-    id_labels_dict_from_names,
-    get_csv_row_count,
-)
 from dp_wizard.shiny.components.outputs import (
-    output_code_sample,
-    demo_tooltip,
-    nav_button,
+    code_sample,
     hide_if,
     info_md_box,
+    nav_button,
+    tutorial_box,
 )
+from dp_wizard.types import AppState
 from dp_wizard.utils.code_generators import make_privacy_loss_block
+from dp_wizard.utils.csv_helper import (
+    get_csv_row_count,
+    id_labels_dict_from_names,
+    id_names_dict_from_names,
+)
 
 
 def analysis_ui():
@@ -33,10 +35,11 @@ def analysis_ui():
                 ui.markdown("Select columns to calculate statistics on."),
                 ui.input_selectize(
                     "columns_selectize",
-                    ["Columns", ui.output_ui("columns_selectize_tooltip_ui")],
+                    "Columns",
                     [],
                     multiple=True,
                 ),
+                ui.output_ui("columns_selectize_tutorial_ui"),
             ),
             ui.card(
                 ui.card_header("Grouping"),
@@ -55,23 +58,24 @@ def analysis_ui():
                     [],
                     multiple=True,
                 ),
+                ui.output_ui("groups_selectize_tutorial_ui"),
             ),
             ui.card(
                 ui.card_header("Privacy Budget"),
                 ui.markdown(
-                    """
+                    f"""
                     What is your privacy budget for this release?
                     Many factors including the sensitivity of your data,
                     the frequency of DP releases,
                     and the regulatory landscape can be considered.
                     Consider how your budget compares to that of
-                    <a href="https://registry.oblivious.com/#public-dp"
+                    <a href="{registry_url}"
                        target="_blank">other projects</a>.
                     """
                 ),
                 log_slider("log_epsilon_slider", 0.1, 10.0),
                 ui.output_ui("epsilon_ui"),
-                output_code_sample("Privacy Loss", "privacy_loss_python"),
+                ui.output_ui("privacy_loss_python_ui"),
             ),
             ui.card(
                 ui.card_header("Simulation"),
@@ -90,7 +94,7 @@ def analysis_ui():
 
 
 def _cleanup_reactive_dict(
-    reactive_dict: reactive.Value[dict[str, Any]], keys_to_keep: Iterable[str]
+    reactive_dict: reactive.Value[dict], keys_to_keep: Iterable[str]
 ):  # pragma: no cover
     reactive_dict_copy = {**reactive_dict()}
     keys_to_del = set(reactive_dict_copy.keys()) - set(keys_to_keep)
@@ -99,32 +103,80 @@ def _cleanup_reactive_dict(
     reactive_dict.set(reactive_dict_copy)
 
 
+def _trunc_pow(exponent) -> float:
+    """
+    The output should be roughly exponential,
+    but should also be round numbers,
+    so it doesn't seem too arbitrary to the user.
+    >>> _trunc_pow(-1)
+    0.1
+    >>> _trunc_pow(-0.5)
+    0.3
+    >>> _trunc_pow(0)
+    1.0
+    >>> _trunc_pow(0.5)
+    3.0
+    >>> _trunc_pow(1)
+    10.0
+    """
+    number = pow(10, exponent)
+    return float(f"{number:.2g}" if abs(exponent) < 0.5 else f"{number:.1g}")
+
+
 def analysis_server(
     input: Inputs,
     output: Outputs,
     session: Session,
-    released: reactive.Value[bool],
-    public_csv_path: reactive.Value[str],
-    # private_csv_path is not needed, since we have the column_names.
-    column_names: reactive.Value[list[str]],
-    contributions: reactive.Value[int],
-    is_demo: bool,
-    analysis_types: reactive.Value[dict[str, str]],
-    lower_bounds: reactive.Value[dict[str, float]],
-    upper_bounds: reactive.Value[dict[str, float]],
-    bin_counts: reactive.Value[dict[str, int]],
-    groups: reactive.Value[list[str]],
-    weights: reactive.Value[dict[str, str]],
-    epsilon: reactive.Value[float],
+    state: AppState,
 ):  # pragma: no cover
+    # CLI options:
+    is_sample_csv = state.is_sample_csv
+    # in_cloud = state.in_cloud
+
+    # Top-lvel:
+    is_tutorial_mode = state.is_tutorial_mode
+
+    # Dataset choices:
+    # initial_private_csv_path = state.initial_private_csv_path
+    # private_csv_path = state.private_csv_path
+    # initial_public_csv_path = state.initial_private_csv_path
+    public_csv_path = state.public_csv_path
+    contributions = state.contributions
+    # contributions_entity = state.contributions_entity
+    max_rows = state.max_rows
+    # initial_product = state.initial_product
+    # product = state.product
+
+    # Analysis choices:
+    column_names = state.column_names
+    groups = state.groups
+    epsilon = state.epsilon
+
+    # Per-column choices:
+    # (Note that these are all dicts, with the ColumnName as the key.)
+    analysis_types = state.analysis_types
+    lower_bounds = state.lower_bounds
+    upper_bounds = state.upper_bounds
+    bin_counts = state.bin_counts
+    weights = state.weights
+    analysis_errors = state.analysis_errors
+
+    # Release state:
+    released = state.released
+
     @reactive.calc
     def button_enabled():
-        column_ids_selected = input.columns_selectize()
-        return len(column_ids_selected) > 0
+        at_least_one_column = bool(weights())
+        no_errors = not any(analysis_errors().values())
+        return at_least_one_column and no_errors
 
     @reactive.effect
     def _update_columns():
-        csv_ids_labels = csv_ids_labels_calc()
+        csv_ids_labels = {
+            # Cast to string for type checking.
+            str(k): v
+            for k, v in csv_ids_labels_calc().items()
+        }
         ui.update_selectize(
             "groups_selectize",
             label=None,
@@ -178,20 +230,59 @@ def analysis_server(
         _cleanup_reactive_dict(weights, column_ids_selected)
 
     @render.ui
-    def columns_selectize_tooltip_ui():
-        return demo_tooltip(
-            is_demo,
+    def groups_selectize_tutorial_ui():
+        return tutorial_box(
+            is_tutorial_mode(),
             """
-            Not all columns need analysis. For this demo, just check
-            "class_year" and "grade". With more columns selected,
-            each column has a smaller share of the privacy budget.
+            DP Wizard only supports the analysis of numeric data,
+            but string values can be used for grouping.
             """,
+            is_sample_csv,
+            """
+            With `sample.csv` you can select `class_year_str`
+            to group results by class year.
+            """,
+            responsive=False,
+        )
+
+    @render.ui
+    def columns_selectize_tutorial_ui():
+        return tutorial_box(
+            is_tutorial_mode(),
+            """
+            For each column you select here, a panel will appear below
+            where you can configure the analysis for the column.
+            Note that with more columns selected,
+            each column has a smaller share of the privacy budget,
+            and the accurace of results will go decline.
+            """,
+            is_sample_csv,
+            """
+            Not all columns need analysis.
+            With `sample.csv`, you could just select `grade`.
+            """,
+            responsive=False,
         )
 
     @render.ui
     def simulation_card_ui():
+        help = (
+            tutorial_box(
+                is_tutorial_mode(),
+                """
+                Unlike the other settings on this page,
+                this estimate **is not used** in the final calculation.
+
+                Until you make a release, your CSV will not be
+                read except to determine the names columns,
+                but the number of rows does have implications for the
+                accuracy which DP can provide with a given privacy budget.
+                """,
+                responsive=False,
+            ),
+        )
         if public_csv_path():
-            row_count = get_csv_row_count(Path(public_csv_path()))
+            row_count_str = str(get_csv_row_count(Path(public_csv_path())))
             return [
                 ui.markdown(
                     f"""
@@ -199,7 +290,7 @@ def analysis_server(
                     it *will be read* to generate previews.
 
                     The confidence interval depends on the number of rows.
-                    Your public CSV has {row_count} rows,
+                    Your public CSV has {row_count_str} rows,
                     but if you believe the private CSV will be
                     much larger or smaller, please update.
                     """
@@ -207,19 +298,15 @@ def analysis_server(
                 ui.input_select(
                     "row_count",
                     "Estimated Rows",
-                    choices=[row_count, "100", "1000", "10000"],
-                    selected=row_count,
+                    choices=[row_count_str, "100", "1000", "10000"],
+                    selected=row_count_str,
                 ),
+                help,
             ]
         else:
             return [
                 ui.markdown(
                     """
-                    This simulation will assume a normal distribution
-                    between the specified lower and upper bounds.
-                    Until you make a release, your CSV will not be
-                    read except to determine the columns.
-
                     What is the approximate number of rows in the dataset?
                     This number is only used for the simulation
                     and not the final calculation.
@@ -231,6 +318,7 @@ def analysis_server(
                     choices=["100", "1000", "10000"],
                     selected="100",
                 ),
+                help,
             ]
 
     @render.ui
@@ -242,15 +330,18 @@ def analysis_server(
                 column_id,
                 public_csv_path=public_csv_path(),
                 name=column_ids_to_names[column_id],
-                contributions=contributions(),
-                epsilon=epsilon(),
+                contributions=contributions,
+                epsilon=epsilon,
                 row_count=int(input.row_count()),
+                groups=groups,
                 analysis_types=analysis_types,
+                analysis_errors=analysis_errors,
                 lower_bounds=lower_bounds,
                 upper_bounds=upper_bounds,
                 bin_counts=bin_counts,
                 weights=weights,
-                is_demo=is_demo,
+                is_tutorial_mode=is_tutorial_mode,
+                is_sample_csv=is_sample_csv,
                 is_single_column=len(column_ids) == 1,
             )
         return [column_ui(column_id) for column_id in column_ids]
@@ -266,25 +357,31 @@ def analysis_server(
     @reactive.effect
     @reactive.event(input.log_epsilon_slider)
     def _set_epsilon():
-        epsilon.set(pow(10, input.log_epsilon_slider()))
+        epsilon.set(_trunc_pow(input.log_epsilon_slider()))
 
     @render.ui
     def epsilon_ui():
         return tags.label(
-            f"Epsilon: {epsilon():0.3} ",
-            demo_tooltip(
-                is_demo,
+            f"Epsilon: {epsilon()} ",
+            tutorial_box(
+                is_tutorial_mode(),
                 """
                 If you set epsilon above one, you'll see that the distribution
                 becomes less noisy, and the confidence intervals become smaller...
                 but increased accuracy risks revealing personal information.
                 """,
+                responsive=False,
             ),
         )
 
-    @render.code
-    def privacy_loss_python():
-        return make_privacy_loss_block(epsilon())
+    @render.ui
+    def privacy_loss_python_ui():
+        return code_sample(
+            "Privacy Loss",
+            make_privacy_loss_block(
+                pure=False, epsilon=epsilon(), max_rows=int(max_rows())
+            ),
+        )
 
     @reactive.effect
     @reactive.event(input.go_to_results)
@@ -293,11 +390,12 @@ def analysis_server(
 
     @render.ui
     def download_results_button_ui():
+        is_enabled = button_enabled()
         button = nav_button(
-            "go_to_results", "Download Results", disabled=not button_enabled()
+            "go_to_results", "Download Results", disabled=not is_enabled
         )
 
-        if button_enabled():
+        if is_enabled:
             return button
         return [
             button,

@@ -1,5 +1,8 @@
 from math import log10
+
 from shiny import ui
+
+from dp_wizard.shiny.components.outputs import only_for_screenreader
 
 
 def log_slider(id: str, lower_bound: float, upper_bound: float):
@@ -41,5 +44,12 @@ def log_slider(id: str, lower_bound: float, upper_bound: float):
 </style>
 """
         ),
-        ui.input_slider(id, None, log10(lower_bound), log10(upper_bound), 0, step=0.1),
+        ui.input_slider(
+            id,
+            only_for_screenreader("Epsilon"),
+            log10(lower_bound),
+            log10(upper_bound),
+            0,
+            step=0.1,
+        ),
     ]

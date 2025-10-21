@@ -1,20 +1,43 @@
-from dp_wizard.utils.code_generators.abstract_generator import AbstractGenerator
-from dp_wizard.utils.code_template import Template
-from dp_wizard.utils.csv_helper import name_to_identifier
+from pathlib import Path
+
+from dp_wizard_templates.code_template import Template
+
+from dp_wizard.types import ColumnIdentifier, Product
+from dp_wizard.utils.code_generators.abstract_generator import (
+    AbstractGenerator,
+    get_template_root,
+)
 from dp_wizard.utils.dp_helper import confidence
 
+PLACEHOLDER_CSV_NAME = "fill-in-correct-path.csv"
 
-from pathlib import Path
+root = get_template_root(__file__)
 
 
 class NotebookGenerator(AbstractGenerator):
-    root_template = "notebook"
+    def _get_notebook_or_script(self):
+        return "notebook"
 
-    def _make_context(self):
+    def _make_stats_context(self):
+        return self._fill_partial_context(self._make_partial_stats_context())
+
+    def _make_synth_context(self):
+        return self._fill_partial_context(self._make_partial_synth_context())
+
+    def _fill_partial_context(self, partial_context):
+        placeholder_csv_content = ",".join(self.analysis_plan.columns)
         return (
-            self._make_partial_context()
-            .fill_values(
+            partial_context.fill_values(
                 CSV_PATH=self.analysis_plan.csv_path,
+            )
+            .fill_code_blocks(
+                OPTIONAL_CSV_BLOCK=(
+                    "# Write to placeholder CSV so the notebook can still execute:\n"
+                    "from pathlib import Path\n"
+                    f"Path('{PLACEHOLDER_CSV_NAME}').write_text('{placeholder_csv_content}')\n"
+                    if self.analysis_plan.csv_path == PLACEHOLDER_CSV_NAME
+                    else ""
+                )
             )
             .finish()
         )
@@ -34,21 +57,33 @@ class NotebookGenerator(AbstractGenerator):
 
         analysis = get_analysis_by_name(analysis_type)
         return analysis.make_report_kv(
-            name=name, confidence=confidence, identifier=name_to_identifier(name)
+            name=name, confidence=confidence, identifier=ColumnIdentifier(name)
         )
 
-    def _make_extra_blocks(self):
-        outputs_expression = (
-            "{"
-            + ",".join(
-                self._make_report_kv(name, plan[0].analysis_type)
-                for name, plan in self.analysis_plan.columns.items()
-            )
-            + "}"
-        )
+    def _make_reports_block(self):
+        def template(synthetic_data):
+            {  # noqa: B018: Allow useless dict
+                "columns": synthetic_data.columns,
+                "rows": [list(row) for row in synthetic_data.rows()],
+            }  # type: ignore
+
+        match self.analysis_plan.product:
+            case Product.SYNTHETIC_DATA:
+                outputs_expression = Template(template).finish()
+            case Product.STATISTICS:
+                outputs_expression = (
+                    "{"
+                    + ",".join(
+                        self._make_report_kv(name, plan[0].analysis_name)
+                        for name, plan in self.analysis_plan.columns.items()
+                    )
+                    + "}"
+                )
+            case _:  # pragma: no cover
+                raise ValueError(self.analysis_plan.product)
         tmp_path = Path(__file__).parent.parent.parent / "tmp"
         reports_block = (
-            Template("reports", __file__)
+            Template(f"{self._get_synth_or_stats()}_reports", root)
             .fill_expressions(
                 OUTPUTS=outputs_expression,
                 COLUMNS={
@@ -63,4 +98,22 @@ class NotebookGenerator(AbstractGenerator):
             )
             .finish()
         )
-        return {"REPORTS_BLOCK": reports_block}
+        return reports_block
+
+    def _make_extra_blocks(self):
+        match self.analysis_plan.product:
+            case Product.SYNTHETIC_DATA:
+                return {
+                    "SYNTH_CONTEXT_BLOCK": self._make_synth_context(),
+                    "SYNTH_QUERY_BLOCK": self._make_synth_query(),
+                    "SYNTH_REPORTS_BLOCK": self._make_reports_block(),
+                }
+            case Product.STATISTICS:
+                return {
+                    "COLUMNS_BLOCK": self._make_columns(),
+                    "STATS_CONTEXT_BLOCK": self._make_stats_context(),
+                    "STATS_QUERIES_BLOCK": self._make_stats_queries(),
+                    "STATS_REPORTS_BLOCK": self._make_reports_block(),
+                }
+            case _:  # pragma: no cover
+                raise ValueError(self.analysis_plan.product)

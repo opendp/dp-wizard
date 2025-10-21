@@ -3,15 +3,12 @@
 [![pypi](https://img.shields.io/pypi/v/dp_wizard)](https://pypi.org/project/dp_wizard/)
 
 DP Wizard makes it easier to get started with differential privacy.
+It demonstrates how to calculate DP statistics or create a synthetic dataset from the data you provide.
 
 You can run DP Wizard locally and upload your own CSV,
 or use the [cloud deployment](https://mccalluc-dp-wizard.share.connect.posit.cloud/) and only provide column names to protect your private data.
-In either case, you'll be prompted to describe your privacy budget and the analysis you need, including:
-
-- Grouping
-- DP means, medians, and histograms
-
-With that information, DP Wizard provides
+In either case, you'll be prompted to describe your privacy budget and the analysis you need.
+With that information, DP Wizard provides:
 
 - A Jupyter notebook which demonstrates how to use the [OpenDP Library](https://docs.opendp.org/).
 - A plain Python script.
@@ -23,19 +20,20 @@ DP Wizard requires Python 3.10 or later.
 You can check your current version with `python --version`.
 The exact upgrade process will depend on your environment and operating system.
 
-Install with `pip install dp_wizard[app]` and you can start DP Wizard from the command line.
+Install with `pip install 'dp_wizard[app]'` and you can start DP Wizard from the command line.
 
 ```
-usage: dp-wizard [-h] [--demo | --cloud]
+usage: dp-wizard [-h] [--sample | --cloud]
 
 DP Wizard makes it easier to get started with Differential Privacy.
 
 options:
   -h, --help  show this help message and exit
-  --demo      Use generated fake CSV for a quick demo
+  --sample    Generate a sample CSV: See how DP Wizard works without providing
+              your own data
   --cloud     Prompt for column names instead of CSV upload
 
-Unless you have set "--demo" or "--cloud", you will specify a CSV
+Unless you have set "--sample" or "--cloud", you will specify a CSV
 inside the application.
 
 Provide a "Private CSV" if you only have a private data set, and want to
@@ -55,14 +53,17 @@ be made with private data.
 
 ## Contributions
 
-There are several ways to contribute. First, if you find DP Wizard useful, please [let us know](https://docs.google.com/forms/d/e/1FAIpQLScaGdKS-vj-RrM7SCV_lAwZmxQ2bOqFrAkyDp4djxTqkTkinA/viewform) and we'll spend more time on this project. If DP Wizard doesn't work for you, we also want to know that! Please [file an issue](https://github.com/opendp/dp-wizard/issues/new/choose) and we'll look into it.
+There are several ways to contribute. First, if you find DP Wizard useful, please [let us know](mailto:info@opendp.org) and we'll spend more time on this project. If DP Wizard doesn't work for you, we also want to know that! Please [file an issue](https://github.com/opendp/dp-wizard/issues/new/choose) and we'll look into it.
 
 We also welcome PRs, but if you have an idea for a new feature, it may be helpful to get in touch before you begin, to make sure your idea is in line with our vision:
 - The DP Wizard codebase shouldn't actually contain any differential privacy algorithms. This project is a thin wrapper around the [OpenDP Library](https://github.com/opendp/opendp/), and that's where new algorithms should be added.
 - DP Wizard isn't trying to do everything: The OpenDP Library is rich, and DP Wizard exposes only a fraction of that functionality so the user isn't overwhelmed by details.
 - DP Wizard tries to model the correct application of differential privacy. For example, while comparing DP results and unnoised statistics can be useful for education, that's not something this application will offer.
 
-With those caveats in mind, feel free to [file a feature request](https://github.com/opendp/dp-wizard/issues/new/choose), or chat with us at our [online office hour](https://harvard.zoom.us/j/98058847683), usually Tuesdays and Thursdays at 11am Eastern.
+With those caveats in mind,
+feel free to [file a feature request](https://github.com/opendp/dp-wizard/issues/new/choose),
+or [email us](mailto:info@opendp.org).
+
 
 ## Development
 
@@ -80,13 +81,13 @@ $ python3.10 -m venv .venv
 $ source .venv/bin/activate
 ```
 
-You can now install dependencies, and the application itself, and start a demo:
+You can now install dependencies, and the application itself, and start a tutorial:
 ```shell
 $ pip install -r requirements-dev.txt
 $ pre-commit install
 $ playwright install
 $ pip install --editable .
-$ dp-wizard --demo
+$ dp-wizard --sample
 ```
 
 Your browser should open and connect you to the application.
@@ -118,15 +119,18 @@ If Playwright fails in CI, we can still see what went wrong:
 ### Release
 
 - Make sure you're up to date, and have the git-ignored credentials file `.pypirc`.
-- Make one last feature branch:
+- Make one last feature branch with the new version number in the name:
   - Run `scripts/changelog.py` to update the `CHANGELOG.md`.
-  - Then bump `dp_wizard/VERSION`, and add the new number at the top of the `CHANGELOG.md`.
-  - Push to github; open PR, with version number in name; merge PR.
-- `flit publish --pypirc .pypirc`
+  - Review the updates and pull a couple highlights to the top.
+  - Bump `dp_wizard/VERSION`, and add the new number at the top of the `CHANGELOG.md`.
+  - Commit your changes, make a PR, and merge this branch to main.
+- Update `main` with the latest changes: `git checkout main; git pull`
+- Publish: `flit publish --pypirc .pypirc`
 
 This project is configured so there are two different install possibilities from pypi:
-- `pip install dp_wizard` does not aggressively pin dependency versions. It is preferred if you're using `dp_wizard` as a library.
-- `pip install dp_wizard[app]` pins all dependencies, and will work more reliably for application users.
+- `pip install 'dp_wizard[app]'` pins all dependencies, and is the best route for most users.
+- `pip install dp_wizard` does not pin dependencies, and is best if you're using `dp_wizard` as a library.
+
 
 The cloud deployment is [configured](https://connect.posit.cloud/mccalluc/content/01966942-7eab-da99-0887-a7c483756aa8/edit) to update on pushes to the `cloud-deployment` branch.
 If you are on `main`, with no local changes, run `scripts/deploy.sh`.
@@ -175,13 +179,36 @@ graph TD
 ```
 - For `manual` transitions, the status of the issue or PR will need to be updated by hand, either on the issue, or by dragging between columns on the board.
 - For `auto` transitions, some other action (for example, approving a PR) should trigger a [workflow](https://github.com/orgs/opendp/projects/10/workflows).
-- These are the only the states that matter. Whether PR is a draft or has assignees does not matter.
+- These are the only states that matter. Whether PR is a draft or has assignees does not matter.
 - If we need anything more than this, we should consider a paid plan, so that we have access to more workflows.
 
-## Other resources
 
-2025-05-07: [Slides for 50 presentation at 2025 Harvard IT Summit](https://opendp.github.io/harvard-it-summit-2025)
+## News
+
+(See also the [CHANGELOG](CHANGELOG.md).)
+
+2025-09-23: [Blog post for v0.5](https://opendp.org/2025/09/23/announcing-dp-wizard-v0-5/)
+
+2025-08-07: [DP Wizard Templates: Code templates and notebook generation](https://opendp.github.io/dp-wizard-templates/)
+
+2025-05-07: [Slides for 50 minute presentation at 2025 Harvard IT Summit](https://opendp.github.io/harvard-it-summit-2025)
+
+2025-04-14: [Blog post for v0.3](https://opendp.org/2025/04/14/announcing-opendp-library-0-13-and-dp-wizard/)
 
 2025-04-11: [Slides for 5 minute mini-talk on v0.3.0 at ABSURD (Annual Boston Security Usability Research Day)](https://docs.google.com/presentation/d/1g1c5ksG9sN8A_qWW9nFmFFZ6dSCkUAmL6_cUahi3VPA/edit#slide=id.g34c5f4bdc6a_0_0)
 
 2024-12-13: [Blog post for initial release](https://opendp.org/blog/dp-wizard-easy-way-get-started-differential-privacy-and-opendp)
+
+
+## Related projects
+
+There are a number of other projects which offer UIs for differential privacy.
+
+From OpenDP:
+
+- [DP Creator](https://github.com/opendp/dpcreator): An earlier project from OpenDP; Can be integrated with [Dataverse data repositories](https://dataverse.org/).
+- [PSI](https://github.com/opendp/PSI): The first DP UI from OpenDP.
+
+From other groups:
+
+- [PrivSyn](https://github.com/vvv214/privsyn-tabular): Uses AIM for synthetic data generation.

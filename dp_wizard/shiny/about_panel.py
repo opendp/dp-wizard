@@ -1,15 +1,15 @@
-import sys
-from pathlib import Path
 import subprocess
+import sys
 import urllib.parse
+from pathlib import Path
 
-from htmltools import tags, HTML
-from shiny import ui, reactive, Inputs, Outputs, Session
+from htmltools import tags
+from shiny import Inputs, Outputs, Session, reactive, ui
 
 from dp_wizard.shiny.components.outputs import nav_button
 
 
-def _run(cmd):
+def _run(cmd) -> str:
     """
     >>> _run("echo hello")
     '    hello'
@@ -24,7 +24,7 @@ def _run(cmd):
     )
 
 
-def _get_info():
+def _get_info() -> str:
     version = (Path(__file__).parent.parent / "VERSION").read_text().strip()
     git_status = _run("git status")
     pip_freeze = _run("pip freeze")
@@ -39,7 +39,7 @@ pip freeze:
     """
 
 
-def _make_issue_url(info):
+def _make_issue_url(info) -> str:
     """
     >>> info = 'A B C'
     >>> query = urllib.parse.urlparse(_make_issue_url(info)).query
@@ -110,30 +110,10 @@ def about_ui():
                         class_="bslib-gap-spacing html-fill-container",
                     ),
                 ),
-                ui.accordion_panel(
-                    "Give Feedback",
-                    ui.div(
-                        HTML(
-                            # Responses to this survey are at:
-                            # https://docs.google.com/forms/d/1l7-RK1R1nRuhHr8pTck1D4RU8Bi6Ehr124bkYvH-96c/edit
-                            """
-                            <iframe
-                                src="https://docs.google.com/forms/d/e/1FAIpQLScaGdKS-vj-RrM7SCV_lAwZmxQ2bOqFrAkyDp4djxTqkTkinA/viewform?embedded=true"
-                                id="feedback-iframe"
-                                width="640"
-                                height="1003"
-                                frameborder="0"
-                                marginheight="0"
-                                marginwidth="0"
-                            >Loading…</iframe>
-                            """
-                        ),
-                    ),
-                ),
                 open=False,
             ),
         ),
-        nav_button("go_to_dataset", "Select dataset"),
+        nav_button("go_to_dataset", "Select Dataset"),
         value="about_panel",
     )
 
