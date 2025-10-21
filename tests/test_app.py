@@ -24,12 +24,6 @@ local_app = create_app_fixture(root_path / "dp_wizard/app_local.py")
 qa_app = create_app_fixture(root_path / "dp_wizard/app_qa.py")
 
 
-def screenshot(page, name):
-    from os import environ
-
-    page.screenshot(path=root_path / f"docs/screenshots/{name}.png", full_page=True)
-
-
 def test_cloud_app(page: Page, cloud_app: ShinyAppProc):  # pragma: no cover
     page.goto(cloud_app.url)
 
@@ -200,11 +194,16 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
         from os import environ
         from time import sleep
 
+        from PIL import Image
+
         if environ["SCREENSHOTS"]:
             sleep(1)  # UI updates can be a little slow.
-            page.screenshot(
-                path=root_path / f"docs/screenshots/{name}.png", full_page=True
-            )
+            path = root_path / f"docs/screenshots/{name}.png"
+            page.screenshot(path=path, full_page=True)
+
+            img = Image.open(path)
+            img = img.quantize(colors=16)
+            img.save(path, optimize=True)
 
     dataset_release_warning = "changes to the dataset will constitute a new release"
     analysis_release_warning = "changes to the analysis will constitute a new release"
