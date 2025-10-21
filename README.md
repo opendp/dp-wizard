@@ -52,6 +52,8 @@ be made with private data.
 
 ## Screenshots
 
+(Run `scripts/screenshots.sh` to regenerate these screenshots.)
+
 Select Dataset:
 ![Screenshot with a "Data Source" panel on the left, and "Unit of Privacy" and "Product" on the right.](docs/screenshots/select-dataset.png)
 
