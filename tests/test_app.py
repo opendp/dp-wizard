@@ -198,8 +198,10 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
         # Keep the screenshot generation fast
         # by limitting it to just one test.
         from os import environ
+        from time import sleep
 
         if environ["SCREENSHOTS"]:
+            sleep(1)  # UI updates can be a little slow.
             page.screenshot(
                 path=root_path / f"docs/screenshots/{name}.png", full_page=True
             )
