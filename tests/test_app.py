@@ -196,7 +196,7 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
 
         from PIL import Image
 
-        if environ["SCREENSHOTS"]:
+        if environ.get("SCREENSHOTS"):
             sleep(1)  # UI updates can be a little slow.
             path = root_path / f"docs/screenshots/{name}.png"
             page.screenshot(path=path, full_page=True)
