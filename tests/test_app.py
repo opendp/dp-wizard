@@ -267,7 +267,7 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
         assert content  # Could add assertions for different document types.
 
     # Check that download name can be changed:
-    stem_locator = page.locator("#custom_download_stem")
+    stem_locator = page.locator("#download_stem")
     expect(stem_locator).to_have_value(expected_stem)
     new_stem = "¡C1ean me!"
     stem_locator.fill(new_stem)

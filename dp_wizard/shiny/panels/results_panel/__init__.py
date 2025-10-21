@@ -81,7 +81,7 @@ def results_ui():  # pragma: no cover
         "Download Results",
         ui.output_ui("results_requirements_warning_ui"),
         ui.output_ui("synthetic_data_ui"),
-        ui.output_ui("custom_download_stem_ui"),
+        ui.output_ui("download_options_ui"),
         ui.output_ui("download_results_ui"),
         ui.output_ui("download_code_ui"),
         value="results_panel",
@@ -146,25 +146,41 @@ def results_server(
     def download_stem() -> str:
         return analysis_plan().to_stem()
 
+    @reactive.calc
+    def download_note() -> str:
+        return analysis_plan().to_note()
+
     @render.ui
-    def custom_download_stem_ui():
+    def download_options_ui():
         return ui.card(
-            ui.card_header("Download Stem"),
+            ui.card_header("Download Options"),
             ui.markdown(
                 """
-                An appropriate extension for each download is added to this stem.
+                An appropriate extension for each download is added to this stem:
                 """
             ),
             ui.input_text(
-                "custom_download_stem",
+                "download_stem",
                 only_for_screenreader("Download Stem"),
                 download_stem(),
+            ),
+            ui.markdown(
+                """
+                Note to include in generated notebooks and code:
+                """
+            ),
+            ui.input_text_area(
+                "download_note",
+                only_for_screenreader("Note to Include"),
+                download_note(),
+                height="6em",
+                width="100%",
             ),
         )
 
     @reactive.calc
     def clean_download_stem() -> str:
-        stem = input.custom_download_stem()
+        stem = input.download_stem()
         return re.sub(r"[^A-Za-z0-9_.-]", "-", stem)[:255]
 
     @render.ui
