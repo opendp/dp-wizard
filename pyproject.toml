@@ -47,9 +47,9 @@ reportPrivateImportUsage = false
 # TODO: Expand strict type checking
 strict = [
     "dp_wizard/utils/argparse_helpers.py",
-    "dp_wizard/utils/code_template.py",
     "dp_wizard/utils/config.py",
-    "dp_wizard/utils/csv_helper.py"
+    "dp_wizard/utils/csv_helper.py",
+    "dp_wizard/utils/mock_data.py",
 ]
 
 [tool.isort]
