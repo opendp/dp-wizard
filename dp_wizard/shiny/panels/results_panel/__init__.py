@@ -373,10 +373,28 @@ def results_server(
     def notebook_html_unexecuted():
         return convert_nb_to_html(notebook_nb_unexecuted())
 
-    @render.download(
-        filename=lambda: clean_download_stem() + ".py",
-        media_type="text/x-python",
-    )
+    def download(ext: str):
+        last_ext = ext.split(".")[-1]
+        mime = {
+            "ipynb": "application/x-ipynb+json",
+            "py": "text/x-python",
+            "html": "text/html",
+            "csv": "text/csv",
+            "txt": "text/plain",
+        }.get(last_ext)
+        if mime is None:
+            raise Exception(f"No MIME type for {ext}")
+
+        def inner(func):
+            wrapped = render.download(
+                filename=lambda: clean_download_stem() + ext,
+                media_type=mime,
+            )(func)
+            return wrapped
+
+        return inner
+
+    @download(".py")
     async def download_script():
         yield make_download_or_modal_error(
             ScriptGenerator(
@@ -385,10 +403,7 @@ def results_server(
             ).make_py,
         )
 
-    @render.download(
-        filename=lambda: clean_download_stem() + ".ipynb.py",
-        media_type="text/x-python",
-    )
+    @download(".ipynb.py")
     async def download_notebook_source():
         with ui.Progress() as progress:
             progress.set(message=wait_message)
@@ -396,45 +411,23 @@ def results_server(
                 analysis_plan(), input.custom_download_note()
             ).make_py()
 
-    def download(ext):
-        def inner(func):
-            wrapped = render.download(
-                filename=lambda: clean_download_stem() + ext,
-                media_type="application/x-ipynb+json",  # TODO: Mime map
-            )(func)
-            return wrapped
-
-        return inner
-
     @download(".ipynb")
     async def download_notebook():
         yield make_download_or_modal_error(notebook_nb)
 
-    @render.download(
-        filename=lambda: clean_download_stem() + ".unexecuted.ipynb",
-        media_type="application/x-ipynb+json",
-    )
+    @download(".unexecuted.ipynb")
     async def download_notebook_unexecuted():
         yield make_download_or_modal_error(notebook_nb_unexecuted)
 
-    @render.download(  # pyright: ignore
-        filename=lambda: clean_download_stem() + ".html",
-        media_type="text/html",
-    )
+    @download(".html")
     async def download_html():
         yield make_download_or_modal_error(notebook_html)
 
-    @render.download(  # pyright: ignore
-        filename=lambda: clean_download_stem() + ".unexecuted.html",
-        media_type="text/html",
-    )
+    @download(".unexecuted.html")
     async def download_html_unexecuted():
         yield make_download_or_modal_error(notebook_html_unexecuted)
 
-    @render.download(
-        filename=lambda: clean_download_stem() + ".txt",
-        media_type="text/plain",
-    )
+    @download(".txt")
     async def download_report():
         def make_report():
             notebook_nb()  # Evaluate just for the side effect of creating report.
@@ -444,10 +437,7 @@ def results_server(
 
         yield make_download_or_modal_error(make_report)
 
-    @render.download(
-        filename=lambda: clean_download_stem() + ".csv",
-        media_type="text/csv",
-    )
+    @download(".csv")
     async def download_table():
         def make_table():
             notebook_nb()  # Evaluate just for the side effect of creating report.
