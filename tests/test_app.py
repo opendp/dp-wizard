@@ -188,6 +188,23 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
 
 def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no cover
 
+    def screenshot(page, name):
+        # Keep the screenshot generation fast
+        # by limitting it to just one test.
+        from os import environ
+        from time import sleep
+
+        from PIL import Image
+
+        if environ.get("SCREENSHOTS"):
+            sleep(1)  # UI updates can be a little slow.
+            path = root_path / f"docs/screenshots/{name}.png"
+            page.screenshot(path=path, full_page=True)
+
+            img = Image.open(path)
+            img = img.quantize(colors=16)
+            img.save(path, optimize=True)
+
     dataset_release_warning = "changes to the dataset will constitute a new release"
     analysis_release_warning = "changes to the analysis will constitute a new release"
     analysis_requirements_warning = "select your dataset on the previous tab"
@@ -200,14 +217,18 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     expect(page.get_by_text(analysis_requirements_warning)).to_be_visible()
     page.get_by_role("tab", name="Download Results").click()
     expect(page.get_by_text(results_requirements_warning)).to_be_visible()
-    page.get_by_role("tab", name="Select Dataset").click()
 
     # -- Select Dataset --
+    page.get_by_role("tab", name="Select Dataset").click()
+    screenshot(page, "select-dataset")
+
     csv_path = Path(__file__).parent / "fixtures" / "fake.csv"
     page.get_by_label("Choose Public CSV").set_input_files(csv_path.resolve())
 
     # -- Define Analysis --
     page.get_by_role("button", name="Define Analysis").click()
+    screenshot(page, "define-analysis")
+
     expect(page.get_by_text(analysis_release_warning)).not_to_be_visible()
     expect(page.get_by_text(analysis_requirements_warning)).not_to_be_visible()
 
@@ -221,9 +242,11 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     page.get_by_label("Lower").fill("0")
     page.get_by_label("Upper").fill("10")
 
-    # -- Download Results --
     expect(page.get_by_text(results_requirements_warning)).not_to_be_visible()
+
+    # -- Download Results --
     page.get_by_role("button", name="Download Results").click()
+    screenshot(page, "download-results")
 
     # Right now, the significant test start-up costs mean
     # it doesn't make sense to parameterize this test,
