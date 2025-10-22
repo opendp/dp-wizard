@@ -396,10 +396,17 @@ def results_server(
                 analysis_plan(), input.custom_download_note()
             ).make_py()
 
-    @render.download(
-        filename=lambda: clean_download_stem() + ".ipynb",
-        media_type="application/x-ipynb+json",
-    )
+    def download(ext):
+        def inner(func):
+            wrapped = render.download(
+                filename=lambda: clean_download_stem() + ext,
+                media_type="application/x-ipynb+json",  # TODO: Mime map
+            )(func)
+            return wrapped
+
+        return inner
+
+    @download(".ipynb")
     async def download_notebook():
         yield make_download_or_modal_error(notebook_nb)
 
