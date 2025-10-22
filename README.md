@@ -50,6 +50,18 @@ visualizations will be made with the public data, but the release will
 be made with private data.
 ```
 
+## Screenshots
+
+(Run `scripts/screenshots.sh` to regenerate these screenshots.)
+
+Select Dataset:
+![Screenshot with a "Data Source" panel on the left, and "Unit of Privacy" and "Product" on the right.](docs/screenshots/select-dataset.png)
+
+Define Analysis:
+![Screenshot with four panels: "Columns", "Grouping", "Privacy Budget", and "Simulation".](docs/screenshots/define-analysis.png)
+
+Download Results:
+![Screenshot with two prominent buttons: "Download Notebook" and "Download HTML".](docs/screenshots/download-results.png)
 
 ## Contributions
 
