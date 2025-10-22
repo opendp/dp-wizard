@@ -1,5 +1,6 @@
 import re
 from pathlib import Path
+from zipfile import ZipFile
 
 from dp_wizard_templates.converters import (
     convert_nb_to_html,
@@ -186,9 +187,26 @@ def results_server(
 
     @render.ui
     def download_package_ui():
+        disabled = not weights()
         return ui.card(
             ui.card_header("Results Package"),
-            "TODO",
+            (
+                ui.markdown(
+                    "Results package is only available when DP Wizard is run locally."
+                )
+                if in_cloud
+                else [
+                    button(
+                        "Package", ".zip", "folder", primary=True, disabled=disabled
+                    ),
+                    p(
+                        """
+                        Zip file containing a README, DP results,
+                        and code which demonstrates how to reproduce the analysis.
+                        """
+                    ),
+                ]
+            ),
         )
 
     @render.ui
@@ -388,6 +406,22 @@ def results_server(
     @reactive.calc
     def notebook_html_unexecuted():
         return convert_nb_to_html(notebook_nb_unexecuted())
+
+    @render.download(
+        filename=lambda: clean_download_stem() + ".zip",
+        media_type="application/zip",
+    )
+    async def download_package():
+        def make_package():
+            zip_path = (
+                Path(__file__).parent.parent.parent.parent / "tmp" / "package.zip"
+            )
+            with ZipFile(zip_path, mode="w") as zip_file:
+                zip_file.writestr("notebook.ipynb", notebook_nb())
+
+            return zip_path.read_bytes()
+
+        yield make_download_or_modal_error(make_package)
 
     @render.download(
         filename=lambda: clean_download_stem() + ".py",
