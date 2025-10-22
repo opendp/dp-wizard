@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from dp_wizard.utils.argparse_helpers import _existing_csv_type, _get_arg_parser
+from dp_wizard.utils.argparse_helpers import _get_arg_parser
 
 fixtures_path = Path(__file__).parent.parent / "fixtures"
 
@@ -33,18 +33,3 @@ def test_help():
 
     readme_md = norm_ws((root_path / "README.md").read_text())
     assert readme_pypi_md in readme_md, "README-PYPI.md content not in README.md"
-
-
-def test_arg_validation_no_file():
-    with pytest.raises(ArgumentTypeError, match="No such file: no-such-file"):
-        _existing_csv_type("no-such-file")
-
-
-def test_arg_validation_not_csv():
-    with pytest.raises(ArgumentTypeError, match='Must have ".csv" extension:'):
-        _existing_csv_type(str(fixtures_path / "fake.ipynb"))
-
-
-def test_arg_validation_works():
-    path = _existing_csv_type(str(fixtures_path / "fake.csv"))
-    assert path.name == "fake.csv"

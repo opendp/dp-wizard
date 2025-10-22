@@ -44,6 +44,13 @@ ignore = ["**/no-tests/"]
 # TODO: Reenable when OpenDP exports are clean:
 # https://github.com/opendp/opendp/issues/2439
 reportPrivateImportUsage = false
+# TODO: Expand strict type checking
+strict = [
+    "dp_wizard/utils/argparse_helpers.py",
+    "dp_wizard/utils/code_template.py",
+    "dp_wizard/utils/config.py",
+    "dp_wizard/utils/csv_helper.py"
+]
 
 [tool.isort]
 profile = "black"
