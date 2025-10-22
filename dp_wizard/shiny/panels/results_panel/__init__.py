@@ -344,6 +344,14 @@ def results_server(
             columns=columns,
         )
 
+    ######################
+    #
+    # Download content
+    #
+    ######################
+
+    # These can be slow, but reactive calcs will cache results.
+
     @reactive.calc
     def notebook_nb():
         # This creates the notebook, and evaluates it,
@@ -372,6 +380,15 @@ def results_server(
     @reactive.calc
     def notebook_html_unexecuted():
         return convert_nb_to_html(notebook_nb_unexecuted())
+
+    ######################
+    #
+    # Download functions
+    #
+    ######################
+
+    # Function names need to match the id constructed by button(),
+    # based on the cleaned-up name parameter.
 
     def download(ext: str):
         last_ext = ext.split(".")[-1]
