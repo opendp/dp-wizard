@@ -80,10 +80,11 @@ def results_ui():  # pragma: no cover
     return ui.nav_panel(
         "Download Results",
         ui.output_ui("results_requirements_warning_ui"),
-        ui.output_ui("synthetic_data_ui"),
         ui.output_ui("download_options_ui"),
-        ui.output_ui("download_results_ui"),
-        ui.output_ui("download_code_ui"),
+        ui.layout_columns(
+            ui.output_ui("download_package_ui"),
+            ui.output_ui("download_files_ui"),
+        ),
         value="results_panel",
     )
 
@@ -182,6 +183,21 @@ def results_server(
     def clean_download_stem() -> str:
         stem = input.custom_download_stem()
         return re.sub(r"[^A-Za-z0-9_.-]", "-", stem)[:255]
+
+    @render.ui
+    def download_package_ui():
+        return ui.card(
+            ui.card_header("Results Package"),
+            "TODO",
+        )
+
+    @render.ui
+    def download_files_ui():
+        return ui.card(
+            ui.card_header("Individual Files"),
+            ui.output_ui("download_results_ui"),
+            ui.output_ui("download_code_ui"),
+        )
 
     @render.ui
     def download_results_ui():
