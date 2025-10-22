@@ -1,8 +1,5 @@
 import re
-from argparse import ArgumentTypeError
 from pathlib import Path
-
-import pytest
 
 from dp_wizard.utils.argparse_helpers import _get_arg_parser
 
