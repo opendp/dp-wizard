@@ -195,17 +195,17 @@ def results_server(
     def download_files_ui():
         return ui.card(
             ui.card_header("Individual Files"),
-            ui.output_ui("download_results_ui"),
-            ui.output_ui("download_code_ui"),
+            ui.output_ui("download_results_files_ui"),
+            ui.output_ui("download_code_files_ui"),
         )
 
     @render.ui
-    def download_results_ui():
+    def download_results_files_ui():
         if in_cloud:
             return None
         disabled = not weights()
         return [
-            ui.h3("Download Results"),
+            ui.markdown("Download executed Jupyter notebooks and result files:"),
             tutorial_box(
                 is_tutorial_mode(),
                 """
@@ -249,10 +249,10 @@ def results_server(
         ]
 
     @render.ui
-    def download_code_ui():
+    def download_code_files_ui():
         disabled = not weights()
         return [
-            ui.h3("Download Code"),
+            ui.markdown("Download unexecuted Jupyter notebooks and Python scripts:"),
             tutorial_box(
                 is_tutorial_mode(),
                 (
