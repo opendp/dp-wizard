@@ -1,17 +1,6 @@
 import argparse
-from pathlib import Path
 from sys import argv
 from typing import NamedTuple
-
-
-def _existing_csv_type(arg: str) -> Path:
-    path = Path(arg)
-    if not path.exists():
-        raise argparse.ArgumentTypeError(f"No such file: {arg}")
-    if path.suffix != ".csv":
-        raise argparse.ArgumentTypeError(f'Must have ".csv" extension: {arg}')
-    return path
-
 
 PUBLIC_TEXT = """if you have a public data set, and are curious how
 DP can be applied: The preview visualizations will use your public data."""
