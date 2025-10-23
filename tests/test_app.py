@@ -92,7 +92,7 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     assert define_analysis_button.is_disabled()
 
     # Now upload:
-    csv_path = Path(__file__).parent / "fixtures" / "fake.csv"
+    csv_path = package_root.parent / "tests/fixtures/fake.csv"
     page.get_by_label("Choose Public CSV").set_input_files(csv_path.resolve())
 
     # Check validation of contributions:
@@ -222,7 +222,7 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     page.get_by_role("tab", name="Select Dataset").click()
     screenshot(page, "select-dataset")
 
-    csv_path = Path(__file__).parent / "fixtures" / "fake.csv"
+    csv_path = package_root.parent / "tests/fixtures/fake.csv"
     page.get_by_label("Choose Public CSV").set_input_files(csv_path.resolve())
 
     # -- Define Analysis --
