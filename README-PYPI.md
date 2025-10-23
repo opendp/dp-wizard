@@ -14,6 +14,19 @@ With that information, DP Wizard provides:
 - A plain Python script.
 - Text and CSV reports.
 
+## Screenshots
+
+<!-- Run `scripts/screenshots.sh` to regenerate these screenshots. -->
+
+Select Dataset:
+![Screenshot with a "Data Source" panel on the left, and "Unit of Privacy" and "Product" on the right.](https://opendp.github.io/dp-wizard/screenshots/select-dataset.png)
+
+Define Analysis:
+![Screenshot with four panels: "Columns", "Grouping", "Privacy Budget", and "Simulation".](https://opendp.github.io/dp-wizard/screenshots/define-analysis.png)
+
+Download Results:
+![Screenshot with two prominent buttons: "Download Notebook" and "Download HTML".](https://opendp.github.io/dp-wizard/screenshots/download-results.png)
+
 ## Usage
 
 DP Wizard requires Python 3.10 or later.
