@@ -7,6 +7,7 @@ from playwright.sync_api import Page, expect
 from shiny.pytest import create_app_fixture
 from shiny.run import ShinyAppProc
 
+from dp_wizard import package_root
 from dp_wizard.utils.code_generators.notebook_generator import PLACEHOLDER_CSV_NAME
 
 bp = "BREAKPOINT()".lower()
@@ -17,11 +18,10 @@ if bp in Path(__file__).read_text():
         "#run-a-test-from-a-specific-breakpoint"
     )
 
-root_path = Path(__file__).parent.parent
-sample_app = create_app_fixture(root_path / "dp_wizard/app_sample.py")
-cloud_app = create_app_fixture(root_path / "dp_wizard/app_cloud.py")
-local_app = create_app_fixture(root_path / "dp_wizard/app_local.py")
-qa_app = create_app_fixture(root_path / "dp_wizard/app_qa.py")
+sample_app = create_app_fixture(package_root / "app_sample.py")
+cloud_app = create_app_fixture(package_root / "app_cloud.py")
+local_app = create_app_fixture(package_root / "app_local.py")
+qa_app = create_app_fixture(package_root / "app_qa.py")
 
 
 def test_cloud_app(page: Page, cloud_app: ShinyAppProc):  # pragma: no cover
@@ -92,7 +92,7 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     assert define_analysis_button.is_disabled()
 
     # Now upload:
-    csv_path = Path(__file__).parent / "fixtures" / "fake.csv"
+    csv_path = package_root.parent / "tests/fixtures/fake.csv"
     page.get_by_label("Choose Public CSV").set_input_files(csv_path.resolve())
 
     # Check validation of contributions:
@@ -198,7 +198,7 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
 
         if environ.get("SCREENSHOTS"):
             sleep(1)  # UI updates can be a little slow.
-            path = root_path / f"docs/screenshots/{name}.png"
+            path = package_root.parent / f"docs/screenshots/{name}.png"
             page.screenshot(path=path, full_page=True)
 
             img = Image.open(path)
@@ -222,7 +222,7 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     page.get_by_role("tab", name="Select Dataset").click()
     screenshot(page, "select-dataset")
 
-    csv_path = Path(__file__).parent / "fixtures" / "fake.csv"
+    csv_path = package_root.parent / "tests/fixtures/fake.csv"
     page.get_by_label("Choose Public CSV").set_input_files(csv_path.resolve())
 
     # -- Define Analysis --
@@ -253,14 +253,7 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     # but that could change.
     matches = [
         re.search(r'button\("([^"]+)", "([^"]+)"', line)
-        for line in (
-            Path(__file__).parent.parent
-            / "dp_wizard"
-            / "shiny"
-            / "panels"
-            / "results_panel"
-            / "__init__.py"
-        )
+        for line in (package_root / "shiny/panels/results_panel/__init__.py")
         .read_text()
         .splitlines()
     ]

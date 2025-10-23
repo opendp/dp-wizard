@@ -1,7 +1,6 @@
-from pathlib import Path
-
 from dp_wizard_templates.code_template import Template
 
+from dp_wizard import package_root
 from dp_wizard.types import ColumnIdentifier, Product
 from dp_wizard.utils.code_generators.abstract_generator import (
     AbstractGenerator,
@@ -81,7 +80,7 @@ class NotebookGenerator(AbstractGenerator):
                 )
             case _:  # pragma: no cover
                 raise ValueError(self.analysis_plan.product)
-        tmp_path = Path(__file__).parent.parent.parent / "tmp"
+        tmp_path = package_root / "tmp"
         reports_block = (
             Template(f"{self._get_synth_or_stats()}_reports", root)
             .fill_expressions(

@@ -3,7 +3,8 @@
 from logging import warning
 from pathlib import Path
 
-__version__ = (Path(__file__).parent / "VERSION").read_text().strip()
+package_root = Path(__file__).parent
+__version__ = (package_root / "VERSION").read_text().strip()
 opendp_version = "0.14.1"
 registry_url = "https://registry.opendp.org/deployments-registry/"
 
@@ -33,7 +34,7 @@ def main() -> None:  # pragma: no cover
     # and to validate inputs before starting the server.
     get_cli_info()
 
-    not_first_run_path = Path(__file__).parent / "tmp/not-first-run.txt"
+    not_first_run_path = package_root / "tmp/not-first-run.txt"
     if not not_first_run_path.exists():
         warning("┌──────────────────────────────────┐")
         warning("│ First startup may take a minute! │")

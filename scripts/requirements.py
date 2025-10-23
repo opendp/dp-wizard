@@ -10,6 +10,8 @@ from subprocess import check_call
 
 from tomlkit import array, dumps, parse
 
+from dp_wizard import package_root
+
 
 def echo_check_call(cmd):
     """
@@ -76,8 +78,10 @@ def get_new_pyproject_toml():
     """
     cwd_root()
     pyproject = parse(Path("pyproject.toml").read_text())
-    pyproject["project"]["dependencies"] = to_toml_array("requirements.in")
-    pyproject["project"]["optional-dependencies"]["app"] = to_toml_array(
+    pyproject["project"]["dependencies"] = to_toml_array(  # type:ignore
+        "requirements.in"
+    )
+    pyproject["project"]["optional-dependencies"]["app"] = to_toml_array(  # type:ignore
         "requirements.txt"
     )
     return dumps(pyproject)
@@ -89,7 +93,7 @@ def rewrite_pyproject_toml():  # pragma: no cover
 
 
 def cwd_root():
-    chdir(Path(__file__).parent.parent)
+    chdir(package_root.parent)
 
 
 def main():  # pragma: no cover

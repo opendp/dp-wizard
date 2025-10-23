@@ -8,7 +8,7 @@ import pytest
 import requests
 from dp_wizard_templates.converters import convert_nb_to_html, convert_py_to_nb
 
-from dp_wizard import opendp_version
+from dp_wizard import opendp_version, package_root
 from dp_wizard.types import AnalysisName, ColumnName, Product
 from dp_wizard.utils.code_generators import (
     AnalysisPlan,
@@ -19,7 +19,7 @@ from dp_wizard.utils.code_generators.analyses import count, histogram, mean, med
 from dp_wizard.utils.code_generators.notebook_generator import NotebookGenerator
 from dp_wizard.utils.code_generators.script_generator import ScriptGenerator
 
-python_paths = Path(__file__).parent.parent.parent.glob("dp_wizard/**/*.py")
+python_paths = package_root.glob("**/*.py")
 
 
 @pytest.mark.parametrize("python_path", python_paths, ids=lambda path: path.name)
