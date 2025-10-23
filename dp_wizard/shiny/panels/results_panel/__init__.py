@@ -1,5 +1,4 @@
 import re
-from pathlib import Path
 
 from dp_wizard_templates.converters import (
     convert_nb_to_html,
@@ -9,6 +8,7 @@ from faicons import icon_svg
 from htmltools.tags import p
 from shiny import Inputs, Outputs, Session, reactive, render, types, ui
 
+from dp_wizard import package_root
 from dp_wizard.shiny.components.outputs import (
     hide_if,
     info_md_box,
@@ -448,9 +448,7 @@ def results_server(
     async def download_report():
         def make_report():
             notebook_nb()  # Evaluate just for the side effect of creating report.
-            return (
-                Path(__file__).parent.parent.parent.parent / "tmp" / "report.txt"
-            ).read_text()
+            return (package_root / "tmp/report.txt").read_text()
 
         yield make_download_or_modal_error(make_report)
 
@@ -458,8 +456,6 @@ def results_server(
     async def download_table():
         def make_table():
             notebook_nb()  # Evaluate just for the side effect of creating report.
-            return (
-                Path(__file__).parent.parent.parent.parent / "tmp" / "report.csv"
-            ).read_text()
+            return (package_root / "tmp/report.csv").read_text()
 
         yield make_download_or_modal_error(make_table)

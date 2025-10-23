@@ -1,17 +1,8 @@
 #!/usr/bin/env python3
 import re
 import subprocess
-from pathlib import Path
 
-root_path = Path(__file__).parent.parent
-
-
-def get_prev_version():
-    """
-    >>> len(get_prev_version().splitlines())
-    1
-    """
-    return (root_path / "dp_wizard" / "VERSION").read_text().strip()
+from dp_wizard import __version__, package_root
 
 
 def log_until(match):  # pragma: no cover
@@ -47,10 +38,10 @@ def parse_log(lines):
 
 
 def main():  # pragma: no cover
-    old_changelog_lines = (root_path / "CHANGELOG.md").read_text().splitlines()
+    old_changelog_lines = (package_root / "CHANGELOG.md").read_text().splitlines()
     new_changelog_lines = []
 
-    prev_version = get_prev_version()
+    prev_version = __version__
     log_lines = log_until(prev_version)
     changelog_update = parse_log(log_lines)
 
@@ -60,7 +51,7 @@ def main():  # pragma: no cover
             new_changelog_lines.append("")
         new_changelog_lines.append(line)
 
-    (root_path / "CHANGELOG.md").write_text("\n".join(new_changelog_lines))
+    (package_root.parent / "CHANGELOG.md").write_text("\n".join(new_changelog_lines))
 
 
 if __name__ == "__main__":  # pragma: no cover
