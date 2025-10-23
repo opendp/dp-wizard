@@ -1,6 +1,7 @@
 from logging import info
 
 import polars as pl
+from faicons import icon_svg
 from htmltools.tags import details, summary
 from shiny import Inputs, Outputs, Session, module, reactive, render, ui
 from shiny.types import SilentException
@@ -116,7 +117,7 @@ def error_md_ui(markdown):  # pragma: no cover
 @module.ui
 def column_ui():  # pragma: no cover
     return ui.card(
-        ui.card_header(ui.output_text("card_header")),
+        ui.card_header(icon_svg("gear"), ui.output_text("card_header", inline=True)),
         ui.output_ui("analysis_name_ui"),
         ui.output_ui("analysis_config_ui"),
     )
