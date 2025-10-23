@@ -78,12 +78,12 @@ def get_new_pyproject_toml():
     """
     cwd_root()
     pyproject = parse(Path("pyproject.toml").read_text())
-    pyproject["project"]["dependencies"] = to_toml_array(
+    pyproject["project"]["dependencies"] = to_toml_array(  # type:ignore
         "requirements.in"
-    )  # pyright: ignore[reportIndexIssue]
-    pyproject["project"]["optional-dependencies"]["app"] = to_toml_array(
+    )
+    pyproject["project"]["optional-dependencies"]["app"] = to_toml_array(  # type:ignore
         "requirements.txt"
-    )  # pyright: ignore[reportIndexIssue]
+    )
     return dumps(pyproject)
 
 
