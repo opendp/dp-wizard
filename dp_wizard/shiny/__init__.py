@@ -20,7 +20,7 @@ from dp_wizard.utils import config
 from dp_wizard.utils.argparse_helpers import CLIInfo
 from dp_wizard.utils.csv_helper import read_csv_names
 
-_assets_path = Path(__file__).parent / "assets"
+_assets_path = package_root / "shiny/assets"
 assert _assets_path.exists()
 
 
