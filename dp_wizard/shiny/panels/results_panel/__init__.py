@@ -207,7 +207,7 @@ def results_server(
                 ui.accordion_panel(
                     "Package",
                     button(
-                        "Package zip",
+                        "Package",
                         ".zip",
                         "folder-open",
                         primary=True,
@@ -490,7 +490,7 @@ def results_server(
         return inner
 
     @download(".zip")
-    async def download_package_zip():
+    async def download_package():
         yield make_download_or_modal_error(package_zip)
 
     @download(".py")
