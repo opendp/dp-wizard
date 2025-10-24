@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from math import gcd
-from pathlib import Path
 from typing import Iterable
 
 from dp_wizard_templates.code_template import Template
@@ -25,10 +24,9 @@ def _analysis_has_bounds(analysis) -> bool:
 
 
 class AbstractGenerator(ABC):
-    def __init__(self, analysis_plan: AnalysisPlan, note: str, target_path: Path):
+    def __init__(self, analysis_plan: AnalysisPlan, note: str):
         self.analysis_plan = analysis_plan
         self.note = note
-        self.target_path = target_path
 
     def _get_synth_or_stats(self) -> str:
         match self.analysis_plan.product:

@@ -405,13 +405,15 @@ def results_server(
         if qa_mode:
             return "raise Exception('qa_mode!')"
         return NotebookGenerator(
-            analysis_plan(), input.custom_download_note(), target_path
+            analysis_plan(),
+            input.custom_download_note(),
         ).make_py()
 
     @reactive.calc
     def script_py():
         return ScriptGenerator(
-            analysis_plan(), input.custom_download_note(), target_path
+            analysis_plan(),
+            input.custom_download_note(),
         ).make_py()
 
     @reactive.calc
