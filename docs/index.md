@@ -13,7 +13,7 @@ author: Chuck McCallum, software developer with the OpenDP Project at SEAS
 
 Chuck McCallum, software developer with the OpenDP Project at SEAS
 
-These slides: `https://opendp.github.io/harvard-it-summit-2025`
+These slides: `https://opendp.github.io/dp-wizard`
 
 ("✋" = class participation!)
 
@@ -138,7 +138,7 @@ Ideas that we now identify as "DP" were in use before the term was coined: [Stan
 
 Here's a question I might not feel comfortable answering honestly:
 
-> Are you at the Harvard IT Summit mostly for the free lunch?
+> Are you here mostly for the free food?
 
 - Decide on your answer.
 - Then flip a coin.
@@ -347,7 +347,7 @@ odds ratio ≤ e<sup>ε</sub>
 
 ## Privacy Deployments Registry, and a discussion
 
-A sample from [`registry.oblivious.com`](https://registry.oblivious.com/#registry):
+A sample from [`registry.opendp.org`](https://registry.opendp.org/deployments-registry/):
 
 | Organization | Epsilon | Context |
 |--------------|---------|---------|
@@ -461,7 +461,7 @@ This is a demonstration of how the OpenDP Library can be used to create a differ
 First install and import the required dependencies:
 
 ```
-%pip install 'opendp[polars]==0.13.0' matplotlib
+%pip install 'opendp[polars]==0.14.1' matplotlib
 ```
 ```
 >>> import polars as pl
@@ -633,6 +633,7 @@ If we try to run more queries at this point, it will error. Once the privacy bud
 - Grouping
 - Means
 - Medians
+- Synthetic Data
 
 </td>
 <td>
@@ -649,7 +650,6 @@ If we try to run more queries at this point, it will error. Once the privacy bud
 
 ### Other libraries
 
-- Synthetic data generation
 - Stochastic gradient descent
 - SQL interfaces
 
@@ -706,14 +706,10 @@ Other PETs protect privacy during computation, but don't preserve privacy in res
 
 ## Thank you, and stay in touch!
 
-| Help us improve! |
-|---|
-| 👉 [tinyurl.com/dp-wizard-study](https://tinyurl.com/dp-wizard-study) 👈 |
-
 |   | OpenDP | DP Wizard |
 |---|--------|-----------|
 |email:| info@opendp.org | cmccallum@g.harvard.edu |
-|docs:| [docs.opendp.org](https://docs.opendp.org) | [opendp.github.io/harvard-it-summit-2025](https://opendp.github.io/harvard-it-summit-2025) |
+|docs:| [docs.opendp.org](https://docs.opendp.org) | [opendp.github.io/dp-wizard](https://opendp.github.io/dp-wizard) |
 |source:| [github.com/opendp/opendp](https://github.com/opendp/opendp/) | [github.com/opendp/dp-wizard](https://github.com/opendp/dp-wizard/) |
 
 | Books! |
