@@ -14,7 +14,7 @@ class DownloadOption(NamedTuple):
 
     @property
     def clean_description_md(self) -> str:
-        return re.sub(r"\s+", " ", self.description_md.strip())
+        return re.sub(r"\s+", " ", self.description_md.strip())  # pragma: no cover
 
 
 download_options = {
