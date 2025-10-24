@@ -234,7 +234,7 @@ If we clipped each value at zero, the mean will be biased.
 </tr>
 </table>
 
-## (2) How do we explain it to users?
+## (2) How do we explain it to users? ✋
 
 <table>
 <tr>
@@ -345,7 +345,7 @@ odds ratio ≤ e<sup>ε</sub>
 </tr>
 </table>
 
-## Privacy Deployments Registry, and a discussion
+## Privacy Deployments Registry, and a discussion ✋
 
 A sample from [`registry.opendp.org`](https://registry.opendp.org/deployments-registry/):
 
@@ -360,6 +360,18 @@ A sample from [`registry.opendp.org`](https://registry.opendp.org/deployments-re
 - Give examples of private data with public applications, ideally something from your own experience.
 - Pick one of these and identify who would be interested in more accurate statistics, and who would prefer more privacy.
 - Finally, how can these two competing interests be represented? Does everyone have a seat at the table?
+
+## DP Wizard preview: Select Dataset
+
+![Select Dataset screenshot](screenshots/select-dataset.png)
+
+## DP Wizard preview: Define Analysis
+
+![Define Analysis screenshot](screenshots/define-analysis.png)
+
+## DP Wizard preview: Download Results
+
+![Download Results screenshot](screenshots/download-results.png)
 
 ## Return to the class grades example ✋
 

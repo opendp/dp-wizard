@@ -57,8 +57,7 @@ id="introduction-to-differential-privacy-with-opendp-and-dp-wizard">Introduction
 to differential privacy with OpenDP and DP Wizard</h3>
 <p>Chuck McCallum, software developer with the OpenDP Project at
 SEAS</p>
-<p>These slides:
-<code>https://opendp.github.io/harvard-it-summit-2025</code></p>
+<p>These slides: <code>https://opendp.github.io/dp-wizard</code></p>
 <p>(“✋” = class participation!)</p>
 </td>
 <td>
@@ -187,7 +186,7 @@ Answer Bias” (1965)</a></p>
 <p>Here’s a question I might not feel comfortable answering
 honestly:</p>
 <blockquote>
-<p>Are you at the Harvard IT Summit mostly for the free lunch?</p>
+<p>Are you here mostly for the free food?</p>
 </blockquote>
 <ul>
 <li>Decide on your answer.</li>
@@ -248,7 +247,7 @@ honestly:</p>
 <pre><code>A% = 3/4 * Yes% + 1/4 * No%
 A% = 3/4 * Yes% + 1/4 * (1 - Yes%)
 A% = 1/2 * Yes% + 1/4
-2 * (A% - 1/4) = Yes% </code></pre>
+2 * (A% - 1/4) = Yes%</code></pre>
 <table>
 <thead>
 <tr>
@@ -375,7 +374,7 @@ each value at zero, the mean will be biased.</p>
 </table>
 </div>
 <div id="how-do-we-explain-it-to-users-1" class="slide section level2">
-<h1>(2) How do we explain it to users?</h1>
+<h1>(2) How do we explain it to users? ✋</h1>
 <table>
 <tr>
 <td>
@@ -568,9 +567,9 @@ Registry</a> to see what other people have used.</li>
 </div>
 <div id="privacy-deployments-registry-and-a-discussion"
 class="slide section level2">
-<h1>Privacy Deployments Registry, and a discussion</h1>
+<h1>Privacy Deployments Registry, and a discussion ✋</h1>
 <p>A sample from <a
-href="https://registry.oblivious.com/#registry"><code>registry.oblivious.com</code></a>:</p>
+href="https://registry.opendp.org/deployments-registry/"><code>registry.opendp.org</code></a>:</p>
 <table>
 <colgroup>
 <col width="43%" />
@@ -616,6 +615,32 @@ accurate statistics, and who would prefer more privacy.</li>
 <li>Finally, how can these two competing interests be represented? Does
 everyone have a seat at the table?</li>
 </ul>
+</div>
+<div id="dp-wizard-preview-select-dataset" class="slide section level2">
+<h1>DP Wizard preview: Select Dataset</h1>
+<div class="float">
+<img src="screenshots/select-dataset.png"
+alt="Select Dataset screenshot" />
+<div class="figcaption">Select Dataset screenshot</div>
+</div>
+</div>
+<div id="dp-wizard-preview-define-analysis"
+class="slide section level2">
+<h1>DP Wizard preview: Define Analysis</h1>
+<div class="float">
+<img src="screenshots/define-analysis.png"
+alt="Define Analysis screenshot" />
+<div class="figcaption">Define Analysis screenshot</div>
+</div>
+</div>
+<div id="dp-wizard-preview-download-results"
+class="slide section level2">
+<h1>DP Wizard preview: Download Results</h1>
+<div class="float">
+<img src="screenshots/download-results.png"
+alt="Download Results screenshot" />
+<div class="figcaption">Download Results screenshot</div>
+</div>
 </div>
 <div id="return-to-the-class-grades-example"
 class="slide section level2">
@@ -719,7 +744,7 @@ going on here, see the documentation for OpenDP:
 https://docs.opendp.org/</p>
 <h4 id="prerequisites">Prerequisites</h4>
 <p>First install and import the required dependencies:</p>
-<pre><code>%pip install &#39;opendp[polars]==0.13.0&#39; matplotlib</code></pre>
+<pre><code>%pip install &#39;opendp[polars]==0.14.1&#39; matplotlib</code></pre>
 <pre><code>&gt;&gt;&gt; import polars as pl
 &gt;&gt;&gt; import opendp.prelude as dp
 &gt;&gt;&gt; import matplotlib.pyplot as plt
@@ -884,6 +909,7 @@ most well developed.</li>
 <li>Grouping</li>
 <li>Means</li>
 <li>Medians</li>
+<li>Synthetic Data</li>
 </ul>
 </td>
 <td>
@@ -903,7 +929,6 @@ example</a>)</li>
 <td>
 <h3 id="other-libraries">Other libraries</h3>
 <ul>
-<li>Synthetic data generation</li>
 <li>Stochastic gradient descent</li>
 <li>SQL interfaces</li>
 </ul>
@@ -970,23 +995,6 @@ execution environment</a></li>
 <h1>Thank you, and stay in touch!</h1>
 <table>
 <colgroup>
-<col width="100%" />
-</colgroup>
-<thead>
-<tr>
-<th>Help us improve!</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>👉 <a
-href="https://tinyurl.com/dp-wizard-study">tinyurl.com/dp-wizard-study</a>
-👈</td>
-</tr>
-</tbody>
-</table>
-<table>
-<colgroup>
 <col width="13%" />
 <col width="36%" />
 <col width="50%" />
@@ -1008,7 +1016,7 @@ href="https://tinyurl.com/dp-wizard-study">tinyurl.com/dp-wizard-study</a>
 <td>docs:</td>
 <td><a href="https://docs.opendp.org">docs.opendp.org</a></td>
 <td><a
-href="https://opendp.github.io/harvard-it-summit-2025">opendp.github.io/harvard-it-summit-2025</a></td>
+href="https://opendp.github.io/dp-wizard">opendp.github.io/dp-wizard</a></td>
 </tr>
 <tr>
 <td>source:</td>
