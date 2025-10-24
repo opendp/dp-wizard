@@ -1,0 +1,138 @@
+import re
+from typing import NamedTuple
+
+from faicons import icon_svg
+from shiny import ui
+
+
+class DownloadOption(NamedTuple):
+    name: str
+    ext: str
+    icon: str
+    description_md: str
+    cloud_description_md: str | None
+
+    @property
+    def clean_description_md(self) -> str:
+        return re.sub(r"\s+", " ", self.description_md.strip())
+
+
+download_options = {
+    option.name: option
+    # Find more icons on Font Awesome: https://fontawesome.com/search?ic=free
+    for option in [
+        DownloadOption(
+            "Package",
+            ".zip",
+            "folder-open",
+            "A zip file containing all the the items below.",
+            None,
+        ),
+        DownloadOption(
+            "Notebook",
+            ".ipynb",
+            "book",
+            """
+            An executed Jupyter notebook which references your CSV
+            and shows the result of a differentially private analysis.
+            """,
+            None,
+        ),
+        DownloadOption(
+            "HTML",
+            ".html",
+            "file-code",
+            "The same content, but exported as HTML.",
+            None,
+        ),
+        DownloadOption(
+            "Report",
+            ".txt",
+            "file-lines",
+            """
+            A report which includes your parameter choices and the results.
+            Intended to be human-readable, but it does use YAML,
+            so it can be parsed by other programs.
+            """,
+            None,
+        ),
+        DownloadOption(
+            "Table",
+            ".csv",
+            "file-csv",
+            "The same information, but condensed into a CSV.",
+            None,
+        ),
+        DownloadOption(
+            "Notebook (unexecuted)",
+            ".ipynb",
+            "book",
+            """
+            An unexecuted Jupyter notebook which shows the steps
+            in a differentially private analysis.
+            It can also be updated with the path
+            to a private CSV and executed locally.
+            """,
+            """
+            This contains the same code as Jupyter notebook above,
+            but none of the cells are executed,
+            so it does not contain any results.
+            """,
+        ),
+        DownloadOption(
+            "HTML (unexecuted)",
+            ".html",
+            "file-code",
+            "The same content, but exported as HTML.",
+            None,
+        ),
+        DownloadOption(
+            "Script",
+            ".py",
+            "python",
+            """
+            The same code as the notebooks, but extracted into
+            a Python script which can be run from the command line.
+            """,
+            None,
+        ),
+        DownloadOption(
+            "Notebook Source",
+            ".py",
+            "python",
+            """
+            Python source code converted by jupytext into notebook.
+            Primarily of interest to DP Wizard developers.
+            """,
+            None,
+        ),
+    ]
+}
+
+
+def button(
+    opt: DownloadOption, cloud=False, primary=False, disabled=False
+):  # pragma: no cover
+    clean_name = re.sub(r"\W+", " ", opt.name).strip().replace(" ", "_").lower()
+    kwargs = {
+        "id": f"download_{clean_name}",
+        "label": f"Download {opt.name} ({opt.ext})",
+        "icon": icon_svg(opt.icon, margin_right="0.5em"),
+        "width": "20em",
+        "class_": "btn-primary" if primary else None,
+    }
+    if disabled:
+        # Would prefer just to use ui.download_button,
+        # but it doesn't have a "disabled" option.
+        ui_button = ui.input_action_button
+        kwargs["disabled"] = True
+    else:
+        ui_button = ui.download_button
+    return [
+        ui_button(**kwargs),
+        ui.markdown(
+            (opt.cloud_description_md or opt.description_md)
+            if cloud
+            else opt.description_md
+        ),
+    ]
