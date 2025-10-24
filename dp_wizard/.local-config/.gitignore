@@ -1,0 +1,4 @@
+# This dot directory will be ignored by Shiny auto-reload.
+# See RELOAD_EXCLUDES_DEFAULT in py-shiny source.
+*
+!.gitignore
