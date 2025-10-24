@@ -8,7 +8,6 @@ from dp_wizard_templates.converters import (
     convert_py_to_nb,
 )
 from faicons import icon_svg
-from htmltools.tags import p
 from shiny import Inputs, Outputs, Session, reactive, render, types, ui
 
 from dp_wizard import package_root
@@ -31,7 +30,7 @@ target_path = package_root / ".local-sessions"
 
 
 def button(
-    name: str, ext: str, icon: str, primary=False, disabled=False
+    name: str, ext: str, icon: str, description_md: str, primary=False, disabled=False
 ):  # pragma: no cover
     clean_name = re.sub(r"\W+", " ", name).strip().replace(" ", "_").lower()
     kwargs = {
@@ -44,11 +43,11 @@ def button(
     if disabled:
         # Would prefer just to use ui.download_button,
         # but it doesn't have a "disabled" option.
-        return ui.input_action_button(
-            disabled=True,
-            **kwargs,
-        )
-    return ui.download_button(**kwargs)
+        ui_button = ui.input_action_button
+        kwargs["disabled"] = True
+    else:
+        ui_button = ui.download_button
+    return [ui_button(**kwargs), ui.markdown(description_md)]
 
 
 def _strip_ansi(e) -> str:
@@ -78,6 +77,9 @@ def make_download_or_modal_error(download_generator):  # pragma: no cover
         )
         ui.modal_show(modal)
         raise types.SilentException("code generation")
+
+
+download_info = {}
 
 
 def results_ui():  # pragma: no cover
@@ -210,13 +212,11 @@ def results_server(
                         "Package",
                         ".zip",
                         "folder-open",
-                        primary=True,
-                        disabled=disabled,
-                    ),
-                    p(
                         """
                         A zip file containing all the the items below.
-                        """
+                        """,
+                        primary=True,
+                        disabled=disabled,
                     ),
                 ),
             ),
@@ -224,31 +224,45 @@ def results_server(
                 ui.accordion_panel(
                     "Notebooks",
                     button(
-                        "Notebook", ".ipynb", "book", primary=True, disabled=disabled
-                    ),
-                    p(
+                        "Notebook",
+                        ".ipynb",
+                        "book",
                         """
                         An executed Jupyter notebook which references your CSV
                         and shows the result of a differentially private analysis.
-                        """
+                        """,
+                        primary=True,
+                        disabled=disabled,
                     ),
-                    button("HTML", ".html", "file-code", disabled=disabled),
-                    p("The same content, but exported as HTML."),
+                    button(
+                        "HTML",
+                        ".html",
+                        "file-code",
+                        "The same content, but exported as HTML.",
+                        disabled=disabled,
+                    ),
                 ),
                 ui.accordion_panel(
                     "Reports",
                     button(
-                        "Report", ".txt", "file-lines", primary=True, disabled=disabled
-                    ),
-                    p(
+                        "Report",
+                        ".txt",
+                        "file-lines",
                         """
                         A report which includes your parameter choices and the results.
                         Intended to be human-readable, but it does use YAML,
                         so it can be parsed by other programs.
-                        """
+                        """,
+                        primary=True,
+                        disabled=disabled,
                     ),
-                    button("Table", ".csv", "file-csv", disabled=disabled),
-                    p("The same information, but condensed into a CSV."),
+                    button(
+                        "Table",
+                        ".csv",
+                        "file-csv",
+                        "The same information, but condensed into a CSV.",
+                        disabled=disabled,
+                    ),
                 ),
             ),
         ]
@@ -287,44 +301,54 @@ def results_server(
                             "Notebook (unexecuted)",
                             ".ipynb",
                             "book",
-                            primary=True,
-                            disabled=disabled,
-                        ),
-                        p(
-                            """
+                            (
+                                """
                             An unexecuted Jupyter notebook which shows the steps
                             in a differentially private analysis.
                             It can also be updated with the path
                             to a private CSV and executed locally.
                             """
-                            if in_cloud
-                            else """
+                                if in_cloud
+                                else """
                             This contains the same code as Jupyter notebook above,
                             but none of the cells are executed,
                             so it does not contain any results.
                             """
+                            ),
+                            primary=True,
+                            disabled=disabled,
                         ),
                         button(
-                            "HTML (unexecuted)", ".html", "file-code", disabled=disabled
+                            "HTML (unexecuted)",
+                            ".html",
+                            "file-code",
+                            "The same content, but exported as HTML.",
+                            disabled=disabled,
                         ),
-                        p("The same content, but exported as HTML."),
                     ],
                 ),
                 ui.accordion_panel(
                     "Scripts",
-                    button("Script", ".py", "python", primary=True, disabled=disabled),
-                    p(
+                    button(
+                        "Script",
+                        ".py",
+                        "python",
                         """
                         The same code as the notebooks, but extracted into
                         a Python script which can be run from the command line.
-                        """
+                        """,
+                        primary=True,
+                        disabled=disabled,
                     ),
-                    button("Notebook Source", ".py", "python", disabled=disabled),
-                    p(
+                    button(
+                        "Notebook Source",
+                        ".py",
+                        "python",
                         """
                         Python source code converted by jupytext into notebook.
                         Primarily of interest to DP Wizard developers.
-                        """
+                        """,
+                        disabled=disabled,
                     ),
                 ),
                 # If running locally, we do not want it open by default.
@@ -386,7 +410,7 @@ def results_server(
             (zip_root_dir / f"{stem}.py").write_text(script_py())
             # This is a little bit redundant, since these have already
             # been written out as files, but it's safer to start
-            # from a clean slate, rather than rely on a side effect
+            # from a clean slate, rather than rely on the side effect
             # of a reactive.calc.
             (zip_root_dir / f"{stem}.txt").write_text(report())
             (zip_root_dir / f"{stem}.csv").write_text(table())

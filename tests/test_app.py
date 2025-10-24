@@ -251,12 +251,11 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     # Right now, the significant test start-up costs mean
     # it doesn't make sense to parameterize this test,
     # but that could change.
-    matches = [
-        re.search(r'button\("([^"]+)", "([^"]+)"', line)
-        for line in (package_root / "shiny/panels/results_panel/__init__.py")
-        .read_text()
-        .splitlines()
-    ]
+
+    matches = re.findall(
+        r'button\(\s+"([^"]+)",\s+"([^"]+)"',
+        (package_root / "shiny/panels/results_panel/__init__.py").read_text(),
+    )
 
     # Expand all accordions:
     page.get_by_text("Reports", exact=True).click()
@@ -268,8 +267,8 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     for match in matches:
         if not match:
             continue
-        name = match.group(1)
-        ext = match.group(2)
+        name = match[0]
+        ext = match[1]
         link_text = f"Download {name} ({ext})"
         with page.expect_download() as download_info:
             page.get_by_text(link_text).click()
@@ -293,8 +292,8 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     for match in matches:
         if not match:
             continue
-        name = match.group(1)
-        ext = match.group(2)
+        name = match[0]
+        ext = match[1]
         link_text = f"Download {name} ({ext})"
         with page.expect_download() as download_info:
             page.get_by_text(link_text).click()
