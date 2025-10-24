@@ -2,13 +2,11 @@ import re
 from pathlib import Path
 from shutil import make_archive
 from tempfile import TemporaryDirectory
-from typing import NamedTuple
 
 from dp_wizard_templates.converters import (
     convert_nb_to_html,
     convert_py_to_nb,
 )
-from faicons import icon_svg
 from shiny import Inputs, Outputs, Session, reactive, render, types, ui
 
 from dp_wizard import package_root
