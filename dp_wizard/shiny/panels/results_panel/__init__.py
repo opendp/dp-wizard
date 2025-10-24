@@ -219,6 +219,8 @@ def results_server(
                         """
                     ),
                 ),
+            ),
+            ui.accordion(
                 ui.accordion_panel(
                     "Notebooks",
                     button(
@@ -421,6 +423,7 @@ def results_server(
 
         # TODO: reactive.calcs shouldn't have side-effects!
         # (Like writing files that other calcs will depend on.)
+        # https://github.com/opendp/dp-wizard/issues/682
         released.set(True)
         plan = analysis_plan()
         return convert_py_to_nb(notebook_py(), title=str(plan), execute=True)
