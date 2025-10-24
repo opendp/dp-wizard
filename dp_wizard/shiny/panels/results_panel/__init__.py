@@ -37,6 +37,9 @@ class DownloadOption(NamedTuple):
     description_md: str
     cloud_description_md: str | None
 
+    def clean_description_md(self) -> str:
+        return re.sub(r"\s+", " ", self.description_md.strip())
+
 
 def button(
     opt: DownloadOption, cloud=False, primary=False, disabled=False
@@ -458,7 +461,7 @@ def results_server(
             included_names = ["Notebook", "HTML", "Script", "Report", "Table"]
             included_options = [download_options[name] for name in included_names]
             toc = "\n".join(
-                f"- {opt.name} ({opt.ext}): {opt.description_md}"
+                f"- {opt.name} ({opt.ext}): {opt.clean_description_md()}"
                 for opt in included_options
             )
             readme = f"# {analysis_plan()}\n\n{note}\n\nContains:\n\n{toc}"
