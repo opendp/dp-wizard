@@ -345,13 +345,34 @@ def results_server(
             columns=columns,
         )
 
-    ######################
+    ################################
     #
-    # Download content
+    # Generate content for downloads
     #
-    ######################
+    ################################
 
-    # These can be slow, but reactive calcs will cache results.
+    @reactive.calc
+    def package_zip():
+        stem = input.custom_download_stem()
+        note = input.custom_download_note()
+        (target_path / "README.txt").write_text(note)
+        (target_path / f"{stem}.ipynb").write_text(notebook_nb())
+        (target_path / f"{stem}.html").write_text(notebook_html())
+        (target_path / f"{stem}.py").write_text(script_py())
+
+    @reactive.calc
+    def notebook_py():
+        if qa_mode:
+            return "raise Exception('qa_mode!')"
+        return NotebookGenerator(
+            analysis_plan(), input.custom_download_note(), target_path
+        ).make_py()
+
+    @reactive.calc
+    def script_py():
+        return ScriptGenerator(
+            analysis_plan(), input.custom_download_note(), target_path
+        ).make_py()
 
     @reactive.calc
     def notebook_nb():
@@ -361,22 +382,12 @@ def results_server(
         # Luckily, reactive calcs are lazy.
         released.set(True)
         plan = analysis_plan()
-        notebook_py = (
-            "raise Exception('qa_mode!')"
-            if qa_mode
-            else NotebookGenerator(
-                plan, input.custom_download_note(), target_path
-            ).make_py()
-        )
-        return convert_py_to_nb(notebook_py, title=str(plan), execute=True)
+        return convert_py_to_nb(notebook_py(), title=str(plan), execute=True)
 
     @reactive.calc
     def notebook_nb_unexecuted():
         plan = analysis_plan()
-        notebook_py = NotebookGenerator(
-            plan, input.custom_download_note(), target_path
-        ).make_py()
-        return convert_py_to_nb(notebook_py, title=str(plan), execute=False)
+        return convert_py_to_nb(notebook_py(), title=str(plan), execute=False)
 
     @reactive.calc
     def notebook_html():
@@ -386,9 +397,19 @@ def results_server(
     def notebook_html_unexecuted():
         return convert_nb_to_html(notebook_nb_unexecuted())
 
+    @reactive.calc
+    def report():
+        notebook_nb()  # Evaluate just for the side effect of creating report.
+        return (target_path / "report.txt").read_text()
+
+    @reactive.calc
+    def table():
+        notebook_nb()  # Evaluate just for the side effect of creating report.
+        return (target_path / "report.csv").read_text()
+
     ######################
     #
-    # Download functions
+    # Handle the downloads
     #
     ######################
 
@@ -396,6 +417,11 @@ def results_server(
     # based on the cleaned-up name parameter.
 
     def download(ext: str):
+        """
+        Rather than dealing with @render.download() directly,
+        this decorator derives MIME type from the
+        provided extension.
+        """
         last_ext = ext.split(".")[-1]
         mime = {
             "ipynb": "application/x-ipynb+json",
@@ -418,19 +444,11 @@ def results_server(
 
     @download(".py")
     async def download_script():
-        yield make_download_or_modal_error(
-            ScriptGenerator(
-                analysis_plan(), input.custom_download_note(), target_path
-            ).make_py,
-        )
+        yield make_download_or_modal_error(script_py)
 
     @download(".ipynb.py")
     async def download_notebook_source():
-        with ui.Progress() as progress:
-            progress.set(message=wait_message)
-            yield NotebookGenerator(
-                analysis_plan(), input.custom_download_note(), target_path
-            ).make_py()
+        yield make_download_or_modal_error(notebook_py)
 
     @download(".ipynb")
     async def download_notebook():
@@ -450,16 +468,8 @@ def results_server(
 
     @download(".txt")
     async def download_report():
-        def make_report():
-            notebook_nb()  # Evaluate just for the side effect of creating report.
-            return (package_root / "local-sessions/report.txt").read_text()
-
-        yield make_download_or_modal_error(make_report)
+        yield make_download_or_modal_error(report)
 
     @download(".csv")
     async def download_table():
-        def make_table():
-            notebook_nb()  # Evaluate just for the side effect of creating report.
-            return (package_root / "local-sessions/report.csv").read_text()
-
-        yield make_download_or_modal_error(make_table)
+        yield make_download_or_modal_error(table)
