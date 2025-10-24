@@ -24,6 +24,7 @@ from dp_wizard.utils.code_generators.notebook_generator import (
 from dp_wizard.utils.code_generators.script_generator import ScriptGenerator
 
 wait_message = "Please wait."
+target_path = package_root / "local-sessions"
 
 
 def button(
@@ -363,14 +364,18 @@ def results_server(
         notebook_py = (
             "raise Exception('qa_mode!')"
             if qa_mode
-            else NotebookGenerator(plan, input.custom_download_note()).make_py()
+            else NotebookGenerator(
+                plan, input.custom_download_note(), target_path
+            ).make_py()
         )
         return convert_py_to_nb(notebook_py, title=str(plan), execute=True)
 
     @reactive.calc
     def notebook_nb_unexecuted():
         plan = analysis_plan()
-        notebook_py = NotebookGenerator(plan, input.custom_download_note()).make_py()
+        notebook_py = NotebookGenerator(
+            plan, input.custom_download_note(), target_path
+        ).make_py()
         return convert_py_to_nb(notebook_py, title=str(plan), execute=False)
 
     @reactive.calc
@@ -415,8 +420,7 @@ def results_server(
     async def download_script():
         yield make_download_or_modal_error(
             ScriptGenerator(
-                analysis_plan(),
-                input.custom_download_note(),
+                analysis_plan(), input.custom_download_note(), target_path
             ).make_py,
         )
 
@@ -425,7 +429,7 @@ def results_server(
         with ui.Progress() as progress:
             progress.set(message=wait_message)
             yield NotebookGenerator(
-                analysis_plan(), input.custom_download_note()
+                analysis_plan(), input.custom_download_note(), target_path
             ).make_py()
 
     @download(".ipynb")
