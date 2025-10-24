@@ -1,4 +1,7 @@
 import re
+from pathlib import Path
+from shutil import make_archive
+from tempfile import TemporaryDirectory
 
 from dp_wizard_templates.converters import (
     convert_nb_to_html,
@@ -24,7 +27,7 @@ from dp_wizard.utils.code_generators.notebook_generator import (
 from dp_wizard.utils.code_generators.script_generator import ScriptGenerator
 
 wait_message = "Please wait."
-target_path = package_root / "local-sessions"
+target_path = package_root / ".local-sessions"
 
 
 def button(
@@ -202,6 +205,21 @@ def results_server(
             # Find more icons on Font Awesome: https://fontawesome.com/search?ic=free
             ui.accordion(
                 ui.accordion_panel(
+                    "Package",
+                    button(
+                        "Package zip",
+                        ".zip",
+                        "folder-open",
+                        primary=True,
+                        disabled=disabled,
+                    ),
+                    p(
+                        """
+                        A zip file containing all the the items below.
+                        """
+                    ),
+                ),
+                ui.accordion_panel(
                     "Notebooks",
                     button(
                         "Notebook", ".ipynb", "book", primary=True, disabled=disabled
@@ -353,12 +371,32 @@ def results_server(
 
     @reactive.calc
     def package_zip():
-        stem = input.custom_download_stem()
-        note = input.custom_download_note()
-        (target_path / "README.txt").write_text(note)
-        (target_path / f"{stem}.ipynb").write_text(notebook_nb())
-        (target_path / f"{stem}.html").write_text(notebook_html())
-        (target_path / f"{stem}.py").write_text(script_py())
+        with TemporaryDirectory() as tmp_dir:
+            zip_root_dir = Path(tmp_dir) / "zip-root"
+            zip_root_dir.mkdir()
+
+            stem = input.custom_download_stem()
+            note = input.custom_download_note()
+
+            (zip_root_dir / "README.txt").write_text(note)
+            (zip_root_dir / f"{stem}.ipynb").write_text(notebook_nb())
+            (zip_root_dir / f"{stem}.html").write_text(notebook_html())
+            (zip_root_dir / f"{stem}.py").write_text(script_py())
+            # This is a little bit redundant, since these have already
+            # been written out as files, but it's safer to start
+            # from a clean slate, rather than rely on a side effect
+            # of a reactive.calc.
+            (zip_root_dir / f"{stem}.txt").write_text(report())
+            (zip_root_dir / f"{stem}.csv").write_text(table())
+
+            base_name = f"{tmp_dir}/{stem}"
+            ext = "zip"
+            make_archive(
+                base_name=base_name,
+                format=ext,
+                root_dir=zip_root_dir,
+            )
+            return Path(f"{base_name}.{ext}").read_bytes()
 
     @reactive.calc
     def notebook_py():
@@ -380,6 +418,9 @@ def results_server(
         # and drops reports in the local-sessions dir.
         # Could be slow!
         # Luckily, reactive calcs are lazy.
+
+        # TODO: reactive.calcs shouldn't have side-effects!
+        # (Like writing files that other calcs will depend on.)
         released.set(True)
         plan = analysis_plan()
         return convert_py_to_nb(notebook_py(), title=str(plan), execute=True)
@@ -424,6 +465,7 @@ def results_server(
         """
         last_ext = ext.split(".")[-1]
         mime = {
+            "zip": "application/zip",
             "ipynb": "application/x-ipynb+json",
             "py": "text/x-python",
             "html": "text/html",
@@ -441,6 +483,10 @@ def results_server(
             return wrapped
 
         return inner
+
+    @download(".zip")
+    async def download_package_zip():
+        yield make_download_or_modal_error(package_zip)
 
     @download(".py")
     async def download_script():
