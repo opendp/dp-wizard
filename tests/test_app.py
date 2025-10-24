@@ -7,6 +7,7 @@ from shiny.pytest import create_app_fixture
 from shiny.run import ShinyAppProc
 
 from dp_wizard import package_root
+from dp_wizard.shiny.panels.results_panel import download_options
 from dp_wizard.utils.code_generators.notebook_generator import PLACEHOLDER_CSV_NAME
 
 bp = "BREAKPOINT()".lower()
@@ -250,8 +251,6 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     # Right now, the significant test start-up costs mean
     # it doesn't make sense to parameterize this test,
     # but that could change.
-
-    from dp_wizard.shiny.panels.results_panel import download_options
 
     # Expand all accordions:
     page.get_by_text("Reports", exact=True).click()
