@@ -2,6 +2,7 @@ import re
 from pathlib import Path
 from shutil import make_archive
 from tempfile import TemporaryDirectory
+from typing import NamedTuple
 
 from dp_wizard_templates.converters import (
     convert_nb_to_html,
@@ -79,7 +80,104 @@ def make_download_or_modal_error(download_generator):  # pragma: no cover
         raise types.SilentException("code generation")
 
 
-download_info = {}
+class DownloadOption(NamedTuple):
+    name: str
+    ext: str
+    icon: str
+    description: str
+    cloud_description: str | None
+
+
+download_options = {
+    option.name: option
+    for option in [
+        DownloadOption(
+            "Package",
+            ".zip",
+            "folder-open",
+            "A zip file containing all the the items below.",
+            None,
+        ),
+        DownloadOption(
+            "Notebook",
+            ".ipynb",
+            "book",
+            """
+            An executed Jupyter notebook which references your CSV
+            and shows the result of a differentially private analysis.
+            """,
+            None,
+        ),
+        DownloadOption(
+            "HTML",
+            ".html",
+            "file-code",
+            "The same content, but exported as HTML.",
+            None,
+        ),
+        DownloadOption(
+            "Report",
+            ".txt",
+            "file-lines",
+            """
+            A report which includes your parameter choices and the results.
+            Intended to be human-readable, but it does use YAML,
+            so it can be parsed by other programs.
+            """,
+            None,
+        ),
+        DownloadOption(
+            "Table",
+            ".csv",
+            "file-csv",
+            "The same information, but condensed into a CSV.",
+            None,
+        ),
+        DownloadOption(
+            "Notebook (unexecuted)",
+            ".ipynb",
+            "book",
+            """
+            An unexecuted Jupyter notebook which shows the steps
+            in a differentially private analysis.
+            It can also be updated with the path
+            to a private CSV and executed locally.
+            """,
+            """
+            This contains the same code as Jupyter notebook above,
+            but none of the cells are executed,
+            so it does not contain any results.
+            """,
+        ),
+        DownloadOption(
+            "HTML (unexecuted)",
+            ".html",
+            "file-code",
+            "The same content, but exported as HTML.",
+            None,
+        ),
+        DownloadOption(
+            "Script",
+            ".py",
+            "python",
+            """
+            The same code as the notebooks, but extracted into
+            a Python script which can be run from the command line.
+            """,
+            None,
+        ),
+        DownloadOption(
+            "Notebook Source",
+            ".py",
+            "python",
+            """
+            Python source code converted by jupytext into notebook.
+            Primarily of interest to DP Wizard developers.
+            """,
+            None,
+        ),
+    ]
+}
 
 
 def results_ui():  # pragma: no cover
