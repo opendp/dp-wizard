@@ -30,14 +30,22 @@ wait_message = "Please wait."
 target_path = package_root / ".local-sessions"
 
 
+class DownloadOption(NamedTuple):
+    name: str
+    ext: str
+    icon: str
+    description_md: str
+    cloud_description_md: str | None
+
+
 def button(
-    name: str, ext: str, icon: str, description_md: str, primary=False, disabled=False
+    opt: DownloadOption, cloud=False, primary=False, disabled=False
 ):  # pragma: no cover
-    clean_name = re.sub(r"\W+", " ", name).strip().replace(" ", "_").lower()
+    clean_name = re.sub(r"\W+", " ", opt.name).strip().replace(" ", "_").lower()
     kwargs = {
         "id": f"download_{clean_name}",
-        "label": f"Download {name} ({ext})",
-        "icon": icon_svg(icon, margin_right="0.5em"),
+        "label": f"Download {opt.name} ({opt.ext})",
+        "icon": icon_svg(opt.icon, margin_right="0.5em"),
         "width": "20em",
         "class_": "btn-primary" if primary else None,
     }
@@ -48,7 +56,14 @@ def button(
         kwargs["disabled"] = True
     else:
         ui_button = ui.download_button
-    return [ui_button(**kwargs), ui.markdown(description_md)]
+    return [
+        ui_button(**kwargs),
+        ui.markdown(
+            (opt.cloud_description_md or opt.description_md)
+            if cloud
+            else opt.description_md
+        ),
+    ]
 
 
 def _strip_ansi(e) -> str:
@@ -78,14 +93,6 @@ def make_download_or_modal_error(download_generator):  # pragma: no cover
         )
         ui.modal_show(modal)
         raise types.SilentException("code generation")
-
-
-class DownloadOption(NamedTuple):
-    name: str
-    ext: str
-    icon: str
-    description: str
-    cloud_description: str | None
 
 
 download_options = {
@@ -307,12 +314,7 @@ def results_server(
                 ui.accordion_panel(
                     "Package",
                     button(
-                        "Package",
-                        ".zip",
-                        "folder-open",
-                        """
-                        A zip file containing all the the items below.
-                        """,
+                        download_options["Package"],
                         primary=True,
                         disabled=disabled,
                     ),
@@ -322,43 +324,24 @@ def results_server(
                 ui.accordion_panel(
                     "Notebooks",
                     button(
-                        "Notebook",
-                        ".ipynb",
-                        "book",
-                        """
-                        An executed Jupyter notebook which references your CSV
-                        and shows the result of a differentially private analysis.
-                        """,
+                        download_options["Notebook"],
                         primary=True,
                         disabled=disabled,
                     ),
                     button(
-                        "HTML",
-                        ".html",
-                        "file-code",
-                        "The same content, but exported as HTML.",
+                        download_options["HTML"],
                         disabled=disabled,
                     ),
                 ),
                 ui.accordion_panel(
                     "Reports",
                     button(
-                        "Report",
-                        ".txt",
-                        "file-lines",
-                        """
-                        A report which includes your parameter choices and the results.
-                        Intended to be human-readable, but it does use YAML,
-                        so it can be parsed by other programs.
-                        """,
+                        download_options["Report"],
                         primary=True,
                         disabled=disabled,
                     ),
                     button(
-                        "Table",
-                        ".csv",
-                        "file-csv",
-                        "The same information, but condensed into a CSV.",
+                        download_options["Table"],
                         disabled=disabled,
                     ),
                 ),
@@ -396,31 +379,13 @@ def results_server(
                     "Unexecuted Notebooks",
                     [
                         button(
-                            "Notebook (unexecuted)",
-                            ".ipynb",
-                            "book",
-                            (
-                                """
-                            An unexecuted Jupyter notebook which shows the steps
-                            in a differentially private analysis.
-                            It can also be updated with the path
-                            to a private CSV and executed locally.
-                            """
-                                if in_cloud
-                                else """
-                            This contains the same code as Jupyter notebook above,
-                            but none of the cells are executed,
-                            so it does not contain any results.
-                            """
-                            ),
+                            download_options["Notebook (unexecuted)"],
+                            cloud=in_cloud,
                             primary=True,
                             disabled=disabled,
                         ),
                         button(
-                            "HTML (unexecuted)",
-                            ".html",
-                            "file-code",
-                            "The same content, but exported as HTML.",
+                            download_options["HTML (unexecuted)"],
                             disabled=disabled,
                         ),
                     ],
@@ -428,24 +393,12 @@ def results_server(
                 ui.accordion_panel(
                     "Scripts",
                     button(
-                        "Script",
-                        ".py",
-                        "python",
-                        """
-                        The same code as the notebooks, but extracted into
-                        a Python script which can be run from the command line.
-                        """,
+                        download_options["Script"],
                         primary=True,
                         disabled=disabled,
                     ),
                     button(
-                        "Notebook Source",
-                        ".py",
-                        "python",
-                        """
-                        Python source code converted by jupytext into notebook.
-                        Primarily of interest to DP Wizard developers.
-                        """,
+                        download_options["Notebook Source"],
                         disabled=disabled,
                     ),
                 ),

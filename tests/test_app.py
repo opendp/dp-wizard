@@ -1,4 +1,3 @@
-import re
 from pathlib import Path
 
 import nbformat
@@ -252,10 +251,7 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     # it doesn't make sense to parameterize this test,
     # but that could change.
 
-    matches = re.findall(
-        r'button\(\s+"([^"]+)",\s+"([^"]+)"',
-        (package_root / "shiny/panels/results_panel/__init__.py").read_text(),
-    )
+    from dp_wizard.shiny.panels.results_panel import download_options
 
     # Expand all accordions:
     page.get_by_text("Reports", exact=True).click()
@@ -264,18 +260,14 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
 
     expected_stem = "dp_statistics_for_grade_grouped_by_class_year"
 
-    for match in matches:
-        if not match:
-            continue
-        name = match[0]
-        ext = match[1]
-        link_text = f"Download {name} ({ext})"
+    for option in download_options.values():
+        link_text = f"Download {option.name} ({option.ext})"
         with page.expect_download() as download_info:
             page.get_by_text(link_text).click()
 
         download_name = download_info.value.suggested_filename
         assert download_name.startswith(expected_stem)
-        assert download_name.endswith(ext)
+        assert download_name.endswith(option.ext)
 
         download_path = download_info.value.path()
         content = download_path.read_bytes()
@@ -289,18 +281,14 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     expect(stem_locator).to_have_value(new_stem)
 
     new_clean_stem = "-C1ean-me-"
-    for match in matches:
-        if not match:
-            continue
-        name = match[0]
-        ext = match[1]
-        link_text = f"Download {name} ({ext})"
+    for option in download_options.values():
+        link_text = f"Download {option.name} ({option.ext})"
         with page.expect_download() as download_info:
             page.get_by_text(link_text).click()
 
         download_name = download_info.value.suggested_filename
         assert download_name.startswith(new_clean_stem)
-        assert download_name.endswith(ext)
+        assert download_name.endswith(option.ext)
 
     # -- Define Analysis --
     page.get_by_role("tab", name="Define Analysis").click()
