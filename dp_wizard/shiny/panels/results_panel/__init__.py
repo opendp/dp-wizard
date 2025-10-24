@@ -455,7 +455,15 @@ def results_server(
             stem = input.custom_download_stem()
             note = input.custom_download_note()
 
-            (zip_root_dir / "README.txt").write_text(note)
+            included_names = ["Notebook", "HTML", "Script", "Report", "Table"]
+            included_options = [download_options[name] for name in included_names]
+            toc = "\n".join(
+                f"- {opt.name} ({opt.ext}): {opt.description_md}"
+                for opt in included_options
+            )
+            readme = f"# {analysis_plan()}\n\n{note}\n\nContains:\n\n{toc}"
+
+            (zip_root_dir / "README.txt").write_text(readme)
             (zip_root_dir / f"{stem}.ipynb").write_text(notebook_nb())
             (zip_root_dir / f"{stem}.html").write_text(notebook_html())
             (zip_root_dir / f"{stem}.py").write_text(script_py())
