@@ -467,37 +467,41 @@ def results_server(
         return inner
 
     @download(".zip")
-    async def download_package():
+    async def download_package_button():
         yield _make_download_or_modal_error(package_zip)
 
     @download(".py")
-    async def download_script():
+    async def download_script_link():
+        yield _make_download_or_modal_error(script_py)
+
+    @download(".py")
+    async def download_script_button():
         yield _make_download_or_modal_error(script_py)
 
     @download(".ipynb.py")
-    async def download_notebook_source():
+    async def download_notebook_source_button():
         yield _make_download_or_modal_error(notebook_py)
 
     @download(".ipynb")
-    async def download_notebook():
+    async def download_notebook_link():
         yield _make_download_or_modal_error(notebook_nb)
 
     @download(".unexecuted.ipynb")
-    async def download_notebook_unexecuted():
+    async def download_notebook_unexecuted_button():
         yield _make_download_or_modal_error(notebook_nb_unexecuted)
 
     @download(".html")
-    async def download_html():
+    async def download_html_link():
         yield _make_download_or_modal_error(notebook_html)
 
     @download(".unexecuted.html")
-    async def download_html_unexecuted():
+    async def download_html_unexecuted_button():
         yield _make_download_or_modal_error(notebook_html_unexecuted)
 
     @download(".txt")
-    async def download_report():
+    async def download_report_link():
         yield _make_download_or_modal_error(report)
 
     @download(".csv")
-    async def download_table():
+    async def download_table_link():
         yield _make_download_or_modal_error(table)
