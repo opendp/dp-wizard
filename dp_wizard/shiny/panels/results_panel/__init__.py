@@ -174,37 +174,49 @@ def results_server(
 
     @render.ui
     def download_results_ui():
-        if in_cloud:
-            return None
         disabled = not weights()
-        return ui.layout_columns(
-            ui.card(
-                ui.card_header("Results"),
-                tutorial_box(
-                    is_tutorial_mode(),
+        return ui.card(
+            ui.card_header("Results"),
+            (
+                ui.markdown(
                     """
-                    Now you can download a notebook for your analysis.
-                    The Jupyter notebook could be used locally or on Colab,
-                    but the HTML version can be viewed in the brower.
-                    """,
-                    responsive=False,
-                ),
-                download_button(
-                    "Package",
-                    primary=True,
-                    disabled=disabled,
-                ),
-                ui.br(),
-                "Contains:",
-                ui.tags.ul(
-                    ui.tags.li(icon_svg("file", margin_right="0.5em"), "README (.txt)"),
-                    ui.tags.li(download_link("Notebook", disabled=disabled)),
-                    ui.tags.li(download_link("HTML", disabled=disabled)),
-                    ui.tags.li(download_link("Script", disabled=disabled)),
-                    ui.tags.li(download_link("Report", disabled=disabled)),
-                    ui.tags.li(download_link("Table", disabled=disabled)),
-                ),
-            )
+                    When [installed and run
+                    locally](https://pypi.org/project/dp_wizard/),
+                    there are more download options because DP Wizard
+                    can read your private CSV and release differentially
+                    private statistics.
+                    """
+                )
+                if in_cloud
+                else [
+                    tutorial_box(
+                        is_tutorial_mode(),
+                        """
+                        Now you can download a notebook for your analysis.
+                        The Jupyter notebook could be used locally or on Colab,
+                        but the HTML version can be viewed in the brower.
+                        """,
+                        responsive=False,
+                    ),
+                    download_button(
+                        "Package",
+                        primary=True,
+                        disabled=disabled,
+                    ),
+                    ui.br(),
+                    "Contains:",
+                    ui.tags.ul(
+                        ui.tags.li(
+                            icon_svg("file", margin_right="0.5em"), "README (.txt)"
+                        ),
+                        ui.tags.li(download_link("Notebook", disabled=disabled)),
+                        ui.tags.li(download_link("HTML", disabled=disabled)),
+                        ui.tags.li(download_link("Script", disabled=disabled)),
+                        ui.tags.li(download_link("Report", disabled=disabled)),
+                        ui.tags.li(download_link("Table", disabled=disabled)),
+                    ),
+                ]
+            ),
         )
 
     @render.ui
@@ -216,12 +228,6 @@ def results_server(
                 is_tutorial_mode(),
                 (
                     """
-                    When [installed and run
-                    locally](https://pypi.org/project/dp_wizard/),
-                    there are more download options because DP Wizard
-                    can read your private CSV and release differentially
-                    private statistics.
-
                     In the cloud, DP Wizard only provides unexecuted
                     notebooks and scripts.
                     """

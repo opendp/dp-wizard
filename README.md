@@ -61,7 +61,7 @@ Define Analysis:
 ![Screenshot with four panels: "Columns", "Grouping", "Privacy Budget", and "Simulation".](docs/screenshots/define-analysis.png)
 
 Download Results:
-![Screenshot with two prominent buttons: "Download Notebook" and "Download HTML".](docs/screenshots/download-results.png)
+![Screenshot with buttons and links for downloads.](docs/screenshots/download-results.png)
 
 ## Contributions
 

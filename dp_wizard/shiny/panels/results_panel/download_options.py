@@ -10,7 +10,6 @@ class DownloadOption(NamedTuple):
     ext: str
     icon: str
     description_md: str
-    cloud_description_md: str | None
 
     @property
     def clean_description_md(self) -> str:
@@ -26,7 +25,6 @@ _download_options = {
             ".zip",
             "folder-open",
             "A zip file with results and code for a reproducible analysis.",
-            None,
         ),
         DownloadOption(
             "Notebook",
@@ -36,14 +34,12 @@ _download_options = {
             An executed Jupyter notebook which references your CSV
             and shows the result of a differentially private analysis.
             """,
-            None,
         ),
         DownloadOption(
             "HTML",
             ".html",
             "file-code",
             "The same content, but exported as HTML.",
-            None,
         ),
         DownloadOption(
             "Report",
@@ -54,14 +50,12 @@ _download_options = {
             Intended to be human-readable, but it does use YAML,
             so it can be parsed by other programs.
             """,
-            None,
         ),
         DownloadOption(
             "Table",
             ".csv",
             "file-csv",
             "The same information, but condensed into a CSV.",
-            None,
         ),
         DownloadOption(
             "Notebook (unexecuted)",
@@ -73,18 +67,12 @@ _download_options = {
             It can also be updated with the path
             to a private CSV and executed locally.
             """,
-            """
-            This contains the same code as Jupyter notebook above,
-            but none of the cells are executed,
-            so it does not contain any results.
-            """,
         ),
         DownloadOption(
             "HTML (unexecuted)",
             ".html",
             "file-code",
             "The same content, but exported as HTML.",
-            None,
         ),
         DownloadOption(
             "Script",
@@ -94,7 +82,6 @@ _download_options = {
             The same code as the notebooks, but extracted into
             a Python script which can be run from the command line.
             """,
-            None,
         ),
         DownloadOption(
             "Notebook Source",
@@ -104,13 +91,18 @@ _download_options = {
             Python source code converted by jupytext into notebook.
             Primarily of interest to DP Wizard developers.
             """,
-            None,
         ),
     ]
 }
 
 
 def table_of_contents_md():
+    """
+    >>> print(table_of_contents_md())
+    - README.txt
+    ...
+    - Table (.csv): The same information, but condensed into a CSV.
+    """
     included_names = ["Notebook", "HTML", "Script", "Report", "Table"]
     included_options = [_download_options[name] for name in included_names]
     return "- README.txt\n" + "\n".join(
@@ -124,7 +116,7 @@ def download_button(
     cloud=None,
     primary=False,
     disabled=False,
-):
+):  # pragma: no cover
     return _download_button_or_link(
         opt_name,
         cloud=cloud,
@@ -139,7 +131,7 @@ def download_link(
     cloud=None,
     primary=False,
     disabled=False,
-):
+):  # pragma: no cover
     return _download_button_or_link(
         opt_name,
         cloud=cloud,
@@ -172,14 +164,7 @@ def _download_button_or_link(
         kwargs["disabled"] = True
     else:
         ui_button_or_link = ui.download_button if button else ui.download_link
-    assert (cloud is None and opt.cloud_description_md is None) or (
-        cloud is not None and opt.clean_description_md is not None
-    )
     return [
         ui_button_or_link(**kwargs),
-        ui.markdown(
-            (opt.cloud_description_md or opt.description_md)
-            if cloud
-            else opt.description_md
-        ),
+        ui.markdown(opt.description_md),
     ]
