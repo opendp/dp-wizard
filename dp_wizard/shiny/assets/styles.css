@@ -83,3 +83,8 @@ https://www.w3.org/WAI/tutorials/forms/labels/#note-on-hiding-elements
 label:has(.only-for-screenreaders) {
     display: inline;
 }
+
+/* Increase default margin on title icon. */
+.card-header > .fa {
+    margin-right: 0.8em !important;
+}
