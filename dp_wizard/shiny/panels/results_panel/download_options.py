@@ -25,7 +25,7 @@ download_options = {
             "Package",
             ".zip",
             "folder-open",
-            "A zip file containing all the the items below.",
+            "A zip file with results and code for a reproducible analysis.",
             None,
         ),
         DownloadOption(

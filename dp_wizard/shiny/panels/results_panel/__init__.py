@@ -191,6 +191,7 @@ def results_server(
                         primary=True,
                         disabled=disabled,
                     ),
+                    ui.markdown("Contains:\n" + table_of_contents_md()),
                 ),
             ),
             ui.accordion(
@@ -320,6 +321,15 @@ def results_server(
     ################################
 
     @reactive.calc
+    def table_of_contents_md():
+        included_names = ["Notebook", "HTML", "Script", "Report", "Table"]
+        included_options = [download_options[name] for name in included_names]
+        return "- README.txt\n" + "\n".join(
+            f"- {opt.name} ({opt.ext}): {opt.clean_description_md}"
+            for opt in included_options
+        )
+
+    @reactive.calc
     def package_zip():
         with TemporaryDirectory() as tmp_dir:
             zip_root_dir = Path(tmp_dir) / "zip-root"
@@ -328,12 +338,7 @@ def results_server(
             stem = input.custom_download_stem()
             note = input.custom_download_note()
 
-            included_names = ["Notebook", "HTML", "Script", "Report", "Table"]
-            included_options = [download_options[name] for name in included_names]
-            toc = "\n".join(
-                f"- {opt.name} ({opt.ext}): {opt.clean_description_md}"
-                for opt in included_options
-            )
+            toc = table_of_contents_md()
             readme = f"# {analysis_plan()}\n\n{note}\n\nContains:\n\n{toc}"
 
             (zip_root_dir / "README.txt").write_text(readme)
