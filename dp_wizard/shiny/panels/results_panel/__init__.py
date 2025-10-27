@@ -68,8 +68,10 @@ def results_ui():  # pragma: no cover
         ui.output_ui("results_requirements_warning_ui"),
         ui.output_ui("synthetic_data_ui"),
         ui.output_ui("download_options_ui"),
-        ui.output_ui("download_results_ui"),
-        ui.output_ui("download_code_ui"),
+        ui.layout_columns(
+            ui.output_ui("download_results_ui"),
+            ui.output_ui("download_code_ui"),
+        ),
         value="results_panel",
     )
 
@@ -174,75 +176,70 @@ def results_server(
         if in_cloud:
             return None
         disabled = not weights()
-        return [
-            ui.h3("Download Results"),
-            tutorial_box(
-                is_tutorial_mode(),
-                """
-                Now you can download a notebook for your analysis.
-                The Jupyter notebook could be used locally or on Colab,
-                but the HTML version can be viewed in the brower.
-                """,
-            ),
-            ui.accordion(
-                ui.accordion_panel(
-                    "Package",
-                    download_button_or_link(
-                        download_options["Package"],
-                        primary=True,
-                        disabled=disabled,
+        return ui.layout_columns(
+            ui.card(
+                ui.card_header("Results"),
+                tutorial_box(
+                    is_tutorial_mode(),
+                    """
+                    Now you can download a notebook for your analysis.
+                    The Jupyter notebook could be used locally or on Colab,
+                    but the HTML version can be viewed in the brower.
+                    """,
+                ),
+                download_button_or_link(
+                    download_options["Package"],
+                    primary=True,
+                    disabled=disabled,
+                ),
+                ui.br(),
+                "Contains:",
+                ui.tags.ul(
+                    ui.tags.li(icon_svg("file", margin_right="0.5em"), "README (.txt)"),
+                    ui.tags.li(
+                        download_button_or_link(
+                            download_options["Notebook"],
+                            primary=True,
+                            disabled=disabled,
+                            link=True,
+                        ),
                     ),
-                    ui.br(),
-                    "Contains:",
-                    ui.tags.ul(
-                        ui.tags.li(
-                            icon_svg("file", margin_right="0.5em"), "README (.txt)"
+                    ui.tags.li(
+                        download_button_or_link(
+                            download_options["HTML"],
+                            disabled=disabled,
+                            link=True,
                         ),
-                        ui.tags.li(
-                            download_button_or_link(
-                                download_options["Notebook"],
-                                primary=True,
-                                disabled=disabled,
-                                link=True,
-                            ),
+                    ),
+                    ui.tags.li(
+                        download_button_or_link(
+                            download_options["Script"], disabled=disabled, link=True
                         ),
-                        ui.tags.li(
-                            download_button_or_link(
-                                download_options["HTML"],
-                                disabled=disabled,
-                                link=True,
-                            ),
+                    ),
+                    ui.tags.li(
+                        download_button_or_link(
+                            download_options["Report"],
+                            primary=True,
+                            disabled=disabled,
+                            link=True,
                         ),
-                        ui.tags.li(
-                            download_button_or_link(
-                                download_options["Script"], disabled=disabled, link=True
-                            ),
-                        ),
-                        ui.tags.li(
-                            download_button_or_link(
-                                download_options["Report"],
-                                primary=True,
-                                disabled=disabled,
-                                link=True,
-                            ),
-                        ),
-                        ui.tags.li(
-                            download_button_or_link(
-                                download_options["Table"],
-                                disabled=disabled,
-                                link=True,
-                            ),
+                    ),
+                    ui.tags.li(
+                        download_button_or_link(
+                            download_options["Table"],
+                            disabled=disabled,
+                            link=True,
                         ),
                     ),
                 ),
-            ),
-        ]
+            )
+        )
 
     @render.ui
     def download_code_ui():
         disabled = not weights()
-        return [
-            ui.h3("Download Code"),
+        return ui.card(
+            ui.card_header("Code"),
             tutorial_box(
                 is_tutorial_mode(),
                 (
@@ -264,42 +261,26 @@ def results_server(
                     """
                 ),
             ),
-            ui.accordion(
-                ui.accordion_panel(
-                    "Unexecuted Notebooks",
-                    [
-                        download_button_or_link(
-                            download_options["Notebook (unexecuted)"],
-                            cloud=in_cloud,
-                            primary=True,
-                            disabled=disabled,
-                        ),
-                        download_button_or_link(
-                            download_options["HTML (unexecuted)"],
-                            disabled=disabled,
-                        ),
-                    ],
-                ),
-                ui.accordion_panel(
-                    "Scripts",
-                    download_button_or_link(
-                        download_options["Script"],
-                        primary=True,
-                        disabled=disabled,
-                    ),
-                    download_button_or_link(
-                        download_options["Notebook Source"],
-                        disabled=disabled,
-                    ),
-                ),
-                # If running locally, we do not want it open by default.
-                # https://shiny.posit.co/py/api/core/ui.accordion.html#shiny.ui.accordion
-                # > The default value of None will open the first accordion_panel.
-                # > Use a value of True to open all (or False to open none)
-                # > of the items.
-                open=None if in_cloud else False,
+            download_button_or_link(
+                download_options["Notebook (unexecuted)"],
+                cloud=in_cloud,
+                primary=True,
+                disabled=disabled,
             ),
-        ]
+            download_button_or_link(
+                download_options["HTML (unexecuted)"],
+                disabled=disabled,
+            ),
+            download_button_or_link(
+                download_options["Script"],
+                primary=True,
+                disabled=disabled,
+            ),
+            download_button_or_link(
+                download_options["Notebook Source"],
+                disabled=disabled,
+            ),
+        )
 
     @reactive.calc
     def analysis_plan() -> AnalysisPlan:
