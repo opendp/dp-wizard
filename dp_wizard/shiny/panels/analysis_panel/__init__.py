@@ -2,10 +2,15 @@ from math import pow
 from pathlib import Path
 from typing import Iterable
 
-from faicons import icon_svg
 from shiny import Inputs, Outputs, Session, reactive, render, ui
 
 from dp_wizard import registry_url
+from dp_wizard.shiny.components.icons import (
+    budget_icon,
+    columns_icon,
+    groups_icon,
+    simulation_icon,
+)
 from dp_wizard.shiny.components.inputs import log_slider
 from dp_wizard.shiny.components.outputs import (
     code_sample,
@@ -14,6 +19,7 @@ from dp_wizard.shiny.components.outputs import (
     nav_button,
     tutorial_box,
 )
+from dp_wizard.shiny.components.summaries import dataset_summary
 from dp_wizard.shiny.panels.analysis_panel.column_module import column_server, column_ui
 from dp_wizard.types import AppState
 from dp_wizard.utils.code_generators import make_privacy_loss_block
@@ -29,9 +35,10 @@ def analysis_ui():
         "Define Analysis",
         ui.output_ui("analysis_requirements_warning_ui"),
         ui.output_ui("analysis_release_warning_ui"),
+        ui.output_ui("previous_summary_ui"),
         ui.layout_columns(
             ui.card(
-                ui.card_header(icon_svg("table-columns"), "Columns"),
+                ui.card_header(columns_icon, "Columns"),
                 ui.markdown("Select columns to calculate statistics on."),
                 ui.input_selectize(
                     "columns_selectize",
@@ -42,7 +49,7 @@ def analysis_ui():
                 ui.output_ui("columns_selectize_tutorial_ui"),
             ),
             ui.card(
-                ui.card_header(icon_svg("table"), "Grouping"),
+                ui.card_header(groups_icon, "Grouping"),
                 ui.markdown(
                     """
                     Select columns to group by, or leave empty
@@ -61,7 +68,7 @@ def analysis_ui():
                 ui.output_ui("groups_selectize_tutorial_ui"),
             ),
             ui.card(
-                ui.card_header(icon_svg("piggy-bank"), "Privacy Budget"),
+                ui.card_header(budget_icon, "Privacy Budget"),
                 ui.markdown(
                     f"""
                     What is your privacy budget, or epsilon, for this release?
@@ -78,7 +85,7 @@ def analysis_ui():
                 ui.output_ui("privacy_loss_python_ui"),
             ),
             ui.card(
-                ui.card_header(icon_svg("chart-simple"), "Simulation"),
+                ui.card_header(simulation_icon, "Simulation"),
                 ui.output_ui("simulation_card_ui"),
             ),
             col_widths={
@@ -219,6 +226,10 @@ def analysis_server(
                 """
             ),
         )
+
+    @render.ui
+    def previous_summary_ui():
+        return dataset_summary(state)
 
     @reactive.effect
     @reactive.event(input.columns_selectize)
