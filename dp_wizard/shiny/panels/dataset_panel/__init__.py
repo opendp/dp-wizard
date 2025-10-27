@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Optional
 
 from dp_wizard_templates.code_template import Template
+from faicons import icon_svg
 from shiny import Inputs, Outputs, Session, reactive, render, ui
 
 from dp_wizard import opendp_version
@@ -74,20 +75,20 @@ def dataset_ui():
         ui.output_ui("welcome_ui"),
         ui.layout_columns(
             ui.card(
-                ui.card_header("Data Source"),
+                ui.card_header(icon_svg("file"), "Data Source"),
                 ui.output_ui("csv_or_columns_ui"),
                 ui.output_ui("row_count_bounds_ui"),
             ),
             [
                 ui.card(
-                    ui.card_header("Unit of Privacy"),
+                    ui.card_header(icon_svg("shield-halved"), "Unit of Privacy"),
                     ui.output_ui("input_entity_ui"),
                     ui.output_ui("input_contributions_ui"),
                     ui.output_ui("contributions_validation_ui"),
                     ui.output_ui("unit_of_privacy_python_ui"),
                 ),
                 ui.card(
-                    ui.card_header("Product"),
+                    ui.card_header(icon_svg("cart-shopping"), "Product"),
                     ui.output_ui("product_ui"),
                 ),
             ],
@@ -258,7 +259,8 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                     # NOTE: If stats vs. synth is moved to the top of the flow,
                     # then we can show the appropriate template here.
                     "stats_context",
-                    Path(__file__).parent.parent / "utils/code_generators/no-tests",
+                    Path(__file__).parent.parent.parent.parent
+                    / "utils/code_generators/no-tests",
                 )
                 .fill_values(CSV_PATH="sample.csv")
                 .fill_expressions(

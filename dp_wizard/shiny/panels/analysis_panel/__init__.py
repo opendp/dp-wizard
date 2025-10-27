@@ -2,11 +2,10 @@ from math import pow
 from pathlib import Path
 from typing import Iterable
 
-from htmltools import tags
+from faicons import icon_svg
 from shiny import Inputs, Outputs, Session, reactive, render, ui
 
 from dp_wizard import registry_url
-from dp_wizard.shiny.components.column_module import column_server, column_ui
 from dp_wizard.shiny.components.inputs import log_slider
 from dp_wizard.shiny.components.outputs import (
     code_sample,
@@ -15,6 +14,7 @@ from dp_wizard.shiny.components.outputs import (
     nav_button,
     tutorial_box,
 )
+from dp_wizard.shiny.panels.analysis_panel.column_module import column_server, column_ui
 from dp_wizard.types import AppState
 from dp_wizard.utils.code_generators import make_privacy_loss_block
 from dp_wizard.utils.csv_helper import (
@@ -31,7 +31,7 @@ def analysis_ui():
         ui.output_ui("analysis_release_warning_ui"),
         ui.layout_columns(
             ui.card(
-                ui.card_header("Columns"),
+                ui.card_header(icon_svg("table-columns"), "Columns"),
                 ui.markdown("Select columns to calculate statistics on."),
                 ui.input_selectize(
                     "columns_selectize",
@@ -42,7 +42,7 @@ def analysis_ui():
                 ui.output_ui("columns_selectize_tutorial_ui"),
             ),
             ui.card(
-                ui.card_header("Grouping"),
+                ui.card_header(icon_svg("table"), "Grouping"),
                 ui.markdown(
                     """
                     Select columns to group by, or leave empty
@@ -61,10 +61,10 @@ def analysis_ui():
                 ui.output_ui("groups_selectize_tutorial_ui"),
             ),
             ui.card(
-                ui.card_header("Privacy Budget"),
+                ui.card_header(icon_svg("piggy-bank"), "Privacy Budget"),
                 ui.markdown(
                     f"""
-                    What is your privacy budget for this release?
+                    What is your privacy budget, or epsilon, for this release?
                     Many factors including the sensitivity of your data,
                     the frequency of DP releases,
                     and the regulatory landscape can be considered.
@@ -78,7 +78,7 @@ def analysis_ui():
                 ui.output_ui("privacy_loss_python_ui"),
             ),
             ui.card(
-                ui.card_header("Simulation"),
+                ui.card_header(icon_svg("chart-simple"), "Simulation"),
                 ui.output_ui("simulation_card_ui"),
             ),
             col_widths={
@@ -361,8 +361,20 @@ def analysis_server(
 
     @render.ui
     def epsilon_ui():
-        return tags.label(
-            f"Epsilon: {epsilon()} ",
+        e_value = epsilon()
+        extra = ""
+        if e_value >= 5:
+            extra = (
+                ": The use of a value this **large** is discouraged "
+                "because it may compromise privacy."
+            )
+        if e_value <= 0.2:
+            extra = (
+                ": The use of a value this **small** is discouraged "
+                "because the additional noise will lower the accuracy of results."
+            )
+        return [
+            ui.markdown(f"Epsilon: {e_value}{extra}"),
             tutorial_box(
                 is_tutorial_mode(),
                 """
@@ -372,7 +384,7 @@ def analysis_server(
                 """,
                 responsive=False,
             ),
-        )
+        ]
 
     @render.ui
     def privacy_loss_python_ui():
