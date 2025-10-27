@@ -36,6 +36,9 @@ jobs:
       - name: Install dev dependencies
         run: pip install -r ${{ matrix.requirements-file }}
 
+      - name: Install pre-commit
+        run: pre-commit install
+
       - name: Install browsers
         # Install just one browser instead of the default three.
         # https://playwright.dev/python/docs/browsers#managing-browser-binaries
