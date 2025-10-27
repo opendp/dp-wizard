@@ -1,6 +1,6 @@
 ---
 title: Introduction to differential privacy with OpenDP and DP Wizard
-author: Chuck McCallum, software developer with the OpenDP Project at SEAS
+# author: Chuck McCallum, software developer with the OpenDP Project at SEAS
 ---
 
 ## Outline
@@ -11,8 +11,6 @@ author: Chuck McCallum, software developer with the OpenDP Project at SEAS
 
 ### Introduction to differential privacy with OpenDP and DP Wizard
 
-Chuck McCallum, software developer with the OpenDP Project at SEAS
-
 These slides: `https://opendp.github.io/dp-wizard`
 
 ("✋" = class participation!)
@@ -20,7 +18,7 @@ These slides: `https://opendp.github.io/dp-wizard`
 </td>
 <td>
 
-- Who should care about privacy? (and a bio)
+<!-- - Who should care about privacy? (and a bio) -->
 - Class grades problem
 - Let's do differential privacy! ✋
 - Interpretation of DP results ✋
@@ -32,6 +30,8 @@ These slides: `https://opendp.github.io/dp-wizard`
 </td>
 </tr>
 </table>
+
+<!--
 
 ## Who should care about privacy?
 
@@ -55,6 +55,8 @@ Why I'm here!
 ### Old North Church (2023-present)
 
 Debates about taxation and representation were central to the revolution! Taxes and the apportionment of representatives depend on personal information, information that people may be reluctant to volunteer.
+
+-->
 
 ## Class grades problem
 
@@ -339,7 +341,7 @@ odds ratio ≤ e<sup>ε</sub>
 - If two calculations consume ε<sub>1</sub> and ε<sub>2</sub>, together they consume ε<sub>1</sub> + ε<sub>2</sub>.
 - ε is proven worst case bound: Research is tightening the bounds on existing mechanisms, and developing new mechanisms which are more efficient.
 - The "right" value of ε in a given situation is social question.
-- We can use the [Privacy Deployments Registry](https://registry.oblivious.com/#registry) to see what other people have used.
+- We can use the [Privacy Deployments Registry](https://registry.opendp.org/deployments-registry/) to see what other people have used.
 
 </td>
 </tr>

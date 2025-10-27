@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import nbformat
+import pytest
 from nbconvert.preprocessors import ExecutePreprocessor
 from playwright.sync_api import Page, expect
 from shiny.pytest import create_app_fixture
@@ -22,6 +23,18 @@ sample_app = create_app_fixture(package_root / "app_sample.py")
 cloud_app = create_app_fixture(package_root / "app_cloud.py")
 local_app = create_app_fixture(package_root / "app_local.py")
 qa_app = create_app_fixture(package_root / "app_qa.py")
+
+
+@pytest.fixture(scope="session")
+def browser_context_args(browser_context_args):
+    # Resize browser narrower than default for screenshots.
+    return {
+        **browser_context_args,
+        "viewport": {
+            "width": 1000,
+            "height": 2000,
+        },
+    }
 
 
 def test_cloud_app(page: Page, cloud_app: ShinyAppProc):  # pragma: no cover
@@ -211,6 +224,10 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     results_requirements_warning = "define your analysis on the previous tab"
 
     page.goto(local_app.url)
+
+    # For more compact screenshots:
+    page.evaluate("document.body.style.zoom=0.66")
+
     page.locator("#max_rows").fill("10000")
     expect(page.get_by_text(dataset_release_warning)).not_to_be_visible()
     page.get_by_role("tab", name="Define Analysis").click()
