@@ -187,6 +187,7 @@ def results_server(
                     The Jupyter notebook could be used locally or on Colab,
                     but the HTML version can be viewed in the brower.
                     """,
+                    responsive=False,
                 ),
                 download_button(
                     "Package",
@@ -197,24 +198,11 @@ def results_server(
                 "Contains:",
                 ui.tags.ul(
                     ui.tags.li(icon_svg("file", margin_right="0.5em"), "README (.txt)"),
-                    ui.tags.li(
-                        download_link("Notebook", disabled=disabled),
-                    ),
-                    ui.tags.li(
-                        download_link("HTML", disabled=disabled),
-                    ),
-                    ui.tags.li(
-                        download_link(
-                            "Script",
-                            disabled=disabled,
-                        ),
-                    ),
-                    ui.tags.li(
-                        download_link("Report", disabled=disabled),
-                    ),
-                    ui.tags.li(
-                        download_link("Table", disabled=disabled),
-                    ),
+                    ui.tags.li(download_link("Notebook", disabled=disabled)),
+                    ui.tags.li(download_link("HTML", disabled=disabled)),
+                    ui.tags.li(download_link("Script", disabled=disabled)),
+                    ui.tags.li(download_link("Report", disabled=disabled)),
+                    ui.tags.li(download_link("Table", disabled=disabled)),
                 ),
             )
         )
@@ -244,6 +232,7 @@ def results_server(
                     but does not contain any data or analysis results.
                     """
                 ),
+                responsive=False,
             ),
             download_button("Notebook (unexecuted)", cloud=in_cloud, disabled=disabled),
             download_button("HTML (unexecuted)", disabled=disabled),
@@ -306,8 +295,8 @@ def results_server(
             # been written out as files, but it's safer to start
             # from a clean slate, rather than rely on the side effect
             # of a reactive.calc.
-            (zip_root_dir / f"{stem}.txt").write_text(report())
-            (zip_root_dir / f"{stem}.csv").write_text(table())
+            (zip_root_dir / f"{stem}.txt").write_text(report_txt())
+            (zip_root_dir / f"{stem}.csv").write_text(table_csv())
 
             base_name = f"{tmp_dir}/{stem}"
             ext = "zip"
@@ -362,12 +351,12 @@ def results_server(
         return convert_nb_to_html(notebook_nb_unexecuted())
 
     @reactive.calc
-    def report():
+    def report_txt():
         notebook_nb()  # Evaluate just for the side effect of creating report.
         return (_target_path / "report.txt").read_text()
 
     @reactive.calc
-    def table():
+    def table_csv():
         notebook_nb()  # Evaluate just for the side effect of creating report.
         return (_target_path / "report.csv").read_text()
 
@@ -441,8 +430,8 @@ def results_server(
 
     @download(".txt")
     async def download_report_link():
-        yield _make_download_or_modal_error(report)
+        yield _make_download_or_modal_error(report_txt)
 
     @download(".csv")
     async def download_table_link():
-        yield _make_download_or_modal_error(table)
+        yield _make_download_or_modal_error(table_csv)

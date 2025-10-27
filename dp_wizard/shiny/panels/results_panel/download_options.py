@@ -121,7 +121,7 @@ def table_of_contents_md():
 
 def download_button(
     opt_name: str,
-    cloud=False,
+    cloud=None,
     primary=False,
     disabled=False,
 ):
@@ -136,7 +136,7 @@ def download_button(
 
 def download_link(
     opt_name: str,
-    cloud=False,
+    cloud=None,
     primary=False,
     disabled=False,
 ):
@@ -151,10 +151,10 @@ def download_link(
 
 def _download_button_or_link(
     opt_name: str,
-    cloud=False,
-    primary=False,
-    disabled=False,
-    button=False,
+    cloud: bool | None,
+    primary: bool,
+    disabled: bool,
+    button: bool,
 ):  # pragma: no cover
     opt = _download_options[opt_name]
     clean_name = re.sub(r"\W+", " ", opt.name).strip().replace(" ", "_").lower()
@@ -172,6 +172,9 @@ def _download_button_or_link(
         kwargs["disabled"] = True
     else:
         ui_button_or_link = ui.download_button if button else ui.download_link
+    assert (cloud is None and opt.cloud_description_md is None) or (
+        cloud is not None and opt.clean_description_md is not None
+    )
     return [
         ui_button_or_link(**kwargs),
         ui.markdown(
