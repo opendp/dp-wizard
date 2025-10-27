@@ -31,7 +31,7 @@ def make_app(cli_info: CLIInfo) -> App:
     )
 
 
-def _get_is_tutorial_mode(cli_info) -> bool:
+def _get_is_tutorial_mode(cli_info: CLIInfo) -> bool:
     is_tutorial_mode = config.get_is_tutorial_mode()
     if is_tutorial_mode is None:
         is_tutorial_mode = cli_info.get_is_tutorial_mode()  # pragma: no cover
@@ -93,7 +93,7 @@ def ctrl_c_reminder() -> None:  # pragma: no cover
     print("Session ended (Press CTRL+C to quit)")
 
 
-def _make_sample_csv(path: Path, contributions) -> None:
+def _make_sample_csv(path: Path, contributions: int) -> None:
     """
     >>> import tempfile
     >>> from pathlib import Path
@@ -153,7 +153,7 @@ def _clip(n: float, lower_bound: float, upper_bound: float) -> float:
     return max(min(n, upper_bound), lower_bound)
 
 
-def _scan_text_for_input_ids(text, rel_path, errors) -> None:
+def _scan_text_for_input_ids(text: str, rel_path: Path, errors: list[str]) -> None:
     """
     >>> text = '''
     ... ui.input_text("misspelled")
@@ -166,7 +166,7 @@ def _scan_text_for_input_ids(text, rel_path, errors) -> None:
     ['fake/component.py:2 includes "input.spell", but there is no "spell" id']
     """
     lines = text.splitlines()
-    props = defaultdict(list)
+    props: dict[str, list[str]] = defaultdict(list)
     for number, line in enumerate(lines):
         if line.strip().startswith("..."):
             continue
@@ -191,7 +191,7 @@ def _scan_files_for_input_ids() -> None:
     This is only checking in one direction, but picking out strings
     that are used as IDs and then looking for "inputs" would be much more work.
     """
-    errors = []
+    errors: list[str] = []
     for path in Path(__file__).parent.glob("**/*.py"):
         text = path.read_text()
         rel_path = path.relative_to(Path(__file__).parent)
@@ -252,14 +252,14 @@ def _make_server(cli_info: CLIInfo):
 
         @reactive.effect
         @reactive.event(input.tutorial_mode)
-        def _update_tutorial_mode():
+        def _update_tutorial_mode():  # pyright: ignore[reportUnusedFunction]
             is_tutorial_mode = input.tutorial_mode()
             state.is_tutorial_mode.set(is_tutorial_mode)
             config.set_is_tutorial_mode(is_tutorial_mode)
 
         @reactive.effect
         @reactive.event(input.dark_mode)
-        def _update_dark_mode():
+        def _update_dark_mode():  # pyright: ignore[reportUnusedFunction]
             dark_mode = input.dark_mode()
             # Do not set state: Nothing downstream needs this.
             config.set_is_dark_mode(dark_mode == "dark")

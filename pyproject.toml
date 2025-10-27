@@ -46,12 +46,14 @@ ignore = ["**/no-tests/"]
 reportPrivateImportUsage = false
 # TODO: Expand strict type checking
 strict = [
+    "dp_wizard/shiny/__init__.py",
     "dp_wizard/utils/argparse_helpers.py",
     "dp_wizard/utils/config.py",
     "dp_wizard/utils/csv_helper.py",
     "dp_wizard/utils/mock_data.py",
     "dp_wizard/types.py",
     "dp_wizard/__init__.py",
+    "scripts/*",
 ]
 
 [tool.isort]
