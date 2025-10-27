@@ -8,7 +8,7 @@ opendp_version = "0.14.1"
 registry_url = "https://registry.opendp.org/deployments-registry/"
 
 
-def get_template_root(path) -> Path:
+def get_template_root(path: str) -> Path:
     # We use the same convention everywhere,
     # but there are separate directories
     # for each of the analyses.

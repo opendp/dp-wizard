@@ -51,6 +51,7 @@ strict = [
     "dp_wizard/utils/csv_helper.py",
     "dp_wizard/utils/mock_data.py",
     "dp_wizard/types.py",
+    "dp_wizard/__init__.py",
 ]
 
 [tool.isort]
