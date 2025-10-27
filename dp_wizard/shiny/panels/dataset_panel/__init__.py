@@ -515,8 +515,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 This value is used downstream two ways:
                 - There is a very small probability that data could be
                     released verbatim. If your dataset is particularly
-                    large, the delta parameter should be increased
-                    correspondingly.
+                    large, this probability should be even smaller.
                 - The floating point numbers used by computers are not the
                     same as the real numbers of mathematics, and with very
                     large datasets, this gap accumulates, and more noise is
