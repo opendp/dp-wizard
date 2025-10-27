@@ -219,7 +219,7 @@ def test_urls_work(url):
 
 @pytest.mark.parametrize("plan", plans, ids=id_for_plan)
 def test_make_notebook(plan):
-    notebook_py = NotebookGenerator(plan).make_py()
+    notebook_py = NotebookGenerator(plan, "Note goes here!").make_py()
     print(number_lines(notebook_py))
     globals = {}
     exec(notebook_py, globals)
@@ -252,7 +252,7 @@ def test_make_notebook(plan):
 
 @pytest.mark.parametrize("plan", plans, ids=id_for_plan)
 def test_make_script(plan):
-    script = ScriptGenerator(plan).make_py()
+    script = ScriptGenerator(plan, "Note goes here!").make_py()
 
     # Make sure jupytext formatting doesn't bleed into the script.
     # https://jupytext.readthedocs.io/en/latest/formats-scripts.html#the-light-format

@@ -1,12 +1,11 @@
 from abc import ABC, abstractmethod
-from datetime import datetime
 from math import gcd
 from pathlib import Path
 from typing import Iterable
 
 from dp_wizard_templates.code_template import Template
 
-from dp_wizard import __version__, get_template_root, opendp_version
+from dp_wizard import get_template_root, opendp_version
 from dp_wizard.types import ColumnIdentifier, Product
 from dp_wizard.utils.code_generators import (
     AnalysisPlan,
@@ -26,8 +25,9 @@ def _analysis_has_bounds(analysis) -> bool:
 
 
 class AbstractGenerator(ABC):
-    def __init__(self, analysis_plan: AnalysisPlan):
+    def __init__(self, analysis_plan: AnalysisPlan, note: str):
         self.analysis_plan = analysis_plan
+        self.note = note
 
     def _get_synth_or_stats(self) -> str:
         match self.analysis_plan.product:
@@ -90,8 +90,6 @@ class AbstractGenerator(ABC):
             .fill_expressions(
                 TITLE=str(self.analysis_plan),
                 DEPENDENCIES=f"'opendp[{extra}]=={opendp_version}' matplotlib",
-                DP_WIZARD_V_VERSION=f"v{__version__}",
-                DATE_TIME=datetime.now().strftime("%b %d, %Y at %I:%M%p"),
             )
             .fill_code_blocks(
                 IMPORTS_BLOCK=Template(template).finish(),
@@ -109,6 +107,7 @@ the Polars library only supports UTF8. Specifying `utf8-lossy` preserves as
 much information as possible, and any unrecognized characters will be replaced
 by "�". If this is not sufficient, you will need to preprocess your data to
 reencode it as UTF8.""",
+                CUSTOM_NOTE=self.note,
             )
             .finish()
         )

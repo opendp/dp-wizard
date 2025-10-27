@@ -82,7 +82,7 @@ def results_ui():  # pragma: no cover
         "Download Results",
         ui.output_ui("results_requirements_warning_ui"),
         ui.output_ui("two_previous_summary_ui"),
-        ui.output_ui("custom_download_stem_ui"),
+        ui.output_ui("download_options_ui"),
         ui.output_ui("download_results_ui"),
         ui.output_ui("download_code_ui"),
         value="results_panel",
@@ -154,19 +154,35 @@ def results_server(
     def download_stem() -> str:
         return analysis_plan().to_stem()
 
+    @reactive.calc
+    def download_note() -> str:
+        return analysis_plan().to_note()
+
     @render.ui
-    def custom_download_stem_ui():
+    def download_options_ui():
         return ui.card(
-            ui.card_header("Download Stem"),
+            ui.card_header("Download Options"),
             ui.markdown(
                 """
-                An appropriate extension for each download is added to this stem.
+                An appropriate extension for each download is added to this stem:
                 """
             ),
             ui.input_text(
                 "custom_download_stem",
                 only_for_screenreader("Download Stem"),
                 download_stem(),
+            ),
+            ui.markdown(
+                """
+                Note to include in generated notebooks and code:
+                """
+            ),
+            ui.input_text_area(
+                "custom_download_note",
+                only_for_screenreader("Note to Include"),
+                download_note(),
+                height="6em",
+                width="100%",
             ),
         )
 
@@ -347,14 +363,14 @@ def results_server(
         notebook_py = (
             "raise Exception('qa_mode!')"
             if qa_mode
-            else NotebookGenerator(plan).make_py()
+            else NotebookGenerator(plan, input.custom_download_note()).make_py()
         )
         return convert_py_to_nb(notebook_py, title=str(plan), execute=True)
 
     @reactive.calc
     def notebook_nb_unexecuted():
         plan = analysis_plan()
-        notebook_py = NotebookGenerator(plan).make_py()
+        notebook_py = NotebookGenerator(plan, input.custom_download_note()).make_py()
         return convert_py_to_nb(notebook_py, title=str(plan), execute=False)
 
     @reactive.calc
@@ -370,7 +386,12 @@ def results_server(
         media_type="text/x-python",
     )
     async def download_script():
-        yield make_download_or_modal_error(ScriptGenerator(analysis_plan()).make_py)
+        yield make_download_or_modal_error(
+            ScriptGenerator(
+                analysis_plan(),
+                input.custom_download_note(),
+            ).make_py,
+        )
 
     @render.download(
         filename=lambda: clean_download_stem() + ".ipynb.py",
@@ -379,7 +400,9 @@ def results_server(
     async def download_notebook_source():
         with ui.Progress() as progress:
             progress.set(message=wait_message)
-            yield NotebookGenerator(analysis_plan()).make_py()
+            yield NotebookGenerator(
+                analysis_plan(), input.custom_download_note()
+            ).make_py()
 
     @render.download(
         filename=lambda: clean_download_stem() + ".ipynb",
@@ -416,7 +439,9 @@ def results_server(
     async def download_report():
         def make_report():
             notebook_nb()  # Evaluate just for the side effect of creating report.
-            return (Path(__file__).parent.parent / "tmp" / "report.txt").read_text()
+            return (
+                Path(__file__).parent.parent.parent.parent / "tmp" / "report.txt"
+            ).read_text()
 
         yield make_download_or_modal_error(make_report)
 
@@ -427,6 +452,8 @@ def results_server(
     async def download_table():
         def make_table():
             notebook_nb()  # Evaluate just for the side effect of creating report.
-            return (Path(__file__).parent.parent / "tmp" / "report.csv").read_text()
+            return (
+                Path(__file__).parent.parent.parent.parent / "tmp" / "report.csv"
+            ).read_text()
 
         yield make_download_or_modal_error(make_table)

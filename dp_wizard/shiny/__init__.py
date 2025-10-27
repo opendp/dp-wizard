@@ -7,13 +7,13 @@ from pathlib import Path
 from htmltools import Tag
 from shiny import App, Inputs, Outputs, Session, reactive, ui
 
-from dp_wizard.shiny import (
+from dp_wizard.shiny.components.icons import tutorial_icon
+from dp_wizard.shiny.panels import (
     about_panel,
     analysis_panel,
     dataset_panel,
     results_panel,
 )
-from dp_wizard.shiny.components.icons import tutorial_icon
 from dp_wizard.types import AppState, Product
 from dp_wizard.utils import config
 from dp_wizard.utils.argparse_helpers import CLIInfo

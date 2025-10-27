@@ -2,11 +2,9 @@ from math import pow
 from pathlib import Path
 from typing import Iterable
 
-from htmltools import tags
 from shiny import Inputs, Outputs, Session, reactive, render, ui
 
 from dp_wizard import registry_url
-from dp_wizard.shiny.components.column_module import column_server, column_ui
 from dp_wizard.shiny.components.icons import (
     budget_icon,
     columns_icon,
@@ -22,6 +20,7 @@ from dp_wizard.shiny.components.outputs import (
     tutorial_box,
 )
 from dp_wizard.shiny.components.summaries import dataset_summary
+from dp_wizard.shiny.panels.analysis_panel.column_module import column_server, column_ui
 from dp_wizard.types import AppState
 from dp_wizard.utils.code_generators import make_privacy_loss_block
 from dp_wizard.utils.csv_helper import (
@@ -72,7 +71,7 @@ def analysis_ui():
                 ui.card_header(budget_icon, "Privacy Budget"),
                 ui.markdown(
                     f"""
-                    What is your privacy budget for this release?
+                    What is your privacy budget, or epsilon, for this release?
                     Many factors including the sensitivity of your data,
                     the frequency of DP releases,
                     and the regulatory landscape can be considered.
@@ -373,8 +372,20 @@ def analysis_server(
 
     @render.ui
     def epsilon_ui():
-        return tags.label(
-            f"Epsilon: {epsilon()} ",
+        e_value = epsilon()
+        extra = ""
+        if e_value >= 5:
+            extra = (
+                ": The use of a value this **large** is discouraged "
+                "because it may compromise privacy."
+            )
+        if e_value <= 0.2:
+            extra = (
+                ": The use of a value this **small** is discouraged "
+                "because the additional noise will lower the accuracy of results."
+            )
+        return [
+            ui.markdown(f"Epsilon: {e_value}{extra}"),
             tutorial_box(
                 is_tutorial_mode(),
                 """
@@ -384,7 +395,7 @@ def analysis_server(
                 """,
                 responsive=False,
             ),
-        )
+        ]
 
     @render.ui
     def privacy_loss_python_ui():
