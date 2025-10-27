@@ -187,7 +187,6 @@ def results_server(
             ui.accordion(
                 ui.accordion_panel(
                     "Package",
-                    f"{disabled=}",
                     download_button_or_link(
                         download_options["Package"],
                         primary=True,
