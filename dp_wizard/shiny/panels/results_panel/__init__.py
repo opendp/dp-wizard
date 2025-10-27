@@ -264,7 +264,6 @@ def results_server(
             download_button_or_link(
                 download_options["Notebook (unexecuted)"],
                 cloud=in_cloud,
-                primary=True,
                 disabled=disabled,
             ),
             download_button_or_link(
@@ -273,7 +272,6 @@ def results_server(
             ),
             download_button_or_link(
                 download_options["Script"],
-                primary=True,
                 disabled=disabled,
             ),
             download_button_or_link(

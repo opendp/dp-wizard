@@ -122,7 +122,7 @@ def download_button_or_link(
         "id": f"download_{clean_name}_{'link' if link else 'button'}",
         "label": f"{'' if link else 'Download '}{opt.name} ({opt.ext})",
         "icon": icon_svg(opt.icon, margin_right="0.5em"),
-        "width": "20em",
+        "width": "22em",
         "class_": "btn-primary" if primary else None,
     }
     if disabled:
