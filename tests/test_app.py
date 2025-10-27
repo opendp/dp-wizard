@@ -253,14 +253,13 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     # but that could change.
 
     # Expand all accordions:
-    page.get_by_text("Reports", exact=True).click()
     page.get_by_text("Unexecuted Notebooks", exact=True).click()
     page.get_by_text("Scripts", exact=True).click()
 
     expected_stem = "dp_statistics_for_grade_grouped_by_class_year"
 
     for option in download_options.values():
-        link_text = f"Download {option.name} ({option.ext})"
+        link_text = f"{option.name} ({option.ext})"
         with page.expect_download() as download_info:
             page.get_by_text(link_text).click()
 

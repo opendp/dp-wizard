@@ -7,6 +7,7 @@ from dp_wizard_templates.converters import (
     convert_nb_to_html,
     convert_py_to_nb,
 )
+from faicons import icon_svg
 from shiny import Inputs, Outputs, Session, reactive, render, types, ui
 
 from dp_wizard import package_root
@@ -17,7 +18,7 @@ from dp_wizard.shiny.components.outputs import (
     tutorial_box,
 )
 from dp_wizard.shiny.panels.results_panel.download_options import (
-    button,
+    download_button_or_link,
     download_options,
 )
 from dp_wizard.types import AppState
@@ -186,37 +187,53 @@ def results_server(
             ui.accordion(
                 ui.accordion_panel(
                     "Package",
-                    button(
+                    f"{disabled=}",
+                    download_button_or_link(
                         download_options["Package"],
                         primary=True,
                         disabled=disabled,
                     ),
-                    ui.markdown("Contains:\n" + table_of_contents_md()),
-                ),
-            ),
-            ui.accordion(
-                ui.accordion_panel(
-                    "Notebooks",
-                    button(
-                        download_options["Notebook"],
-                        primary=True,
-                        disabled=disabled,
-                    ),
-                    button(
-                        download_options["HTML"],
-                        disabled=disabled,
-                    ),
-                ),
-                ui.accordion_panel(
-                    "Reports",
-                    button(
-                        download_options["Report"],
-                        primary=True,
-                        disabled=disabled,
-                    ),
-                    button(
-                        download_options["Table"],
-                        disabled=disabled,
+                    ui.br(),
+                    "Contains:",
+                    ui.tags.ul(
+                        ui.tags.li(
+                            icon_svg("file", margin_right="0.5em"), "README (.txt)"
+                        ),
+                        ui.tags.li(
+                            download_button_or_link(
+                                download_options["Notebook"],
+                                primary=True,
+                                disabled=disabled,
+                                link=True,
+                            ),
+                        ),
+                        ui.tags.li(
+                            download_button_or_link(
+                                download_options["HTML"],
+                                disabled=disabled,
+                                link=True,
+                            ),
+                        ),
+                        ui.tags.li(
+                            download_button_or_link(
+                                download_options["Script"], disabled=disabled, link=True
+                            ),
+                        ),
+                        ui.tags.li(
+                            download_button_or_link(
+                                download_options["Report"],
+                                primary=True,
+                                disabled=disabled,
+                                link=True,
+                            ),
+                        ),
+                        ui.tags.li(
+                            download_button_or_link(
+                                download_options["Table"],
+                                disabled=disabled,
+                                link=True,
+                            ),
+                        ),
                     ),
                 ),
             ),
@@ -252,13 +269,13 @@ def results_server(
                 ui.accordion_panel(
                     "Unexecuted Notebooks",
                     [
-                        button(
+                        download_button_or_link(
                             download_options["Notebook (unexecuted)"],
                             cloud=in_cloud,
                             primary=True,
                             disabled=disabled,
                         ),
-                        button(
+                        download_button_or_link(
                             download_options["HTML (unexecuted)"],
                             disabled=disabled,
                         ),
@@ -266,12 +283,12 @@ def results_server(
                 ),
                 ui.accordion_panel(
                     "Scripts",
-                    button(
+                    download_button_or_link(
                         download_options["Script"],
                         primary=True,
                         disabled=disabled,
                     ),
-                    button(
+                    download_button_or_link(
                         download_options["Notebook Source"],
                         disabled=disabled,
                     ),

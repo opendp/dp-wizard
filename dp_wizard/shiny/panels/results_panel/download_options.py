@@ -110,13 +110,17 @@ download_options = {
 }
 
 
-def button(
-    opt: DownloadOption, cloud=False, primary=False, disabled=False
+def download_button_or_link(
+    opt: DownloadOption,
+    cloud=False,
+    primary=False,
+    disabled=False,
+    link=False,
 ):  # pragma: no cover
     clean_name = re.sub(r"\W+", " ", opt.name).strip().replace(" ", "_").lower()
     kwargs = {
-        "id": f"download_{clean_name}",
-        "label": f"Download {opt.name} ({opt.ext})",
+        "id": f"download_{clean_name}_{'link' if link else 'button'}",
+        "label": f"{'' if link else 'Download '}{opt.name} ({opt.ext})",
         "icon": icon_svg(opt.icon, margin_right="0.5em"),
         "width": "20em",
         "class_": "btn-primary" if primary else None,
@@ -124,12 +128,12 @@ def button(
     if disabled:
         # Would prefer just to use ui.download_button,
         # but it doesn't have a "disabled" option.
-        ui_button = ui.input_action_button
+        ui_button_or_link = ui.input_action_link if link else ui.input_action_button
         kwargs["disabled"] = True
     else:
-        ui_button = ui.download_button
+        ui_button_or_link = ui.download_link if link else ui.download_button
     return [
-        ui_button(**kwargs),
+        ui_button_or_link(**kwargs),
         ui.markdown(
             (opt.cloud_description_md or opt.description_md)
             if cloud

@@ -83,3 +83,10 @@ https://www.w3.org/WAI/tutorials/forms/labels/#note-on-hiding-elements
 label:has(.only-for-screenreaders) {
     display: inline;
 }
+
+/* Disabled download links should look like normal text. */
+a[disabled] {
+    cursor: text;
+    text-decoration: none;
+    color: var(--bs-body-color);
+}
