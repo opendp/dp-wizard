@@ -8,6 +8,7 @@ from dp_wizard import __version__, opendp_version, package_root
 tests = {
     "flake8 linting": "flake8 . --count --show-source --statistics",
     "pyright type checking": "pyright",
+    "precommit checks": "pre-commit run --all-files",
 }
 
 

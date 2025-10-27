@@ -5,6 +5,11 @@ from dp_wizard_templates.code_template import Template
 from shiny import Inputs, Outputs, Session, reactive, render, ui
 
 from dp_wizard import opendp_version, package_root
+from dp_wizard.shiny.components.icons import (
+    data_source_icon,
+    product_icon,
+    unit_of_privacy_icon,
+)
 from dp_wizard.shiny.components.outputs import (
     code_sample,
     col_widths,
@@ -74,20 +79,20 @@ def dataset_ui():
         ui.output_ui("welcome_ui"),
         ui.layout_columns(
             ui.card(
-                ui.card_header("Data Source"),
+                ui.card_header(data_source_icon, "Data Source"),
                 ui.output_ui("csv_or_columns_ui"),
                 ui.output_ui("row_count_bounds_ui"),
             ),
             [
                 ui.card(
-                    ui.card_header("Unit of Privacy"),
+                    ui.card_header(unit_of_privacy_icon, "Unit of Privacy"),
                     ui.output_ui("input_entity_ui"),
                     ui.output_ui("input_contributions_ui"),
                     ui.output_ui("contributions_validation_ui"),
                     ui.output_ui("unit_of_privacy_python_ui"),
                 ),
                 ui.card(
-                    ui.card_header("Product"),
+                    ui.card_header(product_icon, "Product"),
                     ui.output_ui("product_ui"),
                 ),
             ],
@@ -513,8 +518,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 This value is used downstream two ways:
                 - There is a very small probability that data could be
                     released verbatim. If your dataset is particularly
-                    large, the delta parameter should be increased
-                    correspondingly.
+                    large, this probability should be even smaller.
                 - The floating point numbers used by computers are not the
                     same as the real numbers of mathematics, and with very
                     large datasets, this gap accumulates, and more noise is
