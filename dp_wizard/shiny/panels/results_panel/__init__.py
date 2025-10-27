@@ -18,8 +18,9 @@ from dp_wizard.shiny.components.outputs import (
     tutorial_box,
 )
 from dp_wizard.shiny.panels.results_panel.download_options import (
-    download_button_or_link,
-    download_options,
+    download_button,
+    download_link,
+    table_of_contents_md,
 )
 from dp_wizard.types import AppState
 from dp_wizard.utils.code_generators import AnalysisPlan, AnalysisPlanColumn
@@ -187,41 +188,32 @@ def results_server(
                     but the HTML version can be viewed in the brower.
                     """,
                 ),
-                download_button_or_link(
-                    download_options["Package"],
+                download_button(
+                    "Package",
                     primary=True,
                     disabled=disabled,
-                    button=True,
                 ),
                 ui.br(),
                 "Contains:",
                 ui.tags.ul(
                     ui.tags.li(icon_svg("file", margin_right="0.5em"), "README (.txt)"),
                     ui.tags.li(
-                        download_button_or_link(
-                            download_options["Notebook"], disabled=disabled
-                        ),
+                        download_link("Notebook", disabled=disabled),
                     ),
                     ui.tags.li(
-                        download_button_or_link(
-                            download_options["HTML"], disabled=disabled
-                        ),
+                        download_link("HTML", disabled=disabled),
                     ),
                     ui.tags.li(
-                        download_button_or_link(
-                            download_options["Script"],
+                        download_link(
+                            "Script",
                             disabled=disabled,
                         ),
                     ),
                     ui.tags.li(
-                        download_button_or_link(
-                            download_options["Report"], disabled=disabled
-                        ),
+                        download_link("Report", disabled=disabled),
                     ),
                     ui.tags.li(
-                        download_button_or_link(
-                            download_options["Table"], disabled=disabled
-                        ),
+                        download_link("Table", disabled=disabled),
                     ),
                 ),
             )
@@ -253,21 +245,10 @@ def results_server(
                     """
                 ),
             ),
-            download_button_or_link(
-                download_options["Notebook (unexecuted)"],
-                cloud=in_cloud,
-                disabled=disabled,
-                button=True,
-            ),
-            download_button_or_link(
-                download_options["HTML (unexecuted)"], disabled=disabled, button=True
-            ),
-            download_button_or_link(
-                download_options["Script"], disabled=disabled, button=True
-            ),
-            download_button_or_link(
-                download_options["Notebook Source"], disabled=disabled, button=True
-            ),
+            download_button("Notebook (unexecuted)", cloud=in_cloud, disabled=disabled),
+            download_button("HTML (unexecuted)", disabled=disabled),
+            download_button("Script", disabled=disabled),
+            download_button("Notebook Source", disabled=disabled),
         )
 
     @reactive.calc
@@ -304,15 +285,6 @@ def results_server(
     # Generate content for downloads
     #
     ################################
-
-    @reactive.calc
-    def table_of_contents_md():
-        included_names = ["Notebook", "HTML", "Script", "Report", "Table"]
-        included_options = [download_options[name] for name in included_names]
-        return "- README.txt\n" + "\n".join(
-            f"- {opt.name} ({opt.ext}): {opt.clean_description_md}"
-            for opt in included_options
-        )
 
     @reactive.calc
     def package_zip():

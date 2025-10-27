@@ -17,7 +17,7 @@ class DownloadOption(NamedTuple):
         return re.sub(r"\s+", " ", self.description_md.strip())  # pragma: no cover
 
 
-download_options = {
+_download_options = {
     option.name: option
     # Find more icons on Font Awesome: https://fontawesome.com/search?ic=free
     for option in [
@@ -110,13 +110,53 @@ download_options = {
 }
 
 
-def download_button_or_link(
-    opt: DownloadOption,
+def table_of_contents_md():
+    included_names = ["Notebook", "HTML", "Script", "Report", "Table"]
+    included_options = [_download_options[name] for name in included_names]
+    return "- README.txt\n" + "\n".join(
+        f"- {opt.name} ({opt.ext}): {opt.clean_description_md}"
+        for opt in included_options
+    )
+
+
+def download_button(
+    opt_name: str,
+    cloud=False,
+    primary=False,
+    disabled=False,
+):
+    return _download_button_or_link(
+        opt_name,
+        cloud=cloud,
+        primary=primary,
+        disabled=disabled,
+        button=True,
+    )
+
+
+def download_link(
+    opt_name: str,
+    cloud=False,
+    primary=False,
+    disabled=False,
+):
+    return _download_button_or_link(
+        opt_name,
+        cloud=cloud,
+        primary=primary,
+        disabled=disabled,
+        button=False,
+    )
+
+
+def _download_button_or_link(
+    opt_name: str,
     cloud=False,
     primary=False,
     disabled=False,
     button=False,
 ):  # pragma: no cover
+    opt = _download_options[opt_name]
     clean_name = re.sub(r"\W+", " ", opt.name).strip().replace(" ", "_").lower()
     kwargs = {
         "id": f"download_{clean_name}_{'button' if button else 'link'}",
