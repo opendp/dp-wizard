@@ -383,7 +383,7 @@ def results_server(
     # Function names need to match the id constructed by button(),
     # based on the cleaned-up name parameter.
 
-    def download(ext: str):
+    def download(ext: str, stem: str | None = None):
         """
         Rather than dealing with @render.download() directly,
         this decorator derives MIME type from the
@@ -403,7 +403,11 @@ def results_server(
 
         def inner(func):
             wrapped = render.download(
-                filename=lambda: clean_download_stem() + ext,
+                filename=lambda: (
+                    f"{stem}{ext}"
+                    if stem is not None
+                    else (clean_download_stem() + ext)
+                ),
                 media_type=mime,
             )(func)
             return wrapped
@@ -414,7 +418,7 @@ def results_server(
     async def download_package_button():
         yield _make_download_or_modal_error(package_zip)
 
-    @download(".txt")
+    @download(".txt", stem="README")
     async def download_readme_link():
         yield _make_download_or_modal_error(readme_txt)
 
