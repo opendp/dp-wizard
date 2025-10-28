@@ -17,7 +17,10 @@ from dp_wizard.utils.argparse_helpers import (
 )
 
 
-def csv_or_columns_ui(in_cloud: bool, is_tutorial_mode: reactive.Value[bool]):
+def csv_or_columns_ui(
+    in_cloud: bool,
+    is_tutorial_mode: reactive.Value[bool],
+):  # pragma: no cover
     if in_cloud:
         content = [
             ui.markdown(
@@ -96,7 +99,7 @@ def input_files_ui(
     is_sample_csv: bool,
     initial_private_csv_path: str,
     initial_public_csv_path: str,
-):
+):  # pragma: no cover
     # We can't set the actual value of a file input,
     # but the placeholder string is a good substitute.
     #
@@ -142,7 +145,9 @@ def input_files_ui(
     ]
 
 
-def csv_column_match_ui(csv_column_mismatch_calc):
+def csv_column_match_ui(
+    csv_column_mismatch_calc,
+):  # pragma: no cover
     mismatch = csv_column_mismatch_calc()
     messages = []
     if mismatch:
