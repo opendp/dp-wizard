@@ -1,11 +1,10 @@
 from abc import ABC, abstractmethod
 from math import gcd
-from pathlib import Path
 from typing import Iterable
 
 from dp_wizard_templates.code_template import Template
 
-from dp_wizard import get_template_root, opendp_version
+from dp_wizard import get_template_root, opendp_version, package_root
 from dp_wizard.types import ColumnIdentifier, Product
 from dp_wizard.utils.code_generators import (
     AnalysisPlan,
@@ -17,7 +16,7 @@ from dp_wizard.utils.code_generators.analyses import count, histogram
 from dp_wizard.utils.dp_helper import confidence
 from dp_wizard.utils.shared import make_cut_points
 
-root = get_template_root(__file__)
+template_root = get_template_root(__file__)
 
 
 def _analysis_has_bounds(analysis) -> bool:
@@ -86,14 +85,14 @@ class AbstractGenerator(ABC):
         extra = self._get_extra()
 
         code = (
-            Template(self._get_root_template(), root)
+            Template(self._get_root_template(), template_root)
             .fill_expressions(
                 TITLE=str(self.analysis_plan),
                 DEPENDENCIES=f"'opendp[{extra}]=={opendp_version}' matplotlib",
             )
             .fill_code_blocks(
                 IMPORTS_BLOCK=Template(template).finish(),
-                UTILS_BLOCK=(Path(__file__).parent.parent / "shared.py").read_text(),
+                UTILS_BLOCK=(package_root / "utils/shared.py").read_text(),
                 **self._make_extra_blocks(),
             )
             .fill_comment_blocks(
@@ -280,7 +279,7 @@ reencode it as UTF8.""",
             ]
         )
         return (
-            Template("stats_context", root)
+            Template("stats_context", template_root)
             .fill_expressions(
                 MARGINS_LIST=margins_list,
                 EXTRA_COLUMNS=extra_columns,
@@ -311,7 +310,7 @@ reencode it as UTF8.""",
             max_rows=self.analysis_plan.max_rows,
         )
         return (
-            Template("synth_context", root)
+            Template("synth_context", template_root)
             .fill_expressions(
                 OPENDP_V_VERSION=f"v{opendp_version}",
             )

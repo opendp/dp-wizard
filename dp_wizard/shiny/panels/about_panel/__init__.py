@@ -1,11 +1,11 @@
 import subprocess
 import sys
 import urllib.parse
-from pathlib import Path
 
 from htmltools import tags
 from shiny import Inputs, Outputs, Session, reactive, ui
 
+from dp_wizard import __version__
 from dp_wizard.shiny.components.outputs import nav_button
 
 
@@ -25,13 +25,10 @@ def _run(cmd) -> str:
 
 
 def _get_info() -> str:
-    version = (
-        (Path(__file__).parent.parent.parent.parent / "VERSION").read_text().strip()
-    )
     git_status = _run("git status")
     pip_freeze = _run("pip freeze")
     return f"""
-DP Wizard v{version}
+DP Wizard v{__version__}
 python: {sys.version}
 arguments: {' '.join(sys.argv[1:])}
 git status:
