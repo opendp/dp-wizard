@@ -127,7 +127,7 @@ def dataset_server(
     product = state.product
 
     # Analysis choices:
-    column_names = state.column_names
+    all_column_names = state.all_column_names
     # groups = state.groups
     # epsilon = state.epsilon
 
@@ -148,22 +148,22 @@ def dataset_server(
     def _on_public_csv_path_change():
         path = input.public_csv_path()[0]["datapath"]
         public_csv_path.set(path)
-        column_names.set(read_csv_names(Path(path)))
+        all_column_names.set(read_csv_names(Path(path)))
 
     @reactive.effect
     @reactive.event(input.private_csv_path)
     def _on_private_csv_path_change():
         path = input.private_csv_path()[0]["datapath"]
         private_csv_path.set(path)
-        column_names.set(read_csv_names(Path(path)))
+        all_column_names.set(read_csv_names(Path(path)))
 
     @reactive.effect
-    @reactive.event(input.column_names)
+    @reactive.event(input.all_column_names)
     def _on_column_names_change():
-        column_names.set(
+        all_column_names.set(
             [
                 clean
-                for line in input.column_names().splitlines()
+                for line in input.all_column_names().splitlines()
                 if (clean := line.strip())
             ]
         )
@@ -239,7 +239,7 @@ def dataset_server(
                     """,
                     responsive=False,
                 ),
-                ui.input_text_area("column_names", "CSV Column Names", rows=5),
+                ui.input_text_area("all_column_names", "CSV Column Names", rows=5),
             ]
         else:
             content = [
@@ -452,7 +452,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
         return (
             contributions_valid()
             and not get_row_count_errors(max_rows())
-            and len(column_names()) > 0
+            and len(all_column_names()) > 0
             and (in_cloud or not csv_column_mismatch_calc())
         )
 

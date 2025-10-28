@@ -155,7 +155,7 @@ def analysis_server(
     # product = state.product
 
     # Analysis choices:
-    column_names = state.column_names
+    all_column_names = state.all_column_names
     groups = state.groups
     epsilon = state.epsilon
 
@@ -205,7 +205,7 @@ def analysis_server(
     @render.ui
     def analysis_requirements_warning_ui():
         return hide_if(
-            bool(column_names()),
+            bool(all_column_names()),
             info_md_box(
                 """
                 Please select your dataset on the previous tab
@@ -359,11 +359,11 @@ def analysis_server(
 
     @reactive.calc
     def csv_ids_names_calc():
-        return id_names_dict_from_names(column_names())
+        return id_names_dict_from_names(all_column_names())
 
     @reactive.calc
     def csv_ids_labels_calc():
-        return id_labels_dict_from_names(column_names())
+        return id_labels_dict_from_names(all_column_names())
 
     @reactive.effect
     @reactive.event(input.log_epsilon_slider)

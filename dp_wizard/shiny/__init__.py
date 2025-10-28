@@ -236,7 +236,7 @@ def _make_server(cli_info: CLIInfo):
             initial_product=initial_product,
             product=reactive.value(initial_product),
             # Analysis choices:
-            column_names=reactive.value(initial_column_names),
+            all_column_names=reactive.value(initial_column_names),
             groups=reactive.value([]),
             epsilon=reactive.value(1.0),
             # Per-column choices:

@@ -98,7 +98,7 @@ class AppState:
     product: reactive.Value[Product]
 
     # Analysis choices:
-    column_names: reactive.Value[list[ColumnName]]
+    all_column_names: reactive.Value[list[ColumnName]]
     groups: reactive.Value[list[ColumnName]]
     epsilon: reactive.Value[float]
 

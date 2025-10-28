@@ -115,7 +115,7 @@ def results_server(
     product = state.product
 
     # Analysis choices:
-    # column_names = state.column_names
+    # all_column_names = state.all_column_names
     groups = state.groups
     epsilon = state.epsilon
 
