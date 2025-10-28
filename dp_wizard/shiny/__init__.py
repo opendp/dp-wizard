@@ -4,10 +4,11 @@ import re
 from collections import defaultdict
 from pathlib import Path
 
-from faicons import icon_svg
 from htmltools import Tag
 from shiny import App, Inputs, Outputs, Session, reactive, ui
 
+from dp_wizard import package_root
+from dp_wizard.shiny.components.icons import tutorial_icon
 from dp_wizard.shiny.panels import (
     about_panel,
     analysis_panel,
@@ -19,15 +20,16 @@ from dp_wizard.utils import config
 from dp_wizard.utils.argparse_helpers import CLIInfo
 from dp_wizard.utils.csv_helper import read_csv_names
 
-_assets_path = Path(__file__).parent / "assets"
-assert _assets_path.exists()
+_shiny_root = package_root / "shiny"
+_assets_root = _shiny_root / "assets"
+assert _assets_root.exists()
 
 
 def make_app(cli_info: CLIInfo) -> App:
     return App(
         _make_app_ui(cli_info),
         _make_server(cli_info),
-        static_assets=_assets_path,
+        static_assets=_assets_root,
     )
 
 
@@ -47,14 +49,14 @@ def _get_is_dark_mode() -> bool:
 
 
 def _make_app_ui(cli_info: CLIInfo) -> Tag:
-    root = Path(__file__).parent
-
     return ui.page_bootstrap(
         ui.head_content(
             ui.tags.link(rel="icon", href="favicon.ico"),
-            ui.include_css(root / "assets/styles.css"),
-            ui.include_css(root / "vendor/highlight.js/11.11.1/styles/default.min.css"),
-            ui.include_js(root / "vendor/highlight.js/11.11.1/highlight.min.js"),
+            ui.include_css(_shiny_root / "assets/styles.css"),
+            ui.include_css(
+                _shiny_root / "vendor/highlight.js/11.11.1/styles/default.min.css"
+            ),
+            ui.include_js(_shiny_root / "vendor/highlight.js/11.11.1/highlight.min.js"),
         ),
         ui.navset_tab(
             about_panel.about_ui(),
@@ -66,7 +68,7 @@ def _make_app_ui(cli_info: CLIInfo) -> Tag:
                 ui.input_switch(
                     "tutorial_mode",
                     ui.tooltip(
-                        icon_svg("circle-question"),
+                        tutorial_icon,
                         """
                         Tutorial mode walks you through the analysis process
                         and provides extra help along the way.
@@ -192,9 +194,9 @@ def _scan_files_for_input_ids() -> None:
     that are used as IDs and then looking for "inputs" would be much more work.
     """
     errors: list[str] = []
-    for path in Path(__file__).parent.glob("**/*.py"):
+    for path in _shiny_root.glob("**/*.py"):
         text = path.read_text()
-        rel_path = path.relative_to(Path(__file__).parent)
+        rel_path = path.relative_to(_shiny_root)
         _scan_text_for_input_ids(text, rel_path, errors)
     if errors:  # pragma: no cover
         raise Exception("\n".join(errors))
@@ -206,9 +208,7 @@ def _make_server(cli_info: CLIInfo):
     def server(input: Inputs, output: Outputs, session: Session):  # pragma: no cover
         if cli_info.is_sample_csv:
             initial_contributions = 10
-            initial_private_csv_path = (
-                Path(__file__).parent.parent / "tmp" / "sample.csv"
-            )
+            initial_private_csv_path = package_root / "tmp/sample.csv"
             _make_sample_csv(initial_private_csv_path, initial_contributions)
             initial_column_names = read_csv_names(Path(initial_private_csv_path))
         else:

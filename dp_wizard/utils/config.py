@@ -1,7 +1,8 @@
-from pathlib import Path
 from typing import NamedTuple
 
 import yaml
+
+from dp_wizard import package_root
 
 
 class _Config(NamedTuple):
@@ -9,7 +10,7 @@ class _Config(NamedTuple):
     is_dark_mode: bool | None
 
 
-_config_path = Path(__file__).parent / ".config.yaml"
+_config_path = package_root / "utils/.config.yaml"
 _config: _Config
 
 

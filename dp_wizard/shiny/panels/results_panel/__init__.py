@@ -1,5 +1,4 @@
 import re
-from pathlib import Path
 
 from dp_wizard_templates.converters import (
     convert_nb_to_html,
@@ -9,12 +8,14 @@ from faicons import icon_svg
 from htmltools.tags import p
 from shiny import Inputs, Outputs, Session, reactive, render, types, ui
 
+from dp_wizard import package_root
 from dp_wizard.shiny.components.outputs import (
     hide_if,
     info_md_box,
     only_for_screenreader,
     tutorial_box,
 )
+from dp_wizard.shiny.components.summaries import analysis_summary, dataset_summary
 from dp_wizard.types import AppState
 from dp_wizard.utils.code_generators import AnalysisPlan, AnalysisPlanColumn
 from dp_wizard.utils.code_generators.notebook_generator import (
@@ -80,7 +81,7 @@ def results_ui():  # pragma: no cover
     return ui.nav_panel(
         "Download Results",
         ui.output_ui("results_requirements_warning_ui"),
-        ui.output_ui("synthetic_data_ui"),
+        ui.output_ui("two_previous_summary_ui"),
         ui.output_ui("download_options_ui"),
         ui.output_ui("download_results_ui"),
         ui.output_ui("download_code_ui"),
@@ -141,6 +142,13 @@ def results_server(
                 """
             ),
         )
+
+    @render.ui
+    def two_previous_summary_ui():
+        return [
+            dataset_summary(state),
+            analysis_summary(state),
+        ]
 
     @reactive.calc
     def download_stem() -> str:
@@ -344,6 +352,14 @@ def results_server(
             columns=columns,
         )
 
+    ######################
+    #
+    # Download content
+    #
+    ######################
+
+    # These can be slow, but reactive calcs will cache results.
+
     @reactive.calc
     def notebook_nb():
         # This creates the notebook, and evaluates it,
@@ -373,10 +389,37 @@ def results_server(
     def notebook_html_unexecuted():
         return convert_nb_to_html(notebook_nb_unexecuted())
 
-    @render.download(
-        filename=lambda: clean_download_stem() + ".py",
-        media_type="text/x-python",
-    )
+    ######################
+    #
+    # Download functions
+    #
+    ######################
+
+    # Function names need to match the id constructed by button(),
+    # based on the cleaned-up name parameter.
+
+    def download(ext: str):
+        last_ext = ext.split(".")[-1]
+        mime = {
+            "ipynb": "application/x-ipynb+json",
+            "py": "text/x-python",
+            "html": "text/html",
+            "csv": "text/csv",
+            "txt": "text/plain",
+        }.get(last_ext)
+        if mime is None:
+            raise Exception(f"No MIME type for {ext}")
+
+        def inner(func):
+            wrapped = render.download(
+                filename=lambda: clean_download_stem() + ext,
+                media_type=mime,
+            )(func)
+            return wrapped
+
+        return inner
+
+    @download(".py")
     async def download_script():
         yield make_download_or_modal_error(
             ScriptGenerator(
@@ -385,10 +428,7 @@ def results_server(
             ).make_py,
         )
 
-    @render.download(
-        filename=lambda: clean_download_stem() + ".ipynb.py",
-        media_type="text/x-python",
-    )
+    @download(".ipynb.py")
     async def download_notebook_source():
         with ui.Progress() as progress:
             progress.set(message=wait_message)
@@ -396,56 +436,34 @@ def results_server(
                 analysis_plan(), input.custom_download_note()
             ).make_py()
 
-    @render.download(
-        filename=lambda: clean_download_stem() + ".ipynb",
-        media_type="application/x-ipynb+json",
-    )
+    @download(".ipynb")
     async def download_notebook():
         yield make_download_or_modal_error(notebook_nb)
 
-    @render.download(
-        filename=lambda: clean_download_stem() + ".unexecuted.ipynb",
-        media_type="application/x-ipynb+json",
-    )
+    @download(".unexecuted.ipynb")
     async def download_notebook_unexecuted():
         yield make_download_or_modal_error(notebook_nb_unexecuted)
 
-    @render.download(  # pyright: ignore
-        filename=lambda: clean_download_stem() + ".html",
-        media_type="text/html",
-    )
+    @download(".html")
     async def download_html():
         yield make_download_or_modal_error(notebook_html)
 
-    @render.download(  # pyright: ignore
-        filename=lambda: clean_download_stem() + ".unexecuted.html",
-        media_type="text/html",
-    )
+    @download(".unexecuted.html")
     async def download_html_unexecuted():
         yield make_download_or_modal_error(notebook_html_unexecuted)
 
-    @render.download(
-        filename=lambda: clean_download_stem() + ".txt",
-        media_type="text/plain",
-    )
+    @download(".txt")
     async def download_report():
         def make_report():
             notebook_nb()  # Evaluate just for the side effect of creating report.
-            return (
-                Path(__file__).parent.parent.parent.parent / "tmp" / "report.txt"
-            ).read_text()
+            return (package_root / "tmp/report.txt").read_text()
 
         yield make_download_or_modal_error(make_report)
 
-    @render.download(
-        filename=lambda: clean_download_stem() + ".csv",
-        media_type="text/csv",
-    )
+    @download(".csv")
     async def download_table():
         def make_table():
             notebook_nb()  # Evaluate just for the side effect of creating report.
-            return (
-                Path(__file__).parent.parent.parent.parent / "tmp" / "report.csv"
-            ).read_text()
+            return (package_root / "tmp/report.csv").read_text()
 
         yield make_download_or_modal_error(make_table)

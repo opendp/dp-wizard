@@ -1,11 +1,11 @@
-from pathlib import Path
-
 import pytest
+
+from dp_wizard import package_root
 
 
 @pytest.fixture
 def config():
-    test_config_path = Path(__file__).parent.parent / "fixtures/.test_config.yaml"
+    test_config_path = package_root.parent / "tests/fixtures/.test_config.yaml"
     assert not test_config_path.exists()
     from dp_wizard.utils import config
 

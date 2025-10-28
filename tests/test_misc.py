@@ -1,14 +1,14 @@
 import re
 import subprocess
-from pathlib import Path
 
 import pytest
 
-import dp_wizard
+from dp_wizard import __version__, opendp_version, package_root
 
 tests = {
     "flake8 linting": "flake8 . --count --show-source --statistics",
     "pyright type checking": "pyright",
+    "precommit checks": "pre-commit run --all-files",
 }
 
 
@@ -19,7 +19,7 @@ def test_subprocess(cmd: str):
 
 
 def test_version():
-    assert re.match(r"\d+\.\d+\.\d+", dp_wizard.__version__)
+    assert re.match(r"\d+\.\d+\.\d+", __version__)
 
 
 @pytest.mark.parametrize(
@@ -30,13 +30,12 @@ def test_version():
     ],
 )
 def test_opendp_pin(rel_path):
-    root = Path(__file__).parent.parent
     opendp_lines = [
-        line for line in (root / rel_path).read_text().splitlines() if "opendp[" in line
+        line
+        for line in (package_root.parent / rel_path).read_text().splitlines()
+        if "opendp[" in line
     ]
-    assert all(
-        [f"opendp[mbi]=={dp_wizard.opendp_version}" in line for line in opendp_lines]
-    )
+    assert all([f"opendp[mbi]=={opendp_version}" in line for line in opendp_lines])
 
 
 @pytest.mark.parametrize(
@@ -50,8 +49,7 @@ def test_opendp_pin(rel_path):
     ],
 )
 def test_python_min_version(rel_path):
-    root = Path(__file__).parent.parent
-    text = (root / rel_path).read_text()
+    text = (package_root.parent / rel_path).read_text()
     assert "3.10" in text
     if "README" in rel_path:
         # Make sure we haven't upgraded one reference by mistake.
