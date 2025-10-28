@@ -26,7 +26,11 @@ from dp_wizard.utils.argparse_helpers import (
     PUBLIC_TEXT,
 )
 from dp_wizard.utils.code_generators import make_privacy_unit_block
-from dp_wizard.utils.csv_helper import get_csv_names_mismatch, read_csv_names
+from dp_wizard.utils.csv_helper import (
+    get_csv_names_mismatch,
+    read_csv_names,
+    read_csv_numeric_names,
+)
 
 dataset_panel_id = "dataset_panel"
 
@@ -128,6 +132,7 @@ def dataset_server(
 
     # Analysis choices:
     all_column_names = state.all_column_names
+    numeric_column_names = state.numeric_column_names
     # groups = state.groups
     # epsilon = state.epsilon
 
@@ -149,6 +154,7 @@ def dataset_server(
         path = input.public_csv_path()[0]["datapath"]
         public_csv_path.set(path)
         all_column_names.set(read_csv_names(Path(path)))
+        numeric_column_names.set(read_csv_numeric_names(Path(path)))
 
     @reactive.effect
     @reactive.event(input.private_csv_path)
@@ -156,6 +162,7 @@ def dataset_server(
         path = input.private_csv_path()[0]["datapath"]
         private_csv_path.set(path)
         all_column_names.set(read_csv_names(Path(path)))
+        numeric_column_names.set(read_csv_numeric_names(Path(path)))
 
     @reactive.effect
     @reactive.event(input.all_column_names)

@@ -99,6 +99,7 @@ class AppState:
 
     # Analysis choices:
     all_column_names: reactive.Value[list[ColumnName]]
+    numeric_column_names: reactive.Value[list[ColumnName]]
     groups: reactive.Value[list[ColumnName]]
     epsilon: reactive.Value[float]
 

@@ -156,6 +156,7 @@ def analysis_server(
 
     # Analysis choices:
     all_column_names = state.all_column_names
+    # numeric_column_names = state.numeric_column_names
     groups = state.groups
     epsilon = state.epsilon
 
