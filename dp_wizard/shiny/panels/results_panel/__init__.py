@@ -16,6 +16,7 @@ from dp_wizard.shiny.components.outputs import (
     only_for_screenreader,
     tutorial_box,
 )
+from dp_wizard.shiny.components.summaries import analysis_summary, dataset_summary
 from dp_wizard.shiny.panels.results_panel.download_options import (
     button,
     download_options,
@@ -65,7 +66,7 @@ def results_ui():  # pragma: no cover
     return ui.nav_panel(
         "Download Results",
         ui.output_ui("results_requirements_warning_ui"),
-        ui.output_ui("synthetic_data_ui"),
+        ui.output_ui("two_previous_summary_ui"),
         ui.output_ui("download_options_ui"),
         ui.output_ui("download_results_ui"),
         ui.output_ui("download_code_ui"),
@@ -126,6 +127,13 @@ def results_server(
                 """
             ),
         )
+
+    @render.ui
+    def two_previous_summary_ui():
+        return [
+            dataset_summary(state),
+            analysis_summary(state),
+        ]
 
     @reactive.calc
     def download_stem() -> str:

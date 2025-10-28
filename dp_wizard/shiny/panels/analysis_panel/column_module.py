@@ -5,6 +5,9 @@ from htmltools.tags import details, summary
 from shiny import Inputs, Outputs, Session, module, reactive, render, ui
 from shiny.types import SilentException
 
+from dp_wizard.shiny.components.icons import (
+    column_config_icon,
+)
 from dp_wizard.shiny.components.outputs import (
     code_sample,
     col_widths,
@@ -116,7 +119,7 @@ def error_md_ui(markdown):  # pragma: no cover
 @module.ui
 def column_ui():  # pragma: no cover
     return ui.card(
-        ui.card_header(ui.output_text("card_header")),
+        ui.card_header(column_config_icon, ui.output_text("card_header", inline=True)),
         ui.output_ui("analysis_name_ui"),
         ui.output_ui("analysis_config_ui"),
     )

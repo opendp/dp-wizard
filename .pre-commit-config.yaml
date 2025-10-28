@@ -14,7 +14,12 @@ repos:
         # supported by your project here, or alternatively use
         # pre-commit's default_language_version, see
         # https://pre-commit.com/#top_level-default_language_version
-        language_version: python3.11
+
+        # Commented out because in CI it seems to require this binary
+        # even when that is not the version tests are being run on.
+        # Revisit this setting if it causes problems.
+
+        # language_version: python3.13
   - repo: https://github.com/pycqa/isort
     rev: 6.0.1
     hooks:
