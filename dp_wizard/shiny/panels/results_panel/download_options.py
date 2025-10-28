@@ -119,13 +119,11 @@ def table_of_contents_md():
 
 def download_button(
     opt_name: str,
-    cloud=None,
     primary=False,
     disabled=False,
 ):  # pragma: no cover
     return _download_button_or_link(
         opt_name,
-        cloud=cloud,
         primary=primary,
         disabled=disabled,
         button=True,
@@ -134,13 +132,11 @@ def download_button(
 
 def download_link(
     opt_name: str,
-    cloud=None,
     primary=False,
     disabled=False,
 ):  # pragma: no cover
     return _download_button_or_link(
         opt_name,
-        cloud=cloud,
         primary=primary,
         disabled=disabled,
         button=False,
@@ -149,7 +145,6 @@ def download_link(
 
 def _download_button_or_link(
     opt_name: str,
-    cloud: bool | None,
     primary: bool,
     disabled: bool,
     button: bool,

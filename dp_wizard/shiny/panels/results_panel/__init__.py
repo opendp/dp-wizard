@@ -245,7 +245,7 @@ def results_server(
                 ),
                 responsive=False,
             ),
-            download_button("Notebook (unexecuted)", cloud=in_cloud, disabled=disabled),
+            download_button("Notebook (unexecuted)", disabled=disabled),
             download_button("HTML (unexecuted)", disabled=disabled),
             download_button("Script", disabled=disabled),
             download_button("Notebook Source", disabled=disabled),
