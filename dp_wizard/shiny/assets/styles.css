@@ -90,3 +90,11 @@ a[disabled] {
     text-decoration: none;
     color: var(--bs-body-color);
 }
+
+/* Increase default margin on icons. */
+.fa {
+    margin-right: 0.4em !important;
+}
+.card-header > .fa {
+    margin-right: 0.8em !important;
+}
