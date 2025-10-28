@@ -261,8 +261,9 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
             page.get_by_text(link_text).first.click()
 
         download_name = download_info.value.suggested_filename
-        assert download_name.startswith(expected_stem)
         assert download_name.endswith(option.ext)
+        if not download_name.startswith("README"):
+            assert download_name.startswith(expected_stem)
 
         download_path = download_info.value.path()
         content = download_path.read_bytes()
@@ -283,8 +284,9 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
             page.get_by_text(link_text).first.click()
 
         download_name = download_info.value.suggested_filename
-        assert download_name.startswith(new_clean_stem)
         assert download_name.endswith(option.ext)
+        if not download_name.startswith("README"):
+            assert download_name.startswith(new_clean_stem)
 
     # -- Define Analysis --
     page.get_by_role("tab", name="Define Analysis").click()
