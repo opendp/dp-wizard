@@ -21,6 +21,12 @@ _download_options = {
     # Find more icons on Font Awesome: https://fontawesome.com/search?ic=free
     for option in [
         DownloadOption(
+            "README",
+            ".txt",
+            "file",
+            "A short description of the analysis, and a list of contents.",
+        ),
+        DownloadOption(
             "Package",
             ".zip",
             "folder-open",
@@ -99,13 +105,13 @@ _download_options = {
 def table_of_contents_md():
     """
     >>> print(table_of_contents_md())
-    - README.txt
+    - README (.txt): A short description of the analysis, and a list of contents.
     ...
     - Table (.csv): The same information, but condensed into a CSV.
     """
-    included_names = ["Notebook", "HTML", "Script", "Report", "Table"]
+    included_names = ["README", "Notebook", "HTML", "Script", "Report", "Table"]
     included_options = [_download_options[name] for name in included_names]
-    return "- README.txt\n" + "\n".join(
+    return "\n".join(
         f"- {opt.name} ({opt.ext}): {opt.clean_description_md}"
         for opt in included_options
     )
