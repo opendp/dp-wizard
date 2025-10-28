@@ -216,67 +216,18 @@ def dataset_server(
 
     @render.ui
     def input_files_ui():
-        # We can't set the actual value of a file input,
-        # but the placeholder string is a good substitute.
-        #
-        # Make sure this doesn't depend on reactive values,
-        # for two reasons:
-        # - If there is a dependency, the inputs are redrawn,
-        #   and it looks like the file input is unset.
-        # - After file upload, the internal copy of the file
-        #   is renamed to something like "0.csv".
-        return [
-            tutorial_box(
-                is_tutorial_mode(),
-                (
-                    """
-                    For the tutorial, we've provided the grades
-                    on assignments for a school class in `sample.csv`.
-                    You don't need to upload an additional file.
-                    """
-                    if is_sample_csv
-                    else """
-                    If you don't have a CSV on hand to work with,
-                    quit and restart with `dp-wizard --sample`,
-                    and DP Wizard will provide a sample CSV
-                    for the tutorial.
-                    """
-                ),
-                responsive=False,
-            ),
-            ui.row(
-                ui.input_file(
-                    "private_csv_path",
-                    "Choose Private CSV",
-                    accept=[".csv"],
-                    placeholder=Path(initial_private_csv_path).name,
-                ),
-                ui.input_file(
-                    "public_csv_path",
-                    "Choose Public CSV",
-                    accept=[".csv"],
-                    placeholder=Path(initial_public_csv_path).name,
-                ),
-            ),
-        ]
+        return data_source.input_files_ui(
+            is_tutorial_mode=is_tutorial_mode,
+            is_sample_csv=is_sample_csv,
+            initial_private_csv_path=initial_private_csv_path,
+            initial_public_csv_path=initial_public_csv_path,
+        )
 
     @render.ui
     def csv_column_match_ui():
-        mismatch = csv_column_mismatch_calc()
-        messages = []
-        if mismatch:
-            just_public, just_private = mismatch
-            if just_public:
-                messages.append(
-                    "- Only the public CSV contains: "
-                    + ", ".join(f"`{name}`" for name in just_public)
-                )
-            if just_private:
-                messages.append(
-                    "- Only the private CSV contains: "
-                    + ", ".join(f"`{name}`" for name in just_private)
-                )
-        return hide_if(not messages, info_md_box("\n".join(messages)))
+        return data_source.csv_column_match_ui(
+            csv_column_mismatch_calc,
+        )
 
     entities = {
         "📅 Individual Per Period": """
