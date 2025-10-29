@@ -30,13 +30,31 @@ def test_cloud_app(page: Page, cloud_app: ShinyAppProc):  # pragma: no cover
     page.locator("#max_rows").fill("10000")
     expect(page).to_have_title("DP Wizard")
     expect(page.get_by_text("Choose Public CSV")).not_to_be_visible()
-    page.get_by_label("CSV Column Names").fill("a_column")
+    page.get_by_label("CSV Column Names").fill("a_column\nb_column")
 
     page.get_by_role("button", name="Define Analysis").click()
     page.locator(".selectize-input").nth(0).click()
     page.get_by_text("1: a_column").click()
     page.get_by_label("Lower").fill("0")
     page.get_by_label("Upper").fill("10")
+
+    expect(
+        page.get_by_text("Select one or more columns before proceeding.")
+    ).not_to_be_visible()
+    page.locator(".selectize-input").nth(0).click()
+    page.get_by_text("2: b_column").click()
+    page.get_by_text("Select one or more columns before proceeding.")
+    page.get_by_text("2: b_column×").click()
+
+    # Using sleep() isn't great, but the warning message takes a moment to render.
+    # Without waiting, the tests passes when they shouldn't.
+    # This may not catch regressions on CI, where things run more slowly.
+    from time import sleep
+
+    sleep(2)
+    expect(
+        page.get_by_text("Select one or more columns before proceeding.")
+    ).not_to_be_visible()
 
     page.get_by_role("button", name="Download Results").click()
     with page.expect_download() as download_info:
