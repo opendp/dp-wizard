@@ -72,7 +72,7 @@ def test_qa_app(page: Page, qa_app: ShinyAppProc):  # pragma: no cover
 
 def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: no cover
     pick_dataset_text = "How many rows of the CSV"
-    perform_analysis_text = "Select columns to calculate statistics on"
+    perform_analysis_text = "Select numeric columns to calculate statistics on"
     download_results_text = "You can now make a differentially private release"
 
     # -- Select Dataset --
