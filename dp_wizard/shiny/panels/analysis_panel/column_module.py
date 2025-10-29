@@ -16,12 +16,10 @@ from dp_wizard.shiny.components.outputs import (
     only_for_screenreader,
     tutorial_box,
 )
-from dp_wizard.types import AnalysisName, ColumnName
+from dp_wizard.types import AnalysisName, ColumnName, Product
 from dp_wizard.utils.code_generators import make_column_config_block
 from dp_wizard.utils.code_generators.analyses import (
-    count,
     get_analysis_by_name,
-    has_bounds,
     histogram,
     mean,
     median,
@@ -131,6 +129,7 @@ def column_server(
     output: Outputs,
     session: Session,
     public_csv_path: str,
+    product: reactive.Value[Product],
     name: ColumnName,
     contributions: reactive.Value[int],
     epsilon: reactive.Value[float],
@@ -234,17 +233,20 @@ def column_server(
     def analysis_name_ui():
         analysis_name = analysis_types().get(name, histogram.name)
         blurb_md = get_analysis_by_name(analysis_name).blurb_md
-        return (
-            ui.layout_columns(
-                ui.input_select(
-                    "analysis_type",
-                    only_for_screenreader("Type of analysis"),
-                    [histogram.name, mean.name, median.name, count.name],
-                    width=label_width,
-                    selected=analysis_name,
+        return hide_if(
+            product() != Product.STATISTICS,
+            (
+                ui.layout_columns(
+                    ui.input_select(
+                        "analysis_type",
+                        only_for_screenreader("Type of analysis"),
+                        [histogram.name, mean.name, median.name],
+                        width=label_width,
+                        selected=analysis_name,
+                    ),
+                    ui.markdown(blurb_md),
+                    col_widths=col_widths,  # type: ignore
                 ),
-                ui.markdown(blurb_md),
-                col_widths=col_widths,  # type: ignore
             ),
         )
 
@@ -372,11 +374,7 @@ def column_server(
 
     @reactive.calc
     def error_md_calc():
-        bound_errors = (
-            get_bound_errors(input.lower_bound(), input.upper_bound())
-            if has_bounds(get_analysis_by_name(input.analysis_type()))
-            else []
-        )
+        bound_errors = get_bound_errors(input.lower_bound(), input.upper_bound())
 
         return "\n".join(
             f"- {error}" for error in bound_errors + get_bin_errors(input.bins())
