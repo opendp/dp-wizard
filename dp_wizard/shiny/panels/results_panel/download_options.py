@@ -10,14 +10,13 @@ class DownloadOption(NamedTuple):
     ext: str
     icon: str
     description_md: str
-    cloud_description_md: str | None
 
     @property
     def clean_description_md(self) -> str:
         return re.sub(r"\s+", " ", self.description_md.strip())  # pragma: no cover
 
 
-download_options = {
+_download_options = {
     option.name: option
     # Find more icons on Font Awesome: https://fontawesome.com/search?ic=free
     for option in [
@@ -26,7 +25,6 @@ download_options = {
             ".zip",
             "folder-open",
             "A zip file with results and code for a reproducible analysis.",
-            None,
         ),
         DownloadOption(
             "Notebook",
@@ -36,14 +34,12 @@ download_options = {
             An executed Jupyter notebook which references your CSV
             and shows the result of a differentially private analysis.
             """,
-            None,
         ),
         DownloadOption(
             "HTML",
             ".html",
             "file-code",
             "The same content, but exported as HTML.",
-            None,
         ),
         DownloadOption(
             "Report",
@@ -54,14 +50,12 @@ download_options = {
             Intended to be human-readable, but it does use YAML,
             so it can be parsed by other programs.
             """,
-            None,
         ),
         DownloadOption(
             "Table",
             ".csv",
             "file-csv",
             "The same information, but condensed into a CSV.",
-            None,
         ),
         DownloadOption(
             "Notebook (unexecuted)",
@@ -73,18 +67,12 @@ download_options = {
             It can also be updated with the path
             to a private CSV and executed locally.
             """,
-            """
-            This contains the same code as Jupyter notebook above,
-            but none of the cells are executed,
-            so it does not contain any results.
-            """,
         ),
         DownloadOption(
             "HTML (unexecuted)",
             ".html",
             "file-code",
             "The same content, but exported as HTML.",
-            None,
         ),
         DownloadOption(
             "Script",
@@ -94,7 +82,6 @@ download_options = {
             The same code as the notebooks, but extracted into
             a Python script which can be run from the command line.
             """,
-            None,
         ),
         DownloadOption(
             "Notebook Source",
@@ -104,35 +91,80 @@ download_options = {
             Python source code converted by jupytext into notebook.
             Primarily of interest to DP Wizard developers.
             """,
-            None,
         ),
     ]
 }
 
 
-def button(
-    opt: DownloadOption, cloud=False, primary=False, disabled=False
+def table_of_contents_md():
+    """
+    >>> print(table_of_contents_md())
+    - README.txt
+    ...
+    - Table (.csv): The same information, but condensed into a CSV.
+    """
+    included_names = ["Notebook", "HTML", "Script", "Report", "Table"]
+    included_options = [_download_options[name] for name in included_names]
+    return "- README.txt\n" + "\n".join(
+        f"- {opt.name} ({opt.ext}): {opt.clean_description_md}"
+        for opt in included_options
+    )
+
+
+def download_button(
+    opt_name: str,
+    cloud=None,
+    primary=False,
+    disabled=False,
 ):  # pragma: no cover
+    return _download_button_or_link(
+        opt_name,
+        cloud=cloud,
+        primary=primary,
+        disabled=disabled,
+        button=True,
+    )
+
+
+def download_link(
+    opt_name: str,
+    cloud=None,
+    primary=False,
+    disabled=False,
+):  # pragma: no cover
+    return _download_button_or_link(
+        opt_name,
+        cloud=cloud,
+        primary=primary,
+        disabled=disabled,
+        button=False,
+    )
+
+
+def _download_button_or_link(
+    opt_name: str,
+    cloud: bool | None,
+    primary: bool,
+    disabled: bool,
+    button: bool,
+):  # pragma: no cover
+    opt = _download_options[opt_name]
     clean_name = re.sub(r"\W+", " ", opt.name).strip().replace(" ", "_").lower()
     kwargs = {
-        "id": f"download_{clean_name}",
-        "label": f"Download {opt.name} ({opt.ext})",
+        "id": f"download_{clean_name}_{'button' if button else 'link'}",
+        "label": f"{'Download ' if button else ''}{opt.name} ({opt.ext})",
         "icon": icon_svg(opt.icon, margin_right="0.5em"),
-        "width": "20em",
+        "width": "22em",
         "class_": "btn-primary" if primary else None,
     }
     if disabled:
         # Would prefer just to use ui.download_button,
         # but it doesn't have a "disabled" option.
-        ui_button = ui.input_action_button
+        ui_button_or_link = ui.input_action_button if button else ui.input_action_link
         kwargs["disabled"] = True
     else:
-        ui_button = ui.download_button
+        ui_button_or_link = ui.download_button if button else ui.download_link
     return [
-        ui_button(**kwargs),
-        ui.markdown(
-            (opt.cloud_description_md or opt.description_md)
-            if cloud
-            else opt.description_md
-        ),
+        ui_button_or_link(**kwargs),
+        ui.markdown(opt.description_md),
     ]
