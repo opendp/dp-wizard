@@ -133,6 +133,7 @@ def column_server(
     public_csv_path: str,
     name: ColumnName,
     contributions: reactive.Value[int],
+    contributions_entity: reactive.Value[str],
     epsilon: reactive.Value[float],
     row_count: int,
     groups: reactive.Value[list[ColumnName]],
@@ -473,7 +474,7 @@ def column_server(
         title = ", ".join(
             [
                 name if public_csv_path else f"Simulated {name}: normal distribution",
-                f"{contributions_int} contribution{s} / individual",
+                f"{contributions_int} contribution{s} / {contributions_entity()}",
             ]
         )
         return plot_bars(
