@@ -167,13 +167,13 @@ def dataset_server(
     @reactive.effect
     @reactive.event(input.all_column_names)
     def _on_column_names_change():
-        all_column_names.set(
-            [
-                clean
-                for line in input.all_column_names().splitlines()
-                if (clean := line.strip())
-            ]
-        )
+        column_names = [
+            clean
+            for line in input.all_column_names().splitlines()
+            if (clean := line.strip())
+        ]
+        all_column_names.set(column_names)
+        numeric_column_names.set(column_names)
 
     @reactive.calc
     def csv_column_mismatch_calc() -> Optional[tuple[set, set]]:
