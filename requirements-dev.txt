@@ -26,6 +26,8 @@ attrs==25.3.0
     #   jsonschema
     #   mbi
     #   referencing
+autoflake8==0.4.1
+    # via -r requirements-dev.in
 beautifulsoup4==4.13.4
     # via nbconvert
 black==25.1.0
@@ -297,7 +299,9 @@ pycodestyle==2.13.0
 pyee==12.1.1
     # via playwright
 pyflakes==3.3.2
-    # via flake8
+    # via
+    #   autoflake8
+    #   flake8
 pygments==2.19.1
     # via
     #   ipython
