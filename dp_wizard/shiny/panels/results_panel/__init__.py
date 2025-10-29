@@ -363,7 +363,7 @@ def results_server(
     @reactive.calc
     def notebook_nb():
         # This creates the notebook, and evaluates it,
-        # and drops reports in the tmp dir.
+        # and drops reports in the local-sessions dir.
         # Could be slow!
         # Luckily, reactive calcs are lazy.
         released.set(True)
@@ -456,7 +456,7 @@ def results_server(
     async def download_report():
         def make_report():
             notebook_nb()  # Evaluate just for the side effect of creating report.
-            return (package_root / "tmp/report.txt").read_text()
+            return (package_root / "local-sessions/report.txt").read_text()
 
         yield make_download_or_modal_error(make_report)
 
@@ -464,6 +464,6 @@ def results_server(
     async def download_table():
         def make_table():
             notebook_nb()  # Evaluate just for the side effect of creating report.
-            return (package_root / "tmp/report.csv").read_text()
+            return (package_root / "local-sessions/report.csv").read_text()
 
         yield make_download_or_modal_error(make_table)
