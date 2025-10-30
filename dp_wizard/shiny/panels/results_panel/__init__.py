@@ -16,7 +16,7 @@ from dp_wizard.shiny.components.outputs import (
     tutorial_box,
 )
 from dp_wizard.shiny.components.summaries import analysis_summary, dataset_summary
-from dp_wizard.types import AppState
+from dp_wizard.types import AppState, Product
 from dp_wizard.utils.code_generators import AnalysisPlan, AnalysisPlanColumn
 from dp_wizard.utils.code_generators.notebook_generator import (
     PLACEHOLDER_CSV_NAME,
@@ -135,7 +135,9 @@ def results_server(
     @render.ui
     def results_requirements_warning_ui():
         return hide_if(
-            bool(weights()),
+            # TODO: Get this in sync with analysis_panel validation
+            # https://github.com/opendp/dp-wizard/issues/562
+            bool(weights()) or product() == Product.CODEBOOK,
             info_md_box(
                 """
                 Please define your analysis on the previous tab
