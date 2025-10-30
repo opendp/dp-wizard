@@ -585,17 +585,20 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             ),
             tutorial_box(
                 is_tutorial_mode(),
-                """
+                f"""
                 Although the underlying OpenDP library is very flexible,
-                DP Wizard offers only a few analysis options:
+                DP Wizard offers a few analysis options to help you get started:
 
-                - The **DP Statistics** option supports
+                - The **{Product.STATISTICS}** option supports
                   grouping, histograms, mean, median, and count.
-                - With **DP Synthetic Data**, your privacy budget is used
+                - With **{Product.SYNTHETIC_DATA}**, your privacy budget is used
                   to infer the distributions of values within the
                   selected columns, and the correlations between columns.
                   This is less accurate than calculating the desired
                   statistics directly, but can be easier to work with downstream.
+                - The **{Product.CSV_DESCRIPTION}** summarizes the contents of CSVs
+                  with a large number of columns, without revealing details
+                  from individual rows.
                 """,
                 responsive=False,
             ),

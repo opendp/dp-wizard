@@ -8,7 +8,7 @@ from shiny import reactive
 class Product(Enum):
     STATISTICS = auto()
     SYNTHETIC_DATA = auto()
-    CODEBOOK = auto()
+    CSV_DESCRIPTION = auto()
 
     @classmethod
     def to_dict(cls) -> dict[str, str]:
@@ -21,7 +21,7 @@ class Product(Enum):
         }
 
     def __str__(self) -> str:
-        return "DP " + self.name.replace("_", " ").title()
+        return "DP " + self.name.replace("_", " ").title().replace("Csv", "CSV")
 
 
 class AnalysisName(str):

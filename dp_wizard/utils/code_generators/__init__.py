@@ -48,10 +48,8 @@ class AnalysisPlan(NamedTuple):
     columns: dict[ColumnName, list[AnalysisPlanColumn]]
 
     def __str__(self) -> str:
-        if self.product == Product.CODEBOOK:
-            # No user specified columns,
-            # and it reads better with an article.
-            return "a DP Codebook"
+        if self.product == Product.CSV_DESCRIPTION:
+            return str(self.product)
 
         def md_list(names) -> str:
             return ", ".join(f"`{name}`" for name in names)

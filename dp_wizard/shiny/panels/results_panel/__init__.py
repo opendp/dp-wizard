@@ -137,7 +137,7 @@ def results_server(
         return hide_if(
             # TODO: Get this in sync with analysis_panel validation
             # https://github.com/opendp/dp-wizard/issues/562
-            bool(weights()) or product() == Product.CODEBOOK,
+            bool(weights()) or product() == Product.CSV_DESCRIPTION,
             info_md_box(
                 """
                 Please define your analysis on the previous tab
@@ -198,7 +198,7 @@ def results_server(
     def download_results_ui():
         if in_cloud:
             return None
-        disabled = not weights()
+        disabled = not (weights() or product() == Product.CSV_DESCRIPTION)
         return [
             ui.h3("Download Results"),
             tutorial_box(

@@ -34,7 +34,7 @@ class AbstractGenerator(ABC):
                 return "stats"
             case Product.SYNTHETIC_DATA:
                 return "synth"
-            case Product.CODEBOOK:
+            case Product.CSV_DESCRIPTION:
                 return "codebook"
             case _:  # pragma: no cover
                 raise ValueError(self.analysis_plan.product)
@@ -48,7 +48,7 @@ class AbstractGenerator(ABC):
                 return "polars"
             case Product.SYNTHETIC_DATA:
                 return "mbi"
-            case Product.CODEBOOK:
+            case Product.CSV_DESCRIPTION:
                 return "polars"
             case _:  # pragma: no cover
                 raise ValueError(self.analysis_plan.product)

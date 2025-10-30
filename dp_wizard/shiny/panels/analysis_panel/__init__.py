@@ -121,7 +121,9 @@ def analysis_server(
         # https://github.com/opendp/dp-wizard/issues/562
         at_least_one_column = bool(weights())
         no_errors = not any(analysis_errors().values())
-        return (at_least_one_column and no_errors) or product() == Product.CODEBOOK
+        return (
+            at_least_one_column and no_errors
+        ) or product() == Product.CSV_DESCRIPTION
 
     @reactive.effect
     def _update_columns():
@@ -246,7 +248,7 @@ def analysis_server(
             ),
         )
 
-        if product() == Product.CODEBOOK:
+        if product() == Product.CSV_DESCRIPTION:
             return (
                 ui.layout_columns(
                     budget_card,

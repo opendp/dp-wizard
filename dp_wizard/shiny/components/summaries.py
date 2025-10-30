@@ -49,7 +49,7 @@ def analysis_summary(state: AppState):  # pragma: no cover
     return tags.small(
         (
             []
-            if state.product() == Product.CODEBOOK
+            if state.product() == Product.CSV_DESCRIPTION
             else [
                 columns_icon,
                 f"Columns: {columns}; ",

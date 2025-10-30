@@ -78,7 +78,7 @@ class NotebookGenerator(AbstractGenerator):
                     )
                     + "}"
                 )
-            case Product.CODEBOOK:
+            case Product.CSV_DESCRIPTION:
                 outputs_expression = "TODO"
             case _:  # pragma: no cover
                 raise ValueError(self.analysis_plan.product)
@@ -116,7 +116,7 @@ class NotebookGenerator(AbstractGenerator):
                     "STATS_QUERIES_BLOCK": self._make_stats_queries(),
                     "STATS_REPORTS_BLOCK": self._make_reports_block(),
                 }
-            case Product.CODEBOOK:
+            case Product.CSV_DESCRIPTION:
                 return {}  # TODO
             case _:  # pragma: no cover
                 raise ValueError(self.analysis_plan.product)
