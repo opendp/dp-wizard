@@ -25,18 +25,6 @@ local_app = create_app_fixture(package_root / "app_local.py")
 qa_app = create_app_fixture(package_root / "app_qa.py")
 
 
-@pytest.fixture(scope="session")
-def browser_context_args(browser_context_args):
-    # Resize browser narrower than default for screenshots.
-    return {
-        **browser_context_args,
-        "viewport": {
-            "width": 1000,
-            "height": 2000,
-        },
-    }
-
-
 def test_cloud_app(page: Page, cloud_app: ShinyAppProc):  # pragma: no cover
     page.goto(cloud_app.url)
 
@@ -199,6 +187,18 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     # to run tests in parallel.
 
 
+@pytest.fixture(scope="session")
+def browser_context_args(browser_context_args):
+    # Resize browser narrower than default for screenshots.
+    return {
+        **browser_context_args,
+        "viewport": {
+            "width": 900,
+            "height": 600,
+        },
+    }
+
+
 def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no cover
 
     def screenshot(page, name):
@@ -212,7 +212,7 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
         if environ.get("SCREENSHOTS"):
             sleep(1)  # UI updates can be a little slow.
             path = package_root.parent / f"docs/screenshots/{name}.png"
-            page.screenshot(path=path, full_page=True)
+            page.screenshot(path=path)
 
             img = Image.open(path)
             img = img.quantize(colors=16)
