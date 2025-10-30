@@ -38,7 +38,9 @@ def parse_log(lines):
 
 
 def main():  # pragma: no cover
-    old_changelog_lines = (package_root / "CHANGELOG.md").read_text().splitlines()
+    old_changelog_lines = (
+        (package_root.parent / "CHANGELOG.md").read_text().splitlines()
+    )
     new_changelog_lines = []
 
     prev_version = __version__
