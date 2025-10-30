@@ -78,11 +78,13 @@ class NotebookGenerator(AbstractGenerator):
                     )
                     + "}"
                 )
+            case Product.CODEBOOK:
+                outputs_expression = "TODO"
             case _:  # pragma: no cover
                 raise ValueError(self.analysis_plan.product)
         tmp_path = package_root / "tmp"
         reports_block = (
-            Template(f"{self._get_synth_or_stats()}_reports", root)
+            Template(f"{self._get_product()}_reports", root)
             .fill_expressions(
                 OUTPUTS=outputs_expression,
                 COLUMNS={
@@ -114,5 +116,7 @@ class NotebookGenerator(AbstractGenerator):
                     "STATS_QUERIES_BLOCK": self._make_stats_queries(),
                     "STATS_REPORTS_BLOCK": self._make_reports_block(),
                 }
+            case Product.CODEBOOK:
+                return {}  # TODO
             case _:  # pragma: no cover
                 raise ValueError(self.analysis_plan.product)

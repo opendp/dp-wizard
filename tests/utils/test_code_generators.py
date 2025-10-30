@@ -237,6 +237,8 @@ def test_make_notebook(plan):
             context_global = "synth_context"
         case Product.STATISTICS:
             context_global = "stats_context"
+        case Product.CODEBOOK:
+            context_global = "codebook_context"
         case _:  # pragma: no cover
             raise ValueError(plan.product)
     assert isinstance(globals[context_global], dp.Context)

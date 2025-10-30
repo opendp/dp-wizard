@@ -54,5 +54,7 @@ class ScriptGenerator(AbstractGenerator):
                     "STATS_CONTEXT_BLOCK": self._make_stats_context(),
                     "STATS_QUERIES_BLOCK": self._make_stats_queries(),
                 }
+            case Product.CODEBOOK:
+                return {}  # TODO
             case _:  # pragma: no cover
                 raise ValueError(self.analysis_plan.product)

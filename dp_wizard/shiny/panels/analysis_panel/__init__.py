@@ -36,64 +36,7 @@ def analysis_ui():
         ui.output_ui("analysis_requirements_warning_ui"),
         ui.output_ui("analysis_release_warning_ui"),
         ui.output_ui("previous_summary_ui"),
-        ui.layout_columns(
-            ui.card(
-                ui.card_header(columns_icon, "Columns"),
-                ui.markdown("Select numeric columns to calculate statistics on."),
-                ui.input_selectize(
-                    "columns_selectize",
-                    "Columns",
-                    [],
-                    multiple=True,
-                ),
-                ui.output_ui("columns_selectize_tutorial_ui"),
-            ),
-            ui.card(
-                ui.card_header(groups_icon, "Grouping"),
-                ui.markdown(
-                    """
-                    Select columns to group by, or leave empty
-                    to calculate statistics across the entire dataset.
-
-                    Groups aren't applied to the previews on this page
-                    but will be used in the final release.
-                    """
-                ),
-                ui.input_selectize(
-                    "groups_selectize",
-                    "Group by",
-                    [],
-                    multiple=True,
-                ),
-                ui.output_ui("groups_selectize_tutorial_ui"),
-            ),
-            ui.card(
-                ui.card_header(budget_icon, "Privacy Budget"),
-                ui.markdown(
-                    f"""
-                    What is your privacy budget, or epsilon, for this release?
-                    Many factors including the sensitivity of your data,
-                    the frequency of DP releases,
-                    and the regulatory landscape can be considered.
-                    Consider how your budget compares to that of
-                    <a href="{registry_url}"
-                       target="_blank">other projects</a>.
-                    """
-                ),
-                log_slider("log_epsilon_slider", 0.1, 10.0),
-                ui.output_ui("epsilon_ui"),
-                ui.output_ui("privacy_loss_python_ui"),
-            ),
-            ui.card(
-                ui.card_header(simulation_icon, "Simulation"),
-                ui.output_ui("simulation_card_ui"),
-            ),
-            col_widths={
-                "sm": [12, 12, 12, 12],  # 4 rows
-                "md": [6, 6, 6, 6],  # 2 rows
-                "xxl": [3, 3, 3, 3],  # 1 row
-            },
-        ),
+        ui.output_ui("top_cards_ui"),
         ui.output_ui("columns_ui"),
         ui.output_ui("download_results_button_ui"),
         value="analysis_panel",
@@ -238,6 +181,69 @@ def analysis_server(
     @render.ui
     def previous_summary_ui():
         return dataset_summary(state)
+
+    @render.ui
+    def top_cards_ui():
+        return (
+            ui.layout_columns(
+                ui.card(
+                    ui.card_header(columns_icon, "Columns"),
+                    ui.markdown("Select numeric columns to calculate statistics on."),
+                    ui.input_selectize(
+                        "columns_selectize",
+                        "Columns",
+                        [],
+                        multiple=True,
+                    ),
+                    ui.output_ui("columns_selectize_tutorial_ui"),
+                ),
+                ui.card(
+                    ui.card_header(groups_icon, "Grouping"),
+                    ui.markdown(
+                        """
+                    Select columns to group by, or leave empty
+                    to calculate statistics across the entire dataset.
+
+                    Groups aren't applied to the previews on this page
+                    but will be used in the final release.
+                    """
+                    ),
+                    ui.input_selectize(
+                        "groups_selectize",
+                        "Group by",
+                        [],
+                        multiple=True,
+                    ),
+                    ui.output_ui("groups_selectize_tutorial_ui"),
+                ),
+                ui.card(
+                    ui.card_header(budget_icon, "Privacy Budget"),
+                    ui.markdown(
+                        f"""
+                    What is your privacy budget, or epsilon, for this release?
+                    Many factors including the sensitivity of your data,
+                    the frequency of DP releases,
+                    and the regulatory landscape can be considered.
+                    Consider how your budget compares to that of
+                    <a href="{registry_url}"
+                       target="_blank">other projects</a>.
+                    """
+                    ),
+                    log_slider("log_epsilon_slider", 0.1, 10.0),
+                    ui.output_ui("epsilon_ui"),
+                    ui.output_ui("privacy_loss_python_ui"),
+                ),
+                ui.card(
+                    ui.card_header(simulation_icon, "Simulation"),
+                    ui.output_ui("simulation_card_ui"),
+                ),
+                col_widths={
+                    "sm": [12, 12, 12, 12],  # 4 rows
+                    "md": [6, 6, 6, 6],  # 2 rows
+                    "xxl": [3, 3, 3, 3],  # 1 row
+                },
+            ),
+        )
 
     @reactive.effect
     @reactive.event(input.columns_selectize)
