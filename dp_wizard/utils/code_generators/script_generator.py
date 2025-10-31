@@ -57,4 +57,4 @@ class ScriptGenerator(AbstractGenerator):
             case Product.CSV_DESCRIPTION:
                 return {}  # TODO
             case _:  # pragma: no cover
-                raise ValueError(_)
+                raise ValueError(self.analysis_plan.product)

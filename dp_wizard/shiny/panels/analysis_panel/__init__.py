@@ -36,6 +36,7 @@ def analysis_ui():
         ui.output_ui("analysis_requirements_warning_ui"),
         ui.output_ui("analysis_release_warning_ui"),
         ui.output_ui("previous_summary_ui"),
+        ui.output_ui("conditional_css_ui"),
         ui.layout_columns(
             ui.card(
                 ui.card_header(columns_icon, "Columns"),
@@ -47,6 +48,7 @@ def analysis_ui():
                     multiple=True,
                 ),
                 ui.output_ui("columns_selectize_tutorial_ui"),
+                class_="columns-card",
             ),
             ui.card(
                 ui.card_header(groups_icon, "Grouping"),
@@ -66,6 +68,7 @@ def analysis_ui():
                     multiple=True,
                 ),
                 ui.output_ui("groups_selectize_tutorial_ui"),
+                class_="grouping-card",
             ),
             ui.card(
                 ui.card_header(budget_icon, "Privacy Budget"),
@@ -83,10 +86,12 @@ def analysis_ui():
                 log_slider("log_epsilon_slider", 0.1, 10.0),
                 ui.output_ui("epsilon_ui"),
                 ui.output_ui("privacy_loss_python_ui"),
+                class_="budget-card",
             ),
             ui.card(
                 ui.card_header(simulation_icon, "Simulation"),
                 ui.output_ui("simulation_card_ui"),
+                class_="simulation-card",
             ),
             col_widths={
                 "sm": [12, 12, 12, 12],  # 4 rows
@@ -238,6 +243,26 @@ def analysis_server(
                 """
             ),
         )
+
+    @render.ui
+    def conditional_css_ui():
+        # This is hacky, but other approaches for conditional card display
+        # didn't work for me.
+        # - Adding a wrapping element caused the card not to fill the whole height.
+        # - The selectize lists for columns and groups weren't updating.
+        # If we can find something better, great!
+        if product() == Product.CSV_DESCRIPTION:
+            return ui.tags.style(
+                """
+                .bslib-grid-item:has(
+                    .columns-card,
+                    .grouping-card,
+                    .simulation-card
+                ) {
+                    display: none;
+                }
+                """
+            )
 
     @render.ui
     def previous_summary_ui():
