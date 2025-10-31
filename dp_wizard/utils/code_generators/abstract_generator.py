@@ -96,7 +96,6 @@ class AbstractGenerator(ABC):
             )
             .fill_code_blocks(
                 IMPORTS_BLOCK=Template(template).finish(),
-                UTILS_BLOCK=(package_root / "utils/shared.py").read_text(),
                 **self._make_extra_blocks(),
             )
             .fill_comment_blocks(
@@ -315,6 +314,27 @@ reencode it as UTF8.""",
         )
         return (
             Template("synth_context", template_root)
+            .fill_expressions(
+                OPENDP_V_VERSION=f"v{opendp_version}",
+            )
+            .fill_code_blocks(
+                PRIVACY_UNIT_BLOCK=privacy_unit_block,
+                PRIVACY_LOSS_BLOCK=privacy_loss_block,
+            )
+        )
+
+    def _make_partial_description_context(self):
+        privacy_unit_block = make_privacy_unit_block(
+            contributions=self.analysis_plan.contributions,
+            contributions_entity=self.analysis_plan.contributions_entity,
+        )
+        privacy_loss_block = make_privacy_loss_block(
+            pure=False,
+            epsilon=self.analysis_plan.epsilon,
+            max_rows=self.analysis_plan.max_rows,
+        )
+        return (
+            Template("description_context", template_root)
             .fill_expressions(
                 OPENDP_V_VERSION=f"v{opendp_version}",
             )

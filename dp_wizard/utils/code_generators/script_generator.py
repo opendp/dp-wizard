@@ -21,17 +21,17 @@ class ScriptGenerator(AbstractGenerator):
         )
 
     def _make_stats_context(self):
-        return (
-            self._make_partial_stats_context()
-            .fill_expressions(CSV_PATH="csv_path")
-            .fill_code_blocks(OPTIONAL_CSV_BLOCK="")
-            .finish()
-        )
+        return self._fill_partial_context(self._make_partial_stats_context())
 
     def _make_synth_context(self):
+        return self._fill_partial_context(self._make_partial_synth_context())
+
+    def _make_description_context(self):
+        return self._fill_partial_context(self._make_partial_description_context())
+
+    def _fill_partial_context(self, partial_context):
         return (
-            self._make_partial_synth_context()
-            .fill_expressions(CSV_PATH="csv_path")
+            partial_context.fill_expressions(CSV_PATH="csv_path")
             .fill_code_blocks(OPTIONAL_CSV_BLOCK="")
             .finish()
         )
@@ -50,11 +50,11 @@ class ScriptGenerator(AbstractGenerator):
                 }
             case Product.STATISTICS:
                 return {
-                    "COLUMNS_BLOCK": self._make_columns(),
+                    "STATS_COLUMNS_BLOCK": self._make_columns(),
                     "STATS_CONTEXT_BLOCK": self._make_stats_context(),
                     "STATS_QUERIES_BLOCK": self._make_stats_queries(),
                 }
             case Product.CSV_DESCRIPTION:
-                return {}  # TODO
+                return {}
             case _:  # pragma: no cover
                 raise ValueError(self.analysis_plan.product)
