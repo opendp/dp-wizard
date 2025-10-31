@@ -28,12 +28,14 @@ class AbstractGenerator(ABC):
         self.analysis_plan = analysis_plan
         self.note = note
 
-    def _get_synth_or_stats(self) -> str:
+    def _get_product(self) -> str:
         match self.analysis_plan.product:
             case Product.STATISTICS:
                 return "stats"
             case Product.SYNTHETIC_DATA:
                 return "synth"
+            case Product.CSV_DESCRIPTION:
+                return "description"
             case _:  # pragma: no cover
                 raise ValueError(self.analysis_plan.product)
 
@@ -46,6 +48,8 @@ class AbstractGenerator(ABC):
                 return "polars"
             case Product.SYNTHETIC_DATA:
                 return "mbi"
+            case Product.CSV_DESCRIPTION:
+                return "polars"
             case _:  # pragma: no cover
                 raise ValueError(self.analysis_plan.product)
 
@@ -53,7 +57,7 @@ class AbstractGenerator(ABC):
     def _get_notebook_or_script(self) -> str: ...  # pragma: no cover
 
     def _get_root_template(self) -> str:
-        adj = self._get_synth_or_stats()
+        adj = self._get_product()
         noun = self._get_notebook_or_script()
         return f"{adj}_{noun}"
 

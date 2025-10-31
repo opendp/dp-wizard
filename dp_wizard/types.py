@@ -8,19 +8,20 @@ from shiny import reactive
 class Product(Enum):
     STATISTICS = auto()
     SYNTHETIC_DATA = auto()
+    CSV_DESCRIPTION = auto()
 
     @classmethod
     def to_dict(cls) -> dict[str, str]:
         """
         >>> Product.to_dict()
-        {'1': 'DP Statistics', '2': 'DP Synthetic Data'}
+        {'1': 'DP Statistics', '2': 'DP Synthetic Data', '3': 'DP CSV Description'}
         """
         return {
             str(member.value): str(member) for (name, member) in cls.__members__.items()
         }
 
     def __str__(self) -> str:
-        return "DP " + self.name.replace("_", " ").title()
+        return "DP " + self.name.replace("_", " ").title().replace("Csv", "CSV")
 
 
 class AnalysisName(str):

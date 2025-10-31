@@ -21,7 +21,7 @@ from dp_wizard.shiny.components.outputs import (
 )
 from dp_wizard.shiny.components.summaries import dataset_summary
 from dp_wizard.shiny.panels.analysis_panel.column_module import column_server, column_ui
-from dp_wizard.types import AppState
+from dp_wizard.types import AppState, Product
 from dp_wizard.utils.code_generators import make_privacy_loss_block
 from dp_wizard.utils.csv_helper import (
     get_csv_row_count,
@@ -152,7 +152,7 @@ def analysis_server(
     # contributions_entity = state.contributions_entity
     max_rows = state.max_rows
     # initial_product = state.initial_product
-    # product = state.product
+    product = state.product
 
     # Analysis choices:
     all_column_names = state.all_column_names
@@ -174,9 +174,13 @@ def analysis_server(
 
     @reactive.calc
     def button_enabled():
+        # TODO: Get this in sync with results panel warning:
+        # https://github.com/opendp/dp-wizard/issues/562
         at_least_one_column = bool(weights())
         no_errors = not any(analysis_errors().values())
-        return at_least_one_column and no_errors
+        return (
+            at_least_one_column and no_errors
+        ) or product() == Product.CSV_DESCRIPTION
 
     @reactive.effect
     def _update_columns():
