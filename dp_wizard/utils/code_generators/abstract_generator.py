@@ -28,12 +28,14 @@ class AbstractGenerator(ABC):
         self.analysis_plan = analysis_plan
         self.note = note
 
-    def _get_synth_or_stats(self) -> str:
+    def _get_product(self) -> str:
         match self.analysis_plan.product:
             case Product.STATISTICS:
                 return "stats"
             case Product.SYNTHETIC_DATA:
                 return "synth"
+            case Product.CSV_DESCRIPTION:
+                return "description"
             case _:  # pragma: no cover
                 raise ValueError(self.analysis_plan.product)
 
@@ -46,6 +48,8 @@ class AbstractGenerator(ABC):
                 return "polars"
             case Product.SYNTHETIC_DATA:
                 return "mbi"
+            case Product.CSV_DESCRIPTION:
+                return "polars"
             case _:  # pragma: no cover
                 raise ValueError(self.analysis_plan.product)
 
@@ -53,7 +57,7 @@ class AbstractGenerator(ABC):
     def _get_notebook_or_script(self) -> str: ...  # pragma: no cover
 
     def _get_root_template(self) -> str:
-        adj = self._get_synth_or_stats()
+        adj = self._get_product()
         noun = self._get_notebook_or_script()
         return f"{adj}_{noun}"
 
@@ -92,7 +96,6 @@ class AbstractGenerator(ABC):
             )
             .fill_code_blocks(
                 IMPORTS_BLOCK=Template(template).finish(),
-                UTILS_BLOCK=(package_root / "utils/shared.py").read_text(),
                 **self._make_extra_blocks(),
             )
             .fill_comment_blocks(
@@ -311,6 +314,27 @@ reencode it as UTF8.""",
         )
         return (
             Template("synth_context", template_root)
+            .fill_expressions(
+                OPENDP_V_VERSION=f"v{opendp_version}",
+            )
+            .fill_code_blocks(
+                PRIVACY_UNIT_BLOCK=privacy_unit_block,
+                PRIVACY_LOSS_BLOCK=privacy_loss_block,
+            )
+        )
+
+    def _make_partial_description_context(self):
+        privacy_unit_block = make_privacy_unit_block(
+            contributions=self.analysis_plan.contributions,
+            contributions_entity=self.analysis_plan.contributions_entity,
+        )
+        privacy_loss_block = make_privacy_loss_block(
+            pure=False,
+            epsilon=self.analysis_plan.epsilon,
+            max_rows=self.analysis_plan.max_rows,
+        )
+        return (
+            Template("description_context", template_root)
             .fill_expressions(
                 OPENDP_V_VERSION=f"v{opendp_version}",
             )

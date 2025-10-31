@@ -11,25 +11,21 @@ from argparse import ArgumentParser
 
 IMPORTS_BLOCK
 
-UTILS_BLOCK
-
-STATS_COLUMNS_BLOCK
+DESCRIPTION_COLUMNS_BLOCK
 
 
 def get_stats_context_contributions(csv_path):
-    STATS_CONTEXT_BLOCK
+    DESCRIPTION_CONTEXT_BLOCK
     # ENCODING_COMMENT_BLOCK
     return stats_context, contributions
 
 
 if __name__ == "__main__":
-    parser = ArgumentParser(
-        description="Creates a differentially private release from a csv"
-    )
+    parser = ArgumentParser(description="Describes the columns of a csv")
     parser.add_argument(
         "--csv", required=True, help="Path to csv containing private data"
     )
     args = parser.parse_args()
     stats_context, contributions = get_stats_context_contributions(csv_path=args.csv)
 
-    STATS_QUERIES_BLOCK
+    DESCRIPTION_QUERIES_BLOCK

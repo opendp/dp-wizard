@@ -78,11 +78,13 @@ class NotebookGenerator(AbstractGenerator):
                     )
                     + "}"
                 )
+            case Product.CSV_DESCRIPTION:
+                outputs_expression = "TODO"
             case _:  # pragma: no cover
                 raise ValueError(self.analysis_plan.product)
         tmp_path = package_root / "tmp"
         reports_block = (
-            Template(f"{self._get_synth_or_stats()}_reports", root)
+            Template(f"{self._get_product()}_reports", root)
             .fill_expressions(
                 OUTPUTS=outputs_expression,
                 COLUMNS={
@@ -100,19 +102,37 @@ class NotebookGenerator(AbstractGenerator):
         return reports_block
 
     def _make_extra_blocks(self):
+        report_blocks = {
+            "REPORTS_BLOCK": self._make_reports_block(),
+        }
+        utils_blocks = {
+            "UTILS_BLOCK": (package_root / "utils/shared.py").read_text(),
+        }
         match self.analysis_plan.product:
             case Product.SYNTHETIC_DATA:
-                return {
-                    "SYNTH_CONTEXT_BLOCK": self._make_synth_context(),
-                    "SYNTH_QUERY_BLOCK": self._make_synth_query(),
-                    "SYNTH_REPORTS_BLOCK": self._make_reports_block(),
-                }
+                return (
+                    report_blocks
+                    | utils_blocks
+                    | {
+                        "SYNTH_CONTEXT_BLOCK": self._make_synth_context(),
+                        "SYNTH_QUERY_BLOCK": self._make_synth_query(),
+                    }
+                )
             case Product.STATISTICS:
-                return {
-                    "COLUMNS_BLOCK": self._make_columns(),
-                    "STATS_CONTEXT_BLOCK": self._make_stats_context(),
-                    "STATS_QUERIES_BLOCK": self._make_stats_queries(),
-                    "STATS_REPORTS_BLOCK": self._make_reports_block(),
+                return (
+                    report_blocks
+                    | utils_blocks
+                    | {
+                        "STATS_COLUMNS_BLOCK": self._make_columns(),
+                        "STATS_CONTEXT_BLOCK": self._make_stats_context(),
+                        "STATS_QUERIES_BLOCK": self._make_stats_queries(),
+                    }
+                )
+            case Product.CSV_DESCRIPTION:
+                # Doesn't need the shared utils
+                return report_blocks | {
+                    "DESCRIPTION_CONTEXT_BLOCK": self._make_stats_context(),
+                    "DESCRIPTION_QUERIES_BLOCK": self._make_stats_queries(),
                 }
             case _:  # pragma: no cover
                 raise ValueError(self.analysis_plan.product)

@@ -21,7 +21,7 @@ from dp_wizard.shiny.components.outputs import (
 )
 from dp_wizard.shiny.components.summaries import dataset_summary
 from dp_wizard.shiny.panels.analysis_panel.column_module import column_server, column_ui
-from dp_wizard.types import AppState
+from dp_wizard.types import AppState, Product
 from dp_wizard.utils.code_generators import make_privacy_loss_block
 from dp_wizard.utils.csv_helper import (
     get_csv_row_count,
@@ -36,6 +36,7 @@ def analysis_ui():
         ui.output_ui("analysis_requirements_warning_ui"),
         ui.output_ui("analysis_release_warning_ui"),
         ui.output_ui("previous_summary_ui"),
+        ui.output_ui("conditional_css_ui"),
         ui.layout_columns(
             ui.card(
                 ui.card_header(columns_icon, "Columns"),
@@ -47,6 +48,7 @@ def analysis_ui():
                     multiple=True,
                 ),
                 ui.output_ui("columns_selectize_tutorial_ui"),
+                class_="columns-card",
             ),
             ui.card(
                 ui.card_header(groups_icon, "Grouping"),
@@ -66,6 +68,7 @@ def analysis_ui():
                     multiple=True,
                 ),
                 ui.output_ui("groups_selectize_tutorial_ui"),
+                class_="grouping-card",
             ),
             ui.card(
                 ui.card_header(budget_icon, "Privacy Budget"),
@@ -83,10 +86,12 @@ def analysis_ui():
                 log_slider("log_epsilon_slider", 0.1, 10.0),
                 ui.output_ui("epsilon_ui"),
                 ui.output_ui("privacy_loss_python_ui"),
+                class_="budget-card",
             ),
             ui.card(
                 ui.card_header(simulation_icon, "Simulation"),
                 ui.output_ui("simulation_card_ui"),
+                class_="simulation-card",
             ),
             col_widths={
                 "sm": [12, 12, 12, 12],  # 4 rows
@@ -152,7 +157,7 @@ def analysis_server(
     # contributions_entity = state.contributions_entity
     max_rows = state.max_rows
     # initial_product = state.initial_product
-    # product = state.product
+    product = state.product
 
     # Analysis choices:
     all_column_names = state.all_column_names
@@ -174,9 +179,13 @@ def analysis_server(
 
     @reactive.calc
     def button_enabled():
+        # TODO: Get this in sync with results panel warning:
+        # https://github.com/opendp/dp-wizard/issues/562
         at_least_one_column = bool(weights())
         no_errors = not any(analysis_errors().values())
-        return at_least_one_column and no_errors
+        return (
+            at_least_one_column and no_errors
+        ) or product() == Product.CSV_DESCRIPTION
 
     @reactive.effect
     def _update_columns():
@@ -234,6 +243,26 @@ def analysis_server(
                 """
             ),
         )
+
+    @render.ui
+    def conditional_css_ui():
+        # This is hacky, but other approaches for conditional card display
+        # didn't work for me.
+        # - Adding a wrapping element caused the card not to fill the whole height.
+        # - The selectize lists for columns and groups weren't updating.
+        # If we can find something better, great!
+        if product() == Product.CSV_DESCRIPTION:
+            return ui.tags.style(
+                """
+                .bslib-grid-item:has(
+                    .columns-card,
+                    .grouping-card,
+                    .simulation-card
+                ) {
+                    display: none;
+                }
+                """
+            )
 
     @render.ui
     def previous_summary_ui():

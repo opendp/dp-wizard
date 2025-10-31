@@ -119,3 +119,7 @@ Selectize menus should overflow the containing card.
 */
 .card, .card-body { overflow: visible !important; }
 ```
+
+## Hard to make elements with controls display conditionally.
+
+I tried moving a `ui.input_selectize` out of the top-level UI function because I needed it to be conditional, but the event that should have updated the list no longer worked: I guess it's not visible if it's not part of the static render?

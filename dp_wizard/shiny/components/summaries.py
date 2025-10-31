@@ -8,7 +8,7 @@ from dp_wizard.shiny.components.icons import (
     product_icon,
     unit_of_privacy_icon,
 )
-from dp_wizard.types import AppState
+from dp_wizard.types import AppState, Product
 
 _css = "display: block; padding: 0 1em 1em 1em;"
 
@@ -47,10 +47,16 @@ def analysis_summary(state: AppState):  # pragma: no cover
     budget = state.epsilon()
 
     return tags.small(
-        columns_icon,
-        f"Columns: {columns}; ",
-        groups_icon,
-        f"Groups: {groups}; ",
+        (
+            []
+            if state.product() == Product.CSV_DESCRIPTION
+            else [
+                columns_icon,
+                f"Columns: {columns}; ",
+                groups_icon,
+                f"Groups: {groups}; ",
+            ]
+        ),
         budget_icon,
         f"Privacy Budget: {budget} epsilon.",
         style=_css,

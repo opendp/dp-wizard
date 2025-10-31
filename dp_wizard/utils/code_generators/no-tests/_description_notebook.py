@@ -19,18 +19,12 @@
 IMPORTS_BLOCK
 # -
 
-# Then define some utility functions to handle dataframes and plot results:
-
-# +
-UTILS_BLOCK
-# -
-
 # ## Analysis
 #
-# Based on the input you provided, for each column we'll create a Polars expression
-# that describes how we want to summarize that column.
+# For each column numeric column we'll create a Polars expression
+# for a histogram that spans orders of magnitude.
 
-STATS_COLUMNS_BLOCK
+DESCRIPTION_COLUMNS_BLOCK
 
 # ### Context
 #
@@ -38,16 +32,16 @@ STATS_COLUMNS_BLOCK
 # and set the weight for each query under that overall budget.
 
 # +
-STATS_CONTEXT_BLOCK
+DESCRIPTION_CONTEXT_BLOCK
 # -
 
 # ENCODING_COMMENT_BLOCK
 #
 # ## Results
 #
-# Finally, we run the queries and plot the results.
+# Finally, we run the queries.
 
-STATS_QUERIES_BLOCK
+DESCRIPTION_QUERIES_BLOCK
 
 # If we try to run more queries at this point, it will error. Once the privacy budget
 # is consumed, the library prevents you from running any more queries.
