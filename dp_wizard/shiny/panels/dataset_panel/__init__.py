@@ -369,6 +369,11 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             In that case, you may prefer to protect your entire household
             rather than just yourself.
             """,
+        "❓️ Something Else": """
+            These options cover many cases, but they are just suggestions.
+            Your choice here makes it easier to understand what information
+            is being protected, but doesn't really affect the analysis.
+            """,
     }
 
     @render.ui
