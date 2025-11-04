@@ -30,13 +30,21 @@ def test_cloud_app(page: Page, cloud_app: ShinyAppProc):  # pragma: no cover
     page.locator("#max_rows").fill("10000")
     expect(page).to_have_title("DP Wizard")
     expect(page.get_by_text("Choose Public CSV")).not_to_be_visible()
-    page.get_by_label("CSV Column Names").fill("a_column")
+    page.get_by_label("CSV Column Names").fill("a_column\nb_column")
 
     page.get_by_role("button", name="Define Analysis").click()
     page.locator(".selectize-input").nth(0).click()
     page.get_by_text("1: a_column").click()
     page.get_by_label("Lower").fill("0")
     page.get_by_label("Upper").fill("10")
+
+    expect(
+        page.get_by_text("Select one or more columns before proceeding.")
+    ).not_to_be_visible()
+    page.locator(".selectize-input").nth(0).click()
+    page.get_by_text("2: b_column").click()
+    page.get_by_text("Select one or more columns before proceeding.")
+    page.get_by_text("2: b_column×").click()
 
     page.get_by_role("button", name="Download Results").click()
     with page.expect_download() as download_info:
@@ -72,7 +80,7 @@ def test_qa_app(page: Page, qa_app: ShinyAppProc):  # pragma: no cover
 
 def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: no cover
     pick_dataset_text = "How many rows of the CSV"
-    perform_analysis_text = "Select columns to calculate statistics on"
+    perform_analysis_text = "Select numeric columns to calculate statistics on"
     download_results_text = "You can now make a differentially private release"
 
     # -- Select Dataset --

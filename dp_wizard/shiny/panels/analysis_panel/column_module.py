@@ -133,6 +133,7 @@ def column_server(
     public_csv_path: str,
     name: ColumnName,
     contributions: reactive.Value[int],
+    contributions_entity: reactive.Value[str],
     epsilon: reactive.Value[float],
     row_count: int,
     groups: reactive.Value[list[ColumnName]],
@@ -259,14 +260,17 @@ def column_server(
             )
 
         def upper_bound_input():
-            return (
-                ui.input_text(
-                    "upper_bound",
-                    "Upper Bound",
-                    str(upper_bounds().get(name, "")),
-                    width=label_width,
+            return [
+                (
+                    ui.input_text(
+                        "upper_bound",
+                        "Upper Bound",
+                        str(upper_bounds().get(name, "")),
+                        width=label_width,
+                    ),
                 ),
-            )
+                ui.output_ui("bounds_tutorial_ui"),
+            ]
 
         def bin_count_input():
             return [
@@ -307,10 +311,7 @@ def column_server(
 
         return ui.layout_columns(
             inputs,
-            [
-                ui.output_ui("bounds_tutorial_ui"),
-                ui.output_ui(f"{analysis_name.lower()}_preview_ui"),
-            ],
+            ui.output_ui(f"{analysis_name.lower()}_preview_ui"),
             col_widths=col_widths,  # type: ignore
         )
 
@@ -328,6 +329,7 @@ def column_server(
             Given what we know _a priori_ about grading scales,
             you could limit `grade` to values between 0 and 100.
             """,
+            responsive=False,
         )
 
     @render.ui
@@ -473,7 +475,7 @@ def column_server(
         title = ", ".join(
             [
                 name if public_csv_path else f"Simulated {name}: normal distribution",
-                f"{contributions_int} contribution{s} / individual",
+                f"{contributions_int} contribution{s} / {contributions_entity()}",
             ]
         )
         return plot_bars(
