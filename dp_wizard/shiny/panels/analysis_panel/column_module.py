@@ -260,14 +260,28 @@ def column_server(
             )
 
         def upper_bound_input():
-            return (
+            return [
                 ui.input_text(
                     "upper_bound",
                     "Upper Bound",
                     str(upper_bounds().get(name, "")),
                     width=label_width,
                 ),
-            )
+                tutorial_box(
+                    is_tutorial_mode(),
+                    """
+                    Interpreting differential privacy strictly,
+                    we should try never to look directly at the data,
+                    not even to set bounds! This can be hard.
+                    """,
+                    is_sample_csv,
+                    """
+                    Given what we know _a priori_ about grading scales,
+                    you could limit `grade` to values between 0 and 100.
+                    """,
+                    responsive=False,
+                ),
+            ]
 
         def bin_count_input():
             return [
@@ -277,7 +291,15 @@ def column_server(
                     bin_counts().get(name, 10),
                     width=label_width,
                 ),
-                ui.output_ui("bins_tutorial_ui"),
+                tutorial_box(
+                    is_tutorial_mode(),
+                    """
+                    If you decrease the number of bins,
+                    you'll see that each individual bin becomes
+                    less noisy.
+                    """,
+                    responsive=False,
+                ),
             ]
 
         def candidate_count_input():
@@ -316,34 +338,6 @@ def column_server(
         )
 
     @render.ui
-    def bounds_tutorial_ui():
-        return tutorial_box(
-            is_tutorial_mode(),
-            """
-            Interpreting differential privacy strictly,
-            we should try never to look directly at the data,
-            not even to set bounds! This can be hard.
-            """,
-            is_sample_csv,
-            """
-            Given what we know _a priori_ about grading scales,
-            you could limit `grade` to values between 0 and 100.
-            """,
-        )
-
-    @render.ui
-    def bins_tutorial_ui():
-        return tutorial_box(
-            is_tutorial_mode(),
-            """
-            If you decrease the number of bins,
-            you'll see that each individual bin becomes
-            less noisy.
-            """,
-            responsive=False,
-        )
-
-    @render.ui
     def optional_weight_ui():
         return hide_if(
             is_single_column,
@@ -359,20 +353,16 @@ def column_server(
                     selected=default_weight,
                     width=label_width,
                 ),
-                ui.output_ui("weight_tutorial_ui"),
+                tutorial_box(
+                    is_tutorial_mode(),
+                    """
+                    You have a finite privacy budget, but you can choose
+                    how to allocate it. For simplicity, we limit the options here,
+                    but when using the library you can fine tune this.
+                    """,
+                    responsive=False,
+                ),
             ],
-        )
-
-    @render.ui
-    def weight_tutorial_ui():
-        return tutorial_box(
-            is_tutorial_mode(),
-            """
-            You have a finite privacy budget, but you can choose
-            how to allocate it. For simplicity, we limit the options here,
-            but when using the library you can fine tune this.
-            """,
-            responsive=False,
         )
 
     @reactive.calc
