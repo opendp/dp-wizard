@@ -19,8 +19,13 @@ def dataset_summary(state: AppState):  # pragma: no cover
         sources.append("Private CSV")
     if state.public_csv_path():
         sources.append("Public CSV")
+    if state.in_cloud:
+        sources.append("Field List")
 
-    unit_of_privacy = f"{state.contributions()} row / {state.contributions_entity()}"
+    contributions = state.contributions()
+    entity = state.contributions_entity()
+    s = "s" if contributions > 1 else ""
+    unit_of_privacy = f"{contributions} row{s} / {entity}"
 
     product = state.product()
 
