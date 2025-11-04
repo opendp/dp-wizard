@@ -9,7 +9,7 @@ opendp_version = "0.14.1"
 registry_url = "https://registry.opendp.org/deployments-registry/"
 
 
-def get_template_root(path) -> Path:
+def get_template_root(path: str) -> Path:
     # We use the same convention everywhere,
     # but there are separate directories
     # for each of the analyses.
@@ -34,7 +34,7 @@ def main() -> None:  # pragma: no cover
     # and to validate inputs before starting the server.
     get_cli_info()
 
-    not_first_run_path = package_root / "tmp/not-first-run.txt"
+    not_first_run_path = package_root / ".local-config/not-first-run.txt"
     if not not_first_run_path.exists():
         warning("┌──────────────────────────────────┐")
         warning("│ First startup may take a minute! │")

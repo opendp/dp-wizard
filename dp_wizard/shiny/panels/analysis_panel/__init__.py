@@ -149,7 +149,7 @@ def analysis_server(
     # initial_public_csv_path = state.initial_private_csv_path
     public_csv_path = state.public_csv_path
     contributions = state.contributions
-    # contributions_entity = state.contributions_entity
+    contributions_entity = state.contributions_entity
     max_rows = state.max_rows
     # initial_product = state.initial_product
     # product = state.product
@@ -174,9 +174,16 @@ def analysis_server(
 
     @reactive.calc
     def button_enabled():
-        at_least_one_column = bool(weights())
-        no_errors = not any(analysis_errors().values())
-        return at_least_one_column and no_errors
+        active_columns = weights().keys()
+        at_least_one_active_column = bool(active_columns)
+        # Just like the others, the analysis_errors() dict is not cleared
+        # when a column is removed, so we need to compare against weights.
+        no_errors = not any(
+            is_error
+            for column, is_error in analysis_errors().items()
+            if column in active_columns
+        )
+        return at_least_one_active_column and no_errors
 
     @reactive.effect
     def _update_columns():
@@ -350,6 +357,7 @@ def analysis_server(
                 public_csv_path=public_csv_path(),
                 name=column_ids_to_names[column_id],
                 contributions=contributions,
+                contributions_entity=contributions_entity,
                 epsilon=epsilon,
                 row_count=int(input.row_count()),
                 groups=groups,
