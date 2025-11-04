@@ -21,22 +21,7 @@ def read_csv_names(csv_path: Path) -> list[ColumnName]:
 def read_csv_numeric_names(csv_path: Path) -> list[ColumnName]:  # pragma: no cover
     lf = pl.scan_csv(csv_path)
     numeric_names = [
-        name
-        for name, pl_type in lf.collect_schema().items()
-        if pl_type
-        in [
-            pl.Int8,
-            pl.Int16,
-            pl.Int32,
-            pl.Int64,
-            pl.Int128,
-            pl.Float32,
-            pl.Float64,
-            pl.UInt8,
-            pl.UInt16,
-            pl.UInt32,
-            pl.UInt64,
-        ]
+        name for name, pl_type in lf.collect_schema().items() if pl_type.is_numeric()
     ]
     # Exclude columns missing names:
     return [ColumnName(name) for name in numeric_names if name.strip() != ""]
