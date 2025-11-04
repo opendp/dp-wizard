@@ -1,4 +1,3 @@
-import re
 from pathlib import Path
 
 import nbformat
@@ -8,6 +7,7 @@ from shiny.pytest import create_app_fixture
 from shiny.run import ShinyAppProc
 
 from dp_wizard import package_root
+from dp_wizard.shiny.panels.results_panel import download_options
 from dp_wizard.utils.code_generators.notebook_generator import PLACEHOLDER_CSV_NAME
 
 bp = "BREAKPOINT()".lower()
@@ -30,13 +30,21 @@ def test_cloud_app(page: Page, cloud_app: ShinyAppProc):  # pragma: no cover
     page.locator("#max_rows").fill("10000")
     expect(page).to_have_title("DP Wizard")
     expect(page.get_by_text("Choose Public CSV")).not_to_be_visible()
-    page.get_by_label("CSV Column Names").fill("a_column")
+    page.get_by_label("CSV Column Names").fill("a_column\nb_column")
 
     page.get_by_role("button", name="Define Analysis").click()
     page.locator(".selectize-input").nth(0).click()
     page.get_by_text("1: a_column").click()
     page.get_by_label("Lower").fill("0")
     page.get_by_label("Upper").fill("10")
+
+    expect(
+        page.get_by_text("Select one or more columns before proceeding.")
+    ).not_to_be_visible()
+    page.locator(".selectize-input").nth(0).click()
+    page.get_by_text("2: b_column").click()
+    page.get_by_text("Select one or more columns before proceeding.")
+    page.get_by_text("2: b_column×").click()
 
     page.get_by_role("button", name="Download Results").click()
     with page.expect_download() as download_info:
@@ -251,12 +259,6 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     # Right now, the significant test start-up costs mean
     # it doesn't make sense to parameterize this test,
     # but that could change.
-    matches = [
-        re.search(r'button\("([^"]+)", "([^"]+)"', line)
-        for line in (package_root / "shiny/panels/results_panel/__init__.py")
-        .read_text()
-        .splitlines()
-    ]
 
     # Expand all accordions:
     page.get_by_text("Reports", exact=True).click()
@@ -265,18 +267,14 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
 
     expected_stem = "dp_statistics_for_grade_grouped_by_class_year"
 
-    for match in matches:
-        if not match:
-            continue
-        name = match.group(1)
-        ext = match.group(2)
-        link_text = f"Download {name} ({ext})"
+    for option in download_options.values():
+        link_text = f"Download {option.name} ({option.ext})"
         with page.expect_download() as download_info:
             page.get_by_text(link_text).click()
 
         download_name = download_info.value.suggested_filename
         assert download_name.startswith(expected_stem)
-        assert download_name.endswith(ext)
+        assert download_name.endswith(option.ext)
 
         download_path = download_info.value.path()
         content = download_path.read_bytes()
@@ -290,18 +288,14 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     expect(stem_locator).to_have_value(new_stem)
 
     new_clean_stem = "-C1ean-me-"
-    for match in matches:
-        if not match:
-            continue
-        name = match.group(1)
-        ext = match.group(2)
-        link_text = f"Download {name} ({ext})"
+    for option in download_options.values():
+        link_text = f"Download {option.name} ({option.ext})"
         with page.expect_download() as download_info:
             page.get_by_text(link_text).click()
 
         download_name = download_info.value.suggested_filename
         assert download_name.startswith(new_clean_stem)
-        assert download_name.endswith(ext)
+        assert download_name.endswith(option.ext)
 
     # -- Define Analysis --
     page.get_by_role("tab", name="Define Analysis").click()
