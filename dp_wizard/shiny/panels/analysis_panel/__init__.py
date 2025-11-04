@@ -39,7 +39,7 @@ def analysis_ui():
         ui.layout_columns(
             ui.card(
                 ui.card_header(columns_icon, "Columns"),
-                ui.markdown("Select columns to calculate statistics on."),
+                ui.markdown("Select numeric columns to calculate statistics on."),
                 ui.input_selectize(
                     "columns_selectize",
                     "Columns",
@@ -155,7 +155,8 @@ def analysis_server(
     # product = state.product
 
     # Analysis choices:
-    column_names = state.column_names
+    all_column_names = state.all_column_names
+    numeric_column_names = state.numeric_column_names
     groups = state.groups
     epsilon = state.epsilon
 
@@ -186,20 +187,27 @@ def analysis_server(
 
     @reactive.effect
     def _update_columns():
-        csv_ids_labels = {
+        all_ids_labels = {
             # Cast to string for type checking.
-            str(k): v
-            for k, v in csv_ids_labels_calc().items()
+            str(col_id): label
+            for col_id, label in csv_ids_labels_calc().items()
         }
         ui.update_selectize(
             "groups_selectize",
             label=None,
-            choices=csv_ids_labels,
+            choices=all_ids_labels,
         )
+
+        numeric_column_ids = id_names_dict_from_names(numeric_column_names()).keys()
+        numeric_ids_labels = {
+            col_id: label
+            for col_id, label in all_ids_labels.items()
+            if col_id in numeric_column_ids
+        }
         ui.update_selectize(
             "columns_selectize",
             label=None,
-            choices=csv_ids_labels,
+            choices=numeric_ids_labels,
         )
 
     @reactive.effect
@@ -212,7 +220,7 @@ def analysis_server(
     @render.ui
     def analysis_requirements_warning_ui():
         return hide_if(
-            bool(column_names()),
+            bool(all_column_names()),
             info_md_box(
                 """
                 Please select your dataset on the previous tab
@@ -367,11 +375,11 @@ def analysis_server(
 
     @reactive.calc
     def csv_ids_names_calc():
-        return id_names_dict_from_names(column_names())
+        return id_names_dict_from_names(all_column_names())
 
     @reactive.calc
     def csv_ids_labels_calc():
-        return id_labels_dict_from_names(column_names())
+        return id_labels_dict_from_names(all_column_names())
 
     @reactive.effect
     @reactive.event(input.log_epsilon_slider)

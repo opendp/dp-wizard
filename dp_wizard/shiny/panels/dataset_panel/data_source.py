@@ -45,7 +45,7 @@ def csv_or_columns_ui(
                 """,
                 responsive=False,
             ),
-            ui.input_text_area("column_names", "CSV Column Names", rows=5),
+            ui.input_text_area("all_column_names", "CSV Column Names", rows=5),
         ]
     else:
         content = [
