@@ -347,17 +347,20 @@ def column_server(
     def optional_weight_ui():
         return hide_if(
             is_single_column,
-            ui.input_select(
-                "weight",
-                ["Weight", ui.output_ui("weight_tutorial_ui")],
-                choices={
-                    "1": "Less accurate",
-                    default_weight: "Default",
-                    "4": "More accurate",
-                },
-                selected=default_weight,
-                width=label_width,
-            ),
+            [
+                ui.input_select(
+                    "weight",
+                    "Weight",
+                    choices={
+                        "1": "Less accurate",
+                        default_weight: "Default",
+                        "4": "More accurate",
+                    },
+                    selected=default_weight,
+                    width=label_width,
+                ),
+                ui.output_ui("weight_tutorial_ui"),
+            ],
         )
 
     @render.ui
@@ -369,6 +372,7 @@ def column_server(
             how to allocate it. For simplicity, we limit the options here,
             but when using the library you can fine tune this.
             """,
+            responsive=False,
         )
 
     @reactive.calc
