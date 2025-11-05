@@ -210,17 +210,15 @@ def browser_context_args(browser_context_args):
 def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no cover
 
     def screenshot(page, name):
-        # Keep the screenshot generation fast
-        # by limitting it to just one test.
         from os import environ
         from time import sleep
 
         from PIL import Image
 
         if environ.get("SCREENSHOTS"):
-            sleep(1)  # UI updates can be a little slow.
+            sleep(1)  # Might not be fully updated initially.
             path = package_root.parent / f"docs/screenshots/{name}.png"
-            page.screenshot(path=path)
+            page.screenshot(path=path, full_page=True)
 
             img = Image.open(path)
             img = img.quantize(colors=16)

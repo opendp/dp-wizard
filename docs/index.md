@@ -365,15 +365,15 @@ A sample from [`registry.opendp.org`](https://registry.opendp.org/deployments-re
 
 ## DP Wizard preview: Select Dataset
 
-![Select Dataset screenshot](screenshots/select-dataset.png)
+![](screenshots/select-dataset.png)
 
 ## DP Wizard preview: Define Analysis
 
-![Define Analysis screenshot](screenshots/define-analysis.png)
+![](screenshots/define-analysis.png)
 
 ## DP Wizard preview: Download Results
 
-![Download Results screenshot](screenshots/download-results.png)
+![](screenshots/download-results.png)
 
 ## Return to the class grades example ✋
 
