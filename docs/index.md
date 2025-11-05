@@ -18,14 +18,15 @@ These slides: `https://opendp.github.io/dp-wizard`
 </td>
 <td>
 
-<!-- - Who should care about privacy? (and a bio) -->
-- Class grades problem
-- Let's do differential privacy! ✋
-- Interpretation of DP results ✋
-- Privacy budgets and epsilon ✋
-- DP Wizard live demo ✋
-- Walk through OpenDP notebook
-- Wider view
+<!-- Linking by ID overrides the slideshow JS, but only works in a new window. -->
+
+- <a target="_blank" href="#class-grades-problem">Class grades problem</a>
+- <a target="_blank" href="#lets-do-differential-privacy">Let's do differential privacy! ✋</a>
+- <a target="_blank" href="#what-does-this-mean-1">Interpretation of DP results ✋</a>
+- <a target="_blank" href="#privacy-budgets-and-epsilon">Privacy budgets and epsilon ✋</a>
+- <a target="_blank" href="#dp-wizard-preview-select-dataset">DP Wizard demo ✋</a>
+- <a target="_blank" href="#introduction-to-the-opendp-library">Walk through OpenDP notebook</a>
+- <a target="_blank" href="#what-else-can-we-do-with-dp">Wider view</a>
 
 </td>
 </tr>
@@ -654,10 +655,10 @@ If we try to run more queries at this point, it will error. Once the privacy bud
 
 ### With OpenDP
 
-- Quantiles ([documentation](https://docs.opendp.org/en/stable/api/user-guide/transformations/aggregation-quantile.html))
-- PCA ([documentation](https://docs.opendp.org/en/stable/getting-started/statistical-modeling/pca.html))
-- RAPPOR ([documentation](https://docs.opendp.org/en/stable/api/python/opendp.measurements.html#opendp.measurements.make_randomized_response_bitvec))
-- Linear regression ([tutorial example](https://docs.opendp.org/en/stable/getting-started/statistical-modeling/regression.html#Linear-Regression))
+- ([Quantiles](https://docs.opendp.org/en/stable/api/user-guide/transformations/aggregation-quantile.html))
+- ([PCA](https://docs.opendp.org/en/stable/getting-started/statistical-modeling/pca.html))
+- ([RAPPOR](https://docs.opendp.org/en/stable/api/python/opendp.measurements.html#opendp.measurements.make_randomized_response_bitvec))
+- ([Linear regression](https://docs.opendp.org/en/stable/api/python/opendp.extras.sklearn.linear_model.html))
 
 </td>
 <td>

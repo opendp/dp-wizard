@@ -234,6 +234,9 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     # For more compact screenshots:
     page.evaluate("document.body.style.zoom=0.66")
 
+    # Turn off tutorial:
+    page.locator("#tutorial_mode").click()
+
     page.locator("#max_rows").fill("10000")
     expect(page.get_by_text(dataset_release_warning)).not_to_be_visible()
     page.get_by_role("tab", name="Define Analysis").click()
@@ -269,6 +272,7 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
 
     # -- Download Results --
     page.get_by_role("button", name="Download Results").click()
+    page.locator("#custom_download_note").fill("Describe your dataset here.")
     screenshot(page, "download-results")
 
     # Right now, the significant test start-up costs mean
