@@ -63,6 +63,19 @@ visualizations will be made with the public data, but the release will
 be made with private data.
 ```
 
+## Screenshots
+
+(Run `scripts/screenshots.sh` to regenerate these screenshots.)
+
+Select Dataset:
+![Screenshot with a "Data Source" panel on the left, and "Unit of Privacy" and "Product" on the right.](docs/screenshots/select-dataset.png)
+
+Define Analysis:
+![Screenshot with four panels: "Columns", "Grouping", "Privacy Budget", and "Simulation".](docs/screenshots/define-analysis.png)
+
+Download Results:
+![Screenshot with buttons and links for downloads.](docs/screenshots/download-results.png)
+
 ## Contributions
 
 There are several ways to contribute. First, if you find DP Wizard useful, please [let us know](mailto:info@opendp.org) and we'll spend more time on this project. If DP Wizard doesn't work for you, we also want to know that! Please [file an issue](https://github.com/opendp/dp-wizard/issues/new/choose) and we'll look into it.
