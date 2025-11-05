@@ -330,10 +330,7 @@ def column_server(
 
         return ui.layout_columns(
             inputs,
-            [
-                ui.output_ui("bounds_tutorial_ui"),
-                ui.output_ui(f"{analysis_name.lower()}_preview_ui"),
-            ],
+            ui.output_ui(f"{analysis_name.lower()}_preview_ui"),
             col_widths=col_widths,  # type: ignore
         )
 

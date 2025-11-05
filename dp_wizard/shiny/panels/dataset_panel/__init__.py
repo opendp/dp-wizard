@@ -20,7 +20,11 @@ from dp_wizard.shiny.components.outputs import (
 from dp_wizard.shiny.panels.dataset_panel import data_source
 from dp_wizard.types import AppState, Product
 from dp_wizard.utils.code_generators import make_privacy_unit_block
-from dp_wizard.utils.csv_helper import get_csv_names_mismatch, read_csv_names
+from dp_wizard.utils.csv_helper import (
+    get_csv_names_mismatch,
+    read_csv_names,
+    read_csv_numeric_names,
+)
 
 dataset_panel_id = "dataset_panel"
 
@@ -121,7 +125,8 @@ def dataset_server(
     product = state.product
 
     # Analysis choices:
-    column_names = state.column_names
+    all_column_names = state.all_column_names
+    numeric_column_names = state.numeric_column_names
     # groups = state.groups
     # epsilon = state.epsilon
 
@@ -142,25 +147,27 @@ def dataset_server(
     def _on_public_csv_path_change():
         path = input.public_csv_path()[0]["datapath"]
         public_csv_path.set(path)
-        column_names.set(read_csv_names(Path(path)))
+        all_column_names.set(read_csv_names(Path(path)))
+        numeric_column_names.set(read_csv_numeric_names(Path(path)))
 
     @reactive.effect
     @reactive.event(input.private_csv_path)
     def _on_private_csv_path_change():
         path = input.private_csv_path()[0]["datapath"]
         private_csv_path.set(path)
-        column_names.set(read_csv_names(Path(path)))
+        all_column_names.set(read_csv_names(Path(path)))
+        numeric_column_names.set(read_csv_numeric_names(Path(path)))
 
     @reactive.effect
-    @reactive.event(input.column_names)
+    @reactive.event(input.all_column_names)
     def _on_column_names_change():
-        column_names.set(
-            [
-                clean
-                for line in input.column_names().splitlines()
-                if (clean := line.strip())
-            ]
-        )
+        column_names = [
+            clean
+            for line in input.all_column_names().splitlines()
+            if (clean := line.strip())
+        ]
+        all_column_names.set(column_names)
+        numeric_column_names.set(column_names)
 
     @reactive.calc
     def csv_column_mismatch_calc() -> Optional[tuple[set, set]]:
@@ -330,7 +337,7 @@ def dataset_server(
         return (
             contributions_valid()
             and not get_row_count_errors(max_rows())
-            and len(column_names()) > 0
+            and len(all_column_names()) > 0
             and (in_cloud or not csv_column_mismatch_calc())
         )
 

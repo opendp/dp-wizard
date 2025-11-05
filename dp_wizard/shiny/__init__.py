@@ -16,7 +16,7 @@ from dp_wizard.shiny.panels import (
 from dp_wizard.types import AppState, Product
 from dp_wizard.utils import config
 from dp_wizard.utils.argparse_helpers import CLIInfo
-from dp_wizard.utils.csv_helper import read_csv_names
+from dp_wizard.utils.csv_helper import read_csv_names, read_csv_numeric_names
 
 _shiny_root = package_root / "shiny"
 _assets_root = _shiny_root / "assets"
@@ -160,10 +160,14 @@ def _make_server(cli_info: CLIInfo):
             initial_private_csv_path = package_root / ".local-config/sample.csv"
             _make_sample_csv(initial_private_csv_path, initial_contributions)
             initial_column_names = read_csv_names(Path(initial_private_csv_path))
+            initial_numeric_column_names = read_csv_numeric_names(
+                Path(initial_private_csv_path)
+            )
         else:
             initial_contributions = 1
             initial_private_csv_path = ""
             initial_column_names = []
+            initial_numeric_column_names = []
 
         initial_product = Product.STATISTICS
 
@@ -185,7 +189,8 @@ def _make_server(cli_info: CLIInfo):
             initial_product=initial_product,
             product=reactive.value(initial_product),
             # Analysis choices:
-            column_names=reactive.value(initial_column_names),
+            all_column_names=reactive.value(initial_column_names),
+            numeric_column_names=reactive.value(initial_numeric_column_names),
             groups=reactive.value([]),
             epsilon=reactive.value(1.0),
             # Per-column choices:
