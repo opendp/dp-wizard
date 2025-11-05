@@ -24,7 +24,7 @@ _download_options = {
             "README",
             ".txt",
             "file",
-            "A short description of the analysis, and a list of contents.",
+            "A short description of the analysis, and a table of contents.",
         ),
         DownloadOption(
             "Package",
@@ -105,7 +105,7 @@ _download_options = {
 def table_of_contents_md():
     """
     >>> print(table_of_contents_md())
-    - README (.txt): A short description of the analysis, and a list of contents.
+    - README (.txt): A short description of the analysis, and a table of contents.
     ...
     - Table (.csv): The same information, but condensed into a CSV.
     """
