@@ -238,6 +238,7 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     # TODO: Right now the test instance is using the local installation's config,
     # so the tutorial mode might be on or off. Would be better if tests and
     # local installation were isolated.
+    # https://github.com/opendp/dp-wizard/issues/717
     try:
         expect(page.get_by_text("DP Wizard makes it easier")).not_to_be_visible()
     except AssertionError:
@@ -279,6 +280,7 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     # -- Download Results --
     page.get_by_role("button", name="Download Results").click()
     # TODO: Replace custom note, so the screen shot is stable.
+    # https://github.com/opendp/dp-wizard/issues/717
     screenshot(page, "download-results")
 
     # Right now, the significant test start-up costs mean
