@@ -16,7 +16,7 @@ class Product(Enum):
         {'1': 'DP Statistics', '2': 'DP Synthetic Data'}
         """
         return {
-            str(member.value): str(member) for (name, member) in cls.__members__.items()
+            str(member.value): str(member) for (_, member) in cls.__members__.items()
         }
 
     def __str__(self) -> str:
@@ -58,7 +58,7 @@ class ColumnId(str):
     >>> assert re.match(r'^[_0-9]+$', ColumnId('xyz'))
     """
 
-    def __new__(cls, content):
+    def __new__(cls, content: str):
         id = str(hash(content)).replace("-", "_")
         return str.__new__(cls, id)
 
@@ -71,7 +71,7 @@ class ColumnIdentifier(str):
     'does_this_work_'
     """
 
-    def __new__(cls, content):
+    def __new__(cls, content: str):
         identifier = re.sub(r"\W+", "_", content).lower()
         return str.__new__(cls, identifier)
 
@@ -98,7 +98,8 @@ class AppState:
     product: reactive.Value[Product]
 
     # Analysis choices:
-    column_names: reactive.Value[list[ColumnName]]
+    all_column_names: reactive.Value[list[ColumnName]]
+    numeric_column_names: reactive.Value[list[ColumnName]]
     groups: reactive.Value[list[ColumnName]]
     epsilon: reactive.Value[float]
 

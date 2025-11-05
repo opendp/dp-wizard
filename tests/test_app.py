@@ -8,7 +8,7 @@ from shiny.pytest import create_app_fixture
 from shiny.run import ShinyAppProc
 
 from dp_wizard import package_root
-from dp_wizard.shiny.panels.results_panel import download_options
+from dp_wizard.shiny.panels.results_panel.download_options import _download_options
 from dp_wizard.utils.code_generators.notebook_generator import PLACEHOLDER_CSV_NAME
 
 bp = "BREAKPOINT()".lower()
@@ -31,7 +31,7 @@ def test_cloud_app(page: Page, cloud_app: ShinyAppProc):  # pragma: no cover
     page.locator("#max_rows").fill("10000")
     expect(page).to_have_title("DP Wizard")
     expect(page.get_by_text("Choose Public CSV")).not_to_be_visible()
-    page.get_by_label("CSV Column Names").fill("a_column")
+    page.get_by_label("CSV Column Names").fill("a_column\nb_column")
 
     page.get_by_role("button", name="Define Analysis").click()
     page.locator(".selectize-input").nth(0).click()
@@ -39,9 +39,17 @@ def test_cloud_app(page: Page, cloud_app: ShinyAppProc):  # pragma: no cover
     page.get_by_label("Lower").fill("0")
     page.get_by_label("Upper").fill("10")
 
+    expect(
+        page.get_by_text("Select one or more columns before proceeding.")
+    ).not_to_be_visible()
+    page.locator(".selectize-input").nth(0).click()
+    page.get_by_text("2: b_column").click()
+    page.get_by_text("Select one or more columns before proceeding.")
+    page.get_by_text("2: b_column×").click()
+
     page.get_by_role("button", name="Download Results").click()
     with page.expect_download() as download_info:
-        page.get_by_role("link", name="Download Notebook (unexecuted").click()
+        page.get_by_role("link", name="Notebook (unexecuted").click()
 
     download_path = download_info.value.path()
 
@@ -67,13 +75,13 @@ def test_qa_app(page: Page, qa_app: ShinyAppProc):  # pragma: no cover
     page.get_by_label("Upper").fill("10")
 
     page.get_by_role("button", name="Download Results").click()
-    page.get_by_role("link", name="Download Notebook (.ipynb)").click()
+    page.get_by_role("link", name="Notebook (.ipynb)").click()
     expect(page.get_by_text('raise Exception("qa_mode!")')).to_be_visible()
 
 
 def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: no cover
     pick_dataset_text = "How many rows of the CSV"
-    perform_analysis_text = "Select columns to calculate statistics on"
+    perform_analysis_text = "Select numeric columns to calculate statistics on"
     download_results_text = "You can now make a differentially private release"
 
     # -- Select Dataset --
@@ -269,21 +277,18 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     # it doesn't make sense to parameterize this test,
     # but that could change.
 
-    # Expand all accordions:
-    page.get_by_text("Reports", exact=True).click()
-    page.get_by_text("Unexecuted Notebooks", exact=True).click()
-    page.get_by_text("Scripts", exact=True).click()
-
     expected_stem = "dp_statistics_for_grade_grouped_by_class_year"
 
-    for option in download_options.values():
-        link_text = f"Download {option.name} ({option.ext})"
+    for option in _download_options.values():
+        link_text = f"{option.name} ({option.ext})"
         with page.expect_download() as download_info:
-            page.get_by_text(link_text).click()
+            # .first because the script link is included in both columns.
+            page.get_by_text(link_text).first.click()
 
         download_name = download_info.value.suggested_filename
-        assert download_name.startswith(expected_stem)
         assert download_name.endswith(option.ext)
+        if not download_name.startswith("README"):
+            assert download_name.startswith(expected_stem)
 
         download_path = download_info.value.path()
         content = download_path.read_bytes()
@@ -297,14 +302,16 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     expect(stem_locator).to_have_value(new_stem)
 
     new_clean_stem = "-C1ean-me-"
-    for option in download_options.values():
-        link_text = f"Download {option.name} ({option.ext})"
+    for option in _download_options.values():
+        link_text = f"{option.name} ({option.ext})"
         with page.expect_download() as download_info:
-            page.get_by_text(link_text).click()
+            # .first because the script link is included in both columns.
+            page.get_by_text(link_text).first.click()
 
         download_name = download_info.value.suggested_filename
-        assert download_name.startswith(new_clean_stem)
         assert download_name.endswith(option.ext)
+        if not download_name.startswith("README"):
+            assert download_name.startswith(new_clean_stem)
 
     # -- Define Analysis --
     page.get_by_role("tab", name="Define Analysis").click()

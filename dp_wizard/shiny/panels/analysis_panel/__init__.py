@@ -39,7 +39,7 @@ def analysis_ui():
         ui.layout_columns(
             ui.card(
                 ui.card_header(columns_icon, "Columns"),
-                ui.markdown("Select columns to calculate statistics on."),
+                ui.markdown("Select numeric columns to calculate statistics on."),
                 ui.input_selectize(
                     "columns_selectize",
                     "Columns",
@@ -149,13 +149,14 @@ def analysis_server(
     # initial_public_csv_path = state.initial_private_csv_path
     public_csv_path = state.public_csv_path
     contributions = state.contributions
-    # contributions_entity = state.contributions_entity
+    contributions_entity = state.contributions_entity
     max_rows = state.max_rows
     # initial_product = state.initial_product
     # product = state.product
 
     # Analysis choices:
-    column_names = state.column_names
+    all_column_names = state.all_column_names
+    numeric_column_names = state.numeric_column_names
     groups = state.groups
     epsilon = state.epsilon
 
@@ -173,26 +174,40 @@ def analysis_server(
 
     @reactive.calc
     def button_enabled():
-        at_least_one_column = bool(weights())
-        no_errors = not any(analysis_errors().values())
-        return at_least_one_column and no_errors
+        active_columns = weights().keys()
+        at_least_one_active_column = bool(active_columns)
+        # Just like the others, the analysis_errors() dict is not cleared
+        # when a column is removed, so we need to compare against weights.
+        no_errors = not any(
+            is_error
+            for column, is_error in analysis_errors().items()
+            if column in active_columns
+        )
+        return at_least_one_active_column and no_errors
 
     @reactive.effect
     def _update_columns():
-        csv_ids_labels = {
+        all_ids_labels = {
             # Cast to string for type checking.
-            str(k): v
-            for k, v in csv_ids_labels_calc().items()
+            str(col_id): label
+            for col_id, label in csv_ids_labels_calc().items()
         }
         ui.update_selectize(
             "groups_selectize",
             label=None,
-            choices=csv_ids_labels,
+            choices=all_ids_labels,
         )
+
+        numeric_column_ids = id_names_dict_from_names(numeric_column_names()).keys()
+        numeric_ids_labels = {
+            col_id: label
+            for col_id, label in all_ids_labels.items()
+            if col_id in numeric_column_ids
+        }
         ui.update_selectize(
             "columns_selectize",
             label=None,
-            choices=csv_ids_labels,
+            choices=numeric_ids_labels,
         )
 
     @reactive.effect
@@ -205,7 +220,7 @@ def analysis_server(
     @render.ui
     def analysis_requirements_warning_ui():
         return hide_if(
-            bool(column_names()),
+            bool(all_column_names()),
             info_md_box(
                 """
                 Please select your dataset on the previous tab
@@ -342,6 +357,7 @@ def analysis_server(
                 public_csv_path=public_csv_path(),
                 name=column_ids_to_names[column_id],
                 contributions=contributions,
+                contributions_entity=contributions_entity,
                 epsilon=epsilon,
                 row_count=int(input.row_count()),
                 groups=groups,
@@ -359,11 +375,11 @@ def analysis_server(
 
     @reactive.calc
     def csv_ids_names_calc():
-        return id_names_dict_from_names(column_names())
+        return id_names_dict_from_names(all_column_names())
 
     @reactive.calc
     def csv_ids_labels_calc():
-        return id_labels_dict_from_names(column_names())
+        return id_labels_dict_from_names(all_column_names())
 
     @reactive.effect
     @reactive.event(input.log_epsilon_slider)
