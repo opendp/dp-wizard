@@ -7,7 +7,6 @@ from dp_wizard_templates.converters import (
     convert_nb_to_html,
     convert_py_to_nb,
 )
-from faicons import icon_svg
 from shiny import Inputs, Outputs, Session, reactive, render, types, ui
 
 from dp_wizard import package_root
@@ -104,7 +103,7 @@ def results_server(
     product = state.product
 
     # Analysis choices:
-    # all_column_names = state.all_column_names
+    all_column_names = state.all_column_names
     # numeric_column_names = state.numeric_column_names
     groups = state.groups
     epsilon = state.epsilon
@@ -215,9 +214,7 @@ def results_server(
                     ui.br(),
                     "Contains:",
                     ui.tags.ul(
-                        ui.tags.li(
-                            icon_svg("file", margin_right="0.5em"), "README (.txt)"
-                        ),
+                        ui.tags.li(download_link("README", disabled=disabled)),
                         ui.tags.li(download_link("Notebook", disabled=disabled)),
                         ui.tags.li(download_link("HTML", disabled=disabled)),
                         ui.tags.li(download_link("Script", disabled=disabled)),
@@ -249,7 +246,7 @@ def results_server(
                 ),
                 responsive=False,
             ),
-            download_button("Notebook (unexecuted)", cloud=in_cloud, disabled=disabled),
+            download_button("Notebook (unexecuted)", disabled=disabled),
             download_button("HTML (unexecuted)", disabled=disabled),
             download_button("Script", disabled=disabled),
             download_button("Notebook Source", disabled=disabled),
@@ -297,12 +294,8 @@ def results_server(
             zip_root_dir.mkdir()
 
             stem = input.custom_download_stem()
-            note = input.custom_download_note()
 
-            toc = table_of_contents_md()
-            readme = f"# {analysis_plan()}\n\n{note}\n\nContains:\n\n{toc}"
-
-            (zip_root_dir / "README.txt").write_text(readme)
+            (zip_root_dir / "README.txt").write_text(readme_txt())
             (zip_root_dir / f"{stem}.ipynb").write_text(notebook_nb())
             (zip_root_dir / f"{stem}.html").write_text(notebook_html())
             (zip_root_dir / f"{stem}.py").write_text(script_py())
@@ -321,6 +314,13 @@ def results_server(
                 root_dir=zip_root_dir,
             )
             return Path(f"{base_name}.{ext}").read_bytes()
+
+    @reactive.calc
+    def readme_txt():
+        note = input.custom_download_note()
+        toc = table_of_contents_md()
+        columns = f"Original CSV columns: {', '.join(all_column_names())}"
+        return "\n\n".join([f"# {analysis_plan()}", note, "Contains:", toc, columns])
 
     @reactive.calc
     def notebook_py():
@@ -384,7 +384,7 @@ def results_server(
     # Function names need to match the id constructed by button(),
     # based on the cleaned-up name parameter.
 
-    def download(ext: str):
+    def download(ext: str, stem: str | None = None):
         """
         Rather than dealing with @render.download() directly,
         this decorator derives MIME type from the
@@ -404,7 +404,11 @@ def results_server(
 
         def inner(func):
             wrapped = render.download(
-                filename=lambda: clean_download_stem() + ext,
+                filename=lambda: (
+                    f"{stem}{ext}"
+                    if stem is not None
+                    else (clean_download_stem() + ext)
+                ),
                 media_type=mime,
             )(func)
             return wrapped
@@ -414,6 +418,10 @@ def results_server(
     @download(".zip")
     async def download_package_button():
         yield _make_download_or_modal_error(package_zip)
+
+    @download(".txt", stem="README")
+    async def download_readme_link():
+        yield _make_download_or_modal_error(readme_txt)
 
     @download(".py")
     async def download_script_link():
