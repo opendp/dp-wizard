@@ -235,7 +235,13 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     page.evaluate("document.body.style.zoom=0.66")
 
     # Turn off tutorial:
-    page.locator("#tutorial_mode").click()
+    # TODO: Right now the test instance is using the local installation's config,
+    # so the tutorial mode might be on or off. Would be better if tests and
+    # local installation were isolated.
+    try:
+        expect(page.get_by_text("DP Wizard makes it easier")).not_to_be_visible()
+    except AssertionError:
+        page.locator("#tutorial_mode").click()
 
     page.locator("#max_rows").fill("10000")
     expect(page.get_by_text(dataset_release_warning)).not_to_be_visible()
@@ -272,7 +278,7 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
 
     # -- Download Results --
     page.get_by_role("button", name="Download Results").click()
-    page.locator("#custom_download_note").fill("Describe your dataset here.")
+    # TODO: Replace custom note, so the screen shot is stable.
     screenshot(page, "download-results")
 
     # Right now, the significant test start-up costs mean
