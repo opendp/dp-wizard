@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import nbformat
+import pytest
 from nbconvert.preprocessors import ExecutePreprocessor
 from playwright.sync_api import Page, expect
 from shiny.pytest import create_app_fixture
@@ -194,18 +195,28 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     # to run tests in parallel.
 
 
+@pytest.fixture(scope="session")
+def browser_context_args(browser_context_args):
+    # Resize browser narrower than default for screenshots.
+    return {
+        **browser_context_args,
+        "viewport": {
+            "width": 900,
+            "height": 600,
+        },
+    }
+
+
 def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no cover
 
     def screenshot(page, name):
-        # Keep the screenshot generation fast
-        # by limitting it to just one test.
         from os import environ
         from time import sleep
 
         from PIL import Image
 
         if environ.get("SCREENSHOTS"):
-            sleep(1)  # UI updates can be a little slow.
+            sleep(1)  # Might not be fully updated initially.
             path = package_root.parent / f"docs/screenshots/{name}.png"
             page.screenshot(path=path, full_page=True)
 
@@ -219,6 +230,20 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     results_requirements_warning = "define your analysis on the previous tab"
 
     page.goto(local_app.url)
+
+    # For more compact screenshots:
+    page.evaluate("document.body.style.zoom=0.66")
+
+    # Turn off tutorial:
+    # TODO: Right now the test instance is using the local installation's config,
+    # so the tutorial mode might be on or off. Would be better if tests and
+    # local installation were isolated.
+    # https://github.com/opendp/dp-wizard/issues/717
+    try:
+        expect(page.get_by_text("DP Wizard makes it easier")).not_to_be_visible()
+    except AssertionError:
+        page.locator("#tutorial_mode").click()
+
     page.locator("#max_rows").fill("10000")
     expect(page.get_by_text(dataset_release_warning)).not_to_be_visible()
     page.get_by_role("tab", name="Define Analysis").click()
@@ -254,6 +279,8 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
 
     # -- Download Results --
     page.get_by_role("button", name="Download Results").click()
+    # TODO: Replace custom note, so the screen shot is stable.
+    # https://github.com/opendp/dp-wizard/issues/717
     screenshot(page, "download-results")
 
     # Right now, the significant test start-up costs mean
