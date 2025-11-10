@@ -315,7 +315,12 @@ def column_server(
                 width=label_width,
             )
 
-        analysis_name = input.analysis_type()
+        # Preserve the user's choices behind the scenes,
+        # but only show mean and median column UI if actually calculating stats:
+        # otherwise show the histogram UI.
+        analysis_name = (
+            input.analysis_type() if product() == Product.STATISTICS else histogram.name
+        )
 
         # Had trouble with locals() inside comprehension in Python 3.10.
         # Not sure if this is the exact issue:
