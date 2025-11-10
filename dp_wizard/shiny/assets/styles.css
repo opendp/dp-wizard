@@ -84,6 +84,13 @@ label:has(.only-for-screenreaders) {
     display: inline;
 }
 
+/* Disabled download links should look like normal text. */
+a[disabled] {
+    cursor: text;
+    text-decoration: none;
+    color: var(--bs-body-color);
+}
+
 /* Increase default margin on icons. */
 .fa {
     margin-right: 0.4em !important;
