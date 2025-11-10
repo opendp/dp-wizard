@@ -2,8 +2,11 @@
 
 [![pypi](https://img.shields.io/pypi/v/dp_wizard)](https://pypi.org/project/dp_wizard/)
 
-DP Wizard makes it easier to get started with differential privacy.
-It demonstrates how to calculate DP statistics or create a synthetic dataset from the data you provide.
+DP Wizard makes it easier to get started with differential privacy,
+the addition of calibrated noise to aggregate statistics to protect the privacy of individuals.
+DP Wizard demonstrates how to calculate DP statistics or create a synthetic dataset from the data you provide.
+
+(If differential privacy is new to you, [these slides](https://opendp.github.io/dp-wizard/) provide some background, and explain how DP Wizard works.)
 
 You can run DP Wizard locally and upload your own CSV,
 or use the [cloud deployment](https://mccalluc-dp-wizard.share.connect.posit.cloud/) and only provide column names to protect your private data.
@@ -13,6 +16,19 @@ With that information, DP Wizard provides:
 - A Jupyter notebook which demonstrates how to use the [OpenDP Library](https://docs.opendp.org/).
 - A plain Python script.
 - Text and CSV reports.
+
+## Screenshots
+
+<!-- Run `scripts/screenshots.sh` to regenerate these screenshots. -->
+
+Select Dataset:
+![Screenshot with a "Data Source" panel on the left, and "Unit of Privacy" and "Product" on the right.](https://opendp.github.io/dp-wizard/screenshots/select-dataset.png)
+
+Define Analysis:
+![Screenshot with four panels: "Columns", "Grouping", "Privacy Budget", and "Simulation".](https://opendp.github.io/dp-wizard/screenshots/define-analysis.png)
+
+Download Results:
+![Screenshot with links to download analysis results".](https://opendp.github.io/dp-wizard/screenshots/download-results.png)
 
 ## Usage
 
