@@ -1,5 +1,44 @@
 # CHANGELOG
 
+## 0.6.0
+
+Highlights:
+
+- Add slides [#687](https://github.com/opendp/dp-wizard/pull/687)
+- Download package [#683](https://github.com/opendp/dp-wizard/pull/683)
+- Allow user to supply a note [#667](https://github.com/opendp/dp-wizard/pull/667)
+
+Also includes:
+
+- For synthetic data, don't show an analysis selector [#704](https://github.com/opendp/dp-wizard/pull/704)
+- Add an "Other" entity [#711](https://github.com/opendp/dp-wizard/pull/711)
+- Fix width on input tutorial box [#714](https://github.com/opendp/dp-wizard/pull/714)
+- List columns in readme [#691](https://github.com/opendp/dp-wizard/pull/691)
+- Download zip: tweak UI [#688](https://github.com/opendp/dp-wizard/pull/688)
+- small message fixes in top of pane summary [#705](https://github.com/opendp/dp-wizard/pull/705)
+- Limit column selection to numerics [#697](https://github.com/opendp/dp-wizard/pull/697)
+- Start strict type checking [#669](https://github.com/opendp/dp-wizard/pull/669)
+- Split out data source ui functions [#690](https://github.com/opendp/dp-wizard/pull/690)
+- contributions entity in plot [#693](https://github.com/opendp/dp-wizard/pull/693)
+- Fix validation message bug [#700](https://github.com/opendp/dp-wizard/pull/700)
+- upgrade starlette [#699](https://github.com/opendp/dp-wizard/pull/699)
+- Clean up files before running tests locally [#698](https://github.com/opendp/dp-wizard/pull/698)
+- Readme reorganization [#679](https://github.com/opendp/dp-wizard/pull/679)
+- upgrade dp-wizard-templates [#665](https://github.com/opendp/dp-wizard/pull/665)
+- Cleanup tmp directory [#680](https://github.com/opendp/dp-wizard/pull/680)
+- Cleanup download code [#671](https://github.com/opendp/dp-wizard/pull/671)
+- Summary of previous choices at top of page [#664](https://github.com/opendp/dp-wizard/pull/664)
+- do not mention "delta" [#662](https://github.com/opendp/dp-wizard/pull/662)
+- Check precommits in CI [#479](https://github.com/opendp/dp-wizard/pull/479)
+- Icons in panel titles [#663](https://github.com/opendp/dp-wizard/pull/663)
+- stub index.html for gh pages [#677](https://github.com/opendp/dp-wizard/pull/677)
+- Add screenshots to README [#481](https://github.com/opendp/dp-wizard/pull/481)
+- warnings for large or small epsilon [#655](https://github.com/opendp/dp-wizard/pull/655)
+- Rearrange UI component files [#660](https://github.com/opendp/dp-wizard/pull/660)
+- fix capitalization [#653](https://github.com/opendp/dp-wizard/pull/653)
+- https URL for registry [#654](https://github.com/opendp/dp-wizard/pull/654)
+- Black should be an explicit dev dependency [#652](https://github.com/opendp/dp-wizard/pull/652)
+
 ## 0.5.1
 
 Highlights:
