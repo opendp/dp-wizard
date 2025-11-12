@@ -27,6 +27,7 @@ from dp_wizard.utils.csv_helper import (
 )
 
 dataset_panel_id = "dataset_panel"
+OTHER = "Other"
 
 
 def get_pos_int_error(number_str, minimum=100) -> str | None:
@@ -254,6 +255,11 @@ def dataset_server(
             In that case, you may prefer to protect your entire household
             rather than just yourself.
             """,
+        f"❓️ {OTHER}": """
+            These options cover many cases, but they are just suggestions.
+            Your choice here makes it easier to understand what information
+            is being protected, but doesn't really affect the analysis.
+            """,
     }
 
     @render.ui
@@ -283,11 +289,16 @@ def dataset_server(
     @render.ui
     def input_contributions_ui():
         entity = contributions_entity_calc()
+        entity_phrase = (
+            "each instance of this entity"
+            if entity == OTHER.lower()
+            else f"each {entity}"
+        )
 
         return [
             ui.markdown(
                 f"""
-                How many **rows** of the CSV can each {entity} contribute to?
+                How many **rows** of the CSV can {entity_phrase} contribute to?
                 This is the "unit of privacy" which will be protected.
                 """
             ),
@@ -330,7 +341,7 @@ def dataset_server(
 
     @reactive.calc
     def contributions_entity_calc() -> str:
-        return input.entity()[2:].lower()
+        return input.entity()[2:].lower().strip()
 
     @reactive.calc
     def button_enabled():
