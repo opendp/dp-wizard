@@ -152,7 +152,7 @@ def analysis_server(
     contributions_entity = state.contributions_entity
     max_rows = state.max_rows
     # initial_product = state.initial_product
-    # product = state.product
+    product = state.product
 
     # Analysis choices:
     all_column_names = state.all_column_names
@@ -354,6 +354,7 @@ def analysis_server(
         for column_id in column_ids:
             column_server(
                 column_id,
+                product=product,
                 public_csv_path=public_csv_path(),
                 name=column_ids_to_names[column_id],
                 contributions=contributions,

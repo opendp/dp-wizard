@@ -479,7 +479,7 @@ def dataset_server(
                 DP Wizard offers only a few analysis options:
 
                 - The **DP Statistics** option supports
-                  grouping, histograms, mean, median, and count.
+                  grouping, histograms, mean, and median.
                 - With **DP Synthetic Data**, your privacy budget is used
                   to infer the distributions of values within the
                   selected columns, and the correlations between columns.

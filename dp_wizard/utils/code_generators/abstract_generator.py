@@ -12,15 +12,11 @@ from dp_wizard.utils.code_generators import (
     make_privacy_loss_block,
     make_privacy_unit_block,
 )
-from dp_wizard.utils.code_generators.analyses import count, histogram
+from dp_wizard.utils.code_generators.analyses import histogram
 from dp_wizard.utils.dp_helper import confidence
 from dp_wizard.utils.shared import make_cut_points
 
 template_root = get_template_root(__file__)
-
-
-def _analysis_has_bounds(analysis) -> bool:
-    return analysis.analysis_name != count.name
 
 
 class AbstractGenerator(ABC):
@@ -297,15 +293,11 @@ reencode it as UTF8.""",
             contributions=self.analysis_plan.contributions,
             contributions_entity=self.analysis_plan.contributions_entity,
         )
-        # If there are no groups and all analyses have bounds (so we have cut points),
-        # then OpenDP requires that pure DP be used for contingency tables.
+        # If there are no groups then OpenDP requires
+        # that pure DP be used for contingency tables.
 
         privacy_loss_block = make_privacy_loss_block(
-            pure=not self.analysis_plan.groups
-            and all(
-                _analysis_has_bounds(analyses[0])
-                for analyses in self.analysis_plan.columns.values()
-            ),
+            pure=not self.analysis_plan.groups,
             epsilon=self.analysis_plan.epsilon,
             max_rows=self.analysis_plan.max_rows,
         )
@@ -388,7 +380,6 @@ reencode it as UTF8.""",
                 }
             )
             for (k, v) in self.analysis_plan.columns.items()
-            if _analysis_has_bounds(v[0])
         }
         return (
             Template(template)
