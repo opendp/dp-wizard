@@ -277,6 +277,7 @@ def results_server(
             contributions_entity=contributions_entity(),
             epsilon=epsilon(),
             max_rows=int(max_rows()),
+            count_rows=False,
             groups=groups(),
             columns=columns,
         )

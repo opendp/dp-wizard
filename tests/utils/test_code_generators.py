@@ -159,6 +159,7 @@ plans = [
         csv_path=abc_csv,
         epsilon=1,
         max_rows=100_000,
+        count_rows=False,
     )
     for product in Product
     for contributions in [1, 10]
