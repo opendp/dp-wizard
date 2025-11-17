@@ -54,18 +54,27 @@ def analysis_ui():
                     """
                     Select columns to group by, or leave empty
                     to calculate statistics across the entire dataset.
-
-                    Groups aren't applied to the previews on this page
-                    but will be used in the final release.
                     """
                 ),
                 ui.input_selectize(
                     "groups_selectize",
-                    "Group by",
+                    "Group By",
                     [],
                     multiple=True,
                 ),
                 ui.output_ui("groups_selectize_tutorial_ui"),
+                ui.markdown(
+                    """
+                    In addition to column statistics, should
+                    row counts for groups be released?
+                    """
+                ),
+                ui.input_checkbox(
+                    "row_counts_checkbox",
+                    "Count Rows",
+                    False,
+                ),
+                ui.output_ui("row_counts_checkbox_tutorial_ui"),
             ),
             ui.card(
                 ui.card_header(budget_icon, "Privacy Budget"),
@@ -267,6 +276,18 @@ def analysis_server(
             """
             With `sample.csv` you can select `class_year_str`
             to group results by class year.
+            """,
+            responsive=False,
+        )
+
+    @render.ui
+    def row_counts_checkbox_tutorial_ui():
+        return tutorial_box(
+            is_tutorial_mode(),
+            """
+            To be safe, even the number of rows in the CSV
+            and in any groups is considered private information.
+            Check this box to release DP estimates of the row count.
             """,
             responsive=False,
         )
