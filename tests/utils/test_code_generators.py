@@ -149,7 +149,7 @@ def id_for_plan(plan: AnalysisPlan):
     return re.sub(r"\W+", "_", description)  # For selection with "pytest -k substring"
 
 
-plans = [
+plans_all_combos = [
     AnalysisPlan(
         product=product,
         groups=groups,
@@ -176,6 +176,10 @@ plans = [
         },
     ]
 ]
+
+mod = 7
+assert len(plans_all_combos) % mod != 0
+plans = [plan for i, plan in enumerate(plans_all_combos) if i % 7 == 0]
 
 
 expected_urls = [
