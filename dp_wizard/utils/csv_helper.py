@@ -68,7 +68,7 @@ def make_sample_csv(path: Path, contributions: int) -> None:
     >>> from pathlib import Path
     >>> import csv
     >>> with tempfile.NamedTemporaryFile() as temp:
-    ...     _make_sample_csv(Path(temp.name), 10)
+    ...     make_sample_csv(Path(temp.name), 10)
     ...     with open(temp.name, newline="") as csv_handle:
     ...         reader = csv.DictReader(csv_handle)
     ...         reader.fieldnames
