@@ -25,7 +25,7 @@ class AnalysisPlan(NamedTuple):
     ...     contributions_entity='Family',
     ...     epsilon=2.0,
     ...     max_rows=1000,
-    ...     count_rows=False,
+    ...     counts=False,
     ...     groups=['grouping_col'],
     ...     columns={
     ...         'data_col': [AnalysisPlanColumn('Histogram', 0, 100, 10, 1)]
@@ -45,7 +45,7 @@ class AnalysisPlan(NamedTuple):
     contributions_entity: str
     epsilon: float
     max_rows: int
-    count_rows: bool
+    counts: bool
     groups: list[ColumnName]
     columns: dict[ColumnName, list[AnalysisPlanColumn]]
 

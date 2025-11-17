@@ -196,6 +196,7 @@ def column_server(
         bin_count = int(input.bins())
         weight = float(input.weight())
         weights_sum = sum(float(weight) for weight in weights().values())
+        # TODO: add 1 if counts will be calculated.
         info(f"Weight ratio for {name}: {weight}/{weights_sum}")
         if weights_sum == 0:
             # This function is triggered when column is removed;

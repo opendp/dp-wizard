@@ -192,6 +192,7 @@ def _make_server(cli_info: CLIInfo):
             all_column_names=reactive.value(initial_column_names),
             numeric_column_names=reactive.value(initial_numeric_column_names),
             groups=reactive.value([]),
+            counts=reactive.value(False),
             epsilon=reactive.value(1.0),
             # Per-column choices:
             analysis_types=reactive.value({}),

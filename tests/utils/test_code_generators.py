@@ -159,11 +159,12 @@ plans = [
         csv_path=abc_csv,
         epsilon=1,
         max_rows=100_000,
-        count_rows=False,
+        counts=counts,
     )
     for product in Product
     for contributions in [1, 10]
     for groups in [[], ["A"]]
+    for counts in [True, False]
     for columns in [
         # Single:
         {ColumnName("B"): [histogram_plan_column]},

@@ -101,6 +101,7 @@ class AppState:
     all_column_names: reactive.Value[list[ColumnName]]
     numeric_column_names: reactive.Value[list[ColumnName]]
     groups: reactive.Value[list[ColumnName]]
+    counts: reactive.Value[bool]
     epsilon: reactive.Value[float]
 
     # Per-column choices:
