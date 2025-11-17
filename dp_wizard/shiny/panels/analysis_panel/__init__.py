@@ -82,6 +82,10 @@ def analysis_ui():
                 ui.output_ui("row_counts_checkbox_tutorial_ui"),
             ),
             ui.card(
+                ui.card_header(simulation_icon, "Simulation"),
+                ui.output_ui("simulation_card_ui"),
+            ),
+            ui.card(
                 ui.card_header(budget_icon, "Privacy Budget"),
                 ui.markdown(
                     f"""
@@ -98,14 +102,10 @@ def analysis_ui():
                 ui.output_ui("epsilon_ui"),
                 ui.output_ui("privacy_loss_python_ui"),
             ),
-            ui.card(
-                ui.card_header(simulation_icon, "Simulation"),
-                ui.output_ui("simulation_card_ui"),
-            ),
             col_widths={
-                "sm": [12, 12, 12, 12],  # 4 rows
-                "md": [6, 6, 6, 6],  # 2 rows
-                "xxl": [3, 3, 3, 3],  # 1 row
+                "sm": [12, 12, 12, 12, 12],  # 5 rows
+                "md": [6, 6, 6, 6, 12],  # 3 rows
+                "xxl": [4, 4, 4, 4, 8],  # 2 row
             },
         ),
         ui.output_ui("columns_ui"),
