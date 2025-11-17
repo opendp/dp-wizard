@@ -19,10 +19,12 @@ if bp in Path(__file__).read_text():
         "#run-a-test-from-a-specific-breakpoint"
     )
 
-sample_app = create_app_fixture(package_root / "app_sample.py")
-cloud_app = create_app_fixture(package_root / "app_cloud.py")
-local_app = create_app_fixture(package_root / "app_local.py")
-qa_app = create_app_fixture(package_root / "app_qa.py")
+local_app = create_app_fixture(package_root / "app.py")
+
+test_apps = Path(__file__).parent / "apps"
+sample_app = create_app_fixture(test_apps / "app_sample.py")
+cloud_app = create_app_fixture(test_apps / "app_cloud.py")
+qa_app = create_app_fixture(test_apps / "app_qa.py")
 
 
 def test_cloud_app(page: Page, cloud_app: ShinyAppProc):  # pragma: no cover
