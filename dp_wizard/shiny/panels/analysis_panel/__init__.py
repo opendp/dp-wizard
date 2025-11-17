@@ -8,6 +8,7 @@ from dp_wizard import registry_url
 from dp_wizard.shiny.components.icons import (
     budget_icon,
     columns_icon,
+    counts_icon,
     groups_icon,
     simulation_icon,
 )
@@ -63,10 +64,14 @@ def analysis_ui():
                     multiple=True,
                 ),
                 ui.output_ui("groups_selectize_tutorial_ui"),
+            ),
+            ui.card(
+                ui.card_header(counts_icon, "Counts"),
                 ui.markdown(
                     """
                     In addition to column statistics, should
-                    row counts for groups be released?
+                    row counts for groups and for the whole CSV
+                    be released?
                     """
                 ),
                 ui.input_checkbox(

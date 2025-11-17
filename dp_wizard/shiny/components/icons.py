@@ -1,11 +1,14 @@
 from faicons import icon_svg
 
+# Find more icons on Font Awesome: https://fontawesome.com/search?ic=free
+
 data_source_icon = icon_svg("file")
 unit_of_privacy_icon = icon_svg("shield-halved")
 product_icon = icon_svg("cart-shopping")
 
 columns_icon = icon_svg("table-columns")
 groups_icon = icon_svg("table")
+counts_icon = icon_svg("hashtag")
 budget_icon = icon_svg("piggy-bank")
 simulation_icon = icon_svg("chart-simple")
 
