@@ -105,7 +105,8 @@ def analysis_ui():
             col_widths={
                 "sm": [12, 12, 12, 12, 12],  # 5 rows
                 "md": [6, 6, 6, 6, 12],  # 3 rows
-                "xxl": [4, 4, 4, 4, 8],  # 2 row
+                "lg": [4, 4, 4, 4, 8],  # 2 rows
+                "xl": [2, 2, 2, 2, 4],  # 1 row
             },
         ),
         ui.output_ui("columns_ui"),
