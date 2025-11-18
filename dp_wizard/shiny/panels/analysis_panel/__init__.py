@@ -66,7 +66,7 @@ def analysis_ui():
                 ui.output_ui("groups_selectize_tutorial_ui"),
             ),
             ui.card(
-                ui.card_header(row_counts_icon, "Counts"),
+                ui.card_header(row_counts_icon, "Row Counts"),
                 ui.markdown(
                     """
                     In addition to column statistics, should
@@ -76,7 +76,7 @@ def analysis_ui():
                 ),
                 ui.input_checkbox(
                     "row_counts_checkbox",
-                    "Count Rows",
+                    "Row Counts",
                     False,
                 ),
                 ui.output_ui("row_counts_checkbox_tutorial_ui"),
