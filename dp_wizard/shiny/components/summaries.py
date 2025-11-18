@@ -3,10 +3,10 @@ from shiny.ui import tags
 from dp_wizard.shiny.components.icons import (
     budget_icon,
     columns_icon,
-    counts_icon,
     data_source_icon,
     groups_icon,
     product_icon,
+    row_counts_icon,
     unit_of_privacy_icon,
 )
 from dp_wizard.types import AppState, Product
@@ -50,7 +50,7 @@ def analysis_summary(state: AppState):  # pragma: no cover
         or "None"
     )
     groups = ", ".join(state.groups()) or "None"
-    counts = "Yes" if state.counts() else "No"
+    row_counts = "Yes" if state.row_counts() else "No"
     budget = state.epsilon()
 
     return tags.small(
@@ -62,8 +62,8 @@ def analysis_summary(state: AppState):  # pragma: no cover
             []
             if state.product() == Product.SYNTHETIC_DATA
             else [
-                counts_icon,
-                f"Counts: {counts}; ",
+                row_counts_icon,
+                f"Row Counts: {row_counts}; ",
             ]
         ),
         budget_icon,

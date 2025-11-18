@@ -129,7 +129,7 @@ def dataset_server(
     all_column_names = state.all_column_names
     numeric_column_names = state.numeric_column_names
     # groups = state.groups
-    # counts = state.counts
+    # row_counts = state.row_counts
     # epsilon = state.epsilon
 
     # Per-column choices:

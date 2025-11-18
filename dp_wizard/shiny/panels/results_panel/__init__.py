@@ -106,7 +106,7 @@ def results_server(
     all_column_names = state.all_column_names
     # numeric_column_names = state.numeric_column_names
     groups = state.groups
-    counts = state.counts
+    row_counts = state.row_counts
     epsilon = state.epsilon
 
     # Per-column choices:
@@ -278,7 +278,7 @@ def results_server(
             contributions_entity=contributions_entity(),
             epsilon=epsilon(),
             max_rows=int(max_rows()),
-            counts=counts(),
+            row_counts=row_counts(),
             groups=groups(),
             columns=columns,
         )

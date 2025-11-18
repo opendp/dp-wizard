@@ -8,8 +8,8 @@ from dp_wizard import registry_url
 from dp_wizard.shiny.components.icons import (
     budget_icon,
     columns_icon,
-    counts_icon,
     groups_icon,
+    row_counts_icon,
     simulation_icon,
 )
 from dp_wizard.shiny.components.inputs import log_slider
@@ -66,7 +66,7 @@ def analysis_ui():
                 ui.output_ui("groups_selectize_tutorial_ui"),
             ),
             ui.card(
-                ui.card_header(counts_icon, "Counts"),
+                ui.card_header(row_counts_icon, "Counts"),
                 ui.markdown(
                     """
                     In addition to column statistics, should
@@ -172,7 +172,7 @@ def analysis_server(
     all_column_names = state.all_column_names
     numeric_column_names = state.numeric_column_names
     groups = state.groups
-    counts = state.counts
+    row_counts = state.row_counts
     epsilon = state.epsilon
 
     # Per-column choices:
@@ -301,7 +301,7 @@ def analysis_server(
     @reactive.effect
     @reactive.event(input.row_counts_checkbox)
     def _set_row_counts():
-        counts.set(input.row_counts_checkbox())
+        row_counts.set(input.row_counts_checkbox())
 
     @render.ui
     def columns_selectize_tutorial_ui():
