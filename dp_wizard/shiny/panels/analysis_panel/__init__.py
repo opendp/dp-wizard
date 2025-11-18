@@ -80,7 +80,13 @@ def analysis_ui():
                        target="_blank">other projects</a>.
                     """
                 ),
-                log_slider("log_epsilon_slider", 0.1, 10.0),
+                log_slider(
+                    "log_epsilon_slider",
+                    lower_bound=0.1,
+                    upper_bound=10.0,
+                    lower_message="Better Privacy",
+                    upper_message="Better Accuracy",
+                ),
                 ui.output_ui("epsilon_ui"),
                 ui.output_ui("privacy_loss_python_ui"),
             ),
