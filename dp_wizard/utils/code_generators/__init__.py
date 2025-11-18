@@ -56,7 +56,8 @@ class AnalysisPlan(NamedTuple):
         columns = md_list(self.columns.keys()) or "TBD"
         groups = md_list(self.groups)
         grouped_by = f" grouped by {groups}" if groups else ""
-        return f"{self.product} for {columns}{grouped_by}"
+        with_counts = " with counts" if self.row_counts else ""
+        return f"{self.product} for {columns}{grouped_by}{with_counts}"
 
     def to_stem(self) -> str:
         return re.sub(r"\W+", " ", str(self)).strip().replace(" ", "_").lower()
