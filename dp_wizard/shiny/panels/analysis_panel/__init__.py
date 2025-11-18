@@ -298,6 +298,11 @@ def analysis_server(
             responsive=False,
         )
 
+    @reactive.effect
+    @reactive.event(input.row_counts_checkbox)
+    def _set_row_counts():
+        counts.set(input.row_counts_checkbox())
+
     @render.ui
     def columns_selectize_tutorial_ui():
         return tutorial_box(
