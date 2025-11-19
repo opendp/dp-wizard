@@ -73,11 +73,11 @@ def results_ui():  # pragma: no cover
         "Download Results",
         ui.output_ui("results_requirements_warning_ui"),
         ui.output_ui("two_previous_summary_ui"),
-        ui.output_ui("download_options_ui"),
+        ui.card(
+            ui.card_header(download_config_icon, "Download Options"),
+            ui.output_ui("download_options_ui"),
+        ),
         ui.layout_columns(
-            # If the ui.card is moved inside the the ui.output_ui,
-            # there's an extra wrapping div, and the card
-            # heights won't be aligned.
             ui.card(
                 ui.card_header(download_results_icon, "Results"),
                 ui.output_ui("download_results_ui"),
@@ -163,8 +163,7 @@ def results_server(
 
     @render.ui
     def download_options_ui():
-        return ui.card(
-            ui.card_header(download_config_icon, "Download Options"),
+        return [
             ui.markdown(
                 """
                 An appropriate extension for each download is added to this stem:
@@ -187,7 +186,7 @@ def results_server(
                 height="6em",
                 width="100%",
             ),
-        )
+        ]
 
     @reactive.calc
     def clean_download_stem() -> str:
