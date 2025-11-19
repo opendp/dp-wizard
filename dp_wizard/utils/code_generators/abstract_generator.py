@@ -203,17 +203,17 @@ reencode it as UTF8.""",
             accuracy_name=accuracy_name,
             stats_name=stats_name,
         )
-        name_md = "DP Count" if column_name is None else f"`{column_name}`"
+        name = "DP Count" if column_name is None else column_name
         output = analysis.make_output(
             code_gen=self,
-            column_name=name_md,
+            column_name=name,
             accuracy_name=accuracy_name,
             stats_name=stats_name,
         )
         note = analysis.make_note()
 
         return (
-            self._make_comment_cell(f"### Query for {name_md}:")
+            self._make_comment_cell(f"### Query for `{name}`:")
             + self._make_python_cell(query)
             + self._make_python_cell(output)
             + (self._make_comment_cell(note) if note else "")

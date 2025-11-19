@@ -234,6 +234,7 @@ def test_make_notebook(plan):
 @pytest.mark.parametrize("plan", plans, ids=id_for_plan)
 def test_make_script(plan):
     script = ScriptGenerator(plan, "Note goes here!").make_py()
+    print(number_lines(script))
 
     # Make sure jupytext formatting doesn't bleed into the script.
     # https://jupytext.readthedocs.io/en/latest/formats-scripts.html#the-light-format
