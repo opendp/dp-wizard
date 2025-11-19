@@ -119,3 +119,7 @@ Selectize menus should overflow the containing card.
 */
 .card, .card-body { overflow: visible !important; }
 ```
+
+## Layout quirks when refactoring
+
+Moving code into an `output_ui` function is usually fine, but introduces an additional div, and this can affect the styling: For example, if `ui.card`s are immediately under a `ui.layout_columns`, they will have the same height, but if they are moved into and `output_ui`, the card height will be determined by the height of the content, and the set will be uneven.
