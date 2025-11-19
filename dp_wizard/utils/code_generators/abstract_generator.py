@@ -5,7 +5,7 @@ from typing import Iterable
 from dp_wizard_templates.code_template import Template
 
 from dp_wizard import get_template_root, opendp_version, package_root
-from dp_wizard.types import ColumnIdentifier, Product
+from dp_wizard.types import ColumnIdentifier, ColumnName, Product, Weight
 from dp_wizard.utils.code_generators import (
     AnalysisPlan,
     make_column_config_block,
@@ -176,36 +176,44 @@ reencode it as UTF8.""",
                 f"confidence = {confidence} # {self._make_confidence_note()}"
             )
         ]
+        if self.analysis_plan.row_counts:
+            to_return.append(self._make_query())
         for column_name in self.analysis_plan.columns.keys():
             to_return.append(self._make_query(column_name))
 
         return "\n".join(to_return)
 
-    def _make_query(self, column_name):
-        plan = self.analysis_plan.columns[column_name]
-        identifier = ColumnIdentifier(column_name)
+    def _make_query(self, column_name=None):
+        # If column_name == None, just do counts.
+        if column_name is None:
+            analysis_name = histogram.name
+            identifier = ColumnIdentifier("dp_count")
+        else:
+            analysis_name = self.analysis_plan.columns[column_name][0].analysis_name
+            identifier = ColumnIdentifier(column_name)
         accuracy_name = f"{identifier}_accuracy"
         stats_name = f"{identifier}_stats"
 
         from dp_wizard.utils.code_generators.analyses import get_analysis_by_name
 
-        analysis = get_analysis_by_name(plan[0].analysis_name)
+        analysis = get_analysis_by_name(analysis_name)
         query = analysis.make_query(
             code_gen=self,
             identifier=identifier,
             accuracy_name=accuracy_name,
             stats_name=stats_name,
         )
+        name_md = "DP Count" if column_name is None else f"`{column_name}`"
         output = analysis.make_output(
             code_gen=self,
-            column_name=column_name,
+            column_name=name_md,
             accuracy_name=accuracy_name,
             stats_name=stats_name,
         )
         note = analysis.make_note()
 
         return (
-            self._make_comment_cell(f"### Query for `{column_name}`:")
+            self._make_comment_cell(f"### Query for {name_md}:")
             + self._make_python_cell(query)
             + self._make_python_cell(output)
             + (self._make_comment_cell(note) if note else "")
@@ -215,6 +223,8 @@ reencode it as UTF8.""",
         weights_dict = {
             name: plans[0].weight for name, plans in self.analysis_plan.columns.items()
         }
+        if self.analysis_plan.row_counts:
+            weights_dict[ColumnName("DP Count")] = int(Weight.DEFAULT.value)
         weights_message = (
             "Allocate the privacy budget to your queries in this ratio:"
             if len(weights_dict) > 1

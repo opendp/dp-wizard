@@ -107,7 +107,7 @@ hw_grade_bin_expr = (
     )
 
 
-abc_csv = "tests/fixtures/abc.csv"
+abc_csv_path = str((package_root.parent / "tests/fixtures/abc.csv").absolute())
 
 
 def number_lines(text: str):
@@ -141,12 +141,8 @@ median_plan_column = AnalysisPlanColumn(
 
 
 def id_for_plan(plan: AnalysisPlan):
-    columns = ", ".join(f"{v[0].analysis_name} of {k}" for k, v in plan.columns.items())
-    description = (
-        f"{plan.product} for {columns}; "
-        f"grouped by ({', '.join(plan.groups) or 'nothing'})"
-    )
-    return re.sub(r"\W+", "_", description)  # For selection with "pytest -k substring"
+    # For selection with "pytest -k substring"
+    return re.sub(r"\W+", "_", str(plan))
 
 
 plans_all_combos = [
@@ -156,7 +152,7 @@ plans_all_combos = [
         columns=columns,
         contributions=contributions,
         contributions_entity="Family",
-        csv_path=abc_csv,
+        csv_path=abc_csv_path,
         epsilon=1,
         max_rows=100_000,
         row_counts=row_counts,
@@ -249,6 +245,6 @@ def test_make_script(plan):
         fp.flush()
 
         result = subprocess.run(
-            ["python", fp.name, "--csv", abc_csv], capture_output=True
+            ["python", fp.name, "--csv", abc_csv_path], capture_output=True
         )
         assert result.returncode == 0

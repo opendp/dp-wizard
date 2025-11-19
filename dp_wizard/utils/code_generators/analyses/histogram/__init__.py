@@ -24,8 +24,8 @@ root = get_template_root(__file__)
 def make_query(code_gen, identifier, accuracy_name, stats_name):
     import polars as pl
 
-    def template(BIN_NAME, GROUP_NAMES, stats_context, confidence):
-        groups = [BIN_NAME] + GROUP_NAMES
+    def template_w_groups(GROUPS, stats_context, confidence):
+        groups = GROUPS
         QUERY_NAME = (
             stats_context.query().group_by(groups).agg(pl.len().dp.noise().alias("count"))  # type: ignore
         )
@@ -35,19 +35,30 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
         STATS_NAME = QUERY_NAME.release().collect()
         STATS_NAME  # type: ignore
 
-    return (
-        Template(template)
-        .fill_values(
-            BIN_NAME=f"{identifier}_bin",
-            GROUP_NAMES=code_gen.analysis_plan.groups,
+    def template_wo_groups(stats_context, confidence):
+        QUERY_NAME = stats_context.query().select(dp.len())  # type: ignore # noqa: F821
+        ACCURACY_NAME = QUERY_NAME.summarize(alpha=1 - confidence)[  # noqa: F841
+            "accuracy"
+        ].item()
+        STATS_NAME = QUERY_NAME.release().collect()
+        STATS_NAME  # type: ignore
+
+    groups = code_gen.analysis_plan.groups
+    if identifier != "dp_count":  # TODO: reference check!
+        groups.append(f"{identifier}_bin")
+
+    partial = (
+        Template(template_w_groups).fill_values(
+            GROUPS=groups,
         )
-        .fill_expressions(
-            QUERY_NAME=f"{identifier}_query",
-            ACCURACY_NAME=accuracy_name,
-            STATS_NAME=stats_name,
-        )
-        .finish()
+        if groups
+        else Template(template_wo_groups)
     )
+    return partial.fill_expressions(
+        QUERY_NAME=f"{identifier}_query",
+        ACCURACY_NAME=accuracy_name,
+        STATS_NAME=stats_name,
+    ).finish()
 
 
 def make_output(code_gen, column_name, accuracy_name, stats_name):
