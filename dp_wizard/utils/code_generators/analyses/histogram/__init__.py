@@ -21,6 +21,10 @@ input_names = [
 root = get_template_root(__file__)
 
 
+DP_COUNT_LABEL = "DP Count"
+DP_COUNT_ID = "dp_count"
+
+
 def make_query(code_gen, identifier, accuracy_name, stats_name):
     import polars as pl
 
@@ -44,7 +48,7 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
         STATS_NAME  # type: ignore
 
     groups = set(code_gen.analysis_plan.groups)
-    if identifier != "dp_count":
+    if identifier != DP_COUNT_ID:
         groups.add(f"{identifier}_bin")
 
     partial = (
@@ -59,9 +63,6 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
         ACCURACY_NAME=accuracy_name,
         STATS_NAME=stats_name,
     ).finish()
-
-
-DP_COUNT_LABEL = "DP Count"
 
 
 def make_output(code_gen, column_name, accuracy_name, stats_name):

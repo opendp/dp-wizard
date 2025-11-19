@@ -187,7 +187,7 @@ reencode it as UTF8.""",
         # If column_name == None, just do counts.
         if column_name is None:
             analysis_name = histogram.name
-            identifier = ColumnIdentifier("dp_count")
+            identifier = ColumnIdentifier(histogram.DP_COUNT_ID)
         else:
             analysis_name = self.analysis_plan.columns[column_name][0].analysis_name
             identifier = ColumnIdentifier(column_name)
