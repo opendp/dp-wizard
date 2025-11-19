@@ -16,7 +16,14 @@ from dp_wizard.shiny.components.outputs import (
     only_for_screenreader,
     tutorial_box,
 )
-from dp_wizard.types import AnalysisName, ColumnName, Product
+from dp_wizard.types import (
+    AnalysisName,
+    ColumnName,
+    Product,
+    default_weight,
+    heavy_weight,
+    light_weight,
+)
 from dp_wizard.utils.code_generators import make_column_config_block
 from dp_wizard.utils.code_generators.analyses import (
     get_analysis_by_name,
@@ -29,7 +36,6 @@ from dp_wizard.utils.mock_data import ColumnDef, mock_data
 from dp_wizard.utils.shared import plot_bars
 
 default_analysis_type = histogram.name
-default_weight = "2"
 label_width = "10em"  # Just wide enough so the text isn't trucated.
 
 
@@ -351,9 +357,9 @@ def column_server(
                     "weight",
                     "Weight",
                     choices={
-                        "1": "Less accurate",
+                        light_weight: "Less accurate",
                         default_weight: "Default",
-                        "4": "More accurate",
+                        heavy_weight: "More accurate",
                     },
                     selected=default_weight,
                     width=label_width,

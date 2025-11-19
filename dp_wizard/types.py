@@ -4,6 +4,13 @@ from enum import Enum, auto
 
 from shiny import reactive
 
+light_weight = "1"
+default_weight = "2"
+heavy_weight = "4"
+assert int(heavy_weight) / int(default_weight) == int(default_weight) / int(
+    light_weight
+)
+
 
 class Product(Enum):
     STATISTICS = auto()

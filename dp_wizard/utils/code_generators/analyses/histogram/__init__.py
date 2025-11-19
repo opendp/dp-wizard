@@ -1,7 +1,7 @@
 from dp_wizard_templates.code_template import Template
 
 from dp_wizard import opendp_version
-from dp_wizard.types import AnalysisName
+from dp_wizard.types import AnalysisName, ColumnIdentifier
 from dp_wizard.utils.code_generators.abstract_generator import get_template_root
 
 name = AnalysisName("Histogram")
@@ -24,10 +24,9 @@ root = get_template_root(__file__)
 def make_query(code_gen, identifier, accuracy_name, stats_name):
     import polars as pl
 
-    def template(BIN_NAME, GROUP_NAMES, stats_context, confidence):
-        groups = [BIN_NAME] + GROUP_NAMES
+    def template(GROUPS, stats_context, confidence):
         QUERY_NAME = (
-            stats_context.query().group_by(groups).agg(pl.len().dp.noise().alias("count"))  # type: ignore
+            stats_context.query().group_by(GROUPS).agg(pl.len().dp.noise().alias("count"))  # type: ignore
         )
         ACCURACY_NAME = QUERY_NAME.summarize(alpha=1 - confidence)[  # noqa: F841
             "accuracy"
@@ -35,11 +34,14 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
         STATS_NAME = QUERY_NAME.release().collect()
         STATS_NAME  # type: ignore
 
+    groups = code_gen.analysis_plan.groups
+    if identifier != ColumnIdentifier("count"):
+        groups.append(f"{identifier}_bin")
+
     return (
         Template(template)
         .fill_values(
-            BIN_NAME=f"{identifier}_bin",
-            GROUP_NAMES=code_gen.analysis_plan.groups,
+            GROUPS=groups,
         )
         .fill_expressions(
             QUERY_NAME=f"{identifier}_query",
