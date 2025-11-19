@@ -1,8 +1,5 @@
 # CONFIDENCE_NOTE
-title = (
-    f"DP counts for COLUMN_NAME, "
-    f"assuming {contributions} contributions per individual"
-)
+title = f"DP counts for COLUMN_NAME, assuming {contributions} contributions per individual"  # noqa: B950
 
 group_names = GROUP_NAMES
 if group_names:

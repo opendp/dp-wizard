@@ -9,6 +9,7 @@ from dp_wizard.shiny.components.icons import (
     budget_icon,
     columns_icon,
     groups_icon,
+    row_counts_icon,
     simulation_icon,
 )
 from dp_wizard.shiny.components.inputs import log_slider
@@ -54,18 +55,35 @@ def analysis_ui():
                     """
                     Select columns to group by, or leave empty
                     to calculate statistics across the entire dataset.
-
-                    Groups aren't applied to the previews on this page
-                    but will be used in the final release.
                     """
                 ),
                 ui.input_selectize(
                     "groups_selectize",
-                    "Group by",
+                    "Group By",
                     [],
                     multiple=True,
                 ),
                 ui.output_ui("groups_selectize_tutorial_ui"),
+            ),
+            ui.card(
+                ui.card_header(row_counts_icon, "Row Counts"),
+                ui.markdown(
+                    """
+                    In addition to column statistics, should
+                    row counts for groups and for the whole CSV
+                    be released?
+                    """
+                ),
+                ui.input_checkbox(
+                    "row_counts_checkbox",
+                    "Row Counts",
+                    False,
+                ),
+                ui.output_ui("row_counts_checkbox_tutorial_ui"),
+            ),
+            ui.card(
+                ui.card_header(simulation_icon, "Simulation"),
+                ui.output_ui("simulation_card_ui"),
             ),
             ui.card(
                 ui.card_header(budget_icon, "Privacy Budget"),
@@ -84,14 +102,11 @@ def analysis_ui():
                 ui.output_ui("epsilon_ui"),
                 ui.output_ui("privacy_loss_python_ui"),
             ),
-            ui.card(
-                ui.card_header(simulation_icon, "Simulation"),
-                ui.output_ui("simulation_card_ui"),
-            ),
             col_widths={
-                "sm": [12, 12, 12, 12],  # 4 rows
-                "md": [6, 6, 6, 6],  # 2 rows
-                "xxl": [3, 3, 3, 3],  # 1 row
+                "sm": [12, 12, 12, 12, 12],  # 5 rows
+                "md": [6, 6, 6, 6, 12],  # 3 rows
+                "lg": [4, 4, 4, 4, 8],  # 2 rows
+                "xl": [2, 2, 2, 2, 4],  # 1 row
             },
         ),
         ui.output_ui("columns_ui"),
@@ -158,6 +173,7 @@ def analysis_server(
     all_column_names = state.all_column_names
     numeric_column_names = state.numeric_column_names
     groups = state.groups
+    row_counts = state.row_counts
     epsilon = state.epsilon
 
     # Per-column choices:
@@ -270,6 +286,23 @@ def analysis_server(
             """,
             responsive=False,
         )
+
+    @render.ui
+    def row_counts_checkbox_tutorial_ui():
+        return tutorial_box(
+            is_tutorial_mode(),
+            """
+            To be safe, even the number of rows in the CSV
+            and in any groups is considered private information.
+            Check this box to release DP estimates of the row count.
+            """,
+            responsive=False,
+        )
+
+    @reactive.effect
+    @reactive.event(input.row_counts_checkbox)
+    def _set_row_counts():
+        row_counts.set(input.row_counts_checkbox())
 
     @render.ui
     def columns_selectize_tutorial_ui():

@@ -1,7 +1,6 @@
 column_name = COLUMN_NAME
 print(
-    f"DP counts for {column_name}, "
-    f"assuming {contributions} contributions per individual"
+    f"DP counts for {column_name}, assuming {contributions} contributions per individual"  # noqa: B950
 )
 
 group_names = GROUP_NAMES

@@ -106,6 +106,7 @@ def results_server(
     all_column_names = state.all_column_names
     # numeric_column_names = state.numeric_column_names
     groups = state.groups
+    row_counts = state.row_counts
     epsilon = state.epsilon
 
     # Per-column choices:
@@ -264,7 +265,7 @@ def results_server(
                     lower_bound=lower_bounds()[col],
                     upper_bound=upper_bounds()[col],
                     bin_count=int(bin_counts()[col]),
-                    weight=int(weights()[col]),
+                    weight=int(weights()[col].value),
                 )
             ]
             for col in weights().keys()
@@ -277,6 +278,7 @@ def results_server(
             contributions_entity=contributions_entity(),
             epsilon=epsilon(),
             max_rows=int(max_rows()),
+            row_counts=row_counts(),
             groups=groups(),
             columns=columns,
         )

@@ -6,9 +6,10 @@ from dp_wizard.shiny.components.icons import (
     data_source_icon,
     groups_icon,
     product_icon,
+    row_counts_icon,
     unit_of_privacy_icon,
 )
-from dp_wizard.types import AppState
+from dp_wizard.types import AppState, Product
 
 _css = "display: block; padding: 0 1em 1em 1em;"
 
@@ -49,6 +50,7 @@ def analysis_summary(state: AppState):  # pragma: no cover
         or "None"
     )
     groups = ", ".join(state.groups()) or "None"
+    row_counts = "Yes" if state.row_counts() else "No"
     budget = state.epsilon()
 
     return tags.small(
@@ -56,6 +58,14 @@ def analysis_summary(state: AppState):  # pragma: no cover
         f"Columns: {columns}; ",
         groups_icon,
         f"Groups: {groups}; ",
+        (
+            []
+            if state.product() == Product.SYNTHETIC_DATA
+            else [
+                row_counts_icon,
+                f"Row Counts: {row_counts}; ",
+            ]
+        ),
         budget_icon,
         f"Privacy Budget: {budget} epsilon.",
         style=_css,

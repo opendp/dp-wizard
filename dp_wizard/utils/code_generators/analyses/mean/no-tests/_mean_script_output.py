@@ -1,6 +1,5 @@
 print(
-    f"DP means for COLUMN_NAME "
-    f"assuming {contributions} contributions per individual"
+    f"DP means for COLUMN_NAME, assuming {contributions} contributions per individual"
 )
 
 if groups:
