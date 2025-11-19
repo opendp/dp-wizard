@@ -70,8 +70,17 @@ def results_ui():  # pragma: no cover
         ui.output_ui("two_previous_summary_ui"),
         ui.output_ui("download_options_ui"),
         ui.layout_columns(
-            ui.output_ui("download_results_ui"),
-            ui.output_ui("download_code_ui"),
+            # If the ui.card is moved inside the the ui.output_ui,
+            # there's an extra wrapping div, and the card
+            # heights won't be aligned.
+            ui.card(
+                ui.card_header("Results"),
+                ui.output_ui("download_results_ui"),
+            ),
+            ui.card(
+                ui.card_header("Code"),
+                ui.output_ui("download_code_ui"),
+            ),
         ),
         value="results_panel",
     )
@@ -183,53 +192,49 @@ def results_server(
     @render.ui
     def download_results_ui():
         disabled = not weights()
-        return ui.card(
-            ui.card_header("Results"),
-            (
-                ui.markdown(
-                    """
+        return (
+            ui.markdown(
+                """
                     When [installed and run
                     locally](https://pypi.org/project/dp_wizard/),
                     there are more download options because DP Wizard
                     can read your private CSV and release differentially
                     private statistics.
                     """
-                )
-                if in_cloud
-                else [
-                    tutorial_box(
-                        is_tutorial_mode(),
-                        """
+            )
+            if in_cloud
+            else [
+                tutorial_box(
+                    is_tutorial_mode(),
+                    """
                         Now you can download a notebook for your analysis.
                         The Jupyter notebook could be used locally or on Colab,
                         but the HTML version can be viewed in the brower.
                         """,
-                        responsive=False,
-                    ),
-                    download_button(
-                        "Package",
-                        primary=True,
-                        disabled=disabled,
-                    ),
-                    ui.br(),
-                    "Contains:",
-                    ui.tags.ul(
-                        ui.tags.li(download_link("README", disabled=disabled)),
-                        ui.tags.li(download_link("Notebook", disabled=disabled)),
-                        ui.tags.li(download_link("HTML", disabled=disabled)),
-                        ui.tags.li(download_link("Script", disabled=disabled)),
-                        ui.tags.li(download_link("Report", disabled=disabled)),
-                        ui.tags.li(download_link("Table", disabled=disabled)),
-                    ),
-                ]
-            ),
+                    responsive=False,
+                ),
+                download_button(
+                    "Package",
+                    primary=True,
+                    disabled=disabled,
+                ),
+                ui.br(),
+                "Contains:",
+                ui.tags.ul(
+                    ui.tags.li(download_link("README", disabled=disabled)),
+                    ui.tags.li(download_link("Notebook", disabled=disabled)),
+                    ui.tags.li(download_link("HTML", disabled=disabled)),
+                    ui.tags.li(download_link("Script", disabled=disabled)),
+                    ui.tags.li(download_link("Report", disabled=disabled)),
+                    ui.tags.li(download_link("Table", disabled=disabled)),
+                ),
+            ]
         )
 
     @render.ui
     def download_code_ui():
         disabled = not weights()
-        return ui.card(
-            ui.card_header("Code"),
+        return [
             tutorial_box(
                 is_tutorial_mode(),
                 (
@@ -250,7 +255,7 @@ def results_server(
             download_button("HTML (unexecuted)", disabled=disabled),
             download_button("Script", disabled=disabled),
             download_button("Notebook Source", disabled=disabled),
-        )
+        ]
 
     @reactive.calc
     def analysis_plan() -> AnalysisPlan:
