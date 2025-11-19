@@ -10,6 +10,11 @@ from dp_wizard_templates.converters import (
 from shiny import Inputs, Outputs, Session, reactive, render, types, ui
 
 from dp_wizard import package_root
+from dp_wizard.shiny.components.icons import (
+    download_code_icon,
+    download_config_icon,
+    download_results_icon,
+)
 from dp_wizard.shiny.components.outputs import (
     hide_if,
     info_md_box,
@@ -74,11 +79,11 @@ def results_ui():  # pragma: no cover
             # there's an extra wrapping div, and the card
             # heights won't be aligned.
             ui.card(
-                ui.card_header("Results"),
+                ui.card_header(download_results_icon, "Results"),
                 ui.output_ui("download_results_ui"),
             ),
             ui.card(
-                ui.card_header("Code"),
+                ui.card_header(download_code_icon, "Code"),
                 ui.output_ui("download_code_ui"),
             ),
         ),
@@ -159,7 +164,7 @@ def results_server(
     @render.ui
     def download_options_ui():
         return ui.card(
-            ui.card_header("Download Options"),
+            ui.card_header(download_config_icon, "Download Options"),
             ui.markdown(
                 """
                 An appropriate extension for each download is added to this stem:
