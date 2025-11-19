@@ -203,7 +203,7 @@ reencode it as UTF8.""",
             accuracy_name=accuracy_name,
             stats_name=stats_name,
         )
-        name = "DP Count" if column_name is None else column_name
+        name = histogram.DP_COUNT_LABEL if column_name is None else column_name
         output = analysis.make_output(
             code_gen=self,
             column_name=name,
@@ -224,7 +224,9 @@ reencode it as UTF8.""",
             name: plans[0].weight for name, plans in self.analysis_plan.columns.items()
         }
         if self.analysis_plan.row_counts:
-            weights_dict[ColumnName("DP Count")] = int(Weight.DEFAULT.value)
+            weights_dict[ColumnName(histogram.DP_COUNT_LABEL)] = int(
+                Weight.DEFAULT.value
+            )
         weights_message = (
             "Allocate the privacy budget to your queries in this ratio:"
             if len(weights_dict) > 1

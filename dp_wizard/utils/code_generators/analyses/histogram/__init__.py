@@ -44,7 +44,7 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
         STATS_NAME  # type: ignore
 
     groups = set(code_gen.analysis_plan.groups)
-    if identifier != "dp_count":  # TODO: reference check!
+    if identifier != "dp_count":
         groups.add(f"{identifier}_bin")
 
     partial = (
@@ -61,6 +61,9 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
     ).finish()
 
 
+DP_COUNT_LABEL = "DP Count"
+
+
 def make_output(code_gen, column_name, accuracy_name, stats_name):
     return (
         Template(f"histogram_{code_gen._get_notebook_or_script()}_output", root)
@@ -74,7 +77,7 @@ def make_output(code_gen, column_name, accuracy_name, stats_name):
             CONFIDENCE_NOTE=code_gen._make_confidence_note(),
         )
         .finish()
-    ).replace("DP counts for 'DP Count'", "DP Count")
+    ).replace(f"DP counts for '{DP_COUNT_LABEL}'", DP_COUNT_LABEL)
 
 
 def make_note():
