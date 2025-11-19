@@ -5,6 +5,23 @@ from enum import Enum, auto
 from shiny import reactive
 
 
+class Weight(Enum):
+    """
+    >>> print(Weight.MORE_ACCURATE)
+    More accurate
+
+    >>> ints = [int(w.value) for w in Weight]
+    >>> assert ints[2] / ints[1] == ints[1] / ints[0]
+    """
+
+    LESS_ACCURATE = "1"
+    DEFAULT = "2"
+    MORE_ACCURATE = "4"
+
+    def __str__(self) -> str:
+        return self.name.replace("_", " ").capitalize()
+
+
 class Product(Enum):
     STATISTICS = auto()
     SYNTHETIC_DATA = auto()
@@ -110,7 +127,7 @@ class AppState:
     lower_bounds: reactive.Value[dict[ColumnName, float]]
     upper_bounds: reactive.Value[dict[ColumnName, float]]
     bin_counts: reactive.Value[dict[ColumnName, int]]
-    weights: reactive.Value[dict[ColumnName, str]]
+    weights: reactive.Value[dict[ColumnName, Weight]]
     analysis_errors: reactive.Value[dict[ColumnName, bool]]
 
     # Release state:

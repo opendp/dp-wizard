@@ -265,7 +265,7 @@ def results_server(
                     lower_bound=lower_bounds()[col],
                     upper_bound=upper_bounds()[col],
                     bin_count=int(bin_counts()[col]),
-                    weight=int(weights()[col]),
+                    weight=int(weights()[col].value),
                 )
             ]
             for col in weights().keys()
