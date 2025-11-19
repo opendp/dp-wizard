@@ -74,7 +74,7 @@ def make_output(code_gen, column_name, accuracy_name, stats_name):
             CONFIDENCE_NOTE=code_gen._make_confidence_note(),
         )
         .finish()
-    )
+    ).replace("DP counts for 'DP Count'", "DP Count")
 
 
 def make_note():
