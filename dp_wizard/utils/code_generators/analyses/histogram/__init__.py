@@ -43,13 +43,13 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
         STATS_NAME = QUERY_NAME.release().collect()
         STATS_NAME  # type: ignore
 
-    groups = code_gen.analysis_plan.groups
+    groups = set(code_gen.analysis_plan.groups)
     if identifier != "dp_count":  # TODO: reference check!
-        groups.append(f"{identifier}_bin")
+        groups.add(f"{identifier}_bin")
 
     partial = (
         Template(template_w_groups).fill_values(
-            GROUPS=groups,
+            GROUPS=list(groups),
         )
         if groups
         else Template(template_wo_groups)
