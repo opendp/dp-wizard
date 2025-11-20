@@ -157,7 +157,7 @@ def analysis_server(
     # Analysis choices:
     all_column_names = state.all_column_names
     numeric_column_names = state.numeric_column_names
-    groups = state.groups
+    group_column_names = state.group_column_names
     epsilon = state.epsilon
 
     # Per-column choices:
@@ -215,7 +215,7 @@ def analysis_server(
     def _on_groups_change():
         group_ids_selected = input.groups_selectize()
         column_ids_to_names = csv_ids_names_calc()
-        groups.set([column_ids_to_names[id] for id in group_ids_selected])
+        group_column_names.set([column_ids_to_names[id] for id in group_ids_selected])
 
     @render.ui
     def analysis_requirements_warning_ui():
@@ -361,7 +361,7 @@ def analysis_server(
                 contributions_entity=contributions_entity,
                 epsilon=epsilon,
                 row_count=int(input.row_count()),
-                groups=groups,
+                groups=group_column_names,
                 analysis_types=analysis_types,
                 analysis_errors=analysis_errors,
                 lower_bounds=lower_bounds,
