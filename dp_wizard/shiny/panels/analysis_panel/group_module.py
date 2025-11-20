@@ -1,0 +1,81 @@
+from shiny import Inputs, Outputs, Session, module, reactive, render, ui
+
+from dp_wizard.shiny.components.icons import (
+    column_config_icon,
+)
+
+# from shiny.types import SilentException
+
+
+# from dp_wizard.shiny.components.outputs import (
+#     code_sample,
+#     col_widths,
+#     hide_if,
+#     info_md_box,
+#     only_for_screenreader,
+#     tutorial_box,
+# )
+# from dp_wizard.types import AnalysisName, ColumnName, Product
+# from dp_wizard.utils.code_generators import make_column_config_block
+# from dp_wizard.utils.code_generators.analyses import (
+#     get_analysis_by_name,
+#     histogram,
+#     mean,
+#     median,
+# )
+# from dp_wizard.utils.dp_helper import confidence, make_accuracy_histogram
+# from dp_wizard.utils.mock_data import ColumnDef, mock_data
+# from dp_wizard.utils.shared import plot_bars
+
+
+@module.ui
+def group_ui():  # pragma: no cover
+    return ui.card(
+        ui.card_header(column_config_icon, "PLACEHOLDER")
+        #    ui.output_text("card_header", inline=True)),
+        # ui.output_ui("analysis_name_ui"),
+        # ui.output_ui("analysis_config_ui"),
+    )
+
+
+@module.server
+def group_server(
+    input: Inputs,
+    output: Outputs,
+    session: Session,
+    # public_csv_path: str,
+    # product: reactive.Value[Product],
+    # name: ColumnName,
+    # contributions: reactive.Value[int],
+    # contributions_entity: reactive.Value[str],
+    # epsilon: reactive.Value[float],
+    # row_count: int,
+    # groups: reactive.Value[list[ColumnName]],
+    # analysis_types: reactive.Value[dict[ColumnName, AnalysisName]],
+    # analysis_errors: reactive.Value[dict[ColumnName, bool]],
+    # lower_bounds: reactive.Value[dict[ColumnName, float]],
+    # upper_bounds: reactive.Value[dict[ColumnName, float]],
+    # bin_counts: reactive.Value[dict[ColumnName, int]],
+    # weights: reactive.Value[dict[ColumnName, str]],
+    # is_tutorial_mode: reactive.Value[bool],
+    # is_sample_csv: bool,
+    # is_single_column: bool,
+):  # pragma: no cover
+    pass
+    # @reactive.effect
+    # def _set_hidden_inputs():
+    #     # TODO: Is isolate still needed?
+    #     with reactive.isolate():  # Without isolate, there is an infinite loop.
+    #         ui.update_numeric("weight", value=int(weights().get(name, default_weight)))
+
+    # @reactive.effect
+    # @reactive.event(input.analysis_type)
+    # def _set_analysis_type():
+    #     analysis_types.set({**analysis_types(), name: input.analysis_type()})
+
+    # @render.text
+    # def card_header():
+    #     groups_str = ", ".join(groups())
+    #     if not groups_str:
+    #         return name
+    #     return f"{name} (grouped by {groups_str})"
