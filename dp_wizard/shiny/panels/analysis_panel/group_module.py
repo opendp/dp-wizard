@@ -40,6 +40,17 @@ def group_ui():  # pragma: no cover
     )
 
 
+def _clean(text: str) -> list[str]:
+    """
+    >>> _clean("\\n\\n before\\n \\nafter \\n\\n")
+    ['before', 'after']
+
+    """
+    return [
+        clean_line for line in text.strip().splitlines() if (clean_line := line.strip())
+    ]
+
+
 @module.server
 def group_server(
     input: Inputs,
@@ -52,7 +63,7 @@ def group_server(
     @reactive.effect
     @reactive.event(input.group_keys)
     def _set_group_keys():
-        group_keys.set({**group_keys(), name: input.group_keys().strip().splitlines()})
+        group_keys.set({**group_keys(), name: _clean(input.group_keys())})
 
     @render.text
     def group_card_header():
@@ -75,5 +86,6 @@ def group_server(
                 only_for_screenreader(f"Known values for `{name}`, one per line"),
                 "\n".join(group_keys().get(name, "")),
                 rows=5,
+                update_on="blur",
             ),
         ]
