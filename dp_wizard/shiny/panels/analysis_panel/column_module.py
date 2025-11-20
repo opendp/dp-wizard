@@ -117,7 +117,9 @@ def error_md_ui(markdown):  # pragma: no cover
 @module.ui
 def column_ui():  # pragma: no cover
     return ui.card(
-        ui.card_header(column_config_icon, ui.output_text("card_header", inline=True)),
+        ui.card_header(
+            column_config_icon, ui.output_text("column_card_header", inline=True)
+        ),
         ui.output_ui("analysis_name_ui"),
         ui.output_ui("analysis_config_ui"),
     )
@@ -224,7 +226,7 @@ def column_server(
         )
 
     @render.text
-    def card_header():
+    def column_card_header():
         groups_str = ", ".join(groups())
         if not groups_str:
             return name

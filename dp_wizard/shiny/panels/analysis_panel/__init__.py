@@ -385,7 +385,7 @@ def analysis_server(
                 group_id,
                 # product=product,
                 # public_csv_path=public_csv_path(),
-                # name=column_ids_to_names[column_id],
+                name=groups_ids_to_names[group_id],
                 # contributions=contributions,
                 # contributions_entity=contributions_entity,
                 # epsilon=epsilon,
