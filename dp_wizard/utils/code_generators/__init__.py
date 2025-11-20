@@ -25,7 +25,7 @@ class AnalysisPlan(NamedTuple):
     ...     contributions_entity='Family',
     ...     epsilon=2.0,
     ...     max_rows=1000,
-    ...     groups={'grouping_col': ['expected', 'values'],
+    ...     groups={'grouping_col': ['expected', 'values']},
     ...     columns={
     ...         'data_col': [AnalysisPlanColumn('Histogram', 0, 100, 10, 1)]
     ...     })
