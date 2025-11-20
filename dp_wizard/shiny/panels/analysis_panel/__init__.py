@@ -171,6 +171,10 @@ def analysis_server(
     weights = state.weights
     analysis_errors = state.analysis_errors
 
+    # Per-group choices:
+    # (Again a dict, with ColumnName as the key.)
+    group_keys = state.group_keys
+
     # Release state:
     released = state.released
 
@@ -383,23 +387,8 @@ def analysis_server(
         for group_id in groups_ids:
             group_server(
                 group_id,
-                # product=product,
-                # public_csv_path=public_csv_path(),
                 name=groups_ids_to_names[group_id],
-                # contributions=contributions,
-                # contributions_entity=contributions_entity,
-                # epsilon=epsilon,
-                # row_count=int(input.row_count()),
-                # groups=group_column_names,
-                # analysis_types=analysis_types,
-                # analysis_errors=analysis_errors,
-                # lower_bounds=lower_bounds,
-                # upper_bounds=upper_bounds,
-                # bin_counts=bin_counts,
-                # weights=weights,
-                # is_tutorial_mode=is_tutorial_mode,
-                # is_sample_csv=is_sample_csv,
-                # is_single_column=len(column_ids) == 1,
+                group_keys=group_keys,
             )
         return [group_ui(group_id) for group_id in groups_ids]
 

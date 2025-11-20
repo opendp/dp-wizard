@@ -112,5 +112,9 @@ class AppState:
     weights: reactive.Value[dict[ColumnName, str]]
     analysis_errors: reactive.Value[dict[ColumnName, bool]]
 
+    # Per-group choices:
+    # (Again a dict, with ColumnName as the key.)
+    group_keys: reactive.Value[dict[ColumnName, list[str]]]
+
     # Release state:
     released: reactive.Value[bool]

@@ -200,6 +200,8 @@ def _make_server(cli_info: CLIInfo):
             bin_counts=reactive.value({}),
             weights=reactive.value({}),
             analysis_errors=reactive.value({}),
+            # Per-group choices:
+            group_keys=reactive.value({}),
             # Release state:
             released=reactive.value(False),
         )

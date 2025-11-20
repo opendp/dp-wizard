@@ -1,4 +1,4 @@
-from shiny import Inputs, Outputs, Session, module, render, ui
+from shiny import Inputs, Outputs, Session, module, reactive, render, ui
 
 from dp_wizard.shiny.components.icons import (
     column_config_icon,
@@ -45,39 +45,18 @@ def group_server(
     input: Inputs,
     output: Outputs,
     session: Session,
-    # public_csv_path: str,
-    # product: reactive.Value[Product],
     name: ColumnName,
-    # contributions: reactive.Value[int],
-    # contributions_entity: reactive.Value[str],
-    # epsilon: reactive.Value[float],
-    # row_count: int,
-    # groups: reactive.Value[list[ColumnName]],
-    # analysis_types: reactive.Value[dict[ColumnName, AnalysisName]],
-    # analysis_errors: reactive.Value[dict[ColumnName, bool]],
-    # lower_bounds: reactive.Value[dict[ColumnName, float]],
-    # upper_bounds: reactive.Value[dict[ColumnName, float]],
-    # bin_counts: reactive.Value[dict[ColumnName, int]],
-    # weights: reactive.Value[dict[ColumnName, str]],
-    # is_tutorial_mode: reactive.Value[bool],
-    # is_sample_csv: bool,
-    # is_single_column: bool,
+    group_keys: reactive.Value[dict[ColumnName, list[str]]],
 ):  # pragma: no cover
 
-    # @reactive.effect
-    # def _set_hidden_inputs():
-    #     # TODO: Is isolate still needed?
-    #     with reactive.isolate():  # Without isolate, there is an infinite loop.
-    # ui.update_numeric("weight", value=int(weights().get(name, default_weight)))
-
-    # @reactive.effect
-    # @reactive.event(input.analysis_type)
-    # def _set_analysis_type():
-    #     analysis_types.set({**analysis_types(), name: input.analysis_type()})
+    @reactive.effect
+    @reactive.event(input.group_keys)
+    def _set_group_keys():
+        group_keys.set({**group_keys(), name: input.group_keys().strip().splitlines()})
 
     @render.text
     def group_card_header():
-        return name
+        return f"{name} values"
 
     @render.ui
     def group_keys_ui():
@@ -94,7 +73,7 @@ def group_server(
             ui.input_text_area(
                 "group_keys",
                 only_for_screenreader(f"Known values for `{name}`, one per line"),
-                "",
+                "\n".join(group_keys().get(name, "")),
                 rows=5,
             ),
         ]
