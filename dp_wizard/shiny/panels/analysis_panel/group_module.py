@@ -3,6 +3,7 @@ from shiny import Inputs, Outputs, Session, module, render, ui
 from dp_wizard.shiny.components.icons import (
     column_config_icon,
 )
+from dp_wizard.shiny.components.outputs import only_for_screenreader
 
 # from dp_wizard.shiny.components.outputs import (
 #     code_sample,
@@ -35,8 +36,7 @@ def group_ui():  # pragma: no cover
         ui.card_header(
             column_config_icon, ui.output_text("group_card_header", inline=True)
         ),
-        # ui.output_ui("analysis_name_ui"),
-        # ui.output_ui("analysis_config_ui"),
+        ui.output_ui("group_keys_ui"),
     )
 
 
@@ -78,3 +78,23 @@ def group_server(
     @render.text
     def group_card_header():
         return name
+
+    @render.ui
+    def group_keys_ui():
+        return [
+            ui.markdown(
+                f"""
+                If known, provide all values for `{name}`,
+                one per line. If the values are not known,
+                those which occur only a small number of times
+                will be excluded from the results,
+                because their inclusion would compromise privacy.
+                """
+            ),
+            ui.input_text_area(
+                "group_keys",
+                only_for_screenreader(f"Known values for `{name}`, one per line"),
+                "",
+                rows=5,
+            ),
+        ]
