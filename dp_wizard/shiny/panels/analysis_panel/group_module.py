@@ -1,3 +1,5 @@
+import re
+
 from shiny import Inputs, Outputs, Session, module, reactive, render, ui
 
 from dp_wizard.shiny.components.icons import (
@@ -42,12 +44,12 @@ def group_ui():  # pragma: no cover
 
 def _clean(text: str) -> list[str]:
     """
-    >>> _clean("\\n\\n before\\n \\nafter \\n\\n")
-    ['before', 'after']
+    >>> _clean("\\n\\n before\\n \\nand, after \\n\\n")
+    ['before', 'and', 'after']
 
     """
     return [
-        clean_line for line in text.strip().splitlines() if (clean_line := line.strip())
+        clean_line for line in re.split(r"[\n,]", text) if (clean_line := line.strip())
     ]
 
 
