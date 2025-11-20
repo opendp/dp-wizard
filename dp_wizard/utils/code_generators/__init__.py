@@ -44,7 +44,7 @@ class AnalysisPlan(NamedTuple):
     contributions_entity: str
     epsilon: float
     max_rows: int
-    groups: list[ColumnName]
+    groups: dict[ColumnName, list[str]]
     columns: dict[ColumnName, list[AnalysisPlanColumn]]
 
     def __str__(self) -> str:

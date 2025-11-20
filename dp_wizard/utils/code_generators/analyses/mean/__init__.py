@@ -33,7 +33,7 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
     return (
         Template(template)
         .fill_values(
-            GROUP_NAMES=code_gen.analysis_plan.groups,
+            GROUP_NAMES=list(code_gen.analysis_plan.groups.keys()),  # TODO,
         )
         .fill_expressions(
             QUERY_NAME=f"{identifier}_query",

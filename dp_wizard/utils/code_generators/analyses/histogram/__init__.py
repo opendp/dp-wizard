@@ -39,7 +39,7 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
         Template(template)
         .fill_values(
             BIN_NAME=f"{identifier}_bin",
-            GROUP_NAMES=code_gen.analysis_plan.groups,
+            GROUP_NAMES=list(code_gen.analysis_plan.groups.keys()),  # TODO
         )
         .fill_expressions(
             QUERY_NAME=f"{identifier}_query",
@@ -55,7 +55,7 @@ def make_output(code_gen, column_name, accuracy_name, stats_name):
         Template(f"histogram_{code_gen._get_notebook_or_script()}_output", root)
         .fill_values(
             COLUMN_NAME=column_name,
-            GROUP_NAMES=code_gen.analysis_plan.groups,
+            GROUP_NAMES=list(code_gen.analysis_plan.groups.keys()),  # TODO
         )
         .fill_expressions(
             ACCURACY_NAME=accuracy_name,
