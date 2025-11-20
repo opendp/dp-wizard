@@ -2,34 +2,9 @@ import re
 
 from shiny import Inputs, Outputs, Session, module, reactive, render, ui
 
-from dp_wizard.shiny.components.icons import (
-    column_config_icon,
-)
+from dp_wizard.shiny.components.icons import column_config_icon
 from dp_wizard.shiny.components.outputs import only_for_screenreader
-
-# from dp_wizard.shiny.components.outputs import (
-#     code_sample,
-#     col_widths,
-#     hide_if,
-#     info_md_box,
-#     only_for_screenreader,
-#     tutorial_box,
-# )
 from dp_wizard.types import ColumnName
-
-# from shiny.types import SilentException
-
-
-# from dp_wizard.utils.code_generators import make_column_config_block
-# from dp_wizard.utils.code_generators.analyses import (
-#     get_analysis_by_name,
-#     histogram,
-#     mean,
-#     median,
-# )
-# from dp_wizard.utils.dp_helper import confidence, make_accuracy_histogram
-# from dp_wizard.utils.mock_data import ColumnDef, mock_data
-# from dp_wizard.utils.shared import plot_bars
 
 
 @module.ui
