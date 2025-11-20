@@ -25,7 +25,7 @@ class AnalysisPlan(NamedTuple):
     ...     contributions_entity='Family',
     ...     epsilon=2.0,
     ...     max_rows=1000,
-    ...     groups=['grouping_col'],
+    ...     groups={'grouping_col': ['expected', 'values'],
     ...     columns={
     ...         'data_col': [AnalysisPlanColumn('Histogram', 0, 100, 10, 1)]
     ...     })
@@ -51,10 +51,10 @@ class AnalysisPlan(NamedTuple):
         def md_list(names) -> str:
             return ", ".join(f"`{name}`" for name in names)
 
-        columns = md_list(self.columns.keys()) or "TBD"
-        groups = md_list(self.groups)
-        grouped_by = f" grouped by {groups}" if groups else ""
-        return f"{self.product} for {columns}{grouped_by}"
+        columns_md = md_list(self.columns.keys()) or "TBD"
+        groups_md = md_list(self.groups)
+        grouped_by = f" grouped by {groups_md}" if groups_md else ""
+        return f"{self.product} for {columns_md}{grouped_by}"
 
     def to_stem(self) -> str:
         return re.sub(r"\W+", " ", str(self)).strip().replace(" ", "_").lower()

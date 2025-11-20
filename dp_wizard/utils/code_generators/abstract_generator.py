@@ -128,14 +128,14 @@ reencode it as UTF8.""",
             # the number of possible values for each grouping column,
             # and taking their product.
             dp.polars.Margin(
-                by=GROUPS,
+                by=list(GROUPS.keys()),
                 invariant="keys",
                 max_length=MAX_ROWS,
                 max_groups=100,
             )
 
         def bin_template(GROUPS, BIN_NAME):
-            dp.polars.Margin(by=([BIN_NAME] + GROUPS), invariant="keys")
+            dp.polars.Margin(by=([BIN_NAME] + list(GROUPS.keys())), invariant="keys")
 
         margins = [
             Template(basic_template)

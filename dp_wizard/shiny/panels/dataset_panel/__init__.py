@@ -140,6 +140,10 @@ def dataset_server(
     # weights = state.weights
     # analysis_errors = state.analysis_errors
 
+    # Per-group choices:
+    # (Again a dict, with ColumnName as the key.)
+    # group_keys = state.group_keys
+
     # Release state:
     released = state.released
 

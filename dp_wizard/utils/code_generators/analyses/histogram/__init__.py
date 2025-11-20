@@ -24,10 +24,13 @@ root = get_template_root(__file__)
 def make_query(code_gen, identifier, accuracy_name, stats_name):
     import polars as pl
 
-    def template(BIN_NAME, GROUP_NAMES, stats_context, confidence):
+    def template(BIN_NAME, GROUP_NAMES, stats_context, confidence, GROUPING_KEYS):
         groups = [BIN_NAME] + GROUP_NAMES
         QUERY_NAME = (
-            stats_context.query().group_by(groups).agg(pl.len().dp.noise().alias("count"))  # type: ignore
+            stats_context.query()
+            .group_by(groups)
+            .agg(pl.len().dp.noise().alias("count"))  # type: ignore
+            # .with_keys(pl.LazyFrame(GROUPING_KEYS))
         )
         ACCURACY_NAME = QUERY_NAME.summarize(alpha=1 - confidence)[  # noqa: F841
             "accuracy"
@@ -39,7 +42,8 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
         Template(template)
         .fill_values(
             BIN_NAME=f"{identifier}_bin",
-            GROUP_NAMES=list(code_gen.analysis_plan.groups.keys()),  # TODO
+            GROUP_NAMES=list(code_gen.analysis_plan.groups.keys()),
+            GROUPING_KEYS=code_gen.analysis_plan.groups,
         )
         .fill_expressions(
             QUERY_NAME=f"{identifier}_query",
