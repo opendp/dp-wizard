@@ -114,6 +114,7 @@ def _make_sample_csv(path: Path, contributions: int) -> None:
     with path.open("w", newline="") as sample_csv_handle:
         fields = [
             "student_id",
+            "class_year",
             "class_year_str",
             "hw_number",
             "grade",
@@ -133,6 +134,7 @@ def _make_sample_csv(path: Path, contributions: int) -> None:
                 writer.writerow(
                     {
                         "student_id": student_id,
+                        "class_year": class_year,  # Useful for testing grouping by numeric columns
                         "class_year_str": class_year_map[class_year],
                         "hw_number": hw_number,
                         "grade": grade,
