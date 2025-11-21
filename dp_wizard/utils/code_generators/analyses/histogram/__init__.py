@@ -30,7 +30,7 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
             stats_context.query()
             .group_by(groups)
             .agg(pl.len().dp.noise().alias("count"))  # type: ignore
-            # .with_keys(pl.LazyFrame(GROUPING_KEYS))
+            .WITH_KEYS
         )
         ACCURACY_NAME = QUERY_NAME.summarize(alpha=1 - confidence)[  # noqa: F841
             "accuracy"
@@ -43,7 +43,15 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
         .fill_values(
             BIN_NAME=f"{identifier}_bin",
             GROUP_NAMES=list(code_gen.analysis_plan.groups.keys()),
-            GROUPING_KEYS=code_gen.analysis_plan.groups,
+        )
+        .fill_attributes(
+            WITH_KEYS=(
+                Template("with_keys(pl.LazyFrame(GROUPING_KEYS))")
+                .fill_values(GROUPING_KEYS=g)
+                .finish()
+                if (g := code_gen.analysis_plan.groups)
+                else None
+            )
         )
         .fill_expressions(
             QUERY_NAME=f"{identifier}_query",
