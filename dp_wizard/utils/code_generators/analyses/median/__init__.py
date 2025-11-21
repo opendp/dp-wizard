@@ -42,7 +42,7 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
                 Template("with_keys(pl.LazyFrame(GROUPING_KEYS))")
                 .fill_values(GROUPING_KEYS=g)
                 .finish()
-                if (g := code_gen.analysis_plan.groups)
+                if (g := code_gen.analysis_plan.get_groups_with_keys())
                 else None
             )
         )
