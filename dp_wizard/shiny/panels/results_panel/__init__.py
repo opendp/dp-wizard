@@ -281,7 +281,9 @@ def results_server(
             contributions_entity=contributions_entity(),
             epsilon=epsilon(),
             max_rows=int(max_rows()),
-            groups=group_keys(),
+            groups={
+                k: v for k, v in group_keys().items() if v  # Leave out the empty ones.
+            },
             columns=columns,
         )
 

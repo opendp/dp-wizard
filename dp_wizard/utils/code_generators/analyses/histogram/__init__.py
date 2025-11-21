@@ -24,7 +24,7 @@ root = get_template_root(__file__)
 def make_query(code_gen, identifier, accuracy_name, stats_name):
     import polars as pl
 
-    def template(BIN_NAME, GROUP_NAMES, stats_context, confidence, GROUPING_KEYS):
+    def template(BIN_NAME, GROUP_NAMES, stats_context, confidence):
         groups = [BIN_NAME] + GROUP_NAMES
         QUERY_NAME = (
             stats_context.query()

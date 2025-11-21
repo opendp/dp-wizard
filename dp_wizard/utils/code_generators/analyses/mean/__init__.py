@@ -1,4 +1,3 @@
-import polars as pl
 from dp_wizard_templates.code_template import Template
 
 from dp_wizard import get_template_root, opendp_version
@@ -21,7 +20,7 @@ root = get_template_root(__file__)
 
 
 def make_query(code_gen, identifier, accuracy_name, stats_name):
-    def template(GROUP_NAMES, stats_context, EXPR_NAME, GROUPING_KEYS):
+    def template(GROUP_NAMES, stats_context, EXPR_NAME):
         groups = GROUP_NAMES
         QUERY_NAME = (
             stats_context.query().group_by(groups).agg(EXPR_NAME).WITH_KEYS
