@@ -100,7 +100,7 @@ class AppState:
     # Analysis choices:
     all_column_names: reactive.Value[list[ColumnName]]
     numeric_column_names: reactive.Value[list[ColumnName]]
-    groups: reactive.Value[list[ColumnName]]
+    group_column_names: reactive.Value[list[ColumnName]]
     epsilon: reactive.Value[float]
 
     # Per-column choices:
@@ -111,6 +111,10 @@ class AppState:
     bin_counts: reactive.Value[dict[ColumnName, int]]
     weights: reactive.Value[dict[ColumnName, str]]
     analysis_errors: reactive.Value[dict[ColumnName, bool]]
+
+    # Per-group choices:
+    # (Again a dict, with ColumnName as the key.)
+    group_keys: reactive.Value[dict[ColumnName, list[str]]]
 
     # Release state:
     released: reactive.Value[bool]

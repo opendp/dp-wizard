@@ -128,7 +128,7 @@ def dataset_server(
     # Analysis choices:
     all_column_names = state.all_column_names
     numeric_column_names = state.numeric_column_names
-    # groups = state.groups
+    # group_column_names = state.group_column_names
     # epsilon = state.epsilon
 
     # Per-column choices:
@@ -139,6 +139,10 @@ def dataset_server(
     # bin_counts = state.bin_counts
     # weights = state.weights
     # analysis_errors = state.analysis_errors
+
+    # Per-group choices:
+    # (Again a dict, with ColumnName as the key.)
+    # group_keys = state.group_keys
 
     # Release state:
     released = state.released

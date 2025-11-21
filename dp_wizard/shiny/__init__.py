@@ -114,6 +114,7 @@ def _make_sample_csv(path: Path, contributions: int) -> None:
     with path.open("w", newline="") as sample_csv_handle:
         fields = [
             "student_id",
+            "class_year",
             "class_year_str",
             "hw_number",
             "grade",
@@ -133,6 +134,7 @@ def _make_sample_csv(path: Path, contributions: int) -> None:
                 writer.writerow(
                     {
                         "student_id": student_id,
+                        "class_year": class_year,  # Useful for testing grouping by numeric columns
                         "class_year_str": class_year_map[class_year],
                         "hw_number": hw_number,
                         "grade": grade,
@@ -191,7 +193,7 @@ def _make_server(cli_info: CLIInfo):
             # Analysis choices:
             all_column_names=reactive.value(initial_column_names),
             numeric_column_names=reactive.value(initial_numeric_column_names),
-            groups=reactive.value([]),
+            group_column_names=reactive.value([]),
             epsilon=reactive.value(1.0),
             # Per-column choices:
             analysis_types=reactive.value({}),
@@ -200,6 +202,8 @@ def _make_server(cli_info: CLIInfo):
             bin_counts=reactive.value({}),
             weights=reactive.value({}),
             analysis_errors=reactive.value({}),
+            # Per-group choices:
+            group_keys=reactive.value({}),
             # Release state:
             released=reactive.value(False),
         )
