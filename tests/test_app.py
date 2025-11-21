@@ -287,7 +287,7 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     # it doesn't make sense to parameterize this test,
     # but that could change.
 
-    expected_stem = "dp_statistics_for_grade_grouped_by_class_year"
+    expected_stem = "dp_statistics_for_grade"
 
     for option in _download_options.values():
         link_text = f"{option.name} ({option.ext})"
