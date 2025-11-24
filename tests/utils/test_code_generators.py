@@ -107,7 +107,7 @@ hw_grade_bin_expr = (
     )
 
 
-abc_csv = "tests/fixtures/abc.csv"
+abc_csv_path = str((package_root.parent / "tests/fixtures/abc.csv").absolute())
 
 
 def number_lines(text: str):
@@ -141,22 +141,17 @@ median_plan_column = AnalysisPlanColumn(
 
 
 def id_for_plan(plan: AnalysisPlan):
-    columns = ", ".join(f"{v[0].analysis_name} of {k}" for k, v in plan.columns.items())
-    description = (
-        f"{plan.product} for {columns}; "
-        f"grouped by ({', '.join(plan.groups) or 'nothing'})"
-    )
-    return re.sub(r"\W+", "_", description)  # For selection with "pytest -k substring"
+    return re.sub(r"\W+", "_", str(plan))  # For selection with "pytest -k substring"
 
 
-plans = [
+plans_all_combos = [
     AnalysisPlan(
         product=product,
         groups=groups,
         columns=columns,
         contributions=contributions,
         contributions_entity="Family",
-        csv_path=abc_csv,
+        csv_path=abc_csv_path,
         epsilon=1,
         max_rows=100_000,
     )
@@ -176,6 +171,13 @@ plans = [
         },
     ]
 ]
+
+
+# The matrix is very redundant! A subsample is sufficient,
+# but make sure it's relatively prime so we have coverage.
+mod = 7
+assert len(plans_all_combos) % mod != 0
+plans = [plan for i, plan in enumerate(plans_all_combos) if i % 7 == 0]
 
 
 expected_urls = [
@@ -230,6 +232,7 @@ def test_make_notebook(plan):
 @pytest.mark.parametrize("plan", plans, ids=id_for_plan)
 def test_make_script(plan):
     script = ScriptGenerator(plan, "Note goes here!").make_py()
+    print(number_lines(script))
 
     # Make sure jupytext formatting doesn't bleed into the script.
     # https://jupytext.readthedocs.io/en/latest/formats-scripts.html#the-light-format
@@ -241,6 +244,6 @@ def test_make_script(plan):
         fp.flush()
 
         result = subprocess.run(
-            ["python", fp.name, "--csv", abc_csv], capture_output=True
+            ["python", fp.name, "--csv", abc_csv_path], capture_output=True
         )
         assert result.returncode == 0
