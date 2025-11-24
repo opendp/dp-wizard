@@ -16,7 +16,7 @@ from dp_wizard.shiny.components.outputs import (
     only_for_screenreader,
     tutorial_box,
 )
-from dp_wizard.types import AnalysisName, ColumnName, Product
+from dp_wizard.types import AnalysisName, ColumnName, Product, Weight
 from dp_wizard.utils.code_generators import make_column_config_block
 from dp_wizard.utils.code_generators.analyses import (
     get_analysis_by_name,
@@ -29,7 +29,6 @@ from dp_wizard.utils.mock_data import ColumnDef, mock_data
 from dp_wizard.utils.shared import plot_bars
 
 default_analysis_type = histogram.name
-default_weight = "2"
 label_width = "10em"  # Just wide enough so the text isn't trucated.
 
 
@@ -141,7 +140,7 @@ def column_server(
     lower_bounds: reactive.Value[dict[ColumnName, float]],
     upper_bounds: reactive.Value[dict[ColumnName, float]],
     bin_counts: reactive.Value[dict[ColumnName, int]],
-    weights: reactive.Value[dict[ColumnName, str]],
+    weights: reactive.Value[dict[ColumnName, Weight]],
     is_tutorial_mode: reactive.Value[bool],
     is_sample_csv: bool,
     is_single_column: bool,
@@ -150,7 +149,10 @@ def column_server(
     def _set_hidden_inputs():
         # TODO: Is isolate still needed?
         with reactive.isolate():  # Without isolate, there is an infinite loop.
-            ui.update_numeric("weight", value=int(weights().get(name, default_weight)))
+            ui.update_numeric(
+                "weight",
+                value=int(weights().get(name, Weight.DEFAULT).value),
+            )
 
     @reactive.effect
     @reactive.event(input.analysis_type)
@@ -187,7 +189,7 @@ def column_server(
     @reactive.effect
     @reactive.event(input.weight)
     def _set_weight():
-        weights.set({**weights(), name: input.weight()})
+        weights.set({**weights(), name: Weight(input.weight())})
 
     @reactive.calc()
     def accuracy_histogram():
@@ -195,7 +197,7 @@ def column_server(
         upper_x = float(input.upper_bound())
         bin_count = int(input.bins())
         weight = float(input.weight())
-        weights_sum = sum(float(weight) for weight in weights().values())
+        weights_sum = sum(float(weight.value) for weight in weights().values())
         info(f"Weight ratio for {name}: {weight}/{weights_sum}")
         if weights_sum == 0:
             # This function is triggered when column is removed;
@@ -349,12 +351,8 @@ def column_server(
                 ui.input_select(
                     "weight",
                     "Weight",
-                    choices={
-                        "1": "Less accurate",
-                        default_weight: "Default",
-                        "4": "More accurate",
-                    },
-                    selected=default_weight,
+                    choices={w.value: str(w) for w in Weight},
+                    selected=Weight.DEFAULT.value,
                     width=label_width,
                 ),
                 tutorial_box(
