@@ -67,7 +67,7 @@ def make_output(code_gen, column_name, accuracy_name, stats_name):
         Template(f"histogram_{code_gen._get_notebook_or_script()}_output", root)
         .fill_values(
             COLUMN_NAME=column_name,
-            GROUP_NAMES=list(code_gen.analysis_plan.groups.keys()),  # TODO
+            GROUP_NAMES=list(code_gen.analysis_plan.groups.keys()),
         )
         .fill_expressions(
             ACCURACY_NAME=accuracy_name,

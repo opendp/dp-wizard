@@ -162,7 +162,11 @@ plans = [
     )
     for product in Product
     for contributions in [1, 10]
-    for groups in [{}, {"A": ["expected", "values"]}]
+    for groups in [
+        {},  # No groups
+        {"A": []},  # Grouped, but no public keys
+        {"A": ["expected", "values"]},  # Grouped with keys
+    ]
     for columns in [
         # Single:
         {ColumnName("B"): [histogram_plan_column]},

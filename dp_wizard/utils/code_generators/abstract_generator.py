@@ -389,7 +389,7 @@ reencode it as UTF8.""",
                     repr(k)
                     for k in (
                         list(self.analysis_plan.columns.keys())
-                        + list(self.analysis_plan.groups.keys())  # TODO
+                        + list(self.analysis_plan.groups.keys())
                     )
                 ),
             )
