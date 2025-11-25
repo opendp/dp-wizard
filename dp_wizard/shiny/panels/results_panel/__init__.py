@@ -105,7 +105,7 @@ def results_server(
     # Analysis choices:
     all_column_names = state.all_column_names
     # numeric_column_names = state.numeric_column_names
-    # group_column_names = state.group_column_names
+    group_column_names = state.group_column_names
     epsilon = state.epsilon
 
     # Per-column choices:
@@ -281,7 +281,9 @@ def results_server(
             contributions_entity=contributions_entity(),
             epsilon=epsilon(),
             max_rows=int(max_rows()),
-            groups=group_keys(),
+            # group_keys may contains groups which are not currently selected.
+            # We *do* need to allow empty v: support grouping w/o keys.
+            groups={k: v for k, v in group_keys().items() if k in group_column_names()},
             columns=columns,
         )
 
