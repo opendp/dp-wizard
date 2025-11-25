@@ -102,13 +102,18 @@ def _make_sample_csv(path: Path, contributions: int) -> None:
     ...     _make_sample_csv(Path(temp.name), 10)
     ...     with open(temp.name, newline="") as csv_handle:
     ...         reader = csv.DictReader(csv_handle)
-    ...         reader.fieldnames
+    ...         print('\\n'.join(reader.fieldnames))
     ...         rows = list(reader)
     ...         rows[0].values()
     ...         rows[-1].values()
-    ['student_id', 'class_year_str', 'hw_number', 'grade', 'self_assessment']
-    dict_values(['1', 'sophomore', '1', '82', '0'])
-    dict_values(['100', 'sophomore', '10', '78', '0'])
+    student_id
+    class_year
+    class_year_str
+    hw_number
+    grade
+    self_assessment
+    dict_values(['1', '1', 'sophomore', '1', '82', '0'])
+    dict_values(['100', '1', 'sophomore', '10', '78', '0'])
     """
     random.seed(0)  # So the mock data will be stable across runs.
     with path.open("w", newline="") as sample_csv_handle:
@@ -134,7 +139,7 @@ def _make_sample_csv(path: Path, contributions: int) -> None:
                 writer.writerow(
                     {
                         "student_id": student_id,
-                        "class_year": class_year,  # Useful for testing grouping by numeric columns
+                        "class_year": class_year,  # To test grouping by numerics.
                         "class_year_str": class_year_map[class_year],
                         "hw_number": hw_number,
                         "grade": grade,
