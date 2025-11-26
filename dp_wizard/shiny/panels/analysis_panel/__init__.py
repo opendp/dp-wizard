@@ -389,6 +389,7 @@ def analysis_server(
                 group_id,
                 name=groups_ids_to_names[group_id],
                 group_keys=group_keys,
+                polars_schema=polars_schema,
             )
         return [group_ui(group_id) for group_id in groups_ids]
 

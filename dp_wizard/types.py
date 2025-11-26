@@ -115,7 +115,7 @@ class AppState:
 
     # Per-group choices:
     # (Again a dict, with ColumnName as the key.)
-    group_keys: reactive.Value[dict[ColumnName, list[str]]]
+    group_keys: reactive.Value[dict[ColumnName, list[str | float]]]
 
     # Release state:
     released: reactive.Value[bool]
