@@ -167,13 +167,19 @@ def dataset_server(
     @reactive.effect
     @reactive.event(input.all_column_names)
     def _on_column_names_change():
+        # Only used when the user is supplying column names in cloud mode.
+        # The Polars type comes into play if/when public keys are given.
         column_names = [
             clean
             for line in input.all_column_names().splitlines()
             if (clean := line.strip())
         ]
-        # The Polars type comes into play if/when public keys are given.
-        polars_schema.set(pl.Schema({name: pl.Int32 for name in column_names}))
+        # Set schema type as string, so that keys can be set.
+        polars_schema.set(pl.Schema({name: pl.String for name in column_names}))
+        # But inconsistently, assume numeric type, so columns can be selected
+        # for stats.
+        # TODO: Allow types to be specified in the cloud.
+        # https://github.com/opendp/dp-wizard/issues/741
         numeric_column_names.set(column_names)
 
     @reactive.calc
