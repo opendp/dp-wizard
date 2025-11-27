@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 import polars as pl
@@ -5,7 +6,48 @@ import polars as pl
 from dp_wizard.types import ColumnId, ColumnLabel, ColumnName
 
 
-def read_polars_schema(csv_path: Path) -> pl.Schema:
+def convert_text(text: str, target_type: pl.DataType) -> list[str | float]:
+    """
+    >>> convert_text("\\n\\n before\\n \\nand, after \\n\\n", pl.String)
+    ['before', 'and', 'after']
+
+    >>> convert_text("-1,0,1,3.14159", pl.Int32)
+    [-1, 0, 1]
+
+    >>> convert_text("-1.1,0,1.1,foobar", pl.Float32)
+    [-1.1, 0.0, 1.1]
+    """
+    if target_type.is_float():
+        convert = float
+    elif target_type.is_integer():
+        convert = int
+    elif target_type == pl.Boolean:
+        convert = bool
+    elif target_type == pl.String:
+        convert = str
+    else:
+        raise Exception(f"Unexpected type: {target_type}")  # pragma: no cover
+
+    def safe_convert(value: str) -> str | float | bool | None:
+        try:
+            new = convert(value)
+        except ValueError:
+            new = None
+        return new
+
+    clean_lines = [
+        clean_line for line in re.split(r"[\n,]", text) if (clean_line := line.strip())
+    ]
+
+    converted_lines = [
+        converted_line
+        for line in clean_lines
+        if (converted_line := safe_convert(line)) is not None
+    ]
+    return converted_lines
+
+
+def read_polars_schema(csv_path: Path | bytes) -> pl.Schema:
     # Polars is overkill, but it is more robust against
     # variations in encoding than Python stdlib csv.
     # However, it could be slow:
