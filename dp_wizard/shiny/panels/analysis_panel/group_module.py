@@ -40,6 +40,17 @@ def group_server(
 
     @render.ui
     def group_keys_ui():
+        match pl_datatype := polars_schema()[name]:
+            case pl.String:
+                datatype = "String"
+            case pl.Int64:
+                datatype = "Integer"
+            case pl.Float64:
+                datatype = "Floating point"
+            case pl.Boolean:
+                datatype = "True/False"
+            case _:
+                datatype = str(pl_datatype)
         return [
             ui.markdown(
                 f"""
@@ -56,5 +67,6 @@ def group_server(
                 "\n".join(str(value) for value in group_keys().get(name, [])),
                 rows=5,
                 update_on="blur",
+                placeholder=f"{datatype} values, one per line",
             ),
         ]
