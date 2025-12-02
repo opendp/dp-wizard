@@ -248,3 +248,22 @@ def test_make_script(plan):
             ["python", fp.name, "--csv", abc_csv], capture_output=True
         )
         assert result.returncode == 0
+
+
+def test_pums():
+    plan = AnalysisPlan(
+        product=Product.STATISTICS,
+        groups={},
+        columns={
+            ColumnName("income"): [AnalysisPlanColumn(mean.name, 0, 100000, 0, 1)]
+        },
+        contributions=1,
+        contributions_entity="Family",
+        csv_path=str(Path(__file__).parent.parent / "fixtures/pums_1000.csv"),
+        epsilon=1,
+        max_rows=1000,
+    )
+    notebook_py = NotebookGenerator(plan, "Note goes here!").make_py()
+    print(number_lines(notebook_py))
+    globals = {}
+    exec(notebook_py, globals)
