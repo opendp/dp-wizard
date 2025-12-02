@@ -96,7 +96,8 @@ def test_csv_loading(write_encoding):
 
         # THIS IS THE RIGHT PATTERN!
         # Not perfect, but "utf8-lossy" retains as much info as possible.
-        read_lf = pl.scan_csv(fp.name, encoding="utf8-lossy")
+        # "ignore_errors" true will skip values that don't match inferred type.
+        read_lf = pl.scan_csv(fp.name, encoding="utf8-lossy", ignore_errors=True)
         if write_encoding == "latin1":
             # Not equal, but the only differce is the "�".
             pl_testing.assert_frame_not_equal(write_lf, read_lf)
