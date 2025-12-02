@@ -101,7 +101,14 @@ represent characters outside the ASCII character set, but out-of-the-box
 the Polars library only supports UTF8. Specifying `utf8-lossy` preserves as
 much information as possible, and any unrecognized characters will be replaced
 by "�". If this is not sufficient, you will need to preprocess your data to
-reencode it as UTF8.""",
+reencode it as UTF8.
+
+We suggest using `ignore_errors=True`. By default, Polars infers types from
+the first rows of a CSV, and if a later value can not be parsed as the inferred
+type it will error. Runtime errors that depend on a single value would leak
+information and violate the DP guarantee, so it is safer to ignore them,
+although this can be a source of bias.
+""",
                 CUSTOM_NOTE=self.note,
             )
             .finish()
