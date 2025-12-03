@@ -4,6 +4,7 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 
 import opendp.prelude as dp
+import polars as pl
 import pytest
 import requests
 from dp_wizard_templates.converters import convert_nb_to_html, convert_py_to_nb
@@ -18,6 +19,7 @@ from dp_wizard.utils.code_generators import (
 from dp_wizard.utils.code_generators.analyses import histogram, mean, median
 from dp_wizard.utils.code_generators.notebook_generator import NotebookGenerator
 from dp_wizard.utils.code_generators.script_generator import ScriptGenerator
+from dp_wizard.utils.csv_helper import read_polars_schema
 
 python_paths = package_root.glob("**/*.py")
 
@@ -251,15 +253,31 @@ def test_make_script(plan):
 
 
 def test_pums():
+    csv_path = Path(__file__).parent.parent / "fixtures/pums_1000.csv"
+
+    # The "income" field looks like integers in the first rows,
+    # but farther down there are floats.
+    # Without ignore_errors=True, the generated notebook fails.
+    assert read_polars_schema(csv_path)["income"] == pl.Int64
+    assert "1e+05" in csv_path.read_text()
+
     plan = AnalysisPlan(
         product=Product.STATISTICS,
         groups={},
         columns={
-            ColumnName("income"): [AnalysisPlanColumn(mean.name, 0, 100000, 0, 1)]
+            ColumnName("income"): [
+                AnalysisPlanColumn(
+                    mean.name,
+                    lower_bound=0,
+                    upper_bound=100000,
+                    bin_count=0,
+                    weight=1,
+                )
+            ]
         },
         contributions=1,
         contributions_entity="Family",
-        csv_path=str(Path(__file__).parent.parent / "fixtures/pums_1000.csv"),
+        csv_path=str(csv_path),
         epsilon=1,
         max_rows=1000,
     )
