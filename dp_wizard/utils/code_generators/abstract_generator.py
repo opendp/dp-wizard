@@ -95,7 +95,7 @@ class AbstractGenerator(ABC):
                 WINDOWS_COMMENT_BLOCK="""
 (If installing in the Windows CMD shell,
 use double-quotes instead of single-quotes below.)""",
-                ENCODING_COMMENT_BLOCK="""
+                CSV_COMMENT_BLOCK="""
 A note on `utf8-lossy`: CSVs can use different "character encodings" to
 represent characters outside the ASCII character set, but out-of-the-box
 the Polars library only supports UTF8. Specifying `utf8-lossy` preserves as
@@ -103,11 +103,10 @@ much information as possible, and any unrecognized characters will be replaced
 by "�". If this is not sufficient, you will need to preprocess your data to
 reencode it as UTF8.
 
-We suggest using `ignore_errors=True`. By default, Polars infers types from
-the first rows of a CSV, and if a later value can not be parsed as the inferred
-type it will error. Runtime errors that depend on a single value would leak
-information and violate the DP guarantee, so it is safer to ignore them,
-although this can be a source of bias.
+We suggest using `ignore_errors=True`. Runtime errors that depend on a single
+value would leak information and violate the DP guarantee,
+so it is safer to ignore them. That said, if a significant number of records
+are ignored because of errors, it will bias results.
 """,
                 CUSTOM_NOTE=self.note,
             )
