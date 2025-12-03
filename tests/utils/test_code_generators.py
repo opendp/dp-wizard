@@ -162,17 +162,17 @@ plans = [
     )
     for product in Product
     for contributions in [1, 10]
-    for groups in [[], ["A"]]
+    for groups in [[], ["1A"]]
     for columns in [
         # Single:
-        {ColumnName("B"): [histogram_plan_column]},
-        {ColumnName("B"): [mean_plan_column]},
-        {ColumnName("B"): [median_plan_column]},
+        {ColumnName("2B"): [histogram_plan_column]},
+        {ColumnName("2B"): [mean_plan_column]},
+        {ColumnName("2B"): [median_plan_column]},
         # Multiple:
         {
-            ColumnName("B"): [histogram_plan_column],
-            ColumnName("C"): [mean_plan_column],
-            ColumnName("D"): [median_plan_column],
+            ColumnName("2B"): [histogram_plan_column],
+            ColumnName("3C"): [mean_plan_column],
+            ColumnName("4D"): [median_plan_column],
         },
     ]
 ]

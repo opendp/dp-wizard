@@ -175,17 +175,3 @@ def make_column_config_block(
         upper_bound=upper_bound,
         bin_count=bin_count,
     )
-
-
-def snake_case(name: str):
-    """
-    >>> snake_case("HW GRADE")
-    'hw_grade'
-    >>> snake_case("123")
-    '_123'
-    """
-    snake = re.sub(r"\W+", "_", name.lower())
-    # TODO: More validation in UI so we don't get zero-length strings.
-    if snake == "" or not re.match(r"[a-z]", snake[0]):
-        snake = f"_{snake}"
-    return snake
