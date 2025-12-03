@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import Optional
 
+import polars as pl
 from shiny import Inputs, Outputs, Session, reactive, render, ui
 
 from dp_wizard.shiny.components.icons import (
@@ -22,8 +23,8 @@ from dp_wizard.types import AppState, Product
 from dp_wizard.utils.code_generators import make_privacy_unit_block
 from dp_wizard.utils.csv_helper import (
     get_csv_names_mismatch,
-    read_csv_names,
     read_csv_numeric_names,
+    read_polars_schema,
 )
 
 dataset_panel_id = "dataset_panel"
@@ -126,9 +127,9 @@ def dataset_server(
     product = state.product
 
     # Analysis choices:
-    all_column_names = state.all_column_names
+    polars_schema = state.polars_schema
     numeric_column_names = state.numeric_column_names
-    # groups = state.groups
+    # group_column_names = state.group_column_names
     # epsilon = state.epsilon
 
     # Per-column choices:
@@ -140,6 +141,10 @@ def dataset_server(
     # weights = state.weights
     # analysis_errors = state.analysis_errors
 
+    # Per-group choices:
+    # (Again a dict, with ColumnName as the key.)
+    # group_keys = state.group_keys
+
     # Release state:
     released = state.released
 
@@ -148,7 +153,7 @@ def dataset_server(
     def _on_public_csv_path_change():
         path = input.public_csv_path()[0]["datapath"]
         public_csv_path.set(path)
-        all_column_names.set(read_csv_names(Path(path)))
+        polars_schema.set(read_polars_schema(Path(path)))
         numeric_column_names.set(read_csv_numeric_names(Path(path)))
 
     @reactive.effect
@@ -156,18 +161,25 @@ def dataset_server(
     def _on_private_csv_path_change():
         path = input.private_csv_path()[0]["datapath"]
         private_csv_path.set(path)
-        all_column_names.set(read_csv_names(Path(path)))
+        polars_schema.set(read_polars_schema(Path(path)))
         numeric_column_names.set(read_csv_numeric_names(Path(path)))
 
     @reactive.effect
     @reactive.event(input.all_column_names)
     def _on_column_names_change():
+        # Only used when the user is supplying column names in cloud mode.
+        # The Polars type comes into play if/when public keys are given.
         column_names = [
             clean
             for line in input.all_column_names().splitlines()
             if (clean := line.strip())
         ]
-        all_column_names.set(column_names)
+        # Set schema type as string, so that keys can be set.
+        polars_schema.set(pl.Schema({name: pl.String for name in column_names}))
+        # But inconsistently, assume numeric type, so columns can be selected
+        # for stats.
+        # TODO: Allow types to be specified in the cloud.
+        # https://github.com/opendp/dp-wizard/issues/741
         numeric_column_names.set(column_names)
 
     @reactive.calc
@@ -348,7 +360,7 @@ def dataset_server(
         return (
             contributions_valid()
             and not get_row_count_errors(max_rows())
-            and len(all_column_names()) > 0
+            and len(polars_schema()) > 0
             and (in_cloud or not csv_column_mismatch_calc())
         )
 
