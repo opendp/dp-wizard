@@ -18,6 +18,16 @@ def log_slider(id: str, lower_bound: float, upper_bound: float):
         ui.HTML(
             f"""
 <style>
+.irs:has(+ #{id}) .irs-line {{
+    top: 29px;
+    height: 7px;
+    background: linear-gradient(to right, blue, white, white, red);
+}}
+
+.irs:has(+ #{id}) .irs-bar {{
+    display: none;
+}}
+
 .irs:has(+ #{id}) .irs-single {{
     /* Hide the current, non-log value. */
     visibility: hidden;
