@@ -70,8 +70,10 @@ faicons==0.2.2
     # via -r requirements.in
 fastjsonschema==2.21.1
     # via nbformat
-fonttools==4.57.0
-    # via matplotlib
+fonttools==4.61.0
+    # via
+    #   -r requirements.in
+    #   matplotlib
 h11==0.16.0
     # via uvicorn
 htmltools==0.6.0
