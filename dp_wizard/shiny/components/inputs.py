@@ -19,31 +19,34 @@ def log_slider(id: str, lower_bound: float, upper_bound: float):
         ui.HTML(
             f"""
 <style>
+{target} .irs-bar {{
+    /* Line from left unnecessary. */
+    display: none;
+}}
 {target} .irs-line {{
+    /* Warn about high or low values. */
     top: 29px;
     height: 7px;
     background: linear-gradient(to right, blue, white, white, red);
 }}
-{target} .irs-bar {{
-    display: none;
-}}
+
 {target} .irs-single {{
     /* Hide the current, non-log value. */
     visibility: hidden;
 }}
+
 {target} .irs-min, {target} .irs-max {{
-    /* Always show the endpoint values. */
-    visibility: visible !important;
     /* Shrink the non-log endpoint values to invisibility... */
     font-size: 0;
+    /* and instead show log values... */
+    visibility: visible !important;
 }}
 {target} .irs-min::before {{
-    /* ... and instead show lower ... */
+    /* ... using css "content": */
     content: "{lower_bound}";
     font-size: 12px;
 }}
 {target} .irs-max::after {{
-    /* ... and upper bounds. */
     content: "{upper_bound}";
     font-size: 12px;
 }}
