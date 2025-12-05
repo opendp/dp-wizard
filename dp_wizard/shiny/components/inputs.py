@@ -14,30 +14,39 @@ def log_slider(id: str, lower_bound: float, upper_bound: float):
     # The rendered widget doesn't have a unique ID, but the following
     # element does, so we can use some fancy CSS to get the preceding element.
     # Long term solution is just to make our own widget.
+    target = f".irs:has(+ #{id})"
     return [
         ui.HTML(
             f"""
 <style>
-.irs:has(+ #{id}) .irs-single {{
+{target} .irs-bar {{
+    /* Line from left unnecessary. */
+    display: none;
+}}
+{target} .irs-line {{
+    /* Warn about high or low values. */
+    top: 29px;
+    height: 7px;
+    background: linear-gradient(to right, blue, white, white, red);
+}}
+
+{target} .irs-single {{
     /* Hide the current, non-log value. */
     visibility: hidden;
 }}
-.irs:has(+ #{id}) .irs-min, .irs:has(+ #{id}) .irs-max {{
-    /* Always show the endpoint values. */
-    visibility: visible !important;
-}}
 
-.irs:has(+ #{id}) .irs-min, .irs:has(+ #{id}) .irs-max {{
+{target} .irs-min, {target} .irs-max {{
     /* Shrink the non-log endpoint values to invisibility... */
     font-size: 0;
+    /* and instead show log values... */
+    visibility: visible !important;
 }}
-.irs:has(+ #{id}) .irs-min::before {{
-    /* ... and instead show lower ... */
+{target} .irs-min::before {{
+    /* ... using css "content": */
     content: "{lower_bound}";
     font-size: 12px;
 }}
-.irs:has(+ #{id}) .irs-max::after {{
-    /* ... and upper bounds. */
+{target} .irs-max::after {{
     content: "{upper_bound}";
     font-size: 12px;
 }}
