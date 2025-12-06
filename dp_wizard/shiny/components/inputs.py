@@ -16,13 +16,13 @@ def log_slider(id: str, lower_bound: float, upper_bound: float):
     # Long term solution is just to make our own widget.
     target = f".irs:has(+ #{id})"
     return [
+        # {target} .irs-bar {{
+        #     /* Line from left unnecessary. */
+        #     display: none;
+        # }}
         ui.HTML(
             f"""
 <style>
-{target} .irs-bar {{
-    /* Line from left unnecessary. */
-    display: none;
-}}
 {target} .irs-line {{
     /* Warn about high or low values. */
     top: 29px;

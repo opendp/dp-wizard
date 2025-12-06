@@ -128,9 +128,10 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     expect(page.get_by_text(download_results_text)).not_to_be_visible()
     # Epsilon slider:
     expect(page.get_by_text("Epsilon: 1.0")).to_be_visible()
-    page.locator(".irs-handle").drag_to(page.locator(".irs-min"))
-    # This passed locally, but not in CI:
-    # expect(page.get_by_text("Epsilon: 0.1")).to_be_visible()
+    page.locator(".irs-bar").click()
+    expect(page.get_by_text("Epsilon: 0.3")).to_be_visible()
+    page.locator(".irs-bar").click()
+    expect(page.get_by_text("Epsilon: 0.2")).to_be_visible()
     # Simulation
     expect(page.get_by_text("Because you've provided a public CSV")).to_be_visible()
 
@@ -156,6 +157,9 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
 
     # Input validation:
     page.get_by_label("Number of Bins").fill("-1")
+    expect(page.get_by_text("Number should be a positive integer.")).to_be_visible()
+    # Changing epsilon should not reset column details:
+    page.locator(".irs-bar").click()
     expect(page.get_by_text("Number should be a positive integer.")).to_be_visible()
     page.get_by_label("Number of Bins").fill("10")
 
