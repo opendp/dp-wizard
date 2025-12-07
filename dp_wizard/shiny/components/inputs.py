@@ -5,7 +5,13 @@ from shiny import ui
 from dp_wizard.shiny.components.outputs import only_for_screenreader
 
 
-def log_slider(id: str, lower_bound: float, upper_bound: float):
+def log_slider(
+    id: str,
+    lower_bound: float,
+    upper_bound: float,
+    lower_message: str = "",
+    upper_message: str = "",
+):
     # Rather than engineer a new widget, hide the numbers we don't want,
     # and insert the log values via CSS.
     # "display" and "visibility" were also hiding the content provided via CSS,
@@ -15,6 +21,8 @@ def log_slider(id: str, lower_bound: float, upper_bound: float):
     # element does, so we can use some fancy CSS to get the preceding element.
     # Long term solution is just to make our own widget.
     target = f".irs:has(+ #{id})"
+    lower_content = lower_message if lower_message else lower_bound
+    upper_content = upper_message if upper_message else upper_bound
     return [
         ui.HTML(
             f"""
@@ -38,16 +46,16 @@ def log_slider(id: str, lower_bound: float, upper_bound: float):
 {target} .irs-min, {target} .irs-max {{
     /* Shrink the non-log endpoint values to invisibility... */
     font-size: 0;
-    /* and instead show log values... */
+    /* and instead show messages... */
     visibility: visible !important;
 }}
 {target} .irs-min::before {{
     /* ... using css "content": */
-    content: "{lower_bound}";
+    content: "{lower_content}";
     font-size: 12px;
 }}
 {target} .irs-max::after {{
-    content: "{upper_bound}";
+    content: "{upper_content}";
     font-size: 12px;
 }}
 </style>
