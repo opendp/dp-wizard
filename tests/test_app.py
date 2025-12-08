@@ -213,18 +213,35 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
 
     def screenshot(page, name):
         from os import environ
+        from shutil import copyfile
         from time import sleep
 
+        from diffimg import diff
         from PIL import Image
 
-        if environ.get("SCREENSHOTS"):
-            sleep(1)  # Might not be fully updated initially.
-            path = package_root.parent / f"docs/screenshots/{name}.png"
-            page.screenshot(path=path, full_page=True)
+        sleep(1)  # Might not be fully updated initially.
 
-            img = Image.open(path)
-            img = img.quantize(colors=16)
-            img.save(path, optimize=True)
+        def img_path(name, ext=""):
+            return f"{package_root.parent}/docs/screenshots/{name}{ext}.png"
+
+        tmp_path = img_path(name, ".tmp")
+        new_path = img_path(name, ".new")
+        diff_path = img_path(name, ".diff")
+        old_path = img_path(name)
+
+        page.screenshot(path=tmp_path, full_page=True)
+
+        img = Image.open(tmp_path)
+        img = img.quantize(colors=16)
+        img.save(new_path, optimize=True)
+        if environ.get("SCREENSHOTS"):
+            copyfile(new_path, old_path)
+        else:
+            # TODO: When screenshot doesn't include timestamp, diff should be zero.
+            # https://github.com/opendp/dp-wizard/issues/717
+            assert (
+                diff(new_path, old_path, diff_img_file=diff_path) < 0.01
+            ), f"Screenshots changed! {diff_path}"
 
     dataset_release_warning = "changes to the dataset will constitute a new release"
     analysis_release_warning = "changes to the analysis will constitute a new release"
