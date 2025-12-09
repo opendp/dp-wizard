@@ -59,7 +59,7 @@ class AnalysisPlan(NamedTuple):
 
     def get_absolute_csv_path(self) -> str:
         if self.csv_path is None:
-            return ""
+            return ""  # pragma: no cover
         return str(Path(self.csv_path).absolute())
 
     def to_stem(self) -> str:
