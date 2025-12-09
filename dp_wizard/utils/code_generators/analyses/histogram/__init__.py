@@ -66,7 +66,7 @@ def make_output(code_gen, column_name, accuracy_name, stats_name):
     )
 
 
-def make_note():
+def make_plot_note():
     return (
         "`None` values above may indicate strings "
         "which could not be converted to numbers."
