@@ -130,7 +130,7 @@ def _make_server(cli_info: CLIInfo):
             max_rows=reactive.value("0"),
             initial_product=initial_product,
             product=reactive.value(initial_product),
-            # Statistic choices:
+            # Analysis choices:
             all_column_names=reactive.value(initial_column_names),
             numeric_column_names=reactive.value(initial_numeric_column_names),
             groups=reactive.value([]),

@@ -97,7 +97,7 @@ class AppState:
     initial_product: Product
     product: reactive.Value[Product]
 
-    # Statistic choices:
+    # Analysis choices:
     all_column_names: reactive.Value[list[ColumnName]]
     numeric_column_names: reactive.Value[list[ColumnName]]
     groups: reactive.Value[list[ColumnName]]

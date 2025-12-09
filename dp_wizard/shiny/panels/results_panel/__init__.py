@@ -102,7 +102,7 @@ def results_server(
     # initial_product = state.initial_product
     product = state.product
 
-    # Statistic choices:
+    # Analysis choices:
     all_column_names = state.all_column_names
     # numeric_column_names = state.numeric_column_names
     groups = state.groups
