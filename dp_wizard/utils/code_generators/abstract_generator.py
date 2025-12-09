@@ -159,7 +159,7 @@ reencode it as UTF8.""",
         return {
             name: make_column_config_block(
                 name=name,
-                analysis_name=col[0].analysis_name,
+                statistic_name=col[0].statistic_name,
                 lower_bound=col[0].lower_bound,
                 upper_bound=col[0].upper_bound,
                 bin_count=col[0].bin_count,
@@ -187,22 +187,22 @@ reencode it as UTF8.""",
         accuracy_name = f"{identifier}_accuracy"
         stats_name = f"{identifier}_stats"
 
-        from dp_wizard.utils.code_generators.analyses import get_analysis_by_name
+        from dp_wizard.utils.code_generators.analyses import get_statistic_by_name
 
-        analysis = get_analysis_by_name(plan[0].analysis_name)
-        query = analysis.make_query(
+        statistic = get_statistic_by_name(plan[0].statistic_name)
+        query = statistic.make_query(
             code_gen=self,
             identifier=identifier,
             accuracy_name=accuracy_name,
             stats_name=stats_name,
         )
-        output = analysis.make_output(
+        output = statistic.make_output(
             code_gen=self,
             column_name=column_name,
             accuracy_name=accuracy_name,
             stats_name=stats_name,
         )
-        note = analysis.make_note()
+        note = statistic.make_note()
 
         return (
             self._make_comment_cell(f"### Query for `{column_name}`:")
@@ -233,14 +233,14 @@ reencode it as UTF8.""",
     def _make_partial_stats_context(self):
 
         from dp_wizard.utils.code_generators.analyses import (
-            get_analysis_by_name,
+            get_statistic_by_name,
             has_bins,
         )
 
         bin_column_names = [
             ColumnIdentifier(name)
             for name, plan in self.analysis_plan.columns.items()
-            if has_bins(get_analysis_by_name(plan[0].analysis_name))
+            if has_bins(get_statistic_by_name(plan[0].statistic_name))
         ]
 
         privacy_unit_block = make_privacy_unit_block(
@@ -254,7 +254,7 @@ reencode it as UTF8.""",
         )
 
         is_just_histograms = all(
-            plan_column[0].analysis_name == histogram.name
+            plan_column[0].statistic_name == histogram.name
             for plan_column in self.analysis_plan.columns.values()
         )
         margins_list = (
@@ -271,7 +271,7 @@ reencode it as UTF8.""",
             [
                 f"{ColumnIdentifier(name)}_bin_expr"
                 for name, plan in self.analysis_plan.columns.items()
-                if has_bins(get_analysis_by_name(plan[0].analysis_name))
+                if has_bins(get_statistic_by_name(plan[0].statistic_name))
             ]
         )
         return (

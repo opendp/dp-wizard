@@ -1,10 +1,10 @@
 from typing import Protocol
 
-from dp_wizard.types import AnalysisName
+from dp_wizard.types import StatisticName
 from dp_wizard.utils.code_generators.abstract_generator import AbstractGenerator
 
 
-class Analysis(Protocol):  # pragma: no cover
+class Statistic(Protocol):  # pragma: no cover
     @property
     def name(self) -> str: ...
 
@@ -49,7 +49,7 @@ class Analysis(Protocol):  # pragma: no cover
     ) -> str: ...
 
 
-def get_analysis_by_name(name: AnalysisName) -> Analysis:  # pragma: no cover
+def get_statistic_by_name(name: StatisticName) -> Statistic:  # pragma: no cover
     # Avoid circular import:
     from dp_wizard.utils.code_generators.analyses import histogram, mean, median
 
@@ -61,11 +61,11 @@ def get_analysis_by_name(name: AnalysisName) -> Analysis:  # pragma: no cover
         case median.name:
             return median
         case _:
-            raise Exception("Unrecognized analysis")
+            raise Exception("Unrecognized statistic")
 
 
 # These might be redone as methods on a superclass:
-def has_bins(analysis: Analysis) -> bool:
+def has_bins(statistic: Statistic) -> bool:
     """
     >>> from dp_wizard.utils.code_generators.analyses import histogram, median
     >>> has_bins(histogram)
@@ -73,4 +73,4 @@ def has_bins(analysis: Analysis) -> bool:
     >>> has_bins(median)
     False
     """
-    return any("bin_count_input" in name for name in analysis.input_names)
+    return any("bin_count_input" in name for name in statistic.input_names)

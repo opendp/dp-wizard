@@ -102,7 +102,7 @@ def results_server(
     # initial_product = state.initial_product
     product = state.product
 
-    # Analysis choices:
+    # Statistic choices:
     all_column_names = state.all_column_names
     # numeric_column_names = state.numeric_column_names
     groups = state.groups
@@ -110,7 +110,7 @@ def results_server(
 
     # Per-column choices:
     # (Note that these are all dicts, with the ColumnName as the key.)
-    analysis_types = state.analysis_types
+    statistic_types = state.statistic_types
     lower_bounds = state.lower_bounds
     upper_bounds = state.upper_bounds
     bin_counts = state.bin_counts
@@ -260,7 +260,7 @@ def results_server(
         columns = {
             col: [
                 AnalysisPlanColumn(
-                    analysis_name=analysis_types()[col],
+                    statistic_name=statistic_types()[col],
                     lower_bound=lower_bounds()[col],
                     upper_bound=upper_bounds()[col],
                     bin_count=int(bin_counts()[col]),

@@ -23,7 +23,7 @@ class Product(Enum):
         return "DP " + self.name.replace("_", " ").title()
 
 
-class AnalysisName(str):
+class StatisticName(str):
     """
     A name like "Histogram" or "Mean".
     """
@@ -97,7 +97,7 @@ class AppState:
     initial_product: Product
     product: reactive.Value[Product]
 
-    # Analysis choices:
+    # Statistic choices:
     all_column_names: reactive.Value[list[ColumnName]]
     numeric_column_names: reactive.Value[list[ColumnName]]
     groups: reactive.Value[list[ColumnName]]
@@ -105,7 +105,7 @@ class AppState:
 
     # Per-column choices:
     # (Note that these are all dicts, with the ColumnName as the key.)
-    analysis_types: reactive.Value[dict[ColumnName, AnalysisName]]
+    statistic_types: reactive.Value[dict[ColumnName, StatisticName]]
     lower_bounds: reactive.Value[dict[ColumnName, float]]
     upper_bounds: reactive.Value[dict[ColumnName, float]]
     bin_counts: reactive.Value[dict[ColumnName, int]]

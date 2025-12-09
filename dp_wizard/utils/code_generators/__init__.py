@@ -5,11 +5,11 @@ from typing import NamedTuple, Optional
 from dp_wizard_templates.code_template import Template
 
 from dp_wizard import __version__, opendp_version, registry_url
-from dp_wizard.types import AnalysisName, ColumnName, Product
+from dp_wizard.types import ColumnName, Product, StatisticName
 
 
 class AnalysisPlanColumn(NamedTuple):
-    analysis_name: AnalysisName
+    statistic_name: StatisticName
     lower_bound: float
     upper_bound: float
     bin_count: int
@@ -162,14 +162,14 @@ def make_privacy_loss_block(pure: bool, epsilon: float, max_rows: int):
 
 def make_column_config_block(
     name: str,
-    analysis_name: AnalysisName,
+    statistic_name: StatisticName,
     lower_bound: float,
     upper_bound: float,
     bin_count: int,
 ):
-    from dp_wizard.utils.code_generators.analyses import get_analysis_by_name
+    from dp_wizard.utils.code_generators.analyses import get_statistic_by_name
 
-    return get_analysis_by_name(analysis_name).make_column_config_block(
+    return get_statistic_by_name(statistic_name).make_column_config_block(
         column_name=name,
         lower_bound=lower_bound,
         upper_bound=upper_bound,

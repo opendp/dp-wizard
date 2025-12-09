@@ -50,11 +50,11 @@ class NotebookGenerator(AbstractGenerator):
             for name, block in column_config_dict.items()
         )
 
-    def _make_report_kv(self, name, analysis_type):
-        from dp_wizard.utils.code_generators.analyses import get_analysis_by_name
+    def _make_report_kv(self, name, statistic_type):
+        from dp_wizard.utils.code_generators.analyses import get_statistic_by_name
 
-        analysis = get_analysis_by_name(analysis_type)
-        return analysis.make_report_kv(
+        statistic = get_statistic_by_name(statistic_type)
+        return statistic.make_report_kv(
             name=name, confidence=confidence, identifier=ColumnIdentifier(name)
         )
 
@@ -72,7 +72,7 @@ class NotebookGenerator(AbstractGenerator):
                 outputs_expression = (
                     "{"
                     + ",".join(
-                        self._make_report_kv(name, plan[0].analysis_name)
+                        self._make_report_kv(name, plan[0].statistic_name)
                         for name, plan in self.analysis_plan.columns.items()
                     )
                     + "}"
