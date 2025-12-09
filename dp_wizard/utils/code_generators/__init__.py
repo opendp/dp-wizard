@@ -119,12 +119,7 @@ def make_privacy_loss_block(pure: bool, epsilon: float, max_rows: int):
 
         def template(EPSILON, MAX_ROWS):
             privacy_loss = dp.loss_of(  # noqa: F841
-                # Your privacy budget is captured in the "epsilon" parameter.
-                # Larger values increase the risk that personal data could be
-                # reconstructed, so choose the smallest value that gives you
-                # the needed accuracy. You can also compare your budget to
-                # other projects:
-                # REGISTRY_URL
+                # EPSILON_COMMENT_BLOCK
                 epsilon=EPSILON,
                 # If your columns don't match your cuts dict,
                 # you will also need to provide a very small "delta" value.
@@ -136,12 +131,7 @@ def make_privacy_loss_block(pure: bool, epsilon: float, max_rows: int):
 
         def template(EPSILON, MAX_ROWS):
             privacy_loss = dp.loss_of(  # noqa: F841
-                # Your privacy budget is captured in the "epsilon" parameter.
-                # Larger values increase the risk that personal data could be
-                # reconstructed, so choose the smallest value that gives you
-                # the needed accuracy. You can also compare your budget to
-                # other projects:
-                # REGISTRY_URL
+                # EPSILON_COMMENT_BLOCK
                 epsilon=EPSILON,
                 # There are many models of differential privacy. For flexibility,
                 # we are using a model which tolerates a small probability (delta)
@@ -156,11 +146,20 @@ def make_privacy_loss_block(pure: bool, epsilon: float, max_rows: int):
         Template(template)
         .fill_expressions(
             OPENDP_V_VERSION=f"v{opendp_version}",
-            REGISTRY_URL=registry_url,
         )
         .fill_values(
             EPSILON=epsilon,
             MAX_ROWS=max_rows,
+        )
+        .fill_comment_blocks(
+            EPSILON_COMMENT_BLOCK=f"""
+Your privacy budget is captured in the "epsilon" parameter.
+Larger values increase the risk that personal data could be
+reconstructed, so choose the smallest value that gives you
+the needed accuracy. You can also compare your budget to
+other projects:
+{registry_url}
+            """
         )
         .finish()
     )

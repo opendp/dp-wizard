@@ -299,11 +299,8 @@ are ignored because of errors, it will bias results.
             contributions=self.analysis_plan.contributions,
             contributions_entity=self.analysis_plan.contributions_entity,
         )
-        # If there are no groups then OpenDP requires
-        # that pure DP be used for contingency tables.
-
         privacy_loss_block = make_privacy_loss_block(
-            pure=not self.analysis_plan.groups,
+            pure=True,
             epsilon=self.analysis_plan.epsilon,
             max_rows=self.analysis_plan.max_rows,
         )
