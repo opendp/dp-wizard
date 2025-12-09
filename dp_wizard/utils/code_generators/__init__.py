@@ -60,7 +60,7 @@ class AnalysisPlan(NamedTuple):
     def get_absolute_csv_path(self) -> str:
         if self.csv_path is None:
             return ""
-        return str(Path(self.csv_path).absolute)
+        return str(Path(self.csv_path).absolute())
 
     def to_stem(self) -> str:
         return re.sub(r"\W+", " ", str(self)).strip().replace(" ", "_").lower()
