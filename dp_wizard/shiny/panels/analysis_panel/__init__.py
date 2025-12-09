@@ -162,7 +162,7 @@ def analysis_server(
 
     # Per-column choices:
     # (Note that these are all dicts, with the ColumnName as the key.)
-    statistic_types = state.statistic_types
+    statistic_names = state.statistic_names
     lower_bounds = state.lower_bounds
     upper_bounds = state.upper_bounds
     bin_counts = state.bin_counts
@@ -362,7 +362,7 @@ def analysis_server(
                 epsilon=epsilon,
                 row_count=int(input.row_count()),
                 groups=groups,
-                statistic_types=statistic_types,
+                statistic_names=statistic_names,
                 analysis_errors=analysis_errors,
                 lower_bounds=lower_bounds,
                 upper_bounds=upper_bounds,

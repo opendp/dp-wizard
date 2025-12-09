@@ -44,7 +44,7 @@ def analysis_summary(state: AppState):  # pragma: no cover
     columns = (
         ", ".join(
             f"{statistic_name} of {column}"
-            for column, statistic_name in state.statistic_types().items()
+            for column, statistic_name in state.statistic_names().items()
         )
         or "None"
     )

@@ -105,7 +105,7 @@ class AppState:
 
     # Per-column choices:
     # (Note that these are all dicts, with the ColumnName as the key.)
-    statistic_types: reactive.Value[dict[ColumnName, StatisticName]]
+    statistic_names: reactive.Value[dict[ColumnName, StatisticName]]
     lower_bounds: reactive.Value[dict[ColumnName, float]]
     upper_bounds: reactive.Value[dict[ColumnName, float]]
     bin_counts: reactive.Value[dict[ColumnName, int]]

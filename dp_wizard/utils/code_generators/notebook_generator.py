@@ -50,10 +50,10 @@ class NotebookGenerator(AbstractGenerator):
             for name, block in column_config_dict.items()
         )
 
-    def _make_report_kv(self, name, statistic_type):
+    def _make_report_kv(self, name, statistic_name):
         from dp_wizard.utils.code_generators.analyses import get_statistic_by_name
 
-        statistic = get_statistic_by_name(statistic_type)
+        statistic = get_statistic_by_name(statistic_name)
         return statistic.make_report_kv(
             name=name, confidence=confidence, identifier=ColumnIdentifier(name)
         )

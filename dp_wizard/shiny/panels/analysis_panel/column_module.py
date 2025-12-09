@@ -28,7 +28,7 @@ from dp_wizard.utils.dp_helper import confidence, make_accuracy_histogram
 from dp_wizard.utils.mock_data import ColumnDef, mock_data
 from dp_wizard.utils.shared import plot_bars
 
-default_statistic_type = histogram.name
+default_statistic_name = histogram.name
 default_weight = "2"
 label_width = "10em"  # Just wide enough so the text isn't trucated.
 
@@ -136,7 +136,7 @@ def column_server(
     epsilon: reactive.Value[float],
     row_count: int,
     groups: reactive.Value[list[ColumnName]],
-    statistic_types: reactive.Value[dict[ColumnName, StatisticName]],
+    statistic_names: reactive.Value[dict[ColumnName, StatisticName]],
     analysis_errors: reactive.Value[dict[ColumnName, bool]],
     lower_bounds: reactive.Value[dict[ColumnName, float]],
     upper_bounds: reactive.Value[dict[ColumnName, float]],
@@ -153,9 +153,9 @@ def column_server(
             ui.update_numeric("weight", value=int(weights().get(name, default_weight)))
 
     @reactive.effect
-    @reactive.event(input.statistic_type)
-    def _set_statistic_type():
-        statistic_types.set({**statistic_types(), name: input.statistic_type()})
+    @reactive.event(input.statistic_name)
+    def _set_statistic_name():
+        statistic_names.set({**statistic_names(), name: input.statistic_name()})
 
     @reactive.effect
     @reactive.event(input.lower_bound)
@@ -232,14 +232,14 @@ def column_server(
 
     @render.ui
     def statistic_name_ui():
-        statistic_name = statistic_types().get(name, histogram.name)
+        statistic_name = statistic_names().get(name, histogram.name)
         blurb_md = get_statistic_by_name(statistic_name).blurb_md
         return hide_if(
             product() != Product.STATISTICS,
             (
                 ui.layout_columns(
                     ui.input_select(
-                        "statistic_type",
+                        "statistic_name",
                         only_for_screenreader("Type of statistic"),
                         [histogram.name, mean.name, median.name],
                         width=label_width,
@@ -319,7 +319,7 @@ def column_server(
         # but only show mean and median column UI if actually calculating stats:
         # otherwise show the histogram UI.
         statistic_name = (
-            input.statistic_type()
+            input.statistic_name()
             if product() == Product.STATISTICS
             else histogram.name
         )
@@ -391,7 +391,7 @@ def column_server(
             "Column Configuration",
             make_column_config_block(
                 name=name,
-                statistic_name=input.statistic_type(),
+                statistic_name=input.statistic_name(),
                 lower_bound=float(input.lower_bound()),
                 upper_bound=float(input.upper_bound()),
                 bin_count=int(input.bins()),
