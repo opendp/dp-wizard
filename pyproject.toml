@@ -16,6 +16,7 @@ dynamic = ["version", "description"]
 dependencies = [
     "dp-wizard-templates>=0.5.0",
     "faicons",
+    "fonttools>=4.60.2",
     "matplotlib",
     "opendp[mbi]==0.14.1",
     "pillow>=11.3.0",
@@ -87,7 +88,7 @@ app = [
     "executing==2.2.0",
     "faicons==0.2.2",
     "fastjsonschema==2.21.1",
-    "fonttools==4.57.0",
+    "fonttools==4.61.0",
     "h11==0.16.0",
     "htmltools==0.6.0",
     "idna==3.10",

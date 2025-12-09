@@ -1,5 +1,3 @@
-import csv
-import random
 from pathlib import Path
 
 import polars as pl
@@ -17,7 +15,11 @@ from dp_wizard.shiny.panels import (
 from dp_wizard.types import AppState, Product
 from dp_wizard.utils import config
 from dp_wizard.utils.argparse_helpers import CLIInfo
-from dp_wizard.utils.csv_helper import read_csv_numeric_names, read_polars_schema
+from dp_wizard.utils.csv_helper import (
+    make_sample_csv,
+    read_csv_numeric_names,
+    read_polars_schema,
+)
 
 _shiny_root = package_root / "shiny"
 _assets_root = _shiny_root / "assets"
@@ -94,79 +96,12 @@ def ctrl_c_reminder() -> None:  # pragma: no cover
     print("Session ended (Press CTRL+C to quit)")
 
 
-def _make_sample_csv(path: Path, contributions: int) -> None:
-    """
-    >>> import tempfile
-    >>> from pathlib import Path
-    >>> import csv
-    >>> with tempfile.NamedTemporaryFile() as temp:
-    ...     _make_sample_csv(Path(temp.name), 10)
-    ...     with open(temp.name, newline="") as csv_handle:
-    ...         reader = csv.DictReader(csv_handle)
-    ...         print('\\n'.join(reader.fieldnames))
-    ...         rows = list(reader)
-    ...         rows[0].values()
-    ...         rows[-1].values()
-    student_id
-    class_year
-    class_year_str
-    hw_number
-    grade
-    self_assessment
-    dict_values(['1', '1', 'sophomore', '1', '82', '0'])
-    dict_values(['100', '1', 'sophomore', '10', '78', '0'])
-    """
-    random.seed(0)  # So the mock data will be stable across runs.
-    with path.open("w", newline="") as sample_csv_handle:
-        fields = [
-            "student_id",
-            "class_year",
-            "class_year_str",
-            "hw_number",
-            "grade",
-            "self_assessment",
-        ]
-        class_year_map = ["first year", "sophomore", "junior", "senior"]
-        writer = csv.DictWriter(sample_csv_handle, fieldnames=fields)
-        writer.writeheader()
-        for student_id in range(1, 101):
-            class_year = int(_clip(random.gauss(1, 1), 0, 3))
-            for hw_number in range(1, contributions + 1):
-                # Older students do slightly better in the class,
-                # but each assignment gets harder.
-                mean_grade = random.gauss(90, 5) + (class_year + 1) * 2 - hw_number
-                grade = int(_clip(random.gauss(mean_grade, 5), 0, 100))
-                self_assessment = 1 if grade > 90 and random.random() > 0.1 else 0
-                writer.writerow(
-                    {
-                        "student_id": student_id,
-                        "class_year": class_year,  # To test grouping by numerics.
-                        "class_year_str": class_year_map[class_year],
-                        "hw_number": hw_number,
-                        "grade": grade,
-                        "self_assessment": self_assessment,
-                    }
-                )
-
-
-def _clip(n: float, lower_bound: float, upper_bound: float) -> float:
-    """
-    >>> _clip(-5, 0, 10)
-    0
-    >>> _clip(5, 0, 10)
-    5
-    >>> _clip(15, 0, 10)
-    10
-    """
-    return max(min(n, upper_bound), lower_bound)
-
-
 def _make_server(cli_info: CLIInfo):
     def server(input: Inputs, output: Outputs, session: Session):  # pragma: no cover
         if cli_info.is_sample_csv:
             initial_contributions = 10
             initial_private_csv_path = package_root / ".local-config/sample.csv"
-            _make_sample_csv(initial_private_csv_path, initial_contributions)
+            make_sample_csv(initial_private_csv_path, initial_contributions)
             initial_schema = read_polars_schema(Path(initial_private_csv_path))
             initial_numeric_column_names = read_csv_numeric_names(
                 Path(initial_private_csv_path)

@@ -43,7 +43,7 @@ def main() -> None:  # pragma: no cover
         not_first_run_path.touch()
 
     shiny.run_app(
-        app="dp_wizard.app_local",
+        app="dp_wizard.app",
         launch_browser=True,
         reload=True,
     )
