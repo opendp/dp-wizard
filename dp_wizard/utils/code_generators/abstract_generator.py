@@ -319,7 +319,7 @@ are ignored because of errors, it will bias results.
         )
 
     def _make_synth_query(self):
-        def template(synth_context, COLUMNS, CUTS):
+        def template(synth_context, COLUMNS, CUTS, KEYS):
             synth_query = (
                 synth_context.query()
                 .select(COLUMNS)
@@ -328,8 +328,8 @@ are ignored because of errors, it will bias results.
                     # unless they contain only a few distinct values.
                     cuts=CUTS,
                     # If you know the possible values for particular columns,
-                    # supply them here to use your privacy budget more efficiently:
-                    # keys={"your_column": ["known_value"]},
+                    # supply them here for better results:
+                    keys=KEYS,
                 )
             )
             contingency_table = synth_query.release()
@@ -387,6 +387,7 @@ are ignored because of errors, it will bias results.
             )
             for (k, v) in self.analysis_plan.columns.items()
         }
+        keys = self.analysis_plan.groups
         return (
             Template(template)
             .fill_expressions(
@@ -401,6 +402,7 @@ are ignored because of errors, it will bias results.
             )
             .fill_values(
                 CUTS=cuts,
+                KEYS=keys,
             )
             .finish()
         )
