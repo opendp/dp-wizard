@@ -31,7 +31,7 @@ def test_no_unparameterized_docs_urls(python_path: Path):
 
 
 def test_make_column_config_block_for_unrecognized():
-    with pytest.raises(Exception, match=r"Unrecognized analysis"):
+    with pytest.raises(Exception, match=r"Unrecognized statistic"):
         make_column_config_block(
             name="HW GRADE",
             statistic_name=StatisticName("Bad AnalysisType!"),
