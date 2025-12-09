@@ -103,8 +103,10 @@ flit==3.12.0
     # via -r requirements-dev.in
 flit-core==3.12.0
     # via flit
-fonttools==4.57.0
-    # via matplotlib
+fonttools==4.61.0
+    # via
+    #   -r .../dp-wizard/requirements.in
+    #   matplotlib
 greenlet==3.2.0
     # via playwright
 h11==0.16.0
