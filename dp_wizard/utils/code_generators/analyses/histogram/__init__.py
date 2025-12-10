@@ -1,7 +1,7 @@
 from dp_wizard_templates.code_template import Template
 
 from dp_wizard import opendp_version
-from dp_wizard.types import StatisticName
+from dp_wizard.types import ColumnIdentifier, StatisticName
 from dp_wizard.utils.code_generators.abstract_generator import get_template_root
 
 name = StatisticName("Histogram")
@@ -89,14 +89,12 @@ def make_report_kv(name, confidence, identifier):
 
 
 def make_column_config_block(column_name, lower_bound, upper_bound, bin_count):
-    from dp_wizard.utils.code_generators import snake_case
-
-    snake_name = snake_case(column_name)
+    identifier = ColumnIdentifier(column_name)
     return (
         Template("histogram_expr", root)
         .fill_expressions(
-            CUT_LIST_NAME=f"{snake_name}_cut_points",
-            BIN_EXPR_NAME=f"{snake_name}_bin_expr",
+            CUT_LIST_NAME=f"{identifier}_cut_points",
+            BIN_EXPR_NAME=f"{identifier}_bin_expr",
             OPENDP_V_VERSION=f"v{opendp_version}",
         )
         .fill_values(
@@ -104,7 +102,7 @@ def make_column_config_block(column_name, lower_bound, upper_bound, bin_count):
             UPPER_BOUND=upper_bound,
             BIN_COUNT=bin_count,
             COLUMN_NAME=column_name,
-            BIN_COLUMN_NAME=f"{snake_name}_bin",
+            BIN_COLUMN_NAME=f"{identifier}_bin",
         )
         .finish()
     )
