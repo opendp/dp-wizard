@@ -13,5 +13,10 @@ simulation_icon = icon_svg("chart-simple")
 
 column_config_icon = icon_svg("gear")
 
+download_config_icon = icon_svg("gear")
+download_results_icon = icon_svg("file-circle-check")
+download_code_icon = icon_svg("file")
+
+
 tutorial_icon = icon_svg("circle-question")
 next_tab_icon = icon_svg("play")

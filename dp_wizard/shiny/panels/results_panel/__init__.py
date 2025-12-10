@@ -10,6 +10,11 @@ from dp_wizard_templates.converters import (
 from shiny import Inputs, Outputs, Session, reactive, render, types, ui
 
 from dp_wizard import package_root
+from dp_wizard.shiny.components.icons import (
+    download_code_icon,
+    download_config_icon,
+    download_results_icon,
+)
 from dp_wizard.shiny.components.outputs import (
     hide_if,
     info_md_box,
@@ -68,10 +73,19 @@ def results_ui():  # pragma: no cover
         "Download Results",
         ui.output_ui("results_requirements_warning_ui"),
         ui.output_ui("two_previous_summary_ui"),
-        ui.output_ui("download_options_ui"),
+        ui.card(
+            ui.card_header(download_config_icon, "Download Options"),
+            ui.output_ui("download_options_ui"),
+        ),
         ui.layout_columns(
-            ui.output_ui("download_results_ui"),
-            ui.output_ui("download_code_ui"),
+            ui.card(
+                ui.card_header(download_results_icon, "Results"),
+                ui.output_ui("download_results_ui"),
+            ),
+            ui.card(
+                ui.card_header(download_code_icon, "Code"),
+                ui.output_ui("download_code_ui"),
+            ),
         ),
         value="results_panel",
     )
@@ -149,8 +163,7 @@ def results_server(
 
     @render.ui
     def download_options_ui():
-        return ui.card(
-            ui.card_header("Download Options"),
+        return [
             ui.markdown(
                 """
                 An appropriate extension for each download is added to this stem:
@@ -173,7 +186,7 @@ def results_server(
                 height="6em",
                 width="100%",
             ),
-        )
+        ]
 
     @reactive.calc
     def clean_download_stem() -> str:
@@ -183,53 +196,49 @@ def results_server(
     @render.ui
     def download_results_ui():
         disabled = not weights()
-        return ui.card(
-            ui.card_header("Results"),
-            (
-                ui.markdown(
-                    """
+        return (
+            ui.markdown(
+                """
                     When [installed and run
                     locally](https://pypi.org/project/dp_wizard/),
                     there are more download options because DP Wizard
                     can read your private CSV and release differentially
                     private statistics.
                     """
-                )
-                if in_cloud
-                else [
-                    tutorial_box(
-                        is_tutorial_mode(),
-                        """
+            )
+            if in_cloud
+            else [
+                tutorial_box(
+                    is_tutorial_mode(),
+                    """
                         Now you can download a notebook for your analysis.
                         The Jupyter notebook could be used locally or on Colab,
                         but the HTML version can be viewed in the brower.
                         """,
-                        responsive=False,
-                    ),
-                    download_button(
-                        "Package",
-                        primary=True,
-                        disabled=disabled,
-                    ),
-                    ui.br(),
-                    "Contains:",
-                    ui.tags.ul(
-                        ui.tags.li(download_link("README", disabled=disabled)),
-                        ui.tags.li(download_link("Notebook", disabled=disabled)),
-                        ui.tags.li(download_link("HTML", disabled=disabled)),
-                        ui.tags.li(download_link("Script", disabled=disabled)),
-                        ui.tags.li(download_link("Report", disabled=disabled)),
-                        ui.tags.li(download_link("Table", disabled=disabled)),
-                    ),
-                ]
-            ),
+                    responsive=False,
+                ),
+                download_button(
+                    "Package",
+                    primary=True,
+                    disabled=disabled,
+                ),
+                ui.br(),
+                "Contains:",
+                ui.tags.ul(
+                    ui.tags.li(download_link("README", disabled=disabled)),
+                    ui.tags.li(download_link("Notebook", disabled=disabled)),
+                    ui.tags.li(download_link("HTML", disabled=disabled)),
+                    ui.tags.li(download_link("Script", disabled=disabled)),
+                    ui.tags.li(download_link("Report", disabled=disabled)),
+                    ui.tags.li(download_link("Table", disabled=disabled)),
+                ),
+            ]
         )
 
     @render.ui
     def download_code_ui():
         disabled = not weights()
-        return ui.card(
-            ui.card_header("Code"),
+        return [
             tutorial_box(
                 is_tutorial_mode(),
                 (
@@ -250,7 +259,7 @@ def results_server(
             download_button("HTML (unexecuted)", disabled=disabled),
             download_button("Script", disabled=disabled),
             download_button("Notebook Source", disabled=disabled),
-        )
+        ]
 
     @reactive.calc
     def analysis_plan() -> AnalysisPlan:
