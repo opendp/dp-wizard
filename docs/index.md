@@ -501,9 +501,10 @@ Then define some utility functions to handle dataframes and plot results:
 >>>
 >>> def make_cut_points(
 ...     lower_bound: float, upper_bound: float, bin_count: int
-... ):
+... ) -> list[float]:
 ...     """
-...     Returns one more cut point than the bin_count.
+...     Returns one more cut point than the bin_count,
+...     with the cut points rounded to two decimal places
 ...     (There are actually two more bins, extending to
 ...     -inf and +inf, but we'll ignore those.)
 ...     Cut points are evenly spaced from lower_bound to upper_bound.
