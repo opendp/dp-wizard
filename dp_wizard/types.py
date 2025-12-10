@@ -83,12 +83,16 @@ class ColumnIdentifier(str):
     """
     A human-readable form that is a valid Python identifier.
 
-    >>> ColumnIdentifier("Does this work?!")
-    'does_this_work_'
+    >>> ColumnIdentifier("basic")
+    'basic'
+    >>> ColumnIdentifier("1: Does this work?!")
+    'number_1_does_this_work_'
     """
 
     def __new__(cls, content: str):
         identifier = re.sub(r"\W+", "_", content).lower()
+        if re.match(r"\d", identifier):
+            identifier = f"number_{identifier}"
         return str.__new__(cls, identifier)
 
 
