@@ -68,7 +68,7 @@ class AbstractGenerator(ABC):
     def _make_comment_cell(self, comment: str) -> str:
         return "".join(f"# {line}\n" for line in comment.splitlines())
 
-    def make_py(self):
+    def make_py(self, reformat=False):
         def template():
             import matplotlib.pyplot as plt  # noqa: F401
             import opendp.prelude as dp  # noqa: F401
@@ -104,7 +104,7 @@ by "�". If this is not sufficient, you will need to preprocess your data to
 reencode it as UTF8.""",
                 CUSTOM_NOTE=self.note,
             )
-            .finish()
+            .finish(reformat=reformat)
         )
         return self._clean_up_py(code)
 
