@@ -1,6 +1,7 @@
 from dp_wizard import package_root
-from dp_wizard.types import Product
-from dp_wizard.utils.code_generators import AnalysisPlan
+from dp_wizard.types import ColumnName, Product
+from dp_wizard.utils.code_generators import AnalysisPlan, AnalysisPlanColumn
+from dp_wizard.utils.code_generators.analyses import histogram
 from dp_wizard.utils.code_generators.notebook_generator import NotebookGenerator
 
 
@@ -36,8 +37,18 @@ def test_doc_examples_up_to_date():
     plan = AnalysisPlan(
         product=Product.STATISTICS,
         groups=[],
-        columns={},
-        contributions=10,
+        columns={
+            ColumnName("grade"): [
+                AnalysisPlanColumn(
+                    analysis_name=histogram.name,
+                    lower_bound=0.0,
+                    upper_bound=100.0,
+                    bin_count=10,
+                    weight=2,
+                )
+            ],
+        },
+        contributions=1,
         contributions_entity="Individual",
         csv_path="docs/fill-in-correct-path.csv",
         epsilon=1.0,

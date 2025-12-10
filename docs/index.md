@@ -526,8 +526,8 @@ Based on the input you provided, for each column we'll create a Polars expressio
 ### Expression for `grade`
 
 ```
->>> # See the OpenDP docs for more on making private histograms:
->>> # https://docs.opendp.org/en/stable/getting-started/examples/histograms.html
+>>> # See the OpenDP Library docs for more on making private histograms:
+>>> # https://docs.opendp.org/en/v0.14.1/getting-started/examples/histograms.html
 >>>
 >>> # Use the public information to make cut points for 'grade':
 >>> grade_cut_points = make_cut_points(
@@ -561,9 +561,9 @@ Next, we'll define our Context. This is where we set the privacy budget, and set
 ...     delta=1e-7,
 ... )
 >>>
->>> # See the OpenDP docs for more on Context:
->>> # https://docs.opendp.org/en/stable/api/user-guide/context/index.html#context:
->>> context = dp.Context.compositor(
+>>> # See the OpenDP Library docs for more on Context:
+>>> # https://docs.opendp.org/en/v0.14.1/api/user-guide/context/index.html#context:
+>>> stats_context = dp.Context.compositor(
 ...     data=pl.scan_csv(
 ...         "docs/fill-in-correct-path.csv", encoding="utf8-lossy"
 ...     ).with_columns(grade_bin_expr),
@@ -573,7 +573,7 @@ Next, we'll define our Context. This is where we set the privacy budget, and set
 ...     margins=[
 ...         # "max_length" should be a loose upper bound,
 ...         # for example, the size of the total population being sampled.
-...         # https://docs.opendp.org/en/stable/api/python/opendp.extras.polars.html#opendp.extras.polars.Margin.max_length
+...         # https://docs.opendp.org/en/v0.14.1/api/python/opendp.extras.polars.html#opendp.extras.polars.Margin.max_length
 ...         #
 ...         # In production, "max_groups" should be set by considering the number
 ...         # of possible values for each grouping column, and taking their product.
@@ -656,10 +656,10 @@ If we try to run more queries at this point, it will error. Once the privacy bud
 
 ### With OpenDP
 
-- ([Quantiles](https://docs.opendp.org/en/stable/api/user-guide/transformations/aggregation-quantile.html))
-- ([PCA](https://docs.opendp.org/en/stable/getting-started/statistical-modeling/pca.html))
-- ([RAPPOR](https://docs.opendp.org/en/stable/api/python/opendp.measurements.html#opendp.measurements.make_randomized_response_bitvec))
-- ([Linear regression](https://docs.opendp.org/en/stable/api/python/opendp.extras.sklearn.linear_model.html))
+- ([Quantiles](https://docs.opendp.org/en/v0.14.1/api/user-guide/transformations/aggregation-quantile.html))
+- ([PCA](https://docs.opendp.org/en/v0.14.1/getting-started/statistical-modeling/pca.html))
+- ([RAPPOR](https://docs.opendp.org/en/v0.14.1/api/python/opendp.measurements.html#opendp.measurements.make_randomized_response_bitvec))
+- ([Linear regression](https://docs.opendp.org/en/v0.14.1/api/python/opendp.extras.sklearn.linear_model.html))
 
 </td>
 <td>

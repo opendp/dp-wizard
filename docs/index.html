@@ -779,8 +779,8 @@ results:</p>
 Polars expression that describes how we want to summarize that
 column.</p>
 <h3 id="expression-for-grade">Expression for <code>grade</code></h3>
-<pre><code>&gt;&gt;&gt; # See the OpenDP docs for more on making private histograms:
-&gt;&gt;&gt; # https://docs.opendp.org/en/stable/getting-started/examples/histograms.html
+<pre><code>&gt;&gt;&gt; # See the OpenDP Library docs for more on making private histograms:
+&gt;&gt;&gt; # https://docs.opendp.org/en/v0.14.1/getting-started/examples/histograms.html
 &gt;&gt;&gt;
 &gt;&gt;&gt; # Use the public information to make cut points for &#39;grade&#39;:
 &gt;&gt;&gt; grade_cut_points = make_cut_points(
@@ -812,8 +812,8 @@ budget, and set the weight for each query under that overall budget.</p>
 ...     delta=1e-7,
 ... )
 &gt;&gt;&gt;
-&gt;&gt;&gt; # See the OpenDP docs for more on Context:
-&gt;&gt;&gt; # https://docs.opendp.org/en/stable/api/user-guide/context/index.html#context:
+&gt;&gt;&gt; # See the OpenDP Library docs for more on Context:
+&gt;&gt;&gt; # https://docs.opendp.org/en/v0.14.1/api/user-guide/context/index.html#context:
 &gt;&gt;&gt; context = dp.Context.compositor(
 ...     data=pl.scan_csv(
 ...         &quot;docs/fill-in-correct-path.csv&quot;, encoding=&quot;utf8-lossy&quot;
@@ -824,7 +824,7 @@ budget, and set the weight for each query under that overall budget.</p>
 ...     margins=[
 ...         # &quot;max_length&quot; should be a loose upper bound,
 ...         # for example, the size of the total population being sampled.
-...         # https://docs.opendp.org/en/stable/api/python/opendp.extras.polars.html#opendp.extras.polars.Margin.max_length
+...         # https://docs.opendp.org/en/v0.14.1/api/python/opendp.extras.polars.html#opendp.extras.polars.Margin.max_length
 ...         #
 ...         # In production, &quot;max_groups&quot; should be set by considering the number
 ...         # of possible values for each grouping column, and taking their product.
@@ -908,13 +908,13 @@ most well developed.</li>
 <h3 id="with-opendp">With OpenDP</h3>
 <ul>
 <li>(<a
-href="https://docs.opendp.org/en/stable/api/user-guide/transformations/aggregation-quantile.html">Quantiles</a>)</li>
+href="https://docs.opendp.org/en/v0.14.1/api/user-guide/transformations/aggregation-quantile.html">Quantiles</a>)</li>
 <li>(<a
-href="https://docs.opendp.org/en/stable/getting-started/statistical-modeling/pca.html">PCA</a>)</li>
+href="https://docs.opendp.org/en/v0.14.1/getting-started/statistical-modeling/pca.html">PCA</a>)</li>
 <li>(<a
-href="https://docs.opendp.org/en/stable/api/python/opendp.measurements.html#opendp.measurements.make_randomized_response_bitvec">RAPPOR</a>)</li>
+href="https://docs.opendp.org/en/v0.14.1/api/python/opendp.measurements.html#opendp.measurements.make_randomized_response_bitvec">RAPPOR</a>)</li>
 <li>(<a
-href="https://docs.opendp.org/en/stable/api/python/opendp.extras.sklearn.linear_model.html">Linear
+href="https://docs.opendp.org/en/v0.14.1/api/python/opendp.extras.sklearn.linear_model.html">Linear
 regression</a>)</li>
 </ul>
 </td>
