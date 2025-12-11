@@ -20,11 +20,7 @@ from dp_wizard.shiny.components.outputs import (
 from dp_wizard.shiny.panels.dataset_panel import data_source
 from dp_wizard.types import AppState, Product
 from dp_wizard.utils.code_generators import make_privacy_unit_block
-from dp_wizard.utils.csv_helper import (
-    get_csv_names_mismatch,
-    read_csv_names,
-    read_csv_numeric_names,
-)
+from dp_wizard.utils.csv_helper import CsvInfo, get_csv_names_mismatch
 
 dataset_panel_id = "dataset_panel"
 OTHER = "Other"
@@ -144,8 +140,9 @@ def dataset_server(
     released = state.released
 
     def _infer_csv_schema(path: Path):
-        all_column_names.set(read_csv_names(path))
-        numeric_column_names.set(read_csv_numeric_names(path))
+        csv_info = CsvInfo(Path(path))
+        all_column_names.set(csv_info.get_all_column_names())
+        numeric_column_names.set(csv_info.get_numeric_column_names())
 
     @reactive.effect
     @reactive.event(input.public_csv_path)

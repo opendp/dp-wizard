@@ -7,33 +7,27 @@ import polars as pl
 from dp_wizard.types import ColumnId, ColumnLabel, ColumnName
 
 
-def read_csv_names(csv_path: Path) -> list[ColumnName]:
-    # Polars is overkill, but it is more robust against
-    # variations in encoding than Python stdlib csv.
-    # However, it could be slow:
-    #
-    # > Determining the column names of a LazyFrame requires
-    # > resolving its schema, which is a potentially expensive operation.
-    lf = pl.scan_csv(csv_path)
-    all_names = lf.collect_schema().names()
-    # Exclude columns missing names:
-    return [ColumnName(name) for name in all_names if name.strip() != ""]
+class CsvInfo:
+    def __init__(self, csv_path: Path):
+        self._schema = pl.scan_csv(csv_path).collect_schema()
 
+    def get_all_column_names(self) -> list[ColumnName]:
+        return [ColumnName(name) for name in self._schema.names()]
 
-def read_csv_numeric_names(csv_path: Path) -> list[ColumnName]:  # pragma: no cover
-    lf = pl.scan_csv(csv_path)
-    numeric_names = [
-        name for name, pl_type in lf.collect_schema().items() if pl_type.is_numeric()
-    ]
-    # Exclude columns missing names:
-    return [ColumnName(name) for name in numeric_names if name.strip() != ""]
+    def get_numeric_column_names(self) -> list[ColumnName]:
+        return [
+            ColumnName(name)
+            for name, pl_type in self._schema.items()
+            if pl_type.is_numeric()
+        ]
 
 
 def get_csv_names_mismatch(
     public_csv_path: Path, private_csv_path: Path
 ) -> tuple[set[ColumnName], set[ColumnName]]:
-    public_names = set(read_csv_names(public_csv_path))
-    private_names = set(read_csv_names(private_csv_path))
+
+    public_names = set(CsvInfo(public_csv_path).get_all_column_names())
+    private_names = set(CsvInfo(private_csv_path).get_all_column_names())
     extra_public = public_names - private_names
     extra_private = private_names - public_names
     return (extra_public, extra_private)
