@@ -143,21 +143,23 @@ def dataset_server(
     # Release state:
     released = state.released
 
+    def _infer_csv_schema(path: Path):
+        all_column_names.set(read_csv_names(path))
+        numeric_column_names.set(read_csv_numeric_names(path))
+
     @reactive.effect
     @reactive.event(input.public_csv_path)
     def _on_public_csv_path_change():
         path = input.public_csv_path()[0]["datapath"]
         public_csv_path.set(path)
-        all_column_names.set(read_csv_names(Path(path)))
-        numeric_column_names.set(read_csv_numeric_names(Path(path)))
+        _infer_csv_schema(Path(path))
 
     @reactive.effect
     @reactive.event(input.private_csv_path)
     def _on_private_csv_path_change():
         path = input.private_csv_path()[0]["datapath"]
         private_csv_path.set(path)
-        all_column_names.set(read_csv_names(Path(path)))
-        numeric_column_names.set(read_csv_numeric_names(Path(path)))
+        _infer_csv_schema(Path(path))
 
     @reactive.effect
     @reactive.event(input.all_column_names)
