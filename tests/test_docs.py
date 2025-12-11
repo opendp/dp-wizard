@@ -55,12 +55,9 @@ def test_doc_examples_up_to_date():
         max_rows=100_000,
     )
     expected_code = NotebookGenerator(plan, "Note goes here!").make_py(reformat=True)
-    fail = False
 
-    for line in doc_code.splitlines():
-        if line not in expected_code:
-            fail = True
-    if fail:
+    if any(line not in expected_code for line in doc_code.splitlines()):
         # It's fine for the docs to be a subset of the generated code,
-        # but if a line is missing, the "pytest -vv" diff will help us fix it.
+        # but if a line is missing, the "pytest -vv" diff
+        # will give us context to fix it.
         assert expected_code == doc_code

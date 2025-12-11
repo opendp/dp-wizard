@@ -479,9 +479,9 @@ First install and import the required dependencies:
 %pip install 'opendp[polars]==0.14.1' matplotlib
 ```
 ```
->>> import polars as pl
->>> import opendp.prelude as dp
 >>> import matplotlib.pyplot as plt
+>>> import opendp.prelude as dp
+>>> import polars as pl
 >>>
 >>> # The OpenDP team is working to vet the core algorithms.
 >>> # Until that is complete we need to opt-in to use these features.
@@ -496,26 +496,15 @@ Then define some utility functions to handle dataframes and plot results:
 ```
 >>> # These functions are used both in the application
 >>> # and in generated notebooks.
->>> from polars import DataFrame
 >>>
+>>> def round_2(number) -> float:
+...     return float(f"{number:.2g}")
 >>>
 >>> def make_cut_points(
 ...     lower_bound: float, upper_bound: float, bin_count: int
 ... ) -> list[float]:
-...     """
-...     Returns one more cut point than the bin_count,
-...     with the cut points rounded to two decimal places
-...     (There are actually two more bins, extending to
-...     -inf and +inf, but we'll ignore those.)
-...     Cut points are evenly spaced from lower_bound to upper_bound.
-...     >>> make_cut_points(0, 10, 2)
-...     [0.0, 5.0, 10.0]
-...     """
 ...     bin_width = (upper_bound - lower_bound) / bin_count
-...     return [
-...         round(lower_bound + i * bin_width, 2)
-...         for i in range(bin_count + 1)
-...     ]
+...     return sorted({round_2(lower_bound + i * bin_width) for i in range(bin_count + 1)})
 
 ```
 
@@ -539,7 +528,7 @@ Based on the input you provided, for each column we'll create a Polars expressio
 >>> # Use these cut points to add a new binned column to the table:
 >>> grade_bin_expr = (
 ...     pl.col("grade")
-...     .cut(grade_cut_points)
+...     .cut(grade_cut_points)  # Use "left_closed=True" to switch endpoint inclusion.
 ...     .alias("grade_bin")  # Give the new column a name.
 ...     .cast(pl.String)
 ... )
@@ -554,11 +543,9 @@ Next, we'll define our Context. This is where we set the privacy budget, and set
 >>> contributions = 1
 >>> privacy_unit = dp.unit_of(contributions=contributions)
 >>>
->>> # Consider how your budget compares to that of other projects.
->>> # https://registry.oblivious.com/#public-dp
 >>> privacy_loss = dp.loss_of(
 ...     epsilon=1.0,
-...     delta=1e-7,
+...     delta=1 / max(1e7, 100000),
 ... )
 >>>
 >>> # See the OpenDP Library docs for more on Context:
@@ -569,34 +556,13 @@ Next, we'll define our Context. This is where we set the privacy budget, and set
 ...     ).with_columns(grade_bin_expr),
 ...     privacy_unit=privacy_unit,
 ...     privacy_loss=privacy_loss,
-...     split_by_weights=[2],
-...     margins=[
-...         # "max_length" should be a loose upper bound,
-...         # for example, the size of the total population being sampled.
-...         # https://docs.opendp.org/en/v0.14.1/api/python/opendp.extras.polars.html#opendp.extras.polars.Margin.max_length
-...         #
-...         # In production, "max_groups" should be set by considering the number
-...         # of possible values for each grouping column, and taking their product.
-...         dp.polars.Margin(
-...             by=[],
-...             invariant="keys",
-...             max_length=1000000,
-...             max_groups=100,
-...         ),
-...         dp.polars.Margin(
-...             by=[
-...                 "grade_bin",
-...             ],
-...             invariant="keys",
-...         ),
+...     split_by_weights=[  # With only one query, the entire budget is allocated to that query:
+...         1,  # grade
 ...     ],
+...     margins=[],
 ... )
 
 ```
-
-## A note on character encodings
-
-A note on `utf8-lossy`: CSVs can use different "character encodings" to represent characters outside the plain ascii character set, but out of the box the Polars library only supports UTF8. Specifying `utf8-lossy` preserves as much information as possible, and any unrecognized characters will be replaced by "�". If this is not sufficient, you will need to preprocess your data to reencode it as UTF8.
 
 ## Results
 
@@ -611,20 +577,11 @@ Query for grade:
 
 ```
 >>> groups = ["grade_bin"] + []
->>> grade_query = context.query().group_by(groups).agg(pl.len().dp.noise())
->>> grade_accuracy = grade_query.summarize(alpha=1 - confidence)[
-...     "accuracy"
-... ].item()
+>>> grade_query = (
+...     stats_context.query().group_by(groups).agg(pl.len().dp.noise().alias("count"))
+... )
+>>> grade_accuracy = grade_query.summarize(alpha=1 - confidence)["accuracy"].item()
 >>> grade_stats = grade_query.release().collect()
->>> grade_stats # doctest: +ELLIPSIS
-shape: (..., 2)
-┌───────────┬─────┐
-│ grade_bin ┆ len │
-│ ---       ┆ --- │
-│ str       ┆ u32 │
-╞═══════════╪═════╡
-...
-└───────────┴─────┘
 
 ```
 
