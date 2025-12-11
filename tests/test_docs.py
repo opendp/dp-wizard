@@ -60,4 +60,4 @@ def test_doc_examples_up_to_date():
         # It's fine for the docs to be a subset of the generated code,
         # but if a line is missing, the "pytest -vv" diff
         # will give us context to fix it.
-        assert expected_code == doc_code
+        assert expected_code == doc_code  # pragma: no cover
