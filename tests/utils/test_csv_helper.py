@@ -16,9 +16,18 @@ from dp_wizard.utils.csv_helper import (
 @pytest.mark.parametrize(
     "csv_text,all,numeric",
     [
-        # skip empty column:
+        # skip empty header:
         (",int\nX,1", "int", "int"),
+        # type inference:
         ("str,int\nX,1", "str,int", "int"),
+        # duplicate header gets suffix from polars:
+        ("dup,dup\nX,1", "dup,dup_duplicated_0", "dup_duplicated_0"),
+        # TODO: numeric column headers suggest that header is missing:
+        ("A,1\nB,2", "A,1", "1"),
+        # TODO: actually TSV:
+        ("str\tint\nX\t1", "str\tint", ""),
+        # TODO: actually pipe-delim:
+        ("str|int\nX|1", "str|int", ""),
     ],
 )
 def test_csv_info(csv_text, all, numeric):
