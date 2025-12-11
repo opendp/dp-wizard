@@ -34,6 +34,7 @@ def test_doc_examples_up_to_date():
 
     doc_code = "\n".join(strip_doc_test(block) for block in doc_test_blocks)
 
+    csv_path = "docs/fill-in-correct-path.csv"
     plan = AnalysisPlan(
         product=Product.STATISTICS,
         groups=[],
@@ -50,13 +51,17 @@ def test_doc_examples_up_to_date():
         },
         contributions=1,
         contributions_entity="Individual",
-        csv_path="docs/fill-in-correct-path.csv",
+        csv_path=csv_path,
         epsilon=1.0,
         max_rows=100_000,
     )
     expected_code = NotebookGenerator(plan, "Note goes here!").make_py(reformat=True)
 
-    if any(line not in expected_code for line in doc_code.splitlines()):
+    if any(
+        # csv_path is expanded to an absolute path, so ignore it:
+        line not in expected_code and csv_path not in line
+        for line in doc_code.splitlines()
+    ):
         # It's fine for the docs to be a subset of the generated code,
         # but if a line is missing, the "pytest -vv" diff
         # will give us context to fix it.
