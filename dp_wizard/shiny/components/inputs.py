@@ -35,7 +35,12 @@ def log_slider(
     /* Warn about high or low values. */
     top: 29px;
     height: 7px;
-    background: linear-gradient(to right, blue, white, white, red);
+    background: linear-gradient(to right, red, lightgrey, lightgrey, red);
+    border: 0.9px solid #8D959E; /* To match bootstrap. */
+}}
+{target} .irs-handle {{
+    /* Match .irs-line: */
+    background-color: #8D959E;
 }}
 
 {target} .irs-single {{
