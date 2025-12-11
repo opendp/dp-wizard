@@ -202,13 +202,13 @@ reencode it as UTF8.""",
             accuracy_name=accuracy_name,
             stats_name=stats_name,
         )
-        note = statistic.make_note()
+        plot_note = statistic.make_plot_note()
 
         return (
             self._make_comment_cell(f"### Query for `{column_name}`:")
             + self._make_python_cell(query)
             + self._make_python_cell(output)
-            + (self._make_comment_cell(note) if note else "")
+            + (self._make_comment_cell(plot_note) if plot_note else "")
         )
 
     def _make_weights_expression(self):

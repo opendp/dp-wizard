@@ -26,7 +26,7 @@ class NotebookGenerator(AbstractGenerator):
         placeholder_csv_content = ",".join(self.analysis_plan.columns)
         return (
             partial_context.fill_values(
-                CSV_PATH=self.analysis_plan.csv_path,
+                CSV_PATH=self.analysis_plan.get_absolute_csv_path(),
             )
             .fill_code_blocks(
                 OPTIONAL_CSV_BLOCK=(
@@ -89,7 +89,7 @@ class NotebookGenerator(AbstractGenerator):
                 },
             )
             .fill_values(
-                CSV_PATH=self.analysis_plan.csv_path,
+                CSV_PATH=self.analysis_plan.get_absolute_csv_path(),
                 EPSILON=self.analysis_plan.epsilon,
                 TXT_REPORT_PATH=str(target_path / "report.txt"),
                 CSV_REPORT_PATH=str(target_path / "report.csv"),
