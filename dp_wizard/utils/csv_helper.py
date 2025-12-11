@@ -1,5 +1,6 @@
 import csv
 import random
+import re
 from pathlib import Path
 
 import polars as pl
@@ -23,12 +24,43 @@ class CsvInfo:
             .items()
             if k.strip() != ""
         }
+        self._warnings: list[str] = []
+        self._errors: list[str] = []
+        for column_name in self._schema.keys():
+            # warnings:
+            try:
+                float(column_name)
+                self._warnings.append(
+                    f"Numeric column name: '{column_name}'; Is the CSV missing a header row?"
+                )
+            except ValueError:
+                pass
+            if "_duplicated_" in column_name:
+                self._warnings.append(
+                    f"Column name modified to avoid duplication: '{column_name}'"
+                )
+            # errors:
+            if "\t" in column_name:
+                self._errors.append(
+                    f"Tab in column name: '{column_name}'; Is this actually a TSV?"
+                )
+            if "�" in column_name:
+                self._errors.append(
+                    f"Bad column name: '{column_name}'; Is this a UTF-8 CSV?"
+                )
 
     def get_all_column_names(self) -> list[ColumnName]:
+        if self._errors:
+            return []
         return list(self._schema.keys())
 
     def get_numeric_column_names(self) -> list[ColumnName]:
+        if self._errors:
+            return []
         return [k for k, v in self._schema.items() if v.is_numeric()]
+
+    def get_messages(self) -> list[str]:
+        return self._errors + self._warnings
 
 
 def get_csv_names_mismatch(

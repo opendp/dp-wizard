@@ -14,29 +14,43 @@ from dp_wizard.utils.csv_helper import (
 
 
 @pytest.mark.parametrize(
-    "csv_text,all,numeric",
+    "csv_text,all,numeric,message_substring",
     [
         # skip empty header:
-        (",int\nX,1", "int", "int"),
+        (b",int\nX,1", "int", "int", ""),
         # type inference:
-        ("str,int\nX,1", "str,int", "int"),
+        (b"str,int\nX,1", "str,int", "int", ""),
+        # TODO: strip padding spaces in header:
+        # TODO: make sure padded number are parsed as numbers:
+        (b" str , int \n X , 1 ", " str , int ", "", ""),
         # duplicate header gets suffix from polars:
-        ("dup,dup\nX,1", "dup,dup_duplicated_0", "dup_duplicated_0"),
+        (
+            b"dup,dup\nX,1",
+            "dup,dup_duplicated_0",
+            "dup_duplicated_0",
+            "Column name modified",
+        ),
         # TODO: numeric column headers suggest that header is missing:
-        ("A,1\nB,2", "A,1", "1"),
+        (b"A,1\nB,2", "A,1", "1", "Numeric column name"),
         # TODO: actually TSV:
-        ("str\tint\nX\t1", "str\tint", ""),
+        (b"str\tint\nX\t1", "", "", "Tab in column name"),
         # TODO: actually pipe-delim:
-        ("str|int\nX|1", "str|int", ""),
+        (b"str|int\nX|1", "str|int", "", ""),
+        # TODO: actually binary:
+        (b"\xff\xff\n\x00\x00", "", "", "Bad column name"),
     ],
 )
-def test_csv_info(csv_text, all, numeric):
-    with tempfile.NamedTemporaryFile(mode="w") as tmp:
+def test_csv_info(csv_text, all, numeric, message_substring):
+    with tempfile.NamedTemporaryFile(mode="wb") as tmp:
         tmp.write(csv_text)
         tmp.flush()
         csv_info = CsvInfo(Path(tmp.file.name))
         assert all == ",".join(csv_info.get_all_column_names())
         assert numeric == ",".join(csv_info.get_numeric_column_names())
+        if not message_substring:
+            assert not csv_info.get_messages()
+        else:
+            assert message_substring in "; ".join(csv_info.get_messages())
 
 
 def test_get_csv_names_mismatch():
