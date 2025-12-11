@@ -9,17 +9,17 @@ from dp_wizard.types import ColumnId, ColumnLabel, ColumnName
 
 class CsvInfo:
     def __init__(self, csv_path: Path):
-        self._schema = pl.scan_csv(csv_path).collect_schema()
+        self._schema = {
+            ColumnName(k): v
+            for k, v in pl.scan_csv(csv_path).collect_schema().items()
+            if k.strip() != ""
+        }
 
     def get_all_column_names(self) -> list[ColumnName]:
-        return [ColumnName(name) for name in self._schema.names()]
+        return list(self._schema.keys())
 
     def get_numeric_column_names(self) -> list[ColumnName]:
-        return [
-            ColumnName(name)
-            for name, pl_type in self._schema.items()
-            if pl_type.is_numeric()
-        ]
+        return [k for k, v in self._schema.items() if v.is_numeric()]
 
 
 def get_csv_names_mismatch(
