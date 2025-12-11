@@ -20,9 +20,12 @@ from dp_wizard.utils.csv_helper import (
         (b",int\nX,1", "int", "int", ""),
         # type inference:
         (b"str,int\nX,1", "str,int", "int", ""),
-        # TODO: strip padding spaces in header:
-        # TODO: make sure padded number are parsed as numbers:
-        (b" str , int \n X , 1 ", " str , int ", "", ""),
+        # numeric column headers suggest that header is missing:
+        (b"A,1\nB,2", "A,1", "1", "Numeric column name"),
+        # actually TSV:
+        (b"str\tint\nX\t1", "", "", "Tab in column name"),
+        # actually binary:
+        (b"\xff\xff\n\x00\x00", "", "", "Bad column name"),
         # duplicate header gets suffix from polars:
         (
             b"dup,dup\nX,1",
@@ -30,14 +33,14 @@ from dp_wizard.utils.csv_helper import (
             "dup_duplicated_0",
             "Column name modified",
         ),
-        # TODO: numeric column headers suggest that header is missing:
-        (b"A,1\nB,2", "A,1", "1", "Numeric column name"),
-        # TODO: actually TSV:
-        (b"str\tint\nX\t1", "", "", "Tab in column name"),
+        #
+        # TODO: xfail these?
+        #
         # TODO: actually pipe-delim:
         (b"str|int\nX|1", "str|int", "", ""),
-        # TODO: actually binary:
-        (b"\xff\xff\n\x00\x00", "", "", "Bad column name"),
+        # TODO: strip padding spaces in header:
+        # TODO: make sure padded number are parsed as numbers:
+        (b" str , int \n X , 1 ", " str , int ", "", ""),
     ],
 )
 def test_csv_info(csv_text, all, numeric, message_substring):

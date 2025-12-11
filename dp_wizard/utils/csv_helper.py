@@ -1,6 +1,5 @@
 import csv
 import random
-import re
 from pathlib import Path
 
 import polars as pl
