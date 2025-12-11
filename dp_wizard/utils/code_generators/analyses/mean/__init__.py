@@ -1,7 +1,7 @@
 from dp_wizard_templates.code_template import Template
 
 from dp_wizard import get_template_root, opendp_version
-from dp_wizard.types import AnalysisName
+from dp_wizard.types import AnalysisName, ColumnIdentifier
 
 name = AnalysisName("Mean")
 blurb_md = """
@@ -55,7 +55,7 @@ def make_output(code_gen, column_name, accuracy_name, stats_name):
     )
 
 
-def make_note():
+def make_plot_note():
     return ""
 
 
@@ -73,13 +73,11 @@ def make_report_kv(name, confidence, identifier):
 
 
 def make_column_config_block(column_name, lower_bound, upper_bound, bin_count):
-    from dp_wizard.utils.code_generators import snake_case
-
-    snake_name = snake_case(column_name)
+    identifier = ColumnIdentifier(column_name)
     return (
         Template("mean_expr", root)
         .fill_expressions(
-            EXPR_NAME=f"{snake_name}_expr",
+            EXPR_NAME=f"{identifier}_expr",
             OPENDP_V_VERSION=f"v{opendp_version}",
         )
         .fill_values(

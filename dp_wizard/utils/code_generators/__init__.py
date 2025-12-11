@@ -1,5 +1,6 @@
 import re
 from datetime import datetime
+from pathlib import Path
 from typing import NamedTuple, Optional
 
 from dp_wizard_templates.code_template import Template
@@ -55,6 +56,11 @@ class AnalysisPlan(NamedTuple):
         groups = md_list(self.groups)
         grouped_by = f" grouped by {groups}" if groups else ""
         return f"{self.product} for {columns}{grouped_by}"
+
+    def get_absolute_csv_path(self) -> str:
+        if self.csv_path is None:
+            return ""  # pragma: no cover
+        return str(Path(self.csv_path).absolute())
 
     def to_stem(self) -> str:
         return re.sub(r"\W+", " ", str(self)).strip().replace(" ", "_").lower()
@@ -175,17 +181,3 @@ def make_column_config_block(
         upper_bound=upper_bound,
         bin_count=bin_count,
     )
-
-
-def snake_case(name: str):
-    """
-    >>> snake_case("HW GRADE")
-    'hw_grade'
-    >>> snake_case("123")
-    '_123'
-    """
-    snake = re.sub(r"\W+", "_", name.lower())
-    # TODO: More validation in UI so we don't get zero-length strings.
-    if snake == "" or not re.match(r"[a-z]", snake[0]):
-        snake = f"_{snake}"
-    return snake

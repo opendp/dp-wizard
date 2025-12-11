@@ -17,6 +17,7 @@ pytest-playwright
 pyright
 pytest-cov
 pytest-xdist
+diffimg
 
 # App dependencies:
 -r requirements.in

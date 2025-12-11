@@ -5,6 +5,22 @@ from enum import Enum, auto
 from shiny import reactive
 
 
+class Weight(Enum):
+    """
+    >>> print(Weight.MORE_ACCURATE)
+    More accurate
+    >>> ints = [int(w.value) for w in Weight]
+    >>> assert ints[2] / ints[1] == ints[1] / ints[0]
+    """
+
+    MORE_PRIVATE = "1"
+    DEFAULT = "2"
+    MORE_ACCURATE = "4"
+
+    def __str__(self) -> str:
+        return self.name.replace("_", " ").capitalize()
+
+
 class Product(Enum):
     STATISTICS = auto()
     SYNTHETIC_DATA = auto()
@@ -67,12 +83,16 @@ class ColumnIdentifier(str):
     """
     A human-readable form that is a valid Python identifier.
 
-    >>> ColumnIdentifier("Does this work?!")
-    'does_this_work_'
+    >>> ColumnIdentifier("basic")
+    'basic'
+    >>> ColumnIdentifier("1: Does this work?!")
+    'number_1_does_this_work_'
     """
 
     def __new__(cls, content: str):
         identifier = re.sub(r"\W+", "_", content).lower()
+        if re.match(r"\d", identifier):
+            identifier = f"number_{identifier}"
         return str.__new__(cls, identifier)
 
 
@@ -109,7 +129,7 @@ class AppState:
     lower_bounds: reactive.Value[dict[ColumnName, float]]
     upper_bounds: reactive.Value[dict[ColumnName, float]]
     bin_counts: reactive.Value[dict[ColumnName, int]]
-    weights: reactive.Value[dict[ColumnName, str]]
+    weights: reactive.Value[dict[ColumnName, Weight]]
     analysis_errors: reactive.Value[dict[ColumnName, bool]]
 
     # Release state:
