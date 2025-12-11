@@ -7,7 +7,7 @@ synth_context = dp.Context.compositor(
     data=pl.scan_csv(CSV_PATH, encoding="utf8-lossy", ignore_errors=True),
     privacy_unit=privacy_unit,
     privacy_loss=privacy_loss,
-    # The release of the contingency table with be a single query,
+    # The release of the contingency table will be a single query,
     # so we don't need to split our budget across multiple queries.
     split_by_weights=[1],
 )
