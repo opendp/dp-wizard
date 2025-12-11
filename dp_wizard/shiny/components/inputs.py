@@ -40,7 +40,8 @@ def log_slider(
 }}
 {target} .irs-handle {{
     /* Match .irs-line: */
-    background-color: #8D959E;
+    border: 2px solid #8D959E; /* To match bootstrap. */
+    background-color: white;
 }}
 
 {target} .irs-single {{
