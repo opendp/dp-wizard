@@ -11,7 +11,16 @@ class CsvInfo:
     def __init__(self, csv_path: Path):
         self._schema = {
             ColumnName(k): v
-            for k, v in pl.scan_csv(csv_path).collect_schema().items()
+            for k, v in pl.scan_csv(
+                csv_path,
+                # Read the whole CSV:
+                # Until we hear that this is too slow,
+                # it's better to be sure the types
+                # have been accurately inferred.
+                infer_schema_length=None,
+            )
+            .collect_schema()
+            .items()
             if k.strip() != ""
         }
 

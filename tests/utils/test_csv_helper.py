@@ -6,7 +6,28 @@ import polars as pl
 import polars.testing as pl_testing
 import pytest
 
-from dp_wizard.utils.csv_helper import get_csv_names_mismatch, get_csv_row_count
+from dp_wizard.utils.csv_helper import (
+    CsvInfo,
+    get_csv_names_mismatch,
+    get_csv_row_count,
+)
+
+
+@pytest.mark.parametrize(
+    "csv_text,all,numeric",
+    [
+        # skip empty column:
+        (",int\nX,1", "int", "int"),
+        ("str,int\nX,1", "str,int", "int"),
+    ],
+)
+def test_csv_info(csv_text, all, numeric):
+    with tempfile.NamedTemporaryFile(mode="w") as tmp:
+        tmp.write(csv_text)
+        tmp.flush()
+        csv_info = CsvInfo(Path(tmp.file.name))
+        assert all == ",".join(csv_info.get_all_column_names())
+        assert numeric == ",".join(csv_info.get_numeric_column_names())
 
 
 def test_get_csv_names_mismatch():
