@@ -20,11 +20,7 @@ from dp_wizard.shiny.components.outputs import (
 from dp_wizard.shiny.panels.dataset_panel import data_source
 from dp_wizard.types import AppState, Product
 from dp_wizard.utils.code_generators import make_privacy_unit_block
-from dp_wizard.utils.csv_helper import (
-    get_csv_names_mismatch,
-    read_csv_names,
-    read_csv_numeric_names,
-)
+from dp_wizard.utils.csv_helper import CsvInfo, get_csv_names_mismatch
 
 dataset_panel_id = "dataset_panel"
 OTHER = "Other"
@@ -143,21 +139,29 @@ def dataset_server(
     # Release state:
     released = state.released
 
+    csv_messages = reactive.value([])
+    csv_is_error = reactive.value(False)
+
+    def _get_csv_info(path: Path):
+        csv_info = CsvInfo(Path(path))
+        csv_messages.set(csv_info.get_messages())
+        csv_is_error.set(csv_info.get_is_error())
+        all_column_names.set(csv_info.get_all_column_names())
+        numeric_column_names.set(csv_info.get_numeric_column_names())
+
     @reactive.effect
     @reactive.event(input.public_csv_path)
     def _on_public_csv_path_change():
         path = input.public_csv_path()[0]["datapath"]
         public_csv_path.set(path)
-        all_column_names.set(read_csv_names(Path(path)))
-        numeric_column_names.set(read_csv_numeric_names(Path(path)))
+        _get_csv_info(Path(path))
 
     @reactive.effect
     @reactive.event(input.private_csv_path)
     def _on_private_csv_path_change():
         path = input.private_csv_path()[0]["datapath"]
         private_csv_path.set(path)
-        all_column_names.set(read_csv_names(Path(path)))
-        numeric_column_names.set(read_csv_numeric_names(Path(path)))
+        _get_csv_info(Path(path))
 
     @reactive.effect
     @reactive.event(input.all_column_names)
@@ -220,6 +224,8 @@ def dataset_server(
         return data_source.csv_or_columns_ui(
             in_cloud=in_cloud,
             is_tutorial_mode=is_tutorial_mode,
+            csv_is_error=csv_is_error,
+            csv_messages=csv_messages,
         )
 
     @render.ui
@@ -232,9 +238,10 @@ def dataset_server(
         )
 
     @render.ui
-    def csv_column_match_ui():
-        return data_source.csv_column_match_ui(
-            csv_column_mismatch_calc,
+    def csv_message_ui():
+        return data_source.csv_message_ui(
+            csv_column_mismatch_calc=csv_column_mismatch_calc,
+            csv_messages=csv_messages,
         )
 
     entities = {
@@ -347,6 +354,7 @@ def dataset_server(
     def button_enabled():
         return (
             contributions_valid()
+            and not csv_is_error()
             and not get_row_count_errors(max_rows())
             and len(all_column_names()) > 0
             and (in_cloud or not csv_column_mismatch_calc())

@@ -15,9 +15,8 @@ from dp_wizard.types import AppState, Product
 from dp_wizard.utils import config
 from dp_wizard.utils.argparse_helpers import CLIInfo
 from dp_wizard.utils.csv_helper import (
+    CsvInfo,
     make_sample_csv,
-    read_csv_names,
-    read_csv_numeric_names,
 )
 
 _shiny_root = package_root / "shiny"
@@ -101,10 +100,9 @@ def _make_server(cli_info: CLIInfo):
             initial_contributions = 10
             initial_private_csv_path = package_root / ".local-config/sample.csv"
             make_sample_csv(initial_private_csv_path, initial_contributions)
-            initial_column_names = read_csv_names(Path(initial_private_csv_path))
-            initial_numeric_column_names = read_csv_numeric_names(
-                Path(initial_private_csv_path)
-            )
+            csv_info = CsvInfo(Path(initial_private_csv_path))
+            initial_column_names = csv_info.get_all_column_names()
+            initial_numeric_column_names = csv_info.get_numeric_column_names()
         else:
             initial_contributions = 1
             initial_private_csv_path = ""

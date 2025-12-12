@@ -20,6 +20,8 @@ from dp_wizard.utils.argparse_helpers import (
 def csv_or_columns_ui(
     in_cloud: bool,
     is_tutorial_mode: reactive.Value[bool],
+    csv_is_error: reactive.Value[bool],
+    csv_messages: reactive.Value[list[str]],
 ):  # pragma: no cover
     if in_cloud:
         content = [
@@ -59,7 +61,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 """
             ),
             ui.output_ui("input_files_ui"),
-            ui.output_ui("csv_column_match_ui"),
+            ui.output_ui("csv_message_ui"),
         ]
 
     content += [
@@ -145,11 +147,12 @@ def input_files_ui(
     ]
 
 
-def csv_column_match_ui(
+def csv_message_ui(
     csv_column_mismatch_calc,
+    csv_messages: reactive.Value[list[str]],
 ):  # pragma: no cover
+    messages = [f"- {m}" for m in csv_messages()]
     mismatch = csv_column_mismatch_calc()
-    messages = []
     if mismatch:
         just_public, just_private = mismatch
         if just_public:

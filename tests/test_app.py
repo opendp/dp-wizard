@@ -289,7 +289,7 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     page.get_by_text(": grade").nth(0).click()
     # Pick grouping:
     page.locator(".selectize-input").nth(1).click()
-    page.get_by_text("class year").nth(2).click()
+    page.get_by_text(": class year").nth(2).click()
     # Fill inputs:
     page.get_by_label("Lower").fill("0")
     page.get_by_label("Upper").fill("10")
