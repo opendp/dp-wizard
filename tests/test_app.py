@@ -129,11 +129,11 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     expect(page.get_by_text(perform_analysis_text)).to_be_visible()
     expect(page.get_by_text(download_results_text)).not_to_be_visible()
     # Epsilon slider:
-    expect(page.get_by_text("Epsilon: 1.0")).to_be_visible()
+    expect(page.get_by_text("(Epsilon): 1.0")).to_be_visible()
     page.locator(".irs-bar").click()
-    expect(page.get_by_text("Epsilon: 0.3")).to_be_visible()
+    expect(page.get_by_text("(Epsilon): 0.3")).to_be_visible()
     page.locator(".irs-bar").click()
-    expect(page.get_by_text("Epsilon: 0.2")).to_be_visible()
+    expect(page.get_by_text("(Epsilon): 0.2")).to_be_visible()
     # Simulation
     expect(page.get_by_text("Because you've provided a public CSV")).to_be_visible()
 
