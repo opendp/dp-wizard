@@ -107,6 +107,12 @@ $ dp-wizard --sample
 
 Your browser should open and connect you to the application.
 
+For building the documentation, pandoc is also required. With Homebrew:
+```shell
+$ brew install pandoc
+```
+
+
 ### Testing
 
 Tests should pass, and code coverage should be complete (except blocks we explicitly ignore):
