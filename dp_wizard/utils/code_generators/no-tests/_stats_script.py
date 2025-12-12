@@ -18,7 +18,7 @@ COLUMNS_BLOCK
 
 def get_stats_context_contributions(csv_path):
     STATS_CONTEXT_BLOCK
-    # ENCODING_COMMENT_BLOCK
+    # CSV_COMMENT_BLOCK
     return stats_context, contributions
 
 

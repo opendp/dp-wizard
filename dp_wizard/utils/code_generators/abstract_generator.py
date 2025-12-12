@@ -95,13 +95,19 @@ class AbstractGenerator(ABC):
                 WINDOWS_COMMENT_BLOCK="""
 (If installing in the Windows CMD shell,
 use double-quotes instead of single-quotes below.)""",
-                ENCODING_COMMENT_BLOCK="""
+                CSV_COMMENT_BLOCK="""
 A note on `utf8-lossy`: CSVs can use different "character encodings" to
 represent characters outside the ASCII character set, but out-of-the-box
 the Polars library only supports UTF8. Specifying `utf8-lossy` preserves as
 much information as possible, and any unrecognized characters will be replaced
 by "�". If this is not sufficient, you will need to preprocess your data to
-reencode it as UTF8.""",
+reencode it as UTF8.
+
+We suggest using `ignore_errors=True`. Runtime errors that depend on a single
+value would leak information and violate the DP guarantee,
+so it is safer to ignore them. That said, if a significant number of records
+are ignored because of errors, it will bias results.
+""",
                 CUSTOM_NOTE=self.note,
             )
             .finish()
@@ -128,14 +134,14 @@ reencode it as UTF8.""",
             # the number of possible values for each grouping column,
             # and taking their product.
             dp.polars.Margin(
-                by=GROUPS,
+                by=list(GROUPS.keys()),
                 invariant="keys",
                 max_length=MAX_ROWS,
                 max_groups=100,
             )
 
         def bin_template(GROUPS, BIN_NAME):
-            dp.polars.Margin(by=([BIN_NAME] + GROUPS), invariant="keys")
+            dp.polars.Margin(by=([BIN_NAME] + list(GROUPS.keys())), invariant="keys")
 
         margins = [
             Template(basic_template)
@@ -389,7 +395,7 @@ reencode it as UTF8.""",
                     repr(k)
                     for k in (
                         list(self.analysis_plan.columns.keys())
-                        + self.analysis_plan.groups
+                        + list(self.analysis_plan.groups.keys())
                     )
                 ),
             )

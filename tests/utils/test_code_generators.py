@@ -4,6 +4,7 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 
 import opendp.prelude as dp
+import polars as pl
 import pytest
 import requests
 from dp_wizard_templates.converters import convert_nb_to_html, convert_py_to_nb
@@ -18,6 +19,7 @@ from dp_wizard.utils.code_generators import (
 from dp_wizard.utils.code_generators.analyses import histogram, mean, median
 from dp_wizard.utils.code_generators.notebook_generator import NotebookGenerator
 from dp_wizard.utils.code_generators.script_generator import ScriptGenerator
+from dp_wizard.utils.csv_helper import read_polars_schema
 
 python_paths = package_root.glob("**/*.py")
 
@@ -157,7 +159,11 @@ plans_all_combos = [
     )
     for product in Product
     for contributions in [1, 10]
-    for groups in [[], ["1A"]]
+    for groups in [
+        {},  # No groups
+        {"1A": []},  # Grouped, but no public keys
+        {"1A": ["expected", "values"]},  # Grouped with keys
+    ]
     for columns in [
         # Single:
         {ColumnName("2B"): [histogram_plan_column]},
@@ -247,3 +253,38 @@ def test_make_script(plan):
             ["python", fp.name, "--csv", abc_csv_path], capture_output=True
         )
         assert result.returncode == 0
+
+
+def test_pums():
+    csv_path = Path(__file__).parent.parent / "fixtures/pums_1000.csv"
+
+    # The "income" field looks like integers in the first rows,
+    # but farther down there are floats.
+    # Without ignore_errors=True, the generated notebook fails.
+    assert read_polars_schema(csv_path)["income"] == pl.Int64
+    assert "1e+05" in csv_path.read_text()
+
+    plan = AnalysisPlan(
+        product=Product.STATISTICS,
+        groups={},
+        columns={
+            ColumnName("income"): [
+                AnalysisPlanColumn(
+                    mean.name,
+                    lower_bound=0,
+                    upper_bound=100000,
+                    bin_count=0,
+                    weight=1,
+                )
+            ]
+        },
+        contributions=1,
+        contributions_entity="Family",
+        csv_path=str(csv_path),
+        epsilon=1,
+        max_rows=1000,
+    )
+    notebook_py = NotebookGenerator(plan, "Note goes here!").make_py()
+    print(number_lines(notebook_py))
+    globals = {}
+    exec(notebook_py, globals)

@@ -16,7 +16,7 @@ UTILS_BLOCK
 
 def get_synth_context_contributions(csv_path):
     SYNTH_CONTEXT_BLOCK
-    # ENCODING_COMMENT_BLOCK
+    # CSV_COMMENT_BLOCK
     return synth_context, contributions
 
 
