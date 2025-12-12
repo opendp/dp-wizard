@@ -1,9 +1,9 @@
 from dp_wizard_templates.code_template import Template
 
 from dp_wizard import get_template_root, opendp_version
-from dp_wizard.types import AnalysisName, ColumnIdentifier
+from dp_wizard.types import ColumnIdentifier, StatisticName
 
-name = AnalysisName("Mean")
+name = StatisticName("Mean")
 blurb_md = """
 Choosing tighter bounds will mean less noise added
 to the statistics, but if you pick bounds that

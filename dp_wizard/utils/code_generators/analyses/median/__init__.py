@@ -1,9 +1,9 @@
 from dp_wizard_templates.code_template import Template
 
 from dp_wizard import get_template_root, opendp_version
-from dp_wizard.types import AnalysisName, ColumnIdentifier
+from dp_wizard.types import ColumnIdentifier, StatisticName
 
-name = AnalysisName("Median")
+name = StatisticName("Median")
 blurb_md = """
 In DP Wizard the median is picked from evenly spaced
 candidates, but the OpenDP library is more flexible.
