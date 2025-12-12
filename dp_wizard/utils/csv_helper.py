@@ -18,6 +18,9 @@ class CsvInfo:
                 # it's better to be sure the types
                 # have been accurately inferred.
                 infer_schema_length=None,
+                # Default is to raise NoDataError:
+                # We prefer to validate below and set error.
+                raise_if_empty=False,
             )
             .collect_schema()
             .items()
@@ -25,7 +28,23 @@ class CsvInfo:
         }
         self._warnings: list[str] = []
         self._errors: list[str] = []
-        for column_name in self._schema.keys():
+        column_names = self._schema.keys()
+        if (
+            len(
+                [
+                    name
+                    for name in column_names
+                    if name and not name.startswith("_duplicated_")
+                ]
+            )
+            == 0
+        ):
+            self._errors.append("No column names detected: First row of CSV empty?")
+        if len(column_names) == 1:
+            self._warnings.append(
+                f"Only one column detected: '{''.join(column_names)}'"
+            )
+        for column_name in column_names:
             # warnings:
             try:
                 float(column_name)
@@ -38,10 +57,16 @@ class CsvInfo:
                 self._warnings.append(
                     f"Column name modified to avoid duplication: '{column_name}'"
                 )
+            if column_name.strip() != column_name:
+                self._warnings.append(
+                    f"Column name is padded: '{column_name}'; Padded numeric values will be treated as strings."
+                )
             # errors:
-            if "\t" in column_name:
+            tab = "\t"
+            if tab in column_name:
+                escaped_tab = "\\t"
                 self._errors.append(
-                    f"Tab in column name: '{column_name}'; Is this actually a TSV?"
+                    f"Tab in column name: '{column_name.replace(tab, escaped_tab)}'; Is this actually a TSV?"
                 )
             if "�" in column_name:
                 self._errors.append(
