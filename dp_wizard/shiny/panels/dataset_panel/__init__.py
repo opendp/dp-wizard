@@ -354,6 +354,7 @@ def dataset_server(
     def button_enabled():
         return (
             contributions_valid()
+            and not csv_is_error()
             and not get_row_count_errors(max_rows())
             and len(all_column_names()) > 0
             and (in_cloud or not csv_column_mismatch_calc())
