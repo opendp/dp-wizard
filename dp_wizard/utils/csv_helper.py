@@ -69,7 +69,7 @@ class CsvInfo:
                 escaped_tab = "\\t"
                 self._errors.append(
                     f"Tab in column name: '{column_name.replace(tab, escaped_tab)}'; "
-                    "Is this actually a TSV?"
+                    "Is this actually a TSV rather than a CSV?"
                 )
             if "�" in column_name:
                 self._errors.append(
