@@ -139,8 +139,13 @@ def dataset_server(
     # Release state:
     released = state.released
 
-    def _infer_csv_schema(path: Path):
+    csv_messages = reactive.value([])
+    csv_is_error = reactive.value(False)
+
+    def _get_csv_info(path: Path):
         csv_info = CsvInfo(Path(path))
+        csv_messages.set(csv_info.get_messages())
+        csv_is_error.set(csv_info.get_is_error())
         all_column_names.set(csv_info.get_all_column_names())
         numeric_column_names.set(csv_info.get_numeric_column_names())
 
@@ -149,14 +154,14 @@ def dataset_server(
     def _on_public_csv_path_change():
         path = input.public_csv_path()[0]["datapath"]
         public_csv_path.set(path)
-        _infer_csv_schema(Path(path))
+        _get_csv_info(Path(path))
 
     @reactive.effect
     @reactive.event(input.private_csv_path)
     def _on_private_csv_path_change():
         path = input.private_csv_path()[0]["datapath"]
         private_csv_path.set(path)
-        _infer_csv_schema(Path(path))
+        _get_csv_info(Path(path))
 
     @reactive.effect
     @reactive.event(input.all_column_names)
@@ -219,6 +224,8 @@ def dataset_server(
         return data_source.csv_or_columns_ui(
             in_cloud=in_cloud,
             is_tutorial_mode=is_tutorial_mode,
+            csv_is_error=csv_is_error,
+            csv_messages=csv_messages,
         )
 
     @render.ui
@@ -231,9 +238,10 @@ def dataset_server(
         )
 
     @render.ui
-    def csv_column_match_ui():
-        return data_source.csv_column_match_ui(
-            csv_column_mismatch_calc,
+    def csv_message_ui():
+        return data_source.csv_message_ui(
+            csv_column_mismatch_calc=csv_column_mismatch_calc,
+            csv_messages=csv_messages,
         )
 
     entities = {

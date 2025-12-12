@@ -44,7 +44,7 @@ from dp_wizard.utils.csv_helper import (
     ],
 )
 def test_csv_info(csv_text, all, numeric, message_substring):
-    assert message_substring is not ""  # programmer error!
+    assert message_substring != ""  # programmer error!
     with tempfile.NamedTemporaryFile(mode="wb") as tmp:
         tmp.write(csv_text)
         tmp.flush()

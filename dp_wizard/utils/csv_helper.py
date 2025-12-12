@@ -49,7 +49,8 @@ class CsvInfo:
             try:
                 float(column_name)
                 self._warnings.append(
-                    f"Numeric column name: '{column_name}'; Is the CSV missing a header row?"
+                    f"Numeric column name: '{column_name}'; "
+                    "Is the CSV missing a header row?"
                 )
             except ValueError:
                 pass
@@ -59,14 +60,16 @@ class CsvInfo:
                 )
             if column_name.strip() != column_name:
                 self._warnings.append(
-                    f"Column name is padded: '{column_name}'; Padded numeric values will be treated as strings."
+                    f"Column name is padded: '{column_name}'; "
+                    "Padded numeric values will be treated as strings."
                 )
             # errors:
             tab = "\t"
             if tab in column_name:
                 escaped_tab = "\\t"
                 self._errors.append(
-                    f"Tab in column name: '{column_name.replace(tab, escaped_tab)}'; Is this actually a TSV?"
+                    f"Tab in column name: '{column_name.replace(tab, escaped_tab)}'; "
+                    "Is this actually a TSV?"
                 )
             if "�" in column_name:
                 self._errors.append(
@@ -85,6 +88,9 @@ class CsvInfo:
 
     def get_messages(self) -> list[str]:
         return self._errors + self._warnings
+
+    def get_is_error(self) -> bool:
+        return bool(self._errors)
 
 
 def get_csv_names_mismatch(
