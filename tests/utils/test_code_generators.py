@@ -55,7 +55,7 @@ def test_make_column_config_block_for_mean():
         == f"""# See the OpenDP Library docs for more on making private means:
 # https://docs.opendp.org/en/v{opendp_version}/getting-started/tabular-data/essential-statistics.html#Mean
 
-hw_grade_expr = pl.col('HW GRADE').cast(float).dp.mean((0, 100))"""
+hw_grade_expr = pl.col('HW GRADE').dp.mean((0, 100))"""
     )
 
 
@@ -72,9 +72,9 @@ def test_make_column_config_block_for_median():
 # https://docs.opendp.org/en/v{opendp_version}/getting-started/tabular-data/essential-statistics.html#Median
 
 hw_grade_expr = (
-    pl.col('HW GRADE')
-    .cast(float)
-    .dp.quantile(0.5, make_cut_points(0, 100, bin_count=20))
+    pl.col('HW GRADE').dp.quantile(
+        0.5, make_cut_points(0, 100, bin_count=20)
+    )
     # Or use "dp.median" which provides 0.5 implicitly.
 )"""  # noqa: B950 (too long!)
     )
