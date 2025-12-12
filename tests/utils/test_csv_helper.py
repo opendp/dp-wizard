@@ -14,36 +14,43 @@ from dp_wizard.utils.csv_helper import (
 
 
 @pytest.mark.parametrize(
-    "csv_text,all,numeric,message_substring",
+    "csv_text,all,numeric,message_substring,is_error",
     [
         # No error! and type inference:
-        (b"str,int\nX,1", "str,int", "int", None),
+        (b"str,int\nX,1", "str,int", "int", None, False),
+        #
+        # WARNINGS
+        #
         # skip empty column header:
-        (b",int\nX,1", "int", "int", "Only one column detected"),
+        (b",int\nX,1", "int", "int", "Only one column detected", False),
         # if a header is a number, might be missing header row:
-        (b"A,1\nB,2", "A,1", "1", "Numeric column name"),
-        # actually TSV:
-        (b"str\tint\nX\t1", "", "", "Tab in column name"),
-        # actually binary:
-        (b"\xff\xff\n\x00\x00", "", "", "Bad column name"),
+        (b"A,1\nB,2", "A,1", "1", "Numeric column name", False),
         # padded values:
-        (b" str , int \n X , 1 ", " str , int ", "", "Column name is padded"),
-        # empty header row:
-        (b",\nX,1", "", "", "No column names detected"),
-        # totally empty:
-        (b"", "", "", "No column names detected"),
+        (b" str , int \n X , 1 ", " str , int ", "", "Column name is padded", False),
         # actually pipe-delim:
-        (b"str|int\nX|1", "str|int", "", "Only one column detected"),
+        (b"str|int\nX|1", "str|int", "", "Only one column detected", False),
         # duplicate header gets suffix from polars:
         (
             b"dup,dup\nX,1",
             "dup,dup_duplicated_0",
             "dup_duplicated_0",
             "Column name modified",
+            False,
         ),
+        #
+        # ERRORS
+        #
+        # empty header row:
+        (b",\nX,1", "", "", "No column names detected", True),
+        # totally empty:
+        (b"", "", "", "No column names detected", True),
+        # actually TSV:
+        (b"str\tint\nX\t1", "", "", "Tab in column name", True),
+        # actually binary:
+        (b"\xff\xff\n\x00\x00", "", "", "Bad column name", True),
     ],
 )
-def test_csv_info(csv_text, all, numeric, message_substring):
+def test_csv_info(csv_text, all, numeric, message_substring, is_error):
     assert message_substring != ""  # programmer error!
     with tempfile.NamedTemporaryFile(mode="wb") as tmp:
         tmp.write(csv_text)
@@ -55,6 +62,7 @@ def test_csv_info(csv_text, all, numeric, message_substring):
             assert not csv_info.get_messages()
         else:
             assert message_substring in "; ".join(csv_info.get_messages())
+        assert csv_info.get_is_error() == is_error
 
 
 def test_get_csv_names_mismatch():
