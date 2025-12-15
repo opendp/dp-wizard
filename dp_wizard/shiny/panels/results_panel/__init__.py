@@ -27,7 +27,7 @@ from dp_wizard.shiny.panels.results_panel.download_options import (
     download_link,
     table_of_contents_md,
 )
-from dp_wizard.types import AppState
+from dp_wizard.types import AppState, Product
 from dp_wizard.utils.code_generators import AnalysisPlan, AnalysisPlanColumn
 from dp_wizard.utils.code_generators.notebook_generator import (
     PLACEHOLDER_CSV_NAME,
@@ -196,6 +196,16 @@ def results_server(
     @render.ui
     def download_results_ui():
         disabled = not weights()
+        downloads = [
+            "README",
+            "Notebook",
+            "HTML",
+            "Script",
+            "Report",
+            "Table",
+        ]
+        if product() == Product.SYNTHETIC_DATA:
+            downloads.append("Contingency Table")
         return (
             ui.markdown(
                 """
@@ -225,12 +235,13 @@ def results_server(
                 ui.br(),
                 "Contains:",
                 ui.tags.ul(
-                    ui.tags.li(download_link("README", disabled=disabled)),
-                    ui.tags.li(download_link("Notebook", disabled=disabled)),
-                    ui.tags.li(download_link("HTML", disabled=disabled)),
-                    ui.tags.li(download_link("Script", disabled=disabled)),
-                    ui.tags.li(download_link("Report", disabled=disabled)),
-                    ui.tags.li(download_link("Table", disabled=disabled)),
+                    *[
+                        ui.tags.li(
+                            download_link(download),
+                            disabled=disabled,
+                        )
+                        for download in downloads
+                    ]
                 ),
             ]
         )
@@ -384,6 +395,11 @@ def results_server(
         notebook_nb()  # Evaluate just for the side effect of creating report.
         return (_target_path / "report.csv").read_text()
 
+    @reactive.calc
+    def contingency_table_csv():
+        notebook_nb()  # Evaluate just for the side effect of creating report.
+        return (_target_path / "contingency.csv").read_text()
+
     ######################
     #
     # Handle the downloads
@@ -467,3 +483,7 @@ def results_server(
     @download(".csv")
     async def download_table_link():
         yield _make_download_or_modal_error(table_csv)
+
+    @download(".contingency.csv")
+    async def download_contingency_table_link():
+        yield _make_download_or_modal_error(contingency_table_csv)
