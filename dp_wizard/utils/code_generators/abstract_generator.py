@@ -338,11 +338,12 @@ reencode it as UTF8.""",
             from math import prod
 
             possible_rows = prod([len(v) for v in contingency_table.keys.values()])
-            (
+            contingency_table_melted = (
                 contingency_table.project_melted(COLUMNS)
                 if possible_rows < 100_000
                 else "Too big!"
             )
+            contingency_table_melted  # pyright: ignore[reportUnusedExpression]
             # -
 
             # Finally, a contingency table can also be used
@@ -357,7 +358,7 @@ reencode it as UTF8.""",
             with warnings.catch_warnings():
                 warnings.simplefilter(action="ignore", category=FutureWarning)
                 synthetic_data = contingency_table.synthesize()
-            synthetic_data  # type: ignore
+            synthetic_data  # pyright: ignore[reportUnusedExpression]
             # -
 
         # The make_cut_points() call could be moved into generated code,

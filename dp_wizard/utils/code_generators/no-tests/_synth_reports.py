@@ -16,3 +16,4 @@ report = {
 Path(TXT_REPORT_PATH).write_text(dump(report))
 
 synthetic_data.write_csv(CSV_REPORT_PATH)
+contingency_table_melted.write_csv(CONTINGENCY_TABLE_PATH)
