@@ -316,7 +316,7 @@ reencode it as UTF8.""",
         def template(synth_context, COLUMNS, CUTS):
             synth_query = (
                 synth_context.query()
-                .select(COLUMNS)
+                .select(*COLUMNS)
                 .contingency_table(
                     # Numeric columns will generally require cut points,
                     # unless they contain only a few distinct values.
@@ -339,7 +339,7 @@ reencode it as UTF8.""",
 
             possible_rows = prod([len(v) for v in contingency_table.keys.values()])
             (
-                contingency_table.project_melted([COLUMNS])
+                contingency_table.project_melted(COLUMNS)
                 if possible_rows < 100_000
                 else "Too big!"
             )
@@ -385,15 +385,10 @@ reencode it as UTF8.""",
             Template(template)
             .fill_expressions(
                 OPENDP_V_VERSION=f"v{opendp_version}",
-                COLUMNS=", ".join(
-                    repr(k)
-                    for k in (
-                        list(self.analysis_plan.columns.keys())
-                        + self.analysis_plan.groups
-                    )
-                ),
             )
             .fill_values(
+                COLUMNS=list(self.analysis_plan.columns.keys())
+                + self.analysis_plan.groups,
                 CUTS=cuts,
             )
             .finish()
