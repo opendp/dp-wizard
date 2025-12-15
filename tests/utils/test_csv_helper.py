@@ -18,6 +18,10 @@ from dp_wizard.utils.csv_helper import (
     [
         # No error! and type inference:
         (b"str,int\nX,1", "str,int", "int", None, False),
+        # more column headers than values below:
+        (b"A,B,C,D\n1,2\n3,4", "A,B,C,D", "A,B", None, False),
+        # fewer column headers than values below:
+        (b"A,B\n1,2,3,4\n5,6,7,8", "A,B", "A,B", None, False),
         #
         # WARNINGS
         #
