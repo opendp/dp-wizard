@@ -209,22 +209,22 @@ def results_server(
         return (
             ui.markdown(
                 """
-                    When [installed and run
-                    locally](https://pypi.org/project/dp_wizard/),
-                    there are more download options because DP Wizard
-                    can read your private CSV and release differentially
-                    private statistics.
-                    """
+                When [installed and run
+                locally](https://pypi.org/project/dp_wizard/),
+                there are more download options because DP Wizard
+                can read your private CSV and release differentially
+                private statistics.
+                """
             )
             if in_cloud
             else [
                 tutorial_box(
                     is_tutorial_mode(),
                     """
-                        Now you can download a notebook for your analysis.
-                        The Jupyter notebook could be used locally or on Colab,
-                        but the HTML version can be viewed in the brower.
-                        """,
+                    Now you can download a notebook for your analysis.
+                    The Jupyter notebook could be used locally or on Colab,
+                    but the HTML version can be viewed in the brower.
+                    """,
                     responsive=False,
                 ),
                 download_button(
@@ -237,8 +237,10 @@ def results_server(
                 ui.tags.ul(
                     *[
                         ui.tags.li(
-                            download_link(download),
-                            disabled=disabled,
+                            download_link(
+                                download,
+                                disabled=disabled,
+                            )
                         )
                         for download in downloads
                     ]
