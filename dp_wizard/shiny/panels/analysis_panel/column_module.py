@@ -26,7 +26,7 @@ from dp_wizard.utils.code_generators.analyses import (
 )
 from dp_wizard.utils.dp_helper import confidence, make_accuracy_histogram
 from dp_wizard.utils.mock_data import ColumnDef, mock_data
-from dp_wizard.utils.shared import plot_bars
+from dp_wizard.utils.shared.plots import plot_bars
 
 default_analysis_type = histogram.name
 label_width = "10em"  # Just wide enough so the text isn't trucated.

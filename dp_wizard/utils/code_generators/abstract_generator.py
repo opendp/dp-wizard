@@ -14,7 +14,7 @@ from dp_wizard.utils.code_generators import (
 )
 from dp_wizard.utils.code_generators.analyses import histogram
 from dp_wizard.utils.dp_helper import confidence
-from dp_wizard.utils.shared import make_cut_points
+from dp_wizard.utils.shared.bins import make_cut_points
 
 template_root = get_template_root(__file__)
 
@@ -69,7 +69,7 @@ class AbstractGenerator(ABC):
         return "".join(f"# {line}\n" for line in comment.splitlines())
 
     def make_py(self):
-        def template():
+        def imports_template():
             import matplotlib.pyplot as plt  # noqa: F401
             import opendp.prelude as dp  # noqa: F401
             import polars as pl  # noqa: F401
@@ -80,6 +80,10 @@ class AbstractGenerator(ABC):
 
         extra = self._get_extra()
 
+        utils_block = (package_root / "utils/shared/bins.py").read_text()
+        if self.analysis_plan.product == Product.STATISTICS:
+            utils_block += (package_root / "utils/shared/plots.py").read_text()
+
         code = (
             Template(self._get_root_template(), template_root)
             .fill_expressions(
@@ -87,8 +91,8 @@ class AbstractGenerator(ABC):
                 DEPENDENCIES=f"'opendp[{extra}]=={opendp_version}' matplotlib",
             )
             .fill_code_blocks(
-                IMPORTS_BLOCK=Template(template).finish(),
-                UTILS_BLOCK=(package_root / "utils/shared.py").read_text(),
+                IMPORTS_BLOCK=Template(imports_template).finish(),
+                UTILS_BLOCK=utils_block,
                 **self._make_extra_blocks(),
             )
             .fill_comment_blocks(
