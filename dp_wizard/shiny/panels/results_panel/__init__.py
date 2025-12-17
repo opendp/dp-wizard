@@ -270,7 +270,8 @@ def results_server(
             col: [
                 AnalysisPlanColumn(
                     statistic_name=statistic_names()[col],
-                    lower_bound=lower_bounds()[col],
+                    # Bounds stat does not have a lower bound:
+                    lower_bound=lower_bounds().get(col, 0),
                     upper_bound=upper_bounds()[col],
                     bin_count=int(bin_counts()[col]),
                     weight=int(weights()[col].value),

@@ -58,7 +58,7 @@ def make_output(code_gen, column_name, accuracy_name, stats_name):
         )
         .fill_expressions(
             ACCURACY_NAME=accuracy_name,
-            bounds_NAME=stats_name,
+            BOUNDS_NAME=stats_name,
             CONFIDENCE_NOTE=code_gen._make_confidence_note(),
         )
         .finish()

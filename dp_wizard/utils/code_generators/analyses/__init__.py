@@ -75,4 +75,6 @@ def has_bins(statistic: Statistic) -> bool:
     >>> has_bins(median)
     False
     """
-    return any("bin_count_input" in name for name in statistic.input_names)
+    from dp_wizard.utils.code_generators.analyses import bounds, histogram
+
+    return statistic in [histogram, bounds]
