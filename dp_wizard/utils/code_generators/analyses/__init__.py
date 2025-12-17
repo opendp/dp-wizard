@@ -51,7 +51,7 @@ class Statistic(Protocol):  # pragma: no cover
 
 def get_statistic_by_name(name: StatisticName) -> Statistic:  # pragma: no cover
     # Avoid circular import:
-    from dp_wizard.utils.code_generators.analyses import histogram, mean, median
+    from dp_wizard.utils.code_generators.analyses import bounds, histogram, mean, median
 
     match name:
         case histogram.name:
@@ -60,6 +60,8 @@ def get_statistic_by_name(name: StatisticName) -> Statistic:  # pragma: no cover
             return mean
         case median.name:
             return median
+        case bounds.name:
+            return bounds
         case _:
             raise Exception("Unrecognized statistic")
 

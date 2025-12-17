@@ -19,6 +19,7 @@ from dp_wizard.shiny.components.outputs import (
 from dp_wizard.types import ColumnName, Product, StatisticName, Weight
 from dp_wizard.utils.code_generators import make_column_config_block
 from dp_wizard.utils.code_generators.analyses import (
+    bounds,
     get_statistic_by_name,
     histogram,
     mean,
@@ -243,7 +244,7 @@ def column_server(
                     ui.input_select(
                         "statistic_name",
                         only_for_screenreader("Type of statistic"),
-                        [histogram.name, mean.name, median.name],
+                        [histogram.name, mean.name, median.name, bounds.name],
                         width=label_width,
                         selected=statistic_name,
                     ),
