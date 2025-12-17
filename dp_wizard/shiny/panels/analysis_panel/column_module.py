@@ -469,8 +469,4 @@ def column_server(
                 f"{contributions_int} contribution{s} / {contributions_entity()}",
             ]
         )
-        return plot_bars(
-            histogram,
-            error=accuracy,
-            title=title,
-        )
+        return plot_bars(histogram, title, error=accuracy)
