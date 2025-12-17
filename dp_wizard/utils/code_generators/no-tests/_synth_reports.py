@@ -16,3 +16,5 @@ report = {
 Path(TXT_REPORT_PATH).write_text(dump(report))
 
 synthetic_data.write_csv(CSV_REPORT_PATH)
+
+# TODO: Use FIGURES_PATH

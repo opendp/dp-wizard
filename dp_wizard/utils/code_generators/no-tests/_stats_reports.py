@@ -52,3 +52,6 @@ with Path(CSV_REPORT_PATH).open(mode="w", newline="") as handle:
     writer = csv.writer(handle)
     for kv_pair in flat_report.items():
         writer.writerow(kv_pair)
+
+for i, figure in enumerate(figures):
+    figure.savefig(Path(FIGURES_PATH) / f"figure-{i}.png")

@@ -78,6 +78,9 @@ class AbstractGenerator(ABC):
             # Until that is complete we need to opt-in to use these features.
             dp.enable_features("contrib")
 
+            # Figures will be added to this list for reuse:
+            figures = []  # noqa: F841
+
         extra = self._get_extra()
 
         code = (

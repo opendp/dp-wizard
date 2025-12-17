@@ -75,7 +75,11 @@ def plot_bars(
     plt.rcParams["figure.figsize"] = (12, 4)
 
     bins, values = df_to_columns(df)
-    _figure, axes = plt.subplots()
+    figure, axes = plt.subplots()
+    try:
+        figures.append(figure)  # pyright: ignore[reportUndefinedVariable]
+    except NameError:
+        pass
     bar_colors = ["blue" if v > cutoff else "lightblue" for v in values]
     axes.bar(bins, values, color=bar_colors, yerr=error)
     axes.set_xticks(bins, bins, rotation=45)
