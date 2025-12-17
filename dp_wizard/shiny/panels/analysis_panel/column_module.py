@@ -372,7 +372,17 @@ def column_server(
 
     @reactive.calc
     def error_md_calc():
-        bound_errors = get_bound_errors(input.lower_bound(), input.upper_bound())
+        if input.statistic_name() != bounds.name:
+            bound_errors = get_bound_errors(input.lower_bound(), input.upper_bound())
+        else:
+            if not input.upper_bound():
+                bound_errors = ["Upper bound is required."]
+            else:
+                error = get_float_error(input.upper_bound())
+                if error is not None:
+                    bound_errors = [error]
+                else:
+                    bound_errors = []
 
         return "\n".join(
             f"- {error}" for error in bound_errors + get_bin_errors(input.bins())
@@ -391,7 +401,9 @@ def column_server(
             make_column_config_block(
                 name=name,
                 statistic_name=input.statistic_name(),
-                lower_bound=float(input.lower_bound()),
+                # The Bounds statistic does not use a lower_bound,
+                # but the function signature requires it.
+                lower_bound=float(input.lower_bound() or "0"),
                 upper_bound=float(input.upper_bound()),
                 bin_count=int(input.bins()),
             ),
@@ -453,7 +465,7 @@ def column_server(
         return stat_preview_ui()
 
     @render.ui
-    def count_preview_ui():
+    def bounds_preview_ui():
         return stat_preview_ui()
 
     @render.data_frame
