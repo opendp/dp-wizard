@@ -460,18 +460,22 @@ def column_server(
 
     @render.plot
     def histogram_preview_plot():
-        accuracy, histogram = accuracy_histogram()
+        title_name = (
+            name
+            if public_csv_path
+            else f"Simulated {name} (assuming a normal distribution)"
+        )
+
         contributions_int = contributions()
         s = "s" if contributions_int > 1 else ""
-        title = ", ".join(
-            [
-                name if public_csv_path else f"Simulated {name}: normal distribution",
-                f"{contributions_int} contribution{s} / {contributions_entity()}",
-            ]
+        title_contributions = (
+            f"{contributions_int} contribution{s} / {contributions_entity()}",
         )
+
+        accuracy, histogram = accuracy_histogram()
         return plot_bars(
             histogram,
             error=accuracy,
             cutoff=0,  # TODO
-            title=title,
+            title=f"{title_name}, {title_contributions}",
         )
