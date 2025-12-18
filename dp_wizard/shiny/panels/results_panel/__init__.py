@@ -27,7 +27,7 @@ from dp_wizard.shiny.panels.results_panel.download_options import (
     download_link,
     table_of_contents_md,
 )
-from dp_wizard.types import AppState
+from dp_wizard.types import AppState, ColumnName
 from dp_wizard.utils.code_generators import AnalysisPlan, AnalysisPlanColumn
 from dp_wizard.utils.code_generators.notebook_generator import (
     PLACEHOLDER_CSV_NAME,
@@ -261,22 +261,31 @@ def results_server(
             download_button("Notebook Source", disabled=disabled),
         ]
 
+    def analysis_plan_column(name: ColumnName) -> AnalysisPlanColumn | None:
+        try:
+            return AnalysisPlanColumn(
+                analysis_name=analysis_types()[name],
+                lower_bound=lower_bounds()[name],
+                upper_bound=upper_bounds()[name],
+                bin_count=int(bin_counts()[name]),
+                weight=int(weights()[name].value),
+            )
+        except KeyError:
+            # Can hit this if the user jumps ahead to results,
+            # without filling out the configuration.
+            return None
+
     @reactive.calc
     def analysis_plan() -> AnalysisPlan:
         # weights().keys() will reflect the desired columns:
         # The others retain inactive columns, so user
         # inputs aren't lost when toggling checkboxes.
         columns = {
-            col: [
-                AnalysisPlanColumn(
-                    analysis_name=analysis_types()[col],
-                    lower_bound=lower_bounds()[col],
-                    upper_bound=upper_bounds()[col],
-                    bin_count=int(bin_counts()[col]),
-                    weight=int(weights()[col].value),
-                )
-            ]
-            for col in weights().keys()
+            # Wrap in list so we can support multiple stats per column,
+            # in the future.
+            name: [column]
+            for name in weights().keys()
+            if (column := analysis_plan_column(name)) is not None
         }
         return AnalysisPlan(
             product=product(),
