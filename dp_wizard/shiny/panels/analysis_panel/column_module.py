@@ -469,7 +469,7 @@ def column_server(
         contributions_int = contributions()
         s = "s" if contributions_int > 1 else ""
         title_contributions = (
-            f"{contributions_int} contribution{s} / {contributions_entity()}",
+            f"{contributions_int} contribution{s} / {contributions_entity()}"
         )
 
         accuracy, histogram = accuracy_histogram()
