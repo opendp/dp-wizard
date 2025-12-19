@@ -33,7 +33,7 @@ def test_cloud_app(page: Page, cloud_app: ShinyAppProc):  # pragma: no cover
     page.locator("#max_rows").fill("10000")
     expect(page).to_have_title("DP Wizard")
     expect(page.get_by_text("Choose Public CSV")).not_to_be_visible()
-    page.get_by_label("CSV Column Names").fill("a_column\nb_column")
+    page.get_by_label("CSV Column Names").fill("a_column:1\nb_column:2")
 
     page.get_by_role("button", name="Define Analysis").click()
     page.locator(".selectize-input").nth(0).click()

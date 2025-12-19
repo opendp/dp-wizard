@@ -168,6 +168,11 @@ class CsvInfo:
                     f"Bad column name: '{column_name}'; Is this a UTF-8 CSV?"
                 )
 
+    def __repr__(self):
+        if self._errors:
+            return f"CsvInfo(messages={self.get_messages()})"
+        return f"CsvInfo({self.get_schema()})"
+
     def get_schema(self) -> dict[ColumnName, pl.DataType]:
         if self._errors:
             return {}

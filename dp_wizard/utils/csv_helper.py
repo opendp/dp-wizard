@@ -136,6 +136,12 @@ def make_sample_csv(path: Path, contributions: int) -> None:
 
 
 def infer_csv_info(names_values_str: str) -> CsvInfo:
+    """
+    >>> csv_info = infer_csv_info("missing\\nstr : foobar\\nint:42")
+    >>> csv_info
+    CsvInfo({'missing': String, 'str': String, 'int': Int64})
+
+    """
     names_values_list = [
         (name_value.split(":") + ["", ""])[:2]
         for name_value in names_values_str.splitlines()

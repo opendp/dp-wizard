@@ -28,7 +28,7 @@ def csv_or_columns_ui(
             ui.markdown(
                 """
                 Provide the names of columns you'll use in your analysis,
-                one per line, with an sample value for each. For example:
+                one per line, with a sample value for each. For example:
 
                 ```
                 name: Chuck
