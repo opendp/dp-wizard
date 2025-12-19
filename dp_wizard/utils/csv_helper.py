@@ -137,9 +137,10 @@ def make_sample_csv(path: Path, contributions: int) -> None:
 
 def infer_csv_info(names_values_str: str) -> CsvInfo:
     """
-    >>> csv_info = infer_csv_info("missing\\nstr : foobar\\nint:42")
-    >>> csv_info
+    >>> infer_csv_info("missing\\nstr : foobar\\nint:42")
     CsvInfo({'missing': String, 'str': String, 'int': Int64})
+    >>> infer_csv_info("")
+    CsvInfo(messages=['No column names detected: First row of CSV empty?'])
 
     """
     names_values_list = [

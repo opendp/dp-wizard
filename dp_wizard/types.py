@@ -175,7 +175,7 @@ class CsvInfo:
 
     def get_schema(self) -> dict[ColumnName, pl.DataType]:
         if self._errors:
-            return {}
+            return {}  # pragma: no cover
         return self._schema
 
     def get_all_column_names(self) -> list[ColumnName]:
