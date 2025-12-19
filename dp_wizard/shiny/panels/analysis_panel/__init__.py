@@ -293,7 +293,7 @@ def analysis_server(
             where you can configure the analysis for the column.
             Note that with more columns selected,
             each column has a smaller share of the privacy budget,
-            and the accurace of results will go decline.
+            and the accuracy of results will decline.
             """,
             is_sample_csv,
             """
@@ -313,7 +313,7 @@ def analysis_server(
                 this estimate **is not used** in the final calculation.
 
                 Until you make a release, your CSV will not be
-                read except to determine the names columns,
+                read except to determine the names of columns,
                 but the number of rows does have implications for the
                 accuracy which DP can provide with a given privacy budget.
                 """,
