@@ -4,12 +4,13 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 
 import opendp.prelude as dp
+import polars as pl
 import pytest
 import requests
 from dp_wizard_templates.converters import convert_nb_to_html, convert_py_to_nb
 
 from dp_wizard import opendp_version, package_root
-from dp_wizard.types import AnalysisName, ColumnName, Product
+from dp_wizard.types import ColumnName, Product, StatisticName
 from dp_wizard.utils.code_generators import (
     AnalysisPlan,
     AnalysisPlanColumn,
@@ -18,6 +19,7 @@ from dp_wizard.utils.code_generators import (
 from dp_wizard.utils.code_generators.analyses import histogram, mean, median
 from dp_wizard.utils.code_generators.notebook_generator import NotebookGenerator
 from dp_wizard.utils.code_generators.script_generator import ScriptGenerator
+from dp_wizard.utils.csv_helper import read_polars_schema
 
 python_paths = package_root.glob("**/*.py")
 
@@ -31,10 +33,10 @@ def test_no_unparameterized_docs_urls(python_path: Path):
 
 
 def test_make_column_config_block_for_unrecognized():
-    with pytest.raises(Exception, match=r"Unrecognized analysis"):
+    with pytest.raises(Exception, match=r"Unrecognized statistic"):
         make_column_config_block(
             name="HW GRADE",
-            analysis_name=AnalysisName("Bad AnalysisType!"),
+            statistic_name=StatisticName("Bad AnalysisType!"),
             lower_bound=0,
             upper_bound=100,
             bin_count=10,
@@ -45,7 +47,7 @@ def test_make_column_config_block_for_mean():
     assert (
         make_column_config_block(
             name="HW GRADE",
-            analysis_name=mean.name,
+            statistic_name=mean.name,
             lower_bound=0,
             upper_bound=100,
             bin_count=10,
@@ -61,7 +63,7 @@ def test_make_column_config_block_for_median():
     assert (
         make_column_config_block(
             name="HW GRADE",
-            analysis_name=median.name,
+            statistic_name=median.name,
             lower_bound=0,
             upper_bound=100,
             bin_count=20,
@@ -82,7 +84,7 @@ def test_make_column_config_block_for_histogram():
     assert (
         make_column_config_block(
             name="HW GRADE",
-            analysis_name=histogram.name,
+            statistic_name=histogram.name,
             lower_bound=0,
             upper_bound=100,
             bin_count=10,
@@ -118,21 +120,21 @@ def number_lines(text: str):
 
 
 histogram_plan_column = AnalysisPlanColumn(
-    analysis_name=histogram.name,
+    statistic_name=histogram.name,
     lower_bound=5,
     upper_bound=15,
     bin_count=20,
     weight=4,
 )
 mean_plan_column = AnalysisPlanColumn(
-    analysis_name=mean.name,
+    statistic_name=mean.name,
     lower_bound=5,
     upper_bound=15,
     bin_count=0,  # Unused
     weight=4,
 )
 median_plan_column = AnalysisPlanColumn(
-    analysis_name=median.name,
+    statistic_name=median.name,
     lower_bound=5,
     upper_bound=15,
     bin_count=10,
@@ -157,7 +159,11 @@ plans_all_combos = [
     )
     for product in Product
     for contributions in [1, 10]
-    for groups in [[], ["1A"]]
+    for groups in [
+        {},  # No groups
+        {"1A": []},  # Grouped, but no public keys
+        {"1A": ["expected", "values"]},  # Grouped with keys
+    ]
     for columns in [
         # Single:
         {ColumnName("2B"): [histogram_plan_column]},
@@ -247,3 +253,38 @@ def test_make_script(plan):
             ["python", fp.name, "--csv", abc_csv_path], capture_output=True
         )
         assert result.returncode == 0
+
+
+def test_pums():
+    csv_path = Path(__file__).parent.parent / "fixtures/pums_1000.csv"
+
+    # The "income" field looks like integers in the first rows,
+    # but farther down there are floats.
+    # Without ignore_errors=True, the generated notebook fails.
+    assert read_polars_schema(csv_path)["income"] == pl.Int64
+    assert "1e+05" in csv_path.read_text()
+
+    plan = AnalysisPlan(
+        product=Product.STATISTICS,
+        groups={},
+        columns={
+            ColumnName("income"): [
+                AnalysisPlanColumn(
+                    mean.name,
+                    lower_bound=0,
+                    upper_bound=100000,
+                    bin_count=0,
+                    weight=1,
+                )
+            ]
+        },
+        contributions=1,
+        contributions_entity="Family",
+        csv_path=str(csv_path),
+        epsilon=1,
+        max_rows=1000,
+    )
+    notebook_py = NotebookGenerator(plan, "Note goes here!").make_py()
+    print(number_lines(notebook_py))
+    globals = {}
+    exec(notebook_py, globals)

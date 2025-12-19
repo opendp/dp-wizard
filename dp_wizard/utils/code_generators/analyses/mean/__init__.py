@@ -1,9 +1,9 @@
 from dp_wizard_templates.code_template import Template
 
 from dp_wizard import get_template_root, opendp_version
-from dp_wizard.types import AnalysisName, ColumnIdentifier
+from dp_wizard.types import ColumnIdentifier, StatisticName
 
-name = AnalysisName("Mean")
+name = StatisticName("Mean")
 blurb_md = """
 Choosing tighter bounds will mean less noise added
 to the statistics, but if you pick bounds that
@@ -23,7 +23,7 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
     def template(GROUP_NAMES, stats_context, EXPR_NAME):
         groups = GROUP_NAMES
         QUERY_NAME = (
-            stats_context.query().group_by(groups).agg(EXPR_NAME)
+            stats_context.query().group_by(groups).agg(EXPR_NAME).WITH_KEYS
             if groups
             else stats_context.query().select(EXPR_NAME)
         )
@@ -33,7 +33,16 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
     return (
         Template(template)
         .fill_values(
-            GROUP_NAMES=code_gen.analysis_plan.groups,
+            GROUP_NAMES=list(code_gen.analysis_plan.groups.keys()),
+        )
+        .fill_attributes(
+            WITH_KEYS=(
+                Template("with_keys(pl.LazyFrame(GROUPING_KEYS))")
+                .fill_values(GROUPING_KEYS=g)
+                .finish()
+                if (g := code_gen.analysis_plan.get_groups_with_keys())
+                else None
+            )
         )
         .fill_expressions(
             QUERY_NAME=f"{identifier}_query",

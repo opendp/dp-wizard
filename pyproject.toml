@@ -14,7 +14,7 @@ classifiers = [
 keywords = ["differential privacy"]
 dynamic = ["version", "description"]
 dependencies = [
-    "dp-wizard-templates==0.6.0",
+    "dp-wizard-templates>=0.6.0",
     "faicons",
     "fonttools>=4.60.2",
     "matplotlib",

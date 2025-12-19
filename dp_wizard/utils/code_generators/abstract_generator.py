@@ -95,13 +95,19 @@ class AbstractGenerator(ABC):
                 WINDOWS_COMMENT_BLOCK="""
 (If installing in the Windows CMD shell,
 use double-quotes instead of single-quotes below.)""",
-                ENCODING_COMMENT_BLOCK="""
+                CSV_COMMENT_BLOCK="""
 A note on `utf8-lossy`: CSVs can use different "character encodings" to
 represent characters outside the ASCII character set, but out-of-the-box
 the Polars library only supports UTF8. Specifying `utf8-lossy` preserves as
 much information as possible, and any unrecognized characters will be replaced
 by "�". If this is not sufficient, you will need to preprocess your data to
-reencode it as UTF8.""",
+reencode it as UTF8.
+
+We suggest using `ignore_errors=True`. Runtime errors that depend on a single
+value would leak information and violate the DP guarantee,
+so it is safer to ignore them. That said, if a significant number of records
+are ignored because of errors, it will bias results.
+""",
                 CUSTOM_NOTE=self.note,
             )
             .finish()
@@ -128,14 +134,14 @@ reencode it as UTF8.""",
             # the number of possible values for each grouping column,
             # and taking their product.
             dp.polars.Margin(
-                by=GROUPS,
+                by=list(GROUPS.keys()),
                 invariant="keys",
                 max_length=MAX_ROWS,
                 max_groups=100,
             )
 
         def bin_template(GROUPS, BIN_NAME):
-            dp.polars.Margin(by=([BIN_NAME] + GROUPS), invariant="keys")
+            dp.polars.Margin(by=([BIN_NAME] + list(GROUPS.keys())), invariant="keys")
 
         margins = [
             Template(basic_template)
@@ -159,7 +165,7 @@ reencode it as UTF8.""",
         return {
             name: make_column_config_block(
                 name=name,
-                analysis_name=col[0].analysis_name,
+                statistic_name=col[0].statistic_name,
                 lower_bound=col[0].lower_bound,
                 upper_bound=col[0].upper_bound,
                 bin_count=col[0].bin_count,
@@ -187,22 +193,22 @@ reencode it as UTF8.""",
         accuracy_name = f"{identifier}_accuracy"
         stats_name = f"{identifier}_stats"
 
-        from dp_wizard.utils.code_generators.analyses import get_analysis_by_name
+        from dp_wizard.utils.code_generators.analyses import get_statistic_by_name
 
-        analysis = get_analysis_by_name(plan[0].analysis_name)
-        query = analysis.make_query(
+        statistic = get_statistic_by_name(plan[0].statistic_name)
+        query = statistic.make_query(
             code_gen=self,
             identifier=identifier,
             accuracy_name=accuracy_name,
             stats_name=stats_name,
         )
-        output = analysis.make_output(
+        output = statistic.make_output(
             code_gen=self,
             column_name=column_name,
             accuracy_name=accuracy_name,
             stats_name=stats_name,
         )
-        plot_note = analysis.make_plot_note()
+        plot_note = statistic.make_plot_note()
 
         return (
             self._make_comment_cell(f"### Query for `{column_name}`:")
@@ -233,14 +239,14 @@ reencode it as UTF8.""",
     def _make_partial_stats_context(self):
 
         from dp_wizard.utils.code_generators.analyses import (
-            get_analysis_by_name,
+            get_statistic_by_name,
             has_bins,
         )
 
         bin_column_names = [
             ColumnIdentifier(name)
             for name, plan in self.analysis_plan.columns.items()
-            if has_bins(get_analysis_by_name(plan[0].analysis_name))
+            if has_bins(get_statistic_by_name(plan[0].statistic_name))
         ]
 
         privacy_unit_block = make_privacy_unit_block(
@@ -254,7 +260,7 @@ reencode it as UTF8.""",
         )
 
         is_just_histograms = all(
-            plan_column[0].analysis_name == histogram.name
+            plan_column[0].statistic_name == histogram.name
             for plan_column in self.analysis_plan.columns.values()
         )
         margins_list = (
@@ -271,7 +277,7 @@ reencode it as UTF8.""",
             [
                 f"{ColumnIdentifier(name)}_bin_expr"
                 for name, plan in self.analysis_plan.columns.items()
-                if has_bins(get_analysis_by_name(plan[0].analysis_name))
+                if has_bins(get_statistic_by_name(plan[0].statistic_name))
             ]
         )
         return (
@@ -293,11 +299,8 @@ reencode it as UTF8.""",
             contributions=self.analysis_plan.contributions,
             contributions_entity=self.analysis_plan.contributions_entity,
         )
-        # If there are no groups then OpenDP requires
-        # that pure DP be used for contingency tables.
-
         privacy_loss_block = make_privacy_loss_block(
-            pure=not self.analysis_plan.groups,
+            pure=True,
             epsilon=self.analysis_plan.epsilon,
             max_rows=self.analysis_plan.max_rows,
         )
@@ -313,7 +316,7 @@ reencode it as UTF8.""",
         )
 
     def _make_synth_query(self):
-        def template(synth_context, COLUMNS, CUTS):
+        def template(synth_context, COLUMNS, CUTS, KEYS):
             synth_query = (
                 synth_context.query()
                 .select(*COLUMNS)
@@ -322,8 +325,8 @@ reencode it as UTF8.""",
                     # unless they contain only a few distinct values.
                     cuts=CUTS,
                     # If you know the possible values for particular columns,
-                    # supply them here to use your privacy budget more efficiently:
-                    # keys={"your_column": ["known_value"]},
+                    # supply them here for better results:
+                    keys=KEYS,
                 )
             )
             contingency_table = synth_query.release()
@@ -382,6 +385,7 @@ reencode it as UTF8.""",
             )
             for (k, v) in self.analysis_plan.columns.items()
         }
+        keys = self.analysis_plan.groups
         return (
             Template(template)
             .fill_expressions(
@@ -391,6 +395,7 @@ reencode it as UTF8.""",
                 COLUMNS=list(self.analysis_plan.columns.keys())
                 + self.analysis_plan.groups,
                 CUTS=cuts,
+                KEYS=keys,
             )
             .finish()
         )
