@@ -2,6 +2,7 @@ import re
 from dataclasses import dataclass
 from enum import Enum, auto
 
+import polars as pl
 from shiny import reactive
 
 
@@ -39,7 +40,7 @@ class Product(Enum):
         return "DP " + self.name.replace("_", " ").title()
 
 
-class AnalysisName(str):
+class StatisticName(str):
     """
     A name like "Histogram" or "Mean".
     """
@@ -118,19 +119,23 @@ class AppState:
     product: reactive.Value[Product]
 
     # Analysis choices:
-    all_column_names: reactive.Value[list[ColumnName]]
+    polars_schema: reactive.Value[pl.Schema]
     numeric_column_names: reactive.Value[list[ColumnName]]
-    groups: reactive.Value[list[ColumnName]]
+    group_column_names: reactive.Value[list[ColumnName]]
     epsilon: reactive.Value[float]
 
     # Per-column choices:
     # (Note that these are all dicts, with the ColumnName as the key.)
-    analysis_types: reactive.Value[dict[ColumnName, AnalysisName]]
+    statistic_names: reactive.Value[dict[ColumnName, StatisticName]]
     lower_bounds: reactive.Value[dict[ColumnName, float]]
     upper_bounds: reactive.Value[dict[ColumnName, float]]
     bin_counts: reactive.Value[dict[ColumnName, int]]
     weights: reactive.Value[dict[ColumnName, Weight]]
     analysis_errors: reactive.Value[dict[ColumnName, bool]]
+
+    # Per-group choices:
+    # (Again a dict, with ColumnName as the key.)
+    group_keys: reactive.Value[dict[ColumnName, list[str | float]]]
 
     # Release state:
     released: reactive.Value[bool]
