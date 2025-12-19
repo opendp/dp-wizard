@@ -56,13 +56,13 @@ def read_polars_schema(csv_path: Path | bytes) -> pl.Schema:
     #
     # > Determining the column names of a LazyFrame requires
     # > resolving its schema, which is a potentially expensive operation.
-    lf = pl.scan_csv(csv_path)
+    lf = pl.scan_csv(csv_path, ignore_errors=True)
     # TODO: What happens if column names are missing?
     return lf.collect_schema()
 
 
 def read_csv_numeric_names(csv_path: Path) -> list[ColumnName]:  # pragma: no cover
-    lf = pl.scan_csv(csv_path)
+    lf = pl.scan_csv(csv_path, ignore_errors=True)
     numeric_names = [
         name for name, pl_type in lf.collect_schema().items() if pl_type.is_numeric()
     ]
@@ -83,7 +83,7 @@ def get_csv_names_mismatch(
 
 
 def get_csv_row_count(csv_path: Path) -> int:
-    lf = pl.scan_csv(csv_path)
+    lf = pl.scan_csv(csv_path, ignore_errors=True)
     return lf.select(pl.len()).collect().item()
 
 
