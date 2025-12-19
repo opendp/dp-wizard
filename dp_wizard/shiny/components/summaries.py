@@ -48,7 +48,7 @@ def analysis_summary(state: AppState):  # pragma: no cover
         )
         or "None"
     )
-    groups = ", ".join(state.groups()) or "None"
+    groups = ", ".join(state.group_column_names()) or "None"
     budget = state.epsilon()
 
     return tags.small(

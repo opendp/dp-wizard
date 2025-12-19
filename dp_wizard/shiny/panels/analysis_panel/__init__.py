@@ -21,12 +21,13 @@ from dp_wizard.shiny.components.outputs import (
 )
 from dp_wizard.shiny.components.summaries import dataset_summary
 from dp_wizard.shiny.panels.analysis_panel.column_module import column_server, column_ui
-from dp_wizard.types import AppState
+from dp_wizard.shiny.panels.analysis_panel.group_module import group_server, group_ui
+from dp_wizard.types import AppState, ColumnId
 from dp_wizard.utils.code_generators import make_privacy_loss_block
 from dp_wizard.utils.csv_helper import (
     get_csv_row_count,
-    id_labels_dict_from_names,
-    id_names_dict_from_names,
+    id_labels_dict_from_schema,
+    id_names_dict_from_schema,
 )
 
 
@@ -101,6 +102,7 @@ def analysis_ui():
             },
         ),
         ui.output_ui("columns_ui"),
+        ui.output_ui("groups_ui"),
         ui.output_ui("download_results_button_ui"),
         value="analysis_panel",
     )
@@ -161,9 +163,9 @@ def analysis_server(
     product = state.product
 
     # Analysis choices:
-    all_column_names = state.all_column_names
+    polars_schema = state.polars_schema
     numeric_column_names = state.numeric_column_names
-    groups = state.groups
+    group_column_names = state.group_column_names
     epsilon = state.epsilon
 
     # Per-column choices:
@@ -174,6 +176,10 @@ def analysis_server(
     bin_counts = state.bin_counts
     weights = state.weights
     analysis_errors = state.analysis_errors
+
+    # Per-group choices:
+    # (Again a dict, with ColumnName as the key.)
+    group_keys = state.group_keys
 
     # Release state:
     released = state.released
@@ -204,7 +210,7 @@ def analysis_server(
             choices=all_ids_labels,
         )
 
-        numeric_column_ids = id_names_dict_from_names(numeric_column_names()).keys()
+        numeric_column_ids = {ColumnId(name) for name in numeric_column_names()}
         numeric_ids_labels = {
             col_id: label
             for col_id, label in all_ids_labels.items()
@@ -221,12 +227,12 @@ def analysis_server(
     def _on_groups_change():
         group_ids_selected = input.groups_selectize()
         column_ids_to_names = csv_ids_names_calc()
-        groups.set([column_ids_to_names[id] for id in group_ids_selected])
+        group_column_names.set([column_ids_to_names[id] for id in group_ids_selected])
 
     @render.ui
     def analysis_requirements_warning_ui():
         return hide_if(
-            bool(all_column_names()),
+            bool(polars_schema()),
             info_md_box(
                 """
                 Please select your dataset on the previous tab
@@ -367,7 +373,7 @@ def analysis_server(
                 contributions_entity=contributions_entity,
                 epsilon=epsilon,
                 row_count=int(input.row_count()),
-                groups=groups,
+                groups=group_column_names,
                 statistic_names=statistic_names,
                 analysis_errors=analysis_errors,
                 lower_bounds=lower_bounds,
@@ -380,13 +386,26 @@ def analysis_server(
             )
         return [column_ui(column_id) for column_id in column_ids]
 
+    @render.ui
+    def groups_ui():
+        groups_ids = input.groups_selectize()
+        groups_ids_to_names = csv_ids_names_calc()
+        for group_id in groups_ids:
+            group_server(
+                group_id,
+                name=groups_ids_to_names[group_id],
+                group_keys=group_keys,
+                polars_schema=polars_schema,
+            )
+        return [group_ui(group_id) for group_id in groups_ids]
+
     @reactive.calc
     def csv_ids_names_calc():
-        return id_names_dict_from_names(all_column_names())
+        return id_names_dict_from_schema(polars_schema())
 
     @reactive.calc
     def csv_ids_labels_calc():
-        return id_labels_dict_from_names(all_column_names())
+        return id_labels_dict_from_schema(polars_schema())
 
     @reactive.effect
     @reactive.event(input.log_epsilon_slider)
