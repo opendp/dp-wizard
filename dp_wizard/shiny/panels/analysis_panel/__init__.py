@@ -72,7 +72,7 @@ def analysis_ui():
                 ui.card_header(budget_icon, "Privacy Budget"),
                 ui.markdown(
                     f"""
-                    What is your privacy budget, or epsilon, for this release?
+                    What is your privacy budget for this release?
                     Many factors including the sensitivity of your data,
                     the frequency of DP releases,
                     and the regulatory landscape can be considered.
@@ -81,7 +81,13 @@ def analysis_ui():
                        target="_blank">other projects</a>.
                     """
                 ),
-                log_slider("log_epsilon_slider", 0.1, 10.0),
+                log_slider(
+                    "log_epsilon_slider",
+                    lower_bound=0.1,
+                    upper_bound=10.0,
+                    lower_message="Better Privacy",
+                    upper_message="Better Accuracy",
+                ),
                 ui.output_ui("epsilon_ui"),
                 ui.output_ui("privacy_loss_python_ui"),
             ),
@@ -421,7 +427,7 @@ def analysis_server(
                 "because the additional noise will lower the accuracy of results."
             )
         return [
-            ui.markdown(f"Epsilon: {e_value}{extra}"),
+            ui.markdown(f"Privacy Budget (Epsilon): {e_value}{extra}"),
             tutorial_box(
                 is_tutorial_mode(),
                 """
