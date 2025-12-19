@@ -1,17 +1,77 @@
 import csv
 import tempfile
 from pathlib import Path
+from tempfile import NamedTemporaryFile
 
 import polars as pl
 import polars.testing as pl_testing
 import pytest
 
 from dp_wizard.utils.csv_helper import (
+    CsvInfo,
     convert_text,
     get_csv_names_mismatch,
     get_csv_row_count,
-    read_polars_schema,
 )
+
+
+@pytest.mark.parametrize(
+    "csv_text,all,numeric,message_substring,is_error",
+    [
+        # No error! and type inference:
+        (b"str,int\nX,1", "str,int", "int", None, False),
+        #
+        # NO WARNING (but might be better if there were...)
+        #
+        # more column headers than values below:
+        (b"A,B,C,D\n1,2\n3,4", "A,B,C,D", "A,B", None, False),
+        # fewer column headers than values below:
+        (b"A,B\n1,2,3,4\n5,6,7,8", "A,B", "A,B", None, False),
+        #
+        # WARNINGS
+        #
+        # skip empty column header:
+        (b",int\nX,1", "int", "int", "Only one column detected", False),
+        # if a header is a number, might be missing header row:
+        (b"A,1\nB,2", "A,1", "1", "Numeric column name", False),
+        # padded values:
+        (b" str , int \n X , 1 ", " str , int ", "", "Column name is padded", False),
+        # actually pipe-delim:
+        (b"str|int\nX|1", "str|int", "", "Only one column detected", False),
+        # duplicate header gets suffix from polars:
+        (
+            b"dup,dup\nX,1",
+            "dup,dup_duplicated_0",
+            "dup_duplicated_0",
+            "Column name modified",
+            False,
+        ),
+        #
+        # ERRORS
+        #
+        # empty header row:
+        (b",\nX,1", "", "", "No column names detected", True),
+        # totally empty:
+        (b"", "", "", "No column names detected", True),
+        # actually TSV:
+        (b"str\tint\nX\t1", "", "", "Tab in column name", True),
+        # actually binary:
+        (b"\xff\xff\n\x00\x00", "", "", "Bad column name", True),
+    ],
+)
+def test_csv_info(csv_text, all, numeric, message_substring, is_error):
+    assert message_substring != ""  # programmer error!
+    with tempfile.NamedTemporaryFile(mode="wb") as tmp:
+        tmp.write(csv_text)
+        tmp.flush()
+        csv_info = CsvInfo(Path(tmp.file.name))
+        assert all == ",".join(csv_info.get_all_column_names())
+        assert numeric == ",".join(csv_info.get_numeric_column_names())
+        if message_substring is None:
+            assert not csv_info.get_messages()
+        else:
+            assert message_substring in "; ".join(csv_info.get_messages())
+        assert csv_info.get_is_error() == is_error
 
 
 @pytest.mark.parametrize(  # type: ignore
@@ -34,8 +94,11 @@ def test_datatype_inference(value_datatype):  # type: ignore
     value: str = value_datatype.pop(0)  # type: ignore
     datatype = value_datatype.pop(0)  # type: ignore
     column_name = "col"
-    schema = read_polars_schema(f"{column_name}\n{value}".encode())
-    assert schema[column_name] == datatype  # type: ignore
+    with NamedTemporaryFile("w") as tmp:
+        tmp.write(f"{column_name}\n{value}")
+        tmp.flush()
+        csv_info = CsvInfo(Path(tmp.name))
+    assert csv_info.get_schema()[column_name] == datatype  # type: ignore
 
     expected = value_datatype.pop(0) if value_datatype else value  # type: ignore
     actual = convert_text(value, datatype)[0]  # type: ignore

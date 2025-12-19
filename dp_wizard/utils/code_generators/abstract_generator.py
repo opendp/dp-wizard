@@ -68,7 +68,7 @@ class AbstractGenerator(ABC):
     def _make_comment_cell(self, comment: str) -> str:
         return "".join(f"# {line}\n" for line in comment.splitlines())
 
-    def make_py(self):
+    def make_py(self, reformat=False):
         def imports_template():
             import matplotlib.pyplot as plt  # noqa: F401
             import opendp.prelude as dp  # noqa: F401
@@ -114,7 +114,7 @@ are ignored because of errors, it will bias results.
 """,
                 CUSTOM_NOTE=self.note,
             )
-            .finish()
+            .finish(reformat=reformat)
         )
         return self._clean_up_py(code)
 
