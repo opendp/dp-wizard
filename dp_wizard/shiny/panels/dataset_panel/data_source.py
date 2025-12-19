@@ -28,7 +28,12 @@ def csv_or_columns_ui(
             ui.markdown(
                 """
                 Provide the names of columns you'll use in your analysis,
-                one per line, with no extra punctuation.
+                one per line, with an sample value for each. For example:
+
+                ```
+                name: Chuck
+                age: 48
+                ```
                 """
             ),
             tutorial_box(

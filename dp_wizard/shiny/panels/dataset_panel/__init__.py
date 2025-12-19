@@ -20,7 +20,7 @@ from dp_wizard.shiny.components.outputs import (
 from dp_wizard.shiny.panels.dataset_panel import data_source
 from dp_wizard.types import AppState, Product
 from dp_wizard.utils.code_generators import make_privacy_unit_block
-from dp_wizard.utils.csv_helper import CsvInfo, get_csv_names_mismatch
+from dp_wizard.utils.csv_helper import CsvInfo, get_csv_names_mismatch, infer_csv_info
 
 dataset_panel_id = "dataset_panel"
 OTHER = "Other"
@@ -155,6 +155,12 @@ def dataset_server(
         path = input.private_csv_path()[0]["datapath"]
         private_csv_path.set(path)
         csv_info.set(CsvInfo(Path(path)))
+
+    @reactive.effect
+    @reactive.event(input.all_column_names)
+    def _on_column_names_change():
+        # Only used when the user is supplying column names in cloud mode.
+        csv_info.set(infer_csv_info(input.all_column_names()))
 
     @reactive.calc
     def csv_column_mismatch_calc() -> Optional[tuple[set, set]]:

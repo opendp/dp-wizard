@@ -135,6 +135,24 @@ def make_sample_csv(path: Path, contributions: int) -> None:
                 )
 
 
+def infer_csv_info(names_values_str: str) -> CsvInfo:
+    names_values_list = [
+        (name_value.split(":") + ["", ""])[:2]
+        for name_value in names_values_str.splitlines()
+    ]
+    names_values_dict = {
+        name.strip(): value.strip() for [name, value] in names_values_list
+    }
+    from tempfile import NamedTemporaryFile
+
+    with NamedTemporaryFile("w") as tmp:
+        tmp.write(",".join(names_values_dict.keys()))
+        tmp.write("\n")
+        tmp.write(",".join(names_values_dict.values()))
+        tmp.flush()
+        return CsvInfo(Path(tmp.name))
+
+
 def _clip(n: float, lower_bound: float, upper_bound: float) -> float:
     """
     >>> _clip(-5, 0, 10)
