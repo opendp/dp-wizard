@@ -259,9 +259,7 @@ def test_pums():
 
     # The "income" field looks like integers in the first rows,
     # but farther down there are floats.
-    # Without ignore_errors=True, the generated notebook fails.
-    assert CsvInfo(csv_path).get_schema()[ColumnName("income")] == pl.Int64
-    assert "1e+05" in csv_path.read_text()
+    assert CsvInfo(csv_path).get_schema()[ColumnName("income")] == pl.Float64
 
     plan = AnalysisPlan(
         product=Product.STATISTICS,

@@ -96,6 +96,7 @@ def test_datatype_inference(value_datatype):  # type: ignore
     column_name = "col"
     with NamedTemporaryFile("w") as tmp:
         tmp.write(f"{column_name}\n{value}")
+        tmp.flush()
         csv_info = CsvInfo(Path(tmp.name))
     assert csv_info.get_schema()[column_name] == datatype  # type: ignore
 
