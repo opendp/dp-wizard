@@ -165,7 +165,7 @@ are ignored because of errors, it will bias results.
         return {
             name: make_column_config_block(
                 name=name,
-                analysis_name=col[0].analysis_name,
+                statistic_name=col[0].statistic_name,
                 lower_bound=col[0].lower_bound,
                 upper_bound=col[0].upper_bound,
                 bin_count=col[0].bin_count,
@@ -193,22 +193,22 @@ are ignored because of errors, it will bias results.
         accuracy_name = f"{identifier}_accuracy"
         stats_name = f"{identifier}_stats"
 
-        from dp_wizard.utils.code_generators.analyses import get_analysis_by_name
+        from dp_wizard.utils.code_generators.analyses import get_statistic_by_name
 
-        analysis = get_analysis_by_name(plan[0].analysis_name)
-        query = analysis.make_query(
+        statistic = get_statistic_by_name(plan[0].statistic_name)
+        query = statistic.make_query(
             code_gen=self,
             identifier=identifier,
             accuracy_name=accuracy_name,
             stats_name=stats_name,
         )
-        output = analysis.make_output(
+        output = statistic.make_output(
             code_gen=self,
             column_name=column_name,
             accuracy_name=accuracy_name,
             stats_name=stats_name,
         )
-        plot_note = analysis.make_plot_note()
+        plot_note = statistic.make_plot_note()
 
         return (
             self._make_comment_cell(f"### Query for `{column_name}`:")
@@ -239,14 +239,14 @@ are ignored because of errors, it will bias results.
     def _make_partial_stats_context(self):
 
         from dp_wizard.utils.code_generators.analyses import (
-            get_analysis_by_name,
+            get_statistic_by_name,
             has_bins,
         )
 
         bin_column_names = [
             ColumnIdentifier(name)
             for name, plan in self.analysis_plan.columns.items()
-            if has_bins(get_analysis_by_name(plan[0].analysis_name))
+            if has_bins(get_statistic_by_name(plan[0].statistic_name))
         ]
 
         privacy_unit_block = make_privacy_unit_block(
@@ -260,7 +260,7 @@ are ignored because of errors, it will bias results.
         )
 
         is_just_histograms = all(
-            plan_column[0].analysis_name == histogram.name
+            plan_column[0].statistic_name == histogram.name
             for plan_column in self.analysis_plan.columns.values()
         )
         margins_list = (
@@ -277,7 +277,7 @@ are ignored because of errors, it will bias results.
             [
                 f"{ColumnIdentifier(name)}_bin_expr"
                 for name, plan in self.analysis_plan.columns.items()
-                if has_bins(get_analysis_by_name(plan[0].analysis_name))
+                if has_bins(get_statistic_by_name(plan[0].statistic_name))
             ]
         )
         return (
