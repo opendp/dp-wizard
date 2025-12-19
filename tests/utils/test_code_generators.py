@@ -10,7 +10,7 @@ import requests
 from dp_wizard_templates.converters import convert_nb_to_html, convert_py_to_nb
 
 from dp_wizard import opendp_version, package_root
-from dp_wizard.types import ColumnName, Product, StatisticName
+from dp_wizard.types import ColumnName, CsvInfo, Product, StatisticName
 from dp_wizard.utils.code_generators import (
     AnalysisPlan,
     AnalysisPlanColumn,
@@ -19,7 +19,6 @@ from dp_wizard.utils.code_generators import (
 from dp_wizard.utils.code_generators.analyses import histogram, mean, median
 from dp_wizard.utils.code_generators.notebook_generator import NotebookGenerator
 from dp_wizard.utils.code_generators.script_generator import ScriptGenerator
-from dp_wizard.utils.csv_helper import read_polars_schema
 
 python_paths = package_root.glob("**/*.py")
 
@@ -260,9 +259,7 @@ def test_pums():
 
     # The "income" field looks like integers in the first rows,
     # but farther down there are floats.
-    # Without ignore_errors=True, the generated notebook fails.
-    assert read_polars_schema(csv_path)["income"] == pl.Int64
-    assert "1e+05" in csv_path.read_text()
+    assert CsvInfo(csv_path).get_schema()[ColumnName("income")] == pl.Float64
 
     plan = AnalysisPlan(
         product=Product.STATISTICS,
