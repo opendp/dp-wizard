@@ -319,7 +319,7 @@ are ignored because of errors, it will bias results.
         def template(synth_context, COLUMNS, CUTS, KEYS):
             synth_query = (
                 synth_context.query()
-                .select(COLUMNS)
+                .select(*COLUMNS)
                 .contingency_table(
                     # Numeric columns will generally require cut points,
                     # unless they contain only a few distinct values.
@@ -341,11 +341,12 @@ are ignored because of errors, it will bias results.
             from math import prod
 
             possible_rows = prod([len(v) for v in contingency_table.keys.values()])
-            (
-                contingency_table.project_melted([COLUMNS])
+            contingency_table_melted = (
+                contingency_table.project_melted(COLUMNS)
                 if possible_rows < 100_000
                 else "Too big!"
             )
+            contingency_table_melted  # pyright: ignore[reportUnusedExpression]
             # -
 
             # Finally, a contingency table can also be used
@@ -360,7 +361,7 @@ are ignored because of errors, it will bias results.
             with warnings.catch_warnings():
                 warnings.simplefilter(action="ignore", category=FutureWarning)
                 synthetic_data = contingency_table.synthesize()
-            synthetic_data  # type: ignore
+            synthetic_data  # pyright: ignore[reportUnusedExpression]
             # -
 
         # The make_cut_points() call could be moved into generated code,
@@ -389,15 +390,10 @@ are ignored because of errors, it will bias results.
             Template(template)
             .fill_expressions(
                 OPENDP_V_VERSION=f"v{opendp_version}",
-                COLUMNS=", ".join(
-                    repr(k)
-                    for k in (
-                        list(self.analysis_plan.columns.keys())
-                        + list(self.analysis_plan.groups.keys())
-                    )
-                ),
             )
             .fill_values(
+                COLUMNS=list(self.analysis_plan.columns.keys())
+                + list(self.analysis_plan.groups.keys()),
                 CUTS=cuts,
                 KEYS=keys,
             )
