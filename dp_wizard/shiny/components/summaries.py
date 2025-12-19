@@ -43,12 +43,12 @@ def dataset_summary(state: AppState):  # pragma: no cover
 def analysis_summary(state: AppState):  # pragma: no cover
     columns = (
         ", ".join(
-            f"{analysis} of {column}"
-            for column, analysis in state.analysis_types().items()
+            f"{statistic_name} of {column}"
+            for column, statistic_name in state.statistic_names().items()
         )
         or "None"
     )
-    groups = ", ".join(state.groups()) or "None"
+    groups = ", ".join(state.group_column_names()) or "None"
     budget = state.epsilon()
 
     return tags.small(
