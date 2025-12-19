@@ -1,5 +1,6 @@
 import csv
 import random
+import re
 from pathlib import Path
 
 import polars as pl
@@ -7,7 +8,48 @@ import polars as pl
 from dp_wizard.types import ColumnId, ColumnLabel, ColumnName
 
 
-def read_csv_names(csv_path: Path) -> list[ColumnName]:
+def convert_text(text: str, target_type: pl.DataType) -> list[str | float]:
+    """
+    >>> convert_text("\\n\\n before\\n \\nand, after \\n\\n", pl.String)
+    ['before', 'and', 'after']
+
+    >>> convert_text("-1,0,1,3.14159", pl.Int32)
+    [-1, 0, 1]
+
+    >>> convert_text("-1.1,0,1.1,foobar", pl.Float32)
+    [-1.1, 0.0, 1.1]
+    """
+    if target_type.is_float():
+        convert = float
+    elif target_type.is_integer():
+        convert = int
+    elif target_type == pl.Boolean:
+        convert = bool
+    elif target_type == pl.String:
+        convert = str
+    else:
+        raise Exception(f"Unexpected type: {target_type}")  # pragma: no cover
+
+    def safe_convert(value: str) -> str | float | bool | None:
+        try:
+            new = convert(value)
+        except ValueError:
+            new = None
+        return new
+
+    clean_lines = [
+        clean_line for line in re.split(r"[\n,]", text) if (clean_line := line.strip())
+    ]
+
+    converted_lines = [
+        converted_line
+        for line in clean_lines
+        if (converted_line := safe_convert(line)) is not None
+    ]
+    return converted_lines
+
+
+def read_polars_schema(csv_path: Path | bytes) -> pl.Schema:
     # Polars is overkill, but it is more robust against
     # variations in encoding than Python stdlib csv.
     # However, it could be slow:
@@ -15,9 +57,8 @@ def read_csv_names(csv_path: Path) -> list[ColumnName]:
     # > Determining the column names of a LazyFrame requires
     # > resolving its schema, which is a potentially expensive operation.
     lf = pl.scan_csv(csv_path)
-    all_names = lf.collect_schema().names()
-    # Exclude columns missing names:
-    return [ColumnName(name) for name in all_names if name.strip() != ""]
+    # TODO: What happens if column names are missing?
+    return lf.collect_schema()
 
 
 def read_csv_numeric_names(csv_path: Path) -> list[ColumnName]:  # pragma: no cover
@@ -32,8 +73,10 @@ def read_csv_numeric_names(csv_path: Path) -> list[ColumnName]:  # pragma: no co
 def get_csv_names_mismatch(
     public_csv_path: Path, private_csv_path: Path
 ) -> tuple[set[ColumnName], set[ColumnName]]:
-    public_names = set(read_csv_names(public_csv_path))
-    private_names = set(read_csv_names(private_csv_path))
+    public_names = set(ColumnName(name) for name in read_polars_schema(public_csv_path))
+    private_names = set(
+        ColumnName(name) for name in read_polars_schema(private_csv_path)
+    )
     extra_public = public_names - private_names
     extra_private = private_names - public_names
     return (extra_public, extra_private)
@@ -44,22 +87,23 @@ def get_csv_row_count(csv_path: Path) -> int:
     return lf.select(pl.len()).collect().item()
 
 
-def id_labels_dict_from_names(names: list[ColumnName]) -> dict[ColumnId, ColumnLabel]:
+def id_labels_dict_from_schema(schema: pl.Schema) -> dict[ColumnId, ColumnLabel]:
     """
-    >>> id_labels_dict_from_names(["abc"])
+    >>> id_labels_dict_from_schema(pl.Schema({"abc": pl.Int32}))
     {'...': '1: abc'}
     """
     return {
-        ColumnId(name): ColumnLabel(f"{i+1}: {name}") for i, name in enumerate(names)
+        ColumnId(name): ColumnLabel(f"{i+1}: {name}")
+        for i, name in enumerate(schema.keys())
     }
 
 
-def id_names_dict_from_names(names: list[ColumnName]) -> dict[ColumnId, ColumnName]:
+def id_names_dict_from_schema(schema: pl.Schema) -> dict[ColumnId, ColumnName]:
     """
-    >>> id_names_dict_from_names(["abc"])
+    >>> id_names_dict_from_schema(pl.Schema({"abc": pl.Int32}))
     {'...': 'abc'}
     """
-    return {ColumnId(name): name for name in names}
+    return {ColumnId(name): ColumnName(name) for name in schema.keys()}
 
 
 def make_sample_csv(path: Path, contributions: int) -> None:
