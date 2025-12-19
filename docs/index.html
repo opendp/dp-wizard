@@ -801,10 +801,12 @@ budget, and set the weight for each query under that overall budget.</p>
 ... )
 &gt;&gt;&gt;
 &gt;&gt;&gt; # See the OpenDP Library docs for more on Context:
-&gt;&gt;&gt; # https://docs.opendp.org/en/v0.14.1/api/user-guide/context/index.html#context:
+&gt;&gt;&gt; # https://docs.opendp.org/en/v0.14.1/api/user-guide/context/index.html#context
 &gt;&gt;&gt; stats_context = dp.Context.compositor(
 ...     data=pl.scan_csv(
-...         &quot;docs/fill-in-correct-path.csv&quot;, encoding=&quot;utf8-lossy&quot;
+...         &quot;docs/fill-in-correct-path.csv&quot;,
+...         encoding=&quot;utf8-lossy&quot;,
+...         ignore_errors=True,
 ...     ).with_columns(grade_bin_expr),
 ...     privacy_unit=privacy_unit,
 ...     privacy_loss=privacy_loss,
