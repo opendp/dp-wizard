@@ -134,7 +134,7 @@ def _make_server(cli_info: CLIInfo):
             group_column_names=reactive.value([]),
             epsilon=reactive.value(1.0),
             # Per-column choices:
-            analysis_types=reactive.value({}),
+            statistic_names=reactive.value({}),
             lower_bounds=reactive.value({}),
             upper_bounds=reactive.value({}),
             bin_counts=reactive.value({}),
