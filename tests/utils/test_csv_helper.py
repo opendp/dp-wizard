@@ -8,8 +8,10 @@ import pytest
 
 from dp_wizard.utils.csv_helper import (
     CsvInfo,
+    convert_text,
     get_csv_names_mismatch,
     get_csv_row_count,
+    read_polars_schema,
 )
 
 
@@ -72,6 +74,34 @@ def test_csv_info(csv_text, all, numeric, message_substring, is_error):
         assert csv_info.get_is_error() == is_error
 
 
+@pytest.mark.parametrize(  # type: ignore
+    "value_datatype",
+    [
+        ["abc", pl.String],
+        ["-0", pl.Int64, 0],
+        ["123", pl.Int64, 123],
+        ["   123", pl.String, "123"],
+        ["123   ", pl.String, "123"],
+        ["123.456", pl.Float64, 123.456],
+        ["1e2", pl.Float64, 100.0],
+        ["tRuE", pl.Boolean, True],
+        ["01-01-2001", pl.String],
+        ["01:00", pl.String],
+    ],
+    ids=str,
+)
+def test_datatype_inference(value_datatype):  # type: ignore
+    value: str = value_datatype.pop(0)  # type: ignore
+    datatype = value_datatype.pop(0)  # type: ignore
+    column_name = "col"
+    schema = read_polars_schema(f"{column_name}\n{value}".encode())
+    assert schema[column_name] == datatype  # type: ignore
+
+    expected = value_datatype.pop(0) if value_datatype else value  # type: ignore
+    actual = convert_text(value, datatype)[0]  # type: ignore
+    assert actual == expected
+
+
 def test_get_csv_names_mismatch():
     with tempfile.TemporaryDirectory() as tmp:
         a_path = Path(tmp) / "a.csv"
@@ -126,7 +156,8 @@ def test_csv_loading(write_encoding):
 
         # THIS IS THE RIGHT PATTERN!
         # Not perfect, but "utf8-lossy" retains as much info as possible.
-        read_lf = pl.scan_csv(fp.name, encoding="utf8-lossy")
+        # "ignore_errors" true will skip values that don't match inferred type.
+        read_lf = pl.scan_csv(fp.name, encoding="utf8-lossy", ignore_errors=True)
         if write_encoding == "latin1":
             # Not equal, but the only differce is the "�".
             pl_testing.assert_frame_not_equal(write_lf, read_lf)

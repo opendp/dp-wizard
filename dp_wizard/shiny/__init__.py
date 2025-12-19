@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import polars as pl
 from htmltools import Tag
 from shiny import App, Inputs, Outputs, Session, reactive, ui
 
@@ -101,12 +102,11 @@ def _make_server(cli_info: CLIInfo):
             initial_private_csv_path = package_root / ".local-config/sample.csv"
             make_sample_csv(initial_private_csv_path, initial_contributions)
             csv_info = CsvInfo(Path(initial_private_csv_path))
-            initial_column_names = csv_info.get_all_column_names()
             initial_numeric_column_names = csv_info.get_numeric_column_names()
         else:
             initial_contributions = 1
             initial_private_csv_path = ""
-            initial_column_names = []
+            initial_schema = pl.Schema()
             initial_numeric_column_names = []
 
         initial_product = Product.STATISTICS
@@ -129,9 +129,9 @@ def _make_server(cli_info: CLIInfo):
             initial_product=initial_product,
             product=reactive.value(initial_product),
             # Analysis choices:
-            all_column_names=reactive.value(initial_column_names),
+            polars_schema=reactive.value(initial_schema),
             numeric_column_names=reactive.value(initial_numeric_column_names),
-            groups=reactive.value([]),
+            group_column_names=reactive.value([]),
             epsilon=reactive.value(1.0),
             # Per-column choices:
             analysis_types=reactive.value({}),
@@ -140,6 +140,8 @@ def _make_server(cli_info: CLIInfo):
             bin_counts=reactive.value({}),
             weights=reactive.value({}),
             analysis_errors=reactive.value({}),
+            # Per-group choices:
+            group_keys=reactive.value({}),
             # Release state:
             released=reactive.value(False),
         )

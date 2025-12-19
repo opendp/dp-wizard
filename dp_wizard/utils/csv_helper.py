@@ -1,5 +1,6 @@
 import csv
 import random
+import re
 from pathlib import Path
 
 import polars as pl
@@ -29,7 +30,7 @@ class CsvInfo:
         self._warnings: list[str] = []
         self._errors: list[str] = []
         column_names = self._schema.keys()
-        if (
+        if (  # TODO: More idiomatic
             len(
                 [
                     name
@@ -93,10 +94,50 @@ class CsvInfo:
         return bool(self._errors)
 
 
+def convert_text(text: str, target_type: pl.DataType) -> list[str | float]:
+    """
+    >>> convert_text("\\n\\n before\\n \\nand, after \\n\\n", pl.String)
+    ['before', 'and', 'after']
+
+    >>> convert_text("-1,0,1,3.14159", pl.Int32)
+    [-1, 0, 1]
+
+    >>> convert_text("-1.1,0,1.1,foobar", pl.Float32)
+    [-1.1, 0.0, 1.1]
+    """
+    if target_type.is_float():
+        convert = float
+    elif target_type.is_integer():
+        convert = int
+    elif target_type == pl.Boolean:
+        convert = bool
+    elif target_type == pl.String:
+        convert = str
+    else:
+        raise Exception(f"Unexpected type: {target_type}")  # pragma: no cover
+
+    def safe_convert(value: str) -> str | float | bool | None:
+        try:
+            new = convert(value)
+        except ValueError:
+            new = None
+        return new
+
+    clean_lines = [
+        clean_line for line in re.split(r"[\n,]", text) if (clean_line := line.strip())
+    ]
+
+    converted_lines = [
+        converted_line
+        for line in clean_lines
+        if (converted_line := safe_convert(line)) is not None
+    ]
+    return converted_lines
+
+
 def get_csv_names_mismatch(
     public_csv_path: Path, private_csv_path: Path
 ) -> tuple[set[ColumnName], set[ColumnName]]:
-
     public_names = set(CsvInfo(public_csv_path).get_all_column_names())
     private_names = set(CsvInfo(private_csv_path).get_all_column_names())
     extra_public = public_names - private_names
@@ -109,22 +150,23 @@ def get_csv_row_count(csv_path: Path) -> int:
     return lf.select(pl.len()).collect().item()
 
 
-def id_labels_dict_from_names(names: list[ColumnName]) -> dict[ColumnId, ColumnLabel]:
+def id_labels_dict_from_schema(schema: pl.Schema) -> dict[ColumnId, ColumnLabel]:
     """
-    >>> id_labels_dict_from_names(["abc"])
+    >>> id_labels_dict_from_schema(pl.Schema({"abc": pl.Int32}))
     {'...': '1: abc'}
     """
     return {
-        ColumnId(name): ColumnLabel(f"{i+1}: {name}") for i, name in enumerate(names)
+        ColumnId(name): ColumnLabel(f"{i+1}: {name}")
+        for i, name in enumerate(schema.keys())
     }
 
 
-def id_names_dict_from_names(names: list[ColumnName]) -> dict[ColumnId, ColumnName]:
+def id_names_dict_from_schema(schema: pl.Schema) -> dict[ColumnId, ColumnName]:
     """
-    >>> id_names_dict_from_names(["abc"])
+    >>> id_names_dict_from_schema(pl.Schema({"abc": pl.Int32}))
     {'...': 'abc'}
     """
-    return {ColumnId(name): name for name in names}
+    return {ColumnId(name): ColumnName(name) for name in schema.keys()}
 
 
 def make_sample_csv(path: Path, contributions: int) -> None:
