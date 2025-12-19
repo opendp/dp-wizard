@@ -15,13 +15,13 @@ from dp_wizard.utils.argparse_helpers import (
     PUBLIC_PRIVATE_TEXT,
     PUBLIC_TEXT,
 )
+from dp_wizard.utils.csv_helper import CsvInfo
 
 
 def csv_or_columns_ui(
     in_cloud: bool,
     is_tutorial_mode: reactive.Value[bool],
-    csv_is_error: reactive.Value[bool],
-    csv_messages: reactive.Value[list[str]],
+    csv_info: reactive.Value[CsvInfo],
 ):  # pragma: no cover
     if in_cloud:
         content = [
@@ -149,9 +149,9 @@ def input_files_ui(
 
 def csv_message_ui(
     csv_column_mismatch_calc,
-    csv_messages: reactive.Value[list[str]],
+    csv_messages: list[str],
 ):  # pragma: no cover
-    messages = [f"- {m}" for m in csv_messages()]
+    messages = [f"- {m}" for m in csv_messages]
     mismatch = csv_column_mismatch_calc()
     if mismatch:
         just_public, just_private = mismatch

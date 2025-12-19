@@ -1,6 +1,7 @@
 import csv
 import tempfile
 from pathlib import Path
+from tempfile import NamedTemporaryFile
 
 import polars as pl
 import polars.testing as pl_testing
@@ -11,7 +12,6 @@ from dp_wizard.utils.csv_helper import (
     convert_text,
     get_csv_names_mismatch,
     get_csv_row_count,
-    read_polars_schema,
 )
 
 
@@ -94,8 +94,10 @@ def test_datatype_inference(value_datatype):  # type: ignore
     value: str = value_datatype.pop(0)  # type: ignore
     datatype = value_datatype.pop(0)  # type: ignore
     column_name = "col"
-    schema = read_polars_schema(f"{column_name}\n{value}".encode())
-    assert schema[column_name] == datatype  # type: ignore
+    with NamedTemporaryFile("w") as tmp:
+        tmp.write(f"{column_name}\n{value}")
+        csv_info = CsvInfo(Path(tmp.name))
+    assert csv_info.get_schema()[column_name] == datatype  # type: ignore
 
     expected = value_datatype.pop(0) if value_datatype else value  # type: ignore
     actual = convert_text(value, datatype)[0]  # type: ignore

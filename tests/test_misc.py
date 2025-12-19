@@ -9,6 +9,13 @@ tests = {
     "flake8 linting": "flake8 . --count --show-source --statistics",
     "pyright type checking": "pyright",
     "precommit checks": "pre-commit run --all-files",
+    # pandoc invocation aligned with scripts/slides.sh:
+    "pandoc slides up to date": "pandoc --to=slidy "
+    "--include-before-body=docs/include-before-body.html "
+    "docs/index.md "
+    "--output docs/index-test.html "
+    "--standalone "
+    "&& diff docs/index.html docs/index-test.html",
 }
 
 

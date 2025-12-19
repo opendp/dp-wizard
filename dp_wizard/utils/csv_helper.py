@@ -5,93 +5,7 @@ from pathlib import Path
 
 import polars as pl
 
-from dp_wizard.types import ColumnId, ColumnLabel, ColumnName
-
-
-class CsvInfo:
-    def __init__(self, csv_path: Path):
-        self._schema = {
-            ColumnName(k): v
-            for k, v in pl.scan_csv(
-                csv_path,
-                # Read the whole CSV:
-                # Until we hear that this is too slow,
-                # it's better to be sure the types
-                # have been accurately inferred.
-                infer_schema_length=None,
-                # Default is to raise NoDataError:
-                # We prefer to validate below and set error.
-                raise_if_empty=False,
-            )
-            .collect_schema()
-            .items()
-            if k.strip() != ""
-        }
-        self._warnings: list[str] = []
-        self._errors: list[str] = []
-        column_names = self._schema.keys()
-        if (  # TODO: More idiomatic
-            len(
-                [
-                    name
-                    for name in column_names
-                    if name and not name.startswith("_duplicated_")
-                ]
-            )
-            == 0
-        ):
-            self._errors.append("No column names detected: First row of CSV empty?")
-        if len(column_names) == 1:
-            self._warnings.append(
-                f"Only one column detected: '{''.join(column_names)}'"
-            )
-        for column_name in column_names:
-            # warnings:
-            try:
-                float(column_name)
-                self._warnings.append(
-                    f"Numeric column name: '{column_name}'; "
-                    "Is the CSV missing a header row?"
-                )
-            except ValueError:
-                pass
-            if "_duplicated_" in column_name:
-                self._warnings.append(
-                    f"Column name modified to avoid duplication: '{column_name}'"
-                )
-            if column_name.strip() != column_name:
-                self._warnings.append(
-                    f"Column name is padded: '{column_name}'; "
-                    "Padded numeric values will be treated as strings."
-                )
-            # errors:
-            tab = "\t"
-            if tab in column_name:
-                escaped_tab = "\\t"
-                self._errors.append(
-                    f"Tab in column name: '{column_name.replace(tab, escaped_tab)}'; "
-                    "Is this actually a TSV rather than a CSV?"
-                )
-            if "�" in column_name:
-                self._errors.append(
-                    f"Bad column name: '{column_name}'; Is this a UTF-8 CSV?"
-                )
-
-    def get_all_column_names(self) -> list[ColumnName]:
-        if self._errors:
-            return []
-        return list(self._schema.keys())
-
-    def get_numeric_column_names(self) -> list[ColumnName]:
-        if self._errors:
-            return []
-        return [k for k, v in self._schema.items() if v.is_numeric()]
-
-    def get_messages(self) -> list[str]:
-        return self._errors + self._warnings
-
-    def get_is_error(self) -> bool:
-        return bool(self._errors)
+from dp_wizard.types import ColumnId, ColumnLabel, ColumnName, CsvInfo
 
 
 def convert_text(text: str, target_type: pl.DataType) -> list[str | float]:
@@ -146,11 +60,13 @@ def get_csv_names_mismatch(
 
 
 def get_csv_row_count(csv_path: Path) -> int:
-    lf = pl.scan_csv(csv_path)
+    lf = pl.scan_csv(csv_path, ignore_errors=True)
     return lf.select(pl.len()).collect().item()
 
 
-def id_labels_dict_from_schema(schema: pl.Schema) -> dict[ColumnId, ColumnLabel]:
+def id_labels_dict_from_schema(
+    schema: dict[ColumnName, pl.DataType],
+) -> dict[ColumnId, ColumnLabel]:
     """
     >>> id_labels_dict_from_schema(pl.Schema({"abc": pl.Int32}))
     {'...': '1: abc'}
@@ -161,7 +77,9 @@ def id_labels_dict_from_schema(schema: pl.Schema) -> dict[ColumnId, ColumnLabel]
     }
 
 
-def id_names_dict_from_schema(schema: pl.Schema) -> dict[ColumnId, ColumnName]:
+def id_names_dict_from_schema(
+    schema: dict[ColumnName, pl.DataType],
+) -> dict[ColumnId, ColumnName]:
     """
     >>> id_names_dict_from_schema(pl.Schema({"abc": pl.Int32}))
     {'...': 'abc'}

@@ -1,7 +1,6 @@
 from pathlib import Path
 from typing import Optional
 
-import polars as pl
 from shiny import Inputs, Outputs, Session, reactive, render, ui
 
 from dp_wizard.shiny.components.icons import (
@@ -123,8 +122,7 @@ def dataset_server(
     product = state.product
 
     # Analysis choices:
-    polars_schema = state.polars_schema
-    numeric_column_names = state.numeric_column_names
+    csv_info = state.csv_info
     # group_column_names = state.group_column_names
     # epsilon = state.epsilon
 
@@ -144,46 +142,19 @@ def dataset_server(
     # Release state:
     released = state.released
 
-    csv_messages = reactive.value([])
-    csv_is_error = reactive.value(False)
-
-    def _get_csv_info(path: Path):
-        csv_info = CsvInfo(Path(path))
-        csv_messages.set(csv_info.get_messages())
-        csv_is_error.set(csv_info.get_is_error())
-        numeric_column_names.set(csv_info.get_numeric_column_names())
-
     @reactive.effect
     @reactive.event(input.public_csv_path)
     def _on_public_csv_path_change():
         path = input.public_csv_path()[0]["datapath"]
         public_csv_path.set(path)
-        _get_csv_info(Path(path))
+        csv_info.set(CsvInfo(Path(path)))
 
     @reactive.effect
     @reactive.event(input.private_csv_path)
     def _on_private_csv_path_change():
         path = input.private_csv_path()[0]["datapath"]
         private_csv_path.set(path)
-        _get_csv_info(Path(path))
-
-    @reactive.effect
-    @reactive.event(input.all_column_names)
-    def _on_column_names_change():
-        # Only used when the user is supplying column names in cloud mode.
-        # The Polars type comes into play if/when public keys are given.
-        column_names = [
-            clean
-            for line in input.all_column_names().splitlines()
-            if (clean := line.strip())
-        ]
-        # Set schema type as string, so that keys can be set.
-        polars_schema.set(pl.Schema({name: pl.String for name in column_names}))
-        # But inconsistently, assume numeric type, so columns can be selected
-        # for stats.
-        # TODO: Allow types to be specified in the cloud.
-        # https://github.com/opendp/dp-wizard/issues/741
-        numeric_column_names.set(column_names)
+        csv_info.set(CsvInfo(Path(path)))
 
     @reactive.calc
     def csv_column_mismatch_calc() -> Optional[tuple[set, set]]:
@@ -235,8 +206,7 @@ def dataset_server(
         return data_source.csv_or_columns_ui(
             in_cloud=in_cloud,
             is_tutorial_mode=is_tutorial_mode,
-            csv_is_error=csv_is_error,
-            csv_messages=csv_messages,
+            csv_info=csv_info,
         )
 
     @render.ui
@@ -252,7 +222,7 @@ def dataset_server(
     def csv_message_ui():
         return data_source.csv_message_ui(
             csv_column_mismatch_calc=csv_column_mismatch_calc,
-            csv_messages=csv_messages,
+            csv_messages=csv_info().get_messages(),
         )
 
     entities = {
@@ -365,9 +335,8 @@ def dataset_server(
     def button_enabled():
         return (
             contributions_valid()
-            and not csv_is_error()
+            and not csv_info().get_is_error()
             and not get_row_count_errors(max_rows())
-            and len(polars_schema()) > 0
             and (in_cloud or not csv_column_mismatch_calc())
         )
 
