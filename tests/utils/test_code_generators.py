@@ -10,7 +10,7 @@ import requests
 from dp_wizard_templates.converters import convert_nb_to_html, convert_py_to_nb
 
 from dp_wizard import opendp_version, package_root
-from dp_wizard.types import AnalysisName, ColumnName, Product
+from dp_wizard.types import ColumnName, Product, StatisticName
 from dp_wizard.utils.code_generators import (
     AnalysisPlan,
     AnalysisPlanColumn,
@@ -33,10 +33,10 @@ def test_no_unparameterized_docs_urls(python_path: Path):
 
 
 def test_make_column_config_block_for_unrecognized():
-    with pytest.raises(Exception, match=r"Unrecognized analysis"):
+    with pytest.raises(Exception, match=r"Unrecognized statistic"):
         make_column_config_block(
             name="HW GRADE",
-            analysis_name=AnalysisName("Bad AnalysisType!"),
+            statistic_name=StatisticName("Bad AnalysisType!"),
             lower_bound=0,
             upper_bound=100,
             bin_count=10,
@@ -47,7 +47,7 @@ def test_make_column_config_block_for_mean():
     assert (
         make_column_config_block(
             name="HW GRADE",
-            analysis_name=mean.name,
+            statistic_name=mean.name,
             lower_bound=0,
             upper_bound=100,
             bin_count=10,
@@ -63,7 +63,7 @@ def test_make_column_config_block_for_median():
     assert (
         make_column_config_block(
             name="HW GRADE",
-            analysis_name=median.name,
+            statistic_name=median.name,
             lower_bound=0,
             upper_bound=100,
             bin_count=20,
@@ -84,7 +84,7 @@ def test_make_column_config_block_for_histogram():
     assert (
         make_column_config_block(
             name="HW GRADE",
-            analysis_name=histogram.name,
+            statistic_name=histogram.name,
             lower_bound=0,
             upper_bound=100,
             bin_count=10,
@@ -120,21 +120,21 @@ def number_lines(text: str):
 
 
 histogram_plan_column = AnalysisPlanColumn(
-    analysis_name=histogram.name,
+    statistic_name=histogram.name,
     lower_bound=5,
     upper_bound=15,
     bin_count=20,
     weight=4,
 )
 mean_plan_column = AnalysisPlanColumn(
-    analysis_name=mean.name,
+    statistic_name=mean.name,
     lower_bound=5,
     upper_bound=15,
     bin_count=0,  # Unused
     weight=4,
 )
 median_plan_column = AnalysisPlanColumn(
-    analysis_name=median.name,
+    statistic_name=median.name,
     lower_bound=5,
     upper_bound=15,
     bin_count=10,

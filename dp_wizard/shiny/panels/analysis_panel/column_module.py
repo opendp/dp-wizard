@@ -16,10 +16,10 @@ from dp_wizard.shiny.components.outputs import (
     only_for_screenreader,
     tutorial_box,
 )
-from dp_wizard.types import AnalysisName, ColumnName, Product, Weight
+from dp_wizard.types import ColumnName, Product, StatisticName, Weight
 from dp_wizard.utils.code_generators import make_column_config_block
 from dp_wizard.utils.code_generators.analyses import (
-    get_analysis_by_name,
+    get_statistic_by_name,
     histogram,
     mean,
     median,
@@ -28,7 +28,7 @@ from dp_wizard.utils.dp_helper import confidence, make_accuracy_histogram
 from dp_wizard.utils.mock_data import ColumnDef, mock_data
 from dp_wizard.utils.shared import plot_bars
 
-default_analysis_type = histogram.name
+default_statistic_name = histogram.name
 label_width = "10em"  # Just wide enough so the text isn't trucated.
 
 
@@ -119,8 +119,8 @@ def column_ui():  # pragma: no cover
         ui.card_header(
             column_config_icon, ui.output_text("column_card_header", inline=True)
         ),
-        ui.output_ui("analysis_name_ui"),
-        ui.output_ui("analysis_config_ui"),
+        ui.output_ui("statistic_name_ui"),
+        ui.output_ui("statistic_config_ui"),
     )
 
 
@@ -137,7 +137,7 @@ def column_server(
     epsilon: reactive.Value[float],
     row_count: int,
     groups: reactive.Value[list[ColumnName]],
-    analysis_types: reactive.Value[dict[ColumnName, AnalysisName]],
+    statistic_names: reactive.Value[dict[ColumnName, StatisticName]],
     analysis_errors: reactive.Value[dict[ColumnName, bool]],
     lower_bounds: reactive.Value[dict[ColumnName, float]],
     upper_bounds: reactive.Value[dict[ColumnName, float]],
@@ -157,9 +157,9 @@ def column_server(
             )
 
     @reactive.effect
-    @reactive.event(input.analysis_type)
-    def _set_analysis_type():
-        analysis_types.set({**analysis_types(), name: input.analysis_type()})
+    @reactive.event(input.statistic_name)
+    def _set_statistic_name():
+        statistic_names.set({**statistic_names(), name: input.statistic_name()})
 
     @reactive.effect
     @reactive.event(input.lower_bound)
@@ -235,19 +235,19 @@ def column_server(
         return f"{name} (grouped by {groups_str})"
 
     @render.ui
-    def analysis_name_ui():
-        analysis_name = analysis_types().get(name, histogram.name)
-        blurb_md = get_analysis_by_name(analysis_name).blurb_md
+    def statistic_name_ui():
+        statistic_name = statistic_names().get(name, histogram.name)
+        blurb_md = get_statistic_by_name(statistic_name).blurb_md
         return hide_if(
             product() != Product.STATISTICS,
             (
                 ui.layout_columns(
                     ui.input_select(
-                        "analysis_type",
-                        only_for_screenreader("Type of analysis"),
+                        "statistic_name",
+                        only_for_screenreader("Type of statistic"),
                         [histogram.name, mean.name, median.name],
                         width=label_width,
-                        selected=analysis_name,
+                        selected=statistic_name,
                     ),
                     ui.markdown(blurb_md),
                     col_widths=col_widths,  # type: ignore
@@ -256,7 +256,7 @@ def column_server(
         )
 
     @render.ui
-    def analysis_config_ui():
+    def statistic_config_ui():
         def lower_bound_input():
             return ui.input_text(
                 "lower_bound",
@@ -322,8 +322,10 @@ def column_server(
         # Preserve the user's choices behind the scenes,
         # but only show mean and median column UI if actually calculating stats:
         # otherwise show the histogram UI.
-        analysis_name = (
-            input.analysis_type() if product() == Product.STATISTICS else histogram.name
+        statistic_name = (
+            input.statistic_name()
+            if product() == Product.STATISTICS
+            else histogram.name
         )
 
         # Had trouble with locals() inside comprehension in Python 3.10.
@@ -332,7 +334,7 @@ def column_server(
 
         # Fix is just to keep it outside the comprehension.
         local_variables = locals()
-        input_names = get_analysis_by_name(analysis_name).input_names
+        input_names = get_statistic_by_name(statistic_name).input_names
         input_functions = [local_variables[input_name] for input_name in input_names]
         with reactive.isolate():
             inputs = [input_function() for input_function in input_functions] + [
@@ -341,7 +343,7 @@ def column_server(
 
         return ui.layout_columns(
             inputs,
-            ui.output_ui(f"{analysis_name.lower()}_preview_ui"),
+            ui.output_ui(f"{statistic_name.lower()}_preview_ui"),
             col_widths=col_widths,  # type: ignore
         )
 
@@ -389,7 +391,7 @@ def column_server(
             "Column Configuration",
             make_column_config_block(
                 name=name,
-                analysis_name=input.analysis_type(),
+                statistic_name=input.statistic_name(),
                 lower_bound=float(input.lower_bound()),
                 upper_bound=float(input.upper_bound()),
                 bin_count=int(input.bins()),

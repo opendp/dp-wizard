@@ -134,7 +134,7 @@ def dataset_server(
 
     # Per-column choices:
     # (Note that these are all dicts, with the ColumnName as the key.)
-    # analysis_types = state.analysis_types
+    # statistic_names = state.statistic_names
     # lower_bounds = state.lower_bounds
     # upper_bounds = state.upper_bounds
     # bin_counts = state.bin_counts
