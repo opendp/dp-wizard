@@ -117,19 +117,23 @@ def results_server(
     product = state.product
 
     # Analysis choices:
-    all_column_names = state.all_column_names
+    polars_schema = state.polars_schema
     # numeric_column_names = state.numeric_column_names
-    groups = state.groups
+    group_column_names = state.group_column_names
     epsilon = state.epsilon
 
     # Per-column choices:
     # (Note that these are all dicts, with the ColumnName as the key.)
-    analysis_types = state.analysis_types
+    statistic_names = state.statistic_names
     lower_bounds = state.lower_bounds
     upper_bounds = state.upper_bounds
     bin_counts = state.bin_counts
     weights = state.weights
     # analysis_errors = state.analysis_errors
+
+    # Per-group choices:
+    # (Again a dict, with ColumnName as the key.)
+    group_keys = state.group_keys
 
     # Release state:
     released = state.released
@@ -264,7 +268,7 @@ def results_server(
     def analysis_plan_column(name: ColumnName) -> AnalysisPlanColumn | None:
         try:
             return AnalysisPlanColumn(
-                analysis_name=analysis_types()[name],
+                statistic_name=statistic_names()[name],
                 lower_bound=lower_bounds()[name],
                 upper_bound=upper_bounds()[name],
                 bin_count=int(bin_counts()[name]),
@@ -295,7 +299,9 @@ def results_server(
             contributions_entity=contributions_entity(),
             epsilon=epsilon(),
             max_rows=int(max_rows()),
-            groups=groups(),
+            # group_keys may contains groups which are not currently selected.
+            # We *do* need to allow empty v: support grouping w/o keys.
+            groups={k: v for k, v in group_keys().items() if k in group_column_names()},
             columns=columns,
         )
 
@@ -337,7 +343,7 @@ def results_server(
     def readme_txt():
         note = input.custom_download_note()
         toc = table_of_contents_md()
-        columns = f"Original CSV columns: {', '.join(all_column_names())}"
+        columns = f"Original CSV columns: {', '.join(polars_schema())}"
         return "\n\n".join([f"# {analysis_plan()}", note, "Contains:", toc, columns])
 
     @reactive.calc
