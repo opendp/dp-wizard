@@ -549,10 +549,11 @@ Next, we'll define our Context. This is where we set the privacy budget, and set
 ... )
 >>>
 >>> # See the OpenDP Library docs for more on Context:
->>> # https://docs.opendp.org/en/v0.14.1/api/user-guide/context/index.html#context:
+>>> # https://docs.opendp.org/en/v0.14.1/api/user-guide/context/index.html#context
 >>> stats_context = dp.Context.compositor(
 ...     data=pl.scan_csv(
-...         "docs/fill-in-correct-path.csv", encoding="utf8-lossy"
+...         "docs/fill-in-correct-path.csv",
+...         encoding="utf8-lossy",
 ...     ).with_columns(grade_bin_expr),
 ...     privacy_unit=privacy_unit,
 ...     privacy_loss=privacy_loss,

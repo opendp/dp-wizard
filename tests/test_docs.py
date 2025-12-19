@@ -37,11 +37,11 @@ def test_doc_examples_up_to_date():
     csv_path = "docs/fill-in-correct-path.csv"
     plan = AnalysisPlan(
         product=Product.STATISTICS,
-        groups=[],
+        groups={},
         columns={
             ColumnName("grade"): [
                 AnalysisPlanColumn(
-                    analysis_name=histogram.name,
+                    statistic_name=histogram.name,
                     lower_bound=0.0,
                     upper_bound=100.0,
                     bin_count=10,
