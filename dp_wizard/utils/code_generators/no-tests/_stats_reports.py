@@ -1,4 +1,5 @@
 import csv
+import re
 from pathlib import Path
 
 from yaml import dump
@@ -45,10 +46,30 @@ report = {
     "outputs": OUTPUTS,
 }
 
-Path(TXT_REPORT_PATH).write_text(dump(report))
+target_path = Path(TARGET_PATH)
+(target_path / "report.txt").write_text(dump(report))
 
 flat_report = flatten_dict(report)
-with Path(CSV_REPORT_PATH).open(mode="w", newline="") as handle:
+with (target_path / "report.csv").open(mode="w", newline="") as handle:
     writer = csv.writer(handle)
     for kv_pair in flat_report.items():
         writer.writerow(kv_pair)
+
+
+def png_name(name):
+    return re.sub(r"\W+", "-", name) + ".png"
+
+
+for name, figure in figures.items():
+    figure.savefig(target_path / png_name(name))
+
+
+imgs = [f"<img src='{png_name(name)}' alt='{name}'>" for name in figures.keys()]
+html = f"""
+<html>
+<body>
+Figures:
+{"\n".join(imgs)}
+</body>
+</html>"""
+(target_path / "report.html").write_text(html)

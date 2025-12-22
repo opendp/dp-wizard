@@ -63,6 +63,9 @@ def df_to_columns(df: DataFrame):
     return transposed if transposed else (tuple(), tuple())
 
 
+figures = {}
+
+
 def plot_bars(
     df: DataFrame, error: float, cutoff: float, title: str
 ):  # pragma: no cover
@@ -75,7 +78,8 @@ def plot_bars(
     plt.rcParams["figure.figsize"] = (12, 4)
 
     bins, values = df_to_columns(df)
-    _figure, axes = plt.subplots()
+    figure, axes = plt.subplots()
+    figures[title] = figure  # pyright: ignore[reportUndefinedVariable]
     bar_colors = ["blue" if v > cutoff else "lightblue" for v in values]
     axes.bar(bins, values, color=bar_colors, yerr=error)
     axes.set_xticks(bins, bins, rotation=45)

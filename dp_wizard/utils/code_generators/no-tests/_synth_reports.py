@@ -13,6 +13,9 @@ report = {
     "outputs": OUTPUTS,
 }
 
-Path(TXT_REPORT_PATH).write_text(dump(report))
+target_path = Path(TARGET_PATH)
+(target_path / "report.txt").write_text(dump(report))
 
-synthetic_data.write_csv(CSV_REPORT_PATH)
+synthetic_data.write_csv(target_path / "report.csv")
+
+# TODO: Use figures

@@ -318,6 +318,7 @@ def results_server(
             # from a clean slate, rather than rely on the side effect
             # of a reactive.calc.
             (zip_root_dir / f"{stem}.txt").write_text(report_txt())
+            (zip_root_dir / f"{stem}.txt").write_text(report_html())
             (zip_root_dir / f"{stem}.csv").write_text(table_csv())
 
             base_name = f"{tmp_dir}/{stem}"
@@ -391,6 +392,11 @@ def results_server(
     def report_txt():
         notebook_nb()  # Evaluate just for the side effect of creating report.
         return (_target_path / "report.txt").read_text()
+
+    @reactive.calc
+    def report_html():
+        notebook_nb()  # Evaluate just for the side effect of creating report.
+        return (_target_path / "report.html").read_text()
 
     @reactive.calc
     def table_csv():
