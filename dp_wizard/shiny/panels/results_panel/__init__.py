@@ -117,8 +117,7 @@ def results_server(
     product = state.product
 
     # Analysis choices:
-    polars_schema = state.polars_schema
-    # numeric_column_names = state.numeric_column_names
+    csv_info = state.csv_info
     group_column_names = state.group_column_names
     epsilon = state.epsilon
 
@@ -335,8 +334,16 @@ def results_server(
     def readme_txt():
         note = input.custom_download_note()
         toc = table_of_contents_md()
-        columns = f"Original CSV columns: {', '.join(polars_schema())}"
-        return "\n\n".join([f"# {analysis_plan()}", note, "Contains:", toc, columns])
+        column_names = csv_info().get_all_column_names()
+        return "\n\n".join(
+            [
+                f"# {analysis_plan()}",
+                note,
+                "Contains:",
+                toc,
+                f"Original CSV columns: {', '.join(column_names)}",
+            ]
+        )
 
     @reactive.calc
     def notebook_py():

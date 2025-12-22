@@ -211,7 +211,7 @@ def column_server(
         # but I'd guess this is dominated by the DP operations,
         # so not worth optimizing.
         lf = (
-            pl.scan_csv(public_csv_path)
+            pl.scan_csv(public_csv_path, ignore_errors=True)
             if public_csv_path
             else pl.LazyFrame(
                 mock_data({name: ColumnDef(lower_x, upper_x)}, row_count=row_count)

@@ -163,8 +163,7 @@ def analysis_server(
     product = state.product
 
     # Analysis choices:
-    polars_schema = state.polars_schema
-    numeric_column_names = state.numeric_column_names
+    csv_info = state.csv_info
     group_column_names = state.group_column_names
     epsilon = state.epsilon
 
@@ -210,7 +209,9 @@ def analysis_server(
             choices=all_ids_labels,
         )
 
-        numeric_column_ids = {ColumnId(name) for name in numeric_column_names()}
+        numeric_column_ids = {
+            ColumnId(name) for name in csv_info().get_numeric_column_names()
+        }
         numeric_ids_labels = {
             col_id: label
             for col_id, label in all_ids_labels.items()
@@ -232,7 +233,7 @@ def analysis_server(
     @render.ui
     def analysis_requirements_warning_ui():
         return hide_if(
-            bool(polars_schema()),
+            bool(csv_info().get_schema()),
             info_md_box(
                 """
                 Please select your dataset on the previous tab
@@ -395,17 +396,17 @@ def analysis_server(
                 group_id,
                 name=groups_ids_to_names[group_id],
                 group_keys=group_keys,
-                polars_schema=polars_schema,
+                schema=csv_info().get_schema(),
             )
         return [group_ui(group_id) for group_id in groups_ids]
 
     @reactive.calc
     def csv_ids_names_calc():
-        return id_names_dict_from_schema(polars_schema())
+        return id_names_dict_from_schema(csv_info().get_schema())
 
     @reactive.calc
     def csv_ids_labels_calc():
-        return id_labels_dict_from_schema(polars_schema())
+        return id_labels_dict_from_schema(csv_info().get_schema())
 
     @reactive.effect
     @reactive.event(input.log_epsilon_slider)
