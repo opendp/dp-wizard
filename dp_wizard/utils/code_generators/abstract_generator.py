@@ -316,7 +316,7 @@ are ignored because of errors, it will bias results.
         )
 
     def _make_synth_query(self):
-        def template(synth_context, COLUMNS, CUTS, KEYS):
+        def template(synth_context, COLUMNS, CUTS, plot_bars, KEYS):
             synth_query = (
                 synth_context.query()
                 .select(*COLUMNS)
@@ -341,12 +341,12 @@ are ignored because of errors, it will bias results.
             from math import prod
 
             possible_rows = prod([len(v) for v in contingency_table.keys.values()])
-            contingency_table_melted = (
-                contingency_table.project_melted(COLUMNS)
-                if possible_rows < 100_000
-                else "Too big!"
-            )
-            contingency_table_melted  # pyright: ignore[reportUnusedExpression]
+            if possible_rows < 100_000:
+                contingency_table_melted = contingency_table.project_melted(COLUMNS)
+                if possible_rows < 200:
+                    plot_bars(contingency_table_melted, "Contingency Table")
+            else:
+                contingency_table_melted = "Too big!"
             # -
 
             # Finally, a contingency table can also be used
@@ -393,7 +393,7 @@ are ignored because of errors, it will bias results.
             )
             .fill_values(
                 COLUMNS=list(self.analysis_plan.columns.keys())
-                + self.analysis_plan.groups,
+                + list(self.analysis_plan.groups.keys()),
                 CUTS=cuts,
                 KEYS=keys,
             )
