@@ -17,9 +17,9 @@ from dp_wizard.shiny.components.icons import (
 )
 from dp_wizard.shiny.components.outputs import (
     hide_if,
-    info_md_box,
     only_for_screenreader,
     tutorial_box,
+    warning_md_box,
 )
 from dp_wizard.shiny.components.summaries import analysis_summary, dataset_summary
 from dp_wizard.shiny.panels.results_panel.download_options import (
@@ -141,7 +141,7 @@ def results_server(
     def results_requirements_warning_ui():
         return hide_if(
             bool(weights()),
-            info_md_box(
+            warning_md_box(
                 """
                 Please define your analysis on the previous tab
                 before downloading results.

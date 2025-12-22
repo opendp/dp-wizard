@@ -15,9 +15,9 @@ from dp_wizard.shiny.components.inputs import log_slider
 from dp_wizard.shiny.components.outputs import (
     code_sample,
     hide_if,
-    info_md_box,
     nav_button,
     tutorial_box,
+    warning_md_box,
 )
 from dp_wizard.shiny.components.summaries import dataset_summary
 from dp_wizard.shiny.panels.analysis_panel.column_module import column_server, column_ui
@@ -234,7 +234,7 @@ def analysis_server(
     def analysis_requirements_warning_ui():
         return hide_if(
             bool(csv_info().get_schema()),
-            info_md_box(
+            warning_md_box(
                 """
                 Please select your dataset on the previous tab
                 before defining your analysis.
@@ -246,7 +246,7 @@ def analysis_server(
     def analysis_release_warning_ui():
         return hide_if(
             not released(),
-            info_md_box(
+            warning_md_box(
                 """
                 After making a differentially private release,
                 changes to the analysis will constitute a new release,
