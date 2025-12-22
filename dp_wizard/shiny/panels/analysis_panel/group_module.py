@@ -24,14 +24,13 @@ def group_server(
     session: Session,
     name: ColumnName,
     group_keys: reactive.Value[dict[ColumnName, list[str | float]]],
-    polars_schema: reactive.Value[pl.Schema],
+    schema: dict[ColumnName, pl.DataType],
 ):  # pragma: no cover
 
     @reactive.effect
     @reactive.event(input.group_keys)
     def _set_group_keys():
-        target_type = polars_schema()[name]
-        cleaned = convert_text(input.group_keys(), target_type)
+        cleaned = convert_text(input.group_keys(), schema[name])
         group_keys.set({**group_keys(), name: cleaned})
 
     @render.text
@@ -40,7 +39,7 @@ def group_server(
 
     @render.ui
     def group_keys_ui():
-        match pl_datatype := polars_schema()[name]:
+        match pl_datatype := schema[name]:
             case pl.String:
                 datatype = "String"
             case pl.Int64:

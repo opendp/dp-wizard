@@ -22,7 +22,7 @@ def make_cut_points(
     (There are actually two more bins, extending to
     -inf and +inf, but we'll ignore those.)
 
-    Cut points are evenly spaced from lower_bound to upper_bound,
+    Cut points are evenly spaced from lower_bound to upper_bound.
 
     >>> make_cut_points(0, 10, 2)
     [0.0, 5.0, 10.0]
