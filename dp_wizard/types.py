@@ -124,6 +124,15 @@ class CsvInfo:
         self._warnings: list[str] = []
         self._errors: list[str] = []
         column_names = self._schema.keys()
+
+        # Schema warnings:
+        if not any(data_type.is_numeric() for data_type in self._schema.values()):
+            self._warnings.append("No numeric columns detected.")
+        if len(column_names) == 1:
+            columns = "".join(column_names)
+            self._warnings.append(f"Only one column detected: '{columns}'")
+
+        # Schema errors:
         if not any(
             # startswith("_duplicated_") is there in case there are
             # multiple columns with missing names: Polars will retitle
@@ -132,12 +141,10 @@ class CsvInfo:
             for name in column_names
         ):
             self._errors.append("No column names detected: First row of CSV empty?")
-        if len(column_names) == 1:
-            self._warnings.append(
-                f"Only one column detected: '{''.join(column_names)}'"
-            )
+
         for column_name in column_names:
-            # warnings:
+
+            # Row warnings:
             try:
                 float(column_name)
                 self._warnings.append(
@@ -155,7 +162,8 @@ class CsvInfo:
                     f"Column name is padded: '{column_name}'; "
                     "Padded numeric values will be treated as strings."
                 )
-            # errors:
+
+            # Row errors:
             tab = "\t"
             if tab in column_name:
                 escaped_tab = "\\t"
