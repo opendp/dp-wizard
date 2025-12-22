@@ -53,5 +53,8 @@ with Path(CSV_REPORT_PATH).open(mode="w", newline="") as handle:
     for kv_pair in flat_report.items():
         writer.writerow(kv_pair)
 
-for i, figure in enumerate(figures):
-    figure.savefig(Path(FIGURES_PATH) / f"figure-{i}.png")
+for name, figure in figures.items():
+    import re
+
+    clean_name = re.sub(r"\W+", "-", name)
+    figure.savefig(Path(FIGURES_PATH) / f"{clean_name}.png")
