@@ -450,8 +450,7 @@ def column_server(
         return [
             ui.p(
                 f"""
-                Since this stat is just a single number,
-                there is not a preview visualization.
+                There is no preview for this statistic.
                 {optional_grouping_message}
                 """
             ),
