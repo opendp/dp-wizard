@@ -91,9 +91,10 @@ class NotebookGenerator(AbstractGenerator):
             .fill_values(
                 CSV_PATH=self.analysis_plan.get_absolute_csv_path(),
                 EPSILON=self.analysis_plan.epsilon,
-                TXT_REPORT_PATH=str(target_path / "report.txt"),
-                CSV_REPORT_PATH=str(target_path / "report.csv"),
-                FIGURES_PATH=str(target_path),
+                TARGET_PATH=target_path,
+                # TXT_REPORT_PATH=str(target_path / "report.txt"),
+                # CSV_REPORT_PATH=str(target_path / "report.csv"),
+                # FIGURES_PATH=str(target_path),
             )
             .finish()
         )
