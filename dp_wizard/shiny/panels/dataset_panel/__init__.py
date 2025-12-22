@@ -12,10 +12,10 @@ from dp_wizard.shiny.components.outputs import (
     code_sample,
     col_widths,
     hide_if,
-    info_md_box,
     nav_button,
     only_for_screenreader,
     tutorial_box,
+    warning_md_box,
 )
 from dp_wizard.shiny.panels.dataset_panel import data_source
 from dp_wizard.types import AppState, Product
@@ -177,7 +177,7 @@ def dataset_server(
     def dataset_release_warning_ui():
         return hide_if(
             not released(),
-            info_md_box(
+            warning_md_box(
                 """
                 After making a differentially private release,
                 changes to the dataset will constitute a new release,
@@ -355,7 +355,7 @@ def dataset_server(
     def contributions_validation_ui():
         return hide_if(
             contributions_valid(),
-            info_md_box("Contributions must be 1 or greater."),
+            warning_md_box("Contributions must be 1 or greater."),
         )
 
     @render.ui
@@ -393,7 +393,7 @@ def dataset_server(
     def optional_row_count_error_ui():
         error_md = "\n".join(f"- {error}" for error in get_row_count_errors(max_rows()))
         if error_md:
-            return info_md_box(error_md)
+            return warning_md_box(error_md)
 
     @render.ui
     def row_count_bounds_ui():
