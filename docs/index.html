@@ -827,7 +827,8 @@ budget, and set the weight for each query under that overall budget.</p>
 &gt;&gt;&gt; grade_query = (
 ...     stats_context.query().group_by(groups).agg(pl.len().dp.noise().alias(&quot;count&quot;))
 ... )
-&gt;&gt;&gt; grade_accuracy = grade_query.summarize(alpha=1 - confidence)[&quot;accuracy&quot;].item()
+&gt;&gt;&gt; summary = grade_query.summarize(alpha=1 - confidence)
+&gt;&gt;&gt; grade_accuracy = summary[&quot;accuracy&quot;].item()
 &gt;&gt;&gt; grade_stats = grade_query.release().collect()
 </code></pre>
 <p>If we try to run more queries at this point, it will error. Once the
