@@ -20,13 +20,16 @@ root = get_template_root(__file__)
 
 
 def make_query(code_gen, identifier, accuracy_name, stats_name):
-    def template(GROUP_NAMES, stats_context, EXPR_NAME):
+    def template(GROUP_NAMES, stats_context, EXPR_NAME, confidence):
         groups = GROUP_NAMES
         QUERY_NAME = (
             stats_context.query().group_by(groups).agg(EXPR_NAME).WITH_KEYS
             if groups
             else stats_context.query().select(EXPR_NAME)
         )
+        ACCURACY_NAME = QUERY_NAME.summarize(alpha=1 - confidence)[  # noqa: F841
+            "accuracy"
+        ]
         STATS_NAME = QUERY_NAME.release().collect()
         STATS_NAME  # type: ignore
 
@@ -46,6 +49,7 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
         )
         .fill_expressions(
             QUERY_NAME=f"{identifier}_query",
+            ACCURACY_NAME=accuracy_name,
             STATS_NAME=stats_name,
             EXPR_NAME=f"{identifier}_expr",
         )
