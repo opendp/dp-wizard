@@ -48,7 +48,7 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
 
         # +
 
-        ACCURACY_NAME = summary["accuracy"].item()
+        ACCURACY_NAME = summary["accuracy"].item()  # noqa: F841
         STATS_NAME = QUERY_NAME.release().collect()
         STATS_NAME  # type: ignore
 

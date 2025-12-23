@@ -582,7 +582,8 @@ Query for grade:
 >>> grade_query = (
 ...     stats_context.query().group_by(groups).agg(pl.len().dp.noise().alias("count"))
 ... )
->>> grade_accuracy = grade_query.summarize(alpha=1 - confidence)["accuracy"].item()
+>>> summary = grade_query.summarize(alpha=1 - confidence)
+>>> grade_accuracy = summary["accuracy"].item()
 >>> grade_stats = grade_query.release().collect()
 
 ```

@@ -57,12 +57,13 @@ def test_doc_examples_up_to_date():
     )
     expected_code = NotebookGenerator(plan, "Note goes here!").make_py(reformat=True)
 
-    if any(
-        # csv_path is expanded to an absolute path, so ignore it:
-        line not in expected_code and csv_path not in line
+    unexpected_lines = [
+        line
         for line in doc_code.splitlines()
-    ):
-        # It's fine for the docs to be a subset of the generated code,
-        # but if a line is missing, the "pytest -vv" diff
-        # will give us context to fix it.
-        assert expected_code == doc_code  # pragma: no cover
+        # csv_path is absolute and it will have local information
+        # that shouldn't be checked in.
+        if line not in expected_code and csv_path not in line
+    ]
+    assert (
+        not unexpected_lines
+    ), f"These lines are missing from {index_md}:\n" + "\n".join(unexpected_lines)
