@@ -27,9 +27,22 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
             if groups
             else stats_context.query().select(EXPR_NAME)
         )
-        ACCURACY_NAME = QUERY_NAME.summarize(alpha=1 - confidence)[  # noqa: F841
-            "accuracy"
-        ]
+
+        # -
+
+        # If we summarize the statistic, we see that a mean is composed
+        # of a sum and a length, each with their own accuracy:
+
+        # +
+
+        QUERY_NAME.summarize(alpha=1 - confidence)
+
+        # -
+
+        # Proceding to the DP release:
+
+        # +
+
         STATS_NAME = QUERY_NAME.release().collect()
         STATS_NAME  # type: ignore
 
@@ -49,7 +62,6 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
         )
         .fill_expressions(
             QUERY_NAME=f"{identifier}_query",
-            ACCURACY_NAME=accuracy_name,
             STATS_NAME=stats_name,
             EXPR_NAME=f"{identifier}_expr",
         )

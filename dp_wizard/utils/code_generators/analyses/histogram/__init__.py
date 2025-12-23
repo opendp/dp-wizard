@@ -32,9 +32,23 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
             .agg(pl.len().dp.noise().alias("count"))  # type: ignore
             .WITH_KEYS
         )
-        ACCURACY_NAME = QUERY_NAME.summarize(alpha=1 - confidence)[  # noqa: F841
-            "accuracy"
-        ].item()
+
+        # -
+
+        # We can summarize the statistic to get the accuracy:
+
+        # +
+
+        summary = QUERY_NAME.summarize(alpha=1 - confidence)
+        summary
+
+        # -
+
+        # Proceding to the DP release:
+
+        # +
+
+        ACCURACY_NAME = summary["accuracy"].item()
         STATS_NAME = QUERY_NAME.release().collect()
         STATS_NAME  # type: ignore
 
