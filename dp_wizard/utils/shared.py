@@ -50,22 +50,24 @@ def interval_bottom(interval: str) -> float:
         return 0.0
 
 
+delim = "; "
+first = lambda merged: merged.split(delim)[0]
+
+
 def df_to_columns(df: DataFrame):
     """
     Transform a Dataframe into a format that is easier to plot,
     parsing the interval strings to sort them as numbers.
     """
     merged_key_rows = [
-        (" ".join(str(k) for k in keys), value) for (*keys, value) in df.rows()
+        (delim.join(str(k) for k in keys), value) for (*keys, value) in df.rows()
     ]
     sorted_rows = sorted(merged_key_rows, key=lambda row: interval_bottom(row[0]))
     transposed = tuple(zip(*sorted_rows))
     return transposed if transposed else (tuple(), tuple())
 
 
-def plot_bars(
-    df: DataFrame, error: float, cutoff: float, title: str
-):  # pragma: no cover
+def plot_bars(df: DataFrame, error: float, title: str):  # pragma: no cover
     """
     Given a Dataframe, make a bar plot of the data in the last column,
     with labels from the prior columns.
@@ -76,9 +78,10 @@ def plot_bars(
 
     bins, values = df_to_columns(df)
     _figure, axes = plt.subplots()
-    bar_colors = ["blue" if v > cutoff else "lightblue" for v in values]
+    top_bins = list({first(b) for b in bins})
+    cmap = plt.cm.tab10
+    bar_colors = [cmap(top_bins.index(first(b)) % cmap.N) for b in bins]
     axes.bar(bins, values, color=bar_colors, yerr=error)
     axes.set_xticks(bins, bins, rotation=45)
-    axes.axhline(cutoff, color="lightgrey", zorder=-1)
     axes.set_ylim(bottom=0)
     axes.set_title(title)
