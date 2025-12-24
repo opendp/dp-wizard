@@ -51,7 +51,7 @@ def interval_bottom(interval: str) -> float:
 
 
 delim = "; "
-first = lambda merged: merged.split(delim)[0]
+first = lambda merged: merged.split(delim)[0]  # noqa: E731
 
 
 def df_to_columns(df: DataFrame):
@@ -79,7 +79,7 @@ def plot_bars(df: DataFrame, error: float, title: str):  # pragma: no cover
     bins, values = df_to_columns(df)
     _figure, axes = plt.subplots()
     top_bins = list({first(b) for b in bins})
-    cmap = plt.cm.tab10
+    cmap = plt.cm.tab10  # pyright: ignore[reportAttributeAccessIssue]
     bar_colors = [cmap(top_bins.index(first(b)) % cmap.N) for b in bins]
     axes.bar(bins, values, color=bar_colors, yerr=error)
     axes.set_xticks(bins, bins, rotation=45)
