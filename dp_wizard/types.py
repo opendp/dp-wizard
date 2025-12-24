@@ -125,13 +125,6 @@ class CsvInfo:
         self._errors: list[str] = []
         column_names = self._schema.keys()
 
-        # Schema warnings:
-        if not any(data_type.is_numeric() for data_type in self._schema.values()):
-            self._warnings.append("No numeric columns detected.")
-        if len(column_names) == 1:
-            columns = "".join(column_names)
-            self._warnings.append(f"Only one column detected: '{columns}'")
-
         # Schema errors:
         if not any(
             # startswith("_duplicated_") is there in case there are
@@ -141,27 +134,15 @@ class CsvInfo:
             for name in column_names
         ):
             self._errors.append("No column names detected: First row of CSV empty?")
+        # Schema warnings:
+        else:
+            if not any(data_type.is_numeric() for data_type in self._schema.values()):
+                self._warnings.append("No numeric columns detected.")
+            if len(column_names) == 1:
+                columns = "".join(column_names)
+                self._warnings.append(f"Only one column detected: '{columns}'")
 
         for column_name in column_names:
-
-            # Row warnings:
-            try:
-                float(column_name)
-                self._warnings.append(
-                    f"Numeric column name: '{column_name}'; "
-                    "Is the CSV missing a header row?"
-                )
-            except ValueError:
-                pass
-            if "_duplicated_" in column_name:
-                self._warnings.append(
-                    f"Column name modified to avoid duplication: '{column_name}'"
-                )
-            if column_name.strip() != column_name:
-                self._warnings.append(
-                    f"Column name is padded: '{column_name}'; "
-                    "Padded numeric values will be treated as strings."
-                )
 
             # Row errors:
             tab = "\t"
@@ -171,10 +152,29 @@ class CsvInfo:
                     f"Tab in column name: '{column_name.replace(tab, escaped_tab)}'; "
                     "Is this actually a TSV rather than a CSV?"
                 )
-            if "�" in column_name:
+            elif "�" in column_name:
                 self._errors.append(
                     f"Bad column name: '{column_name}'; Is this a UTF-8 CSV?"
                 )
+            else:
+                # Row warnings:
+                try:
+                    float(column_name)
+                    self._warnings.append(
+                        f"Numeric column name: '{column_name}'; "
+                        "Is the CSV missing a header row?"
+                    )
+                except ValueError:
+                    pass
+                if "_duplicated_" in column_name:
+                    self._warnings.append(
+                        f"Column name modified to avoid duplication: '{column_name}'"
+                    )
+                if column_name.strip() != column_name:
+                    self._warnings.append(
+                        f"Column name is padded: '{column_name}'; "
+                        "Padded numeric values will be treated as strings."
+                    )
 
     def __repr__(self):
         if self._errors:
