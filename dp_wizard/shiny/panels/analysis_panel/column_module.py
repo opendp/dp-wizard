@@ -476,6 +476,5 @@ def column_server(
         return plot_bars(
             histogram,
             error=accuracy,
-            cutoff=0,  # TODO
             title=title,
         )
