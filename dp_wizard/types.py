@@ -134,13 +134,14 @@ class CsvInfo:
             for name in column_names
         ):
             self._errors.append("No column names detected: First row of CSV empty?")
+            return
+
         # Schema warnings:
-        else:
-            if not any(data_type.is_numeric() for data_type in self._schema.values()):
-                self._warnings.append("No numeric columns detected.")
-            if len(column_names) == 1:
-                columns = "".join(column_names)
-                self._warnings.append(f"Only one column detected: '{columns}'")
+        if not any(data_type.is_numeric() for data_type in self._schema.values()):
+            self._warnings.append("No numeric columns detected.")
+        if len(column_names) == 1:
+            columns = "".join(column_names)
+            self._warnings.append(f"Only one column detected: '{columns}'")
 
         for column_name in column_names:
 
@@ -152,29 +153,31 @@ class CsvInfo:
                     f"Tab in column name: '{column_name.replace(tab, escaped_tab)}'; "
                     "Is this actually a TSV rather than a CSV?"
                 )
+                return
             elif "�" in column_name:
                 self._errors.append(
                     f"Bad column name: '{column_name}'; Is this a UTF-8 CSV?"
                 )
-            else:
-                # Row warnings:
-                try:
-                    float(column_name)
-                    self._warnings.append(
-                        f"Numeric column name: '{column_name}'; "
-                        "Is the CSV missing a header row?"
-                    )
-                except ValueError:
-                    pass
-                if "_duplicated_" in column_name:
-                    self._warnings.append(
-                        f"Column name modified to avoid duplication: '{column_name}'"
-                    )
-                if column_name.strip() != column_name:
-                    self._warnings.append(
-                        f"Column name is padded: '{column_name}'; "
-                        "Padded numeric values will be treated as strings."
-                    )
+                return
+
+            # Row warnings:
+            try:
+                float(column_name)
+                self._warnings.append(
+                    f"Numeric column name: '{column_name}'; "
+                    "Is the CSV missing a header row?"
+                )
+            except ValueError:
+                pass
+            if "_duplicated_" in column_name:
+                self._warnings.append(
+                    f"Column name modified to avoid duplication: '{column_name}'"
+                )
+            if column_name.strip() != column_name:
+                self._warnings.append(
+                    f"Column name is padded: '{column_name}'; "
+                    "Padded numeric values will be treated as strings."
+                )
 
     def __repr__(self):
         if self._errors:
