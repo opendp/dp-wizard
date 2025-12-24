@@ -186,7 +186,7 @@ def analysis_server(
     @reactive.effect
     def set_is_analysis_defined():
         active_columns = weights().keys()
-        at_least_one_active_column = bool(active_columns)
+        at_least_one_active_column = len(active_columns) > 0
         # Just like the others, the analysis_errors() dict is not cleared
         # when a column is removed, so we need to compare against weights.
         no_errors = not any(
@@ -194,7 +194,9 @@ def analysis_server(
             for column, is_error in analysis_errors().items()
             if column in active_columns
         )
-        is_analysis_defined.set(at_least_one_active_column and no_errors)
+        is_analysis_defined.set(
+            is_dataset_selected() and at_least_one_active_column and no_errors
+        )
 
     @reactive.effect
     def _update_columns():
