@@ -38,6 +38,8 @@ from dp_wizard.utils.csv_helper import (
         (b" str , int \n X , 1 ", " str , int ", "", "Column name is padded", False),
         # actually pipe-delim:
         (b"str|int\nX|1", "str|int", "", "Only one column detected", False),
+        # no numbers:
+        (b"A,B,C\na,b,c", "A,B,C", "", "No numeric columns detected", False),
         # duplicate header gets suffix from polars:
         (
             b"dup,dup\nX,1",
