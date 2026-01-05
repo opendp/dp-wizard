@@ -102,8 +102,11 @@ def results_server(
     in_cloud = state.in_cloud
     qa_mode = state.qa_mode
 
-    # Top-level:
+    # Reactive bools:
     is_tutorial_mode = state.is_tutorial_mode
+    # is_dataset_selected = state.is_dataset_selected
+    is_analysis_defined = state.is_analysis_defined
+    is_released = state.is_released
 
     # Dataset choices:
     # initial_private_csv_path = state.initial_private_csv_path
@@ -134,13 +137,10 @@ def results_server(
     # (Again a dict, with ColumnName as the key.)
     group_keys = state.group_keys
 
-    # Release state:
-    released = state.released
-
     @render.ui
     def results_requirements_warning_ui():
         return hide_if(
-            bool(weights()),
+            is_analysis_defined(),
             info_md_box(
                 """
                 Please define your analysis on the previous tab
@@ -198,7 +198,7 @@ def results_server(
 
     @render.ui
     def download_results_ui():
-        disabled = not weights()
+        disabled = not is_analysis_defined()
         return (
             ui.markdown(
                 """
@@ -379,7 +379,7 @@ def results_server(
         # TODO: reactive.calcs shouldn't have side-effects!
         # (Like writing files that other calcs will depend on.)
         # https://github.com/opendp/dp-wizard/issues/682
-        released.set(True)
+        is_released.set(True)
         plan = analysis_plan()
         return convert_py_to_nb(notebook_py(), title=str(plan), execute=True)
 

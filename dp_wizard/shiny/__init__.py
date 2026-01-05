@@ -113,8 +113,11 @@ def _make_server(cli_info: CLIInfo):
             is_sample_csv=cli_info.is_sample_csv,
             in_cloud=cli_info.is_cloud_mode,
             qa_mode=cli_info.is_qa_mode,
-            # Top-level:
+            # Reactive bools:
             is_tutorial_mode=reactive.value(cli_info.get_is_tutorial_mode()),
+            is_dataset_selected=reactive.value(False),
+            is_analysis_defined=reactive.value(False),
+            is_released=reactive.value(False),
             # Dataset choices:
             initial_private_csv_path=str(initial_private_csv_path),
             private_csv_path=reactive.value(str(initial_private_csv_path)),
@@ -138,8 +141,6 @@ def _make_server(cli_info: CLIInfo):
             analysis_errors=reactive.value({}),
             # Per-group choices:
             group_keys=reactive.value({}),
-            # Release state:
-            released=reactive.value(False),
         )
 
         @reactive.effect

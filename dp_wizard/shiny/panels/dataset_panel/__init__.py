@@ -107,8 +107,11 @@ def dataset_server(
     is_sample_csv = state.is_sample_csv
     in_cloud = state.in_cloud
 
-    # Top-level:
+    # Reactive bools:
     is_tutorial_mode = state.is_tutorial_mode
+    is_dataset_selected = state.is_dataset_selected
+    # is_analysis_defined = state.is_analysis_defined
+    is_released = state.is_released
 
     # Dataset choices:
     initial_private_csv_path = state.initial_private_csv_path
@@ -138,9 +141,6 @@ def dataset_server(
     # Per-group choices:
     # (Again a dict, with ColumnName as the key.)
     # group_keys = state.group_keys
-
-    # Release state:
-    released = state.released
 
     @reactive.effect
     @reactive.event(input.public_csv_path)
@@ -176,7 +176,7 @@ def dataset_server(
     @render.ui
     def dataset_release_warning_ui():
         return hide_if(
-            not released(),
+            not is_released(),
             info_md_box(
                 """
                 After making a differentially private release,
@@ -337,9 +337,9 @@ def dataset_server(
     def contributions_entity_calc() -> str:
         return input.entity()[2:].lower().strip()
 
-    @reactive.calc
-    def button_enabled():
-        return (
+    @reactive.effect
+    def set_is_dataset_selected():
+        is_dataset_selected.set(
             contributions_valid()
             and not csv_info().get_is_error()
             and not get_row_count_errors(max_rows())
@@ -430,7 +430,7 @@ def dataset_server(
 
     @render.ui
     def define_analysis_button_ui():
-        enabled = button_enabled()
+        enabled = is_dataset_selected()
         button = nav_button("go_to_analysis", "Define Analysis", disabled=not enabled)
         if enabled:
             return button

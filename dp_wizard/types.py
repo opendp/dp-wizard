@@ -213,8 +213,11 @@ class AppState:
     in_cloud: bool
     qa_mode: bool
 
-    # Top-level:
+    # Reactive bools:
     is_tutorial_mode: reactive.Value[bool]
+    is_dataset_selected: reactive.Value[bool]
+    is_analysis_defined: reactive.Value[bool]
+    is_released: reactive.Value[bool]
 
     # Dataset choices:
     initial_private_csv_path: str
@@ -244,6 +247,3 @@ class AppState:
     # Per-group choices:
     # (Again a dict, with ColumnName as the key.)
     group_keys: reactive.Value[dict[ColumnName, list[str | float | bool]]]
-
-    # Release state:
-    released: reactive.Value[bool]
