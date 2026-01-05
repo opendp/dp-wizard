@@ -1,7 +1,7 @@
 import opendp.prelude as dp
 import polars as pl
 
-from dp_wizard.utils.shared import make_cut_points
+from dp_wizard.utils.shared.bins import make_cut_points
 
 dp.enable_features("contrib")
 

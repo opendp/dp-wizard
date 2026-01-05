@@ -124,6 +124,8 @@ class CsvInfo:
         self._warnings: list[str] = []
         self._errors: list[str] = []
         column_names = self._schema.keys()
+
+        # Schema errors:
         if not any(
             # startswith("_duplicated_") is there in case there are
             # multiple columns with missing names: Polars will retitle
@@ -132,12 +134,33 @@ class CsvInfo:
             for name in column_names
         ):
             self._errors.append("No column names detected: First row of CSV empty?")
+            return
+
+        # Schema warnings:
+        if not any(data_type.is_numeric() for data_type in self._schema.values()):
+            self._warnings.append("No numeric columns detected.")
         if len(column_names) == 1:
-            self._warnings.append(
-                f"Only one column detected: '{''.join(column_names)}'"
-            )
+            columns = "".join(column_names)
+            self._warnings.append(f"Only one column detected: '{columns}'")
+
         for column_name in column_names:
-            # warnings:
+
+            # Row errors:
+            tab = "\t"
+            if tab in column_name:
+                escaped_tab = "\\t"
+                self._errors.append(
+                    f"Tab in column name: '{column_name.replace(tab, escaped_tab)}'; "
+                    "Is this actually a TSV rather than a CSV?"
+                )
+                return
+            elif "�" in column_name:
+                self._errors.append(
+                    f"Bad column name: '{column_name}'; Is this a UTF-8 CSV?"
+                )
+                return
+
+            # Row warnings:
             try:
                 float(column_name)
                 self._warnings.append(
@@ -154,18 +177,6 @@ class CsvInfo:
                 self._warnings.append(
                     f"Column name is padded: '{column_name}'; "
                     "Padded numeric values will be treated as strings."
-                )
-            # errors:
-            tab = "\t"
-            if tab in column_name:
-                escaped_tab = "\\t"
-                self._errors.append(
-                    f"Tab in column name: '{column_name.replace(tab, escaped_tab)}'; "
-                    "Is this actually a TSV rather than a CSV?"
-                )
-            if "�" in column_name:
-                self._errors.append(
-                    f"Bad column name: '{column_name}'; Is this a UTF-8 CSV?"
                 )
 
     def __repr__(self):
@@ -202,8 +213,11 @@ class AppState:
     in_cloud: bool
     qa_mode: bool
 
-    # Top-level:
+    # Reactive bools:
     is_tutorial_mode: reactive.Value[bool]
+    is_dataset_selected: reactive.Value[bool]
+    is_analysis_defined: reactive.Value[bool]
+    is_released: reactive.Value[bool]
 
     # Dataset choices:
     initial_private_csv_path: str
@@ -233,6 +247,3 @@ class AppState:
     # Per-group choices:
     # (Again a dict, with ColumnName as the key.)
     group_keys: reactive.Value[dict[ColumnName, list[str | float | bool]]]
-
-    # Release state:
-    released: reactive.Value[bool]
