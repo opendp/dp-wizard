@@ -345,10 +345,12 @@ are ignored because of errors, it will bias results.
             from math import prod
 
             possible_rows = prod([len(v) for v in contingency_table.keys.values()])
+            max_rows = 100_000
             contingency_table_melted = (
                 contingency_table.project_melted(COLUMNS)
-                if possible_rows < 100_000
-                else "Too big!"
+                if possible_rows < max_rows
+                else f"Contingency table could be more than {max_rows} rows; "
+                "Consider querying for just the information you need."
             )
             contingency_table_melted  # pyright: ignore[reportUnusedExpression]
             # -
