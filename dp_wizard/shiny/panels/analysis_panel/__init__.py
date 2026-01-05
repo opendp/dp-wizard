@@ -148,8 +148,11 @@ def analysis_server(
     is_sample_csv = state.is_sample_csv
     # in_cloud = state.in_cloud
 
-    # Top-lvel:
+    # Reactive bools:
     is_tutorial_mode = state.is_tutorial_mode
+    is_dataset_selected = state.is_dataset_selected
+    is_analysis_defined = state.is_analysis_defined
+    is_released = state.is_released
 
     # Dataset choices:
     # initial_private_csv_path = state.initial_private_csv_path
@@ -180,13 +183,10 @@ def analysis_server(
     # (Again a dict, with ColumnName as the key.)
     group_keys = state.group_keys
 
-    # Release state:
-    released = state.released
-
-    @reactive.calc
-    def button_enabled():
+    @reactive.effect
+    def set_is_analysis_defined():
         active_columns = weights().keys()
-        at_least_one_active_column = bool(active_columns)
+        at_least_one_active_column = len(active_columns) > 0
         # Just like the others, the analysis_errors() dict is not cleared
         # when a column is removed, so we need to compare against weights.
         no_errors = not any(
@@ -194,7 +194,9 @@ def analysis_server(
             for column, is_error in analysis_errors().items()
             if column in active_columns
         )
-        return at_least_one_active_column and no_errors
+        is_analysis_defined.set(
+            is_dataset_selected() and at_least_one_active_column and no_errors
+        )
 
     @reactive.effect
     def _update_columns():
@@ -233,7 +235,7 @@ def analysis_server(
     @render.ui
     def analysis_requirements_warning_ui():
         return hide_if(
-            bool(csv_info().get_schema()),
+            is_dataset_selected(),
             info_md_box(
                 """
                 Please select your dataset on the previous tab
@@ -245,7 +247,7 @@ def analysis_server(
     @render.ui
     def analysis_release_warning_ui():
         return hide_if(
-            not released(),
+            not is_released(),
             info_md_box(
                 """
                 After making a differentially private release,
@@ -293,7 +295,7 @@ def analysis_server(
             where you can configure the analysis for the column.
             Note that with more columns selected,
             each column has a smaller share of the privacy budget,
-            and the accurace of results will go decline.
+            and the accuracy of results will decline.
             """,
             is_sample_csv,
             """
@@ -313,7 +315,7 @@ def analysis_server(
                 this estimate **is not used** in the final calculation.
 
                 Until you make a release, your CSV will not be
-                read except to determine the names columns,
+                read except to determine the names of columns,
                 but the number of rows does have implications for the
                 accuracy which DP can provide with a given privacy budget.
                 """,
@@ -456,7 +458,7 @@ def analysis_server(
 
     @render.ui
     def download_results_button_ui():
-        is_enabled = button_enabled()
+        is_enabled = is_analysis_defined()
         button = nav_button(
             "go_to_results", "Download Results", disabled=not is_enabled
         )

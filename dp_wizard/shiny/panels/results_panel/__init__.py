@@ -27,7 +27,7 @@ from dp_wizard.shiny.panels.results_panel.download_options import (
     download_link,
     table_of_contents_md,
 )
-from dp_wizard.types import AppState, Product
+from dp_wizard.types import AppState, ColumnName, Product
 from dp_wizard.utils.code_generators import AnalysisPlan, AnalysisPlanColumn
 from dp_wizard.utils.code_generators.notebook_generator import (
     PLACEHOLDER_CSV_NAME,
@@ -102,8 +102,11 @@ def results_server(
     in_cloud = state.in_cloud
     qa_mode = state.qa_mode
 
-    # Top-level:
+    # Reactive bools:
     is_tutorial_mode = state.is_tutorial_mode
+    # is_dataset_selected = state.is_dataset_selected
+    is_analysis_defined = state.is_analysis_defined
+    is_released = state.is_released
 
     # Dataset choices:
     # initial_private_csv_path = state.initial_private_csv_path
@@ -134,13 +137,10 @@ def results_server(
     # (Again a dict, with ColumnName as the key.)
     group_keys = state.group_keys
 
-    # Release state:
-    released = state.released
-
     @render.ui
     def results_requirements_warning_ui():
         return hide_if(
-            bool(weights()),
+            is_analysis_defined(),
             info_md_box(
                 """
                 Please define your analysis on the previous tab
@@ -198,7 +198,7 @@ def results_server(
 
     @render.ui
     def download_results_ui():
-        disabled = not weights()
+        disabled = not is_analysis_defined()
         downloads = [
             "README",
             "Notebook",
@@ -277,22 +277,31 @@ def results_server(
             download_button("Notebook Source", disabled=disabled),
         ]
 
+    def analysis_plan_column(name: ColumnName) -> AnalysisPlanColumn | None:
+        try:
+            return AnalysisPlanColumn(
+                statistic_name=statistic_names()[name],
+                lower_bound=lower_bounds()[name],
+                upper_bound=upper_bounds()[name],
+                bin_count=int(bin_counts()[name]),
+                weight=int(weights()[name].value),
+            )
+        except KeyError:
+            # Can hit this if the user jumps ahead to results,
+            # without filling out the configuration.
+            return None
+
     @reactive.calc
     def analysis_plan() -> AnalysisPlan:
         # weights().keys() will reflect the desired columns:
         # The others retain inactive columns, so user
         # inputs aren't lost when toggling checkboxes.
         columns = {
-            col: [
-                AnalysisPlanColumn(
-                    statistic_name=statistic_names()[col],
-                    lower_bound=lower_bounds()[col],
-                    upper_bound=upper_bounds()[col],
-                    bin_count=int(bin_counts()[col]),
-                    weight=int(weights()[col].value),
-                )
-            ]
-            for col in weights().keys()
+            # Wrap in list so we can support multiple stats per column,
+            # in the future.
+            name: [column]
+            for name in weights().keys()
+            if (column := analysis_plan_column(name)) is not None
         }
         return AnalysisPlan(
             product=product(),
@@ -383,7 +392,7 @@ def results_server(
         # TODO: reactive.calcs shouldn't have side-effects!
         # (Like writing files that other calcs will depend on.)
         # https://github.com/opendp/dp-wizard/issues/682
-        released.set(True)
+        is_released.set(True)
         plan = analysis_plan()
         return convert_py_to_nb(notebook_py(), title=str(plan), execute=True)
 

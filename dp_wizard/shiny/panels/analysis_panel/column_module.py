@@ -26,7 +26,7 @@ from dp_wizard.utils.code_generators.analyses import (
 )
 from dp_wizard.utils.dp_helper import confidence, make_accuracy_histogram
 from dp_wizard.utils.mock_data import ColumnDef, mock_data
-from dp_wizard.utils.shared import plot_bars
+from dp_wizard.utils.shared.plots import plot_bars
 
 default_statistic_name = histogram.name
 label_width = "10em"  # Just wide enough so the text isn't trucated.
@@ -464,18 +464,22 @@ def column_server(
 
     @render.plot
     def histogram_preview_plot():
-        accuracy, histogram = accuracy_histogram()
+        title_name = (
+            name
+            if public_csv_path
+            else f"Simulated {name} (assuming a normal distribution)"
+        )
+
         contributions_int = contributions()
         s = "s" if contributions_int > 1 else ""
-        title = ", ".join(
-            [
-                name if public_csv_path else f"Simulated {name}: normal distribution",
-                f"{contributions_int} contribution{s} / {contributions_entity()}",
-            ]
+        title_contributions = (
+            f"{contributions_int} contribution{s} / {contributions_entity()}"
         )
+
+        accuracy, histogram = accuracy_histogram()
         return plot_bars(
             histogram,
             error=accuracy,
             cutoff=0,  # TODO
-            title=title,
+            title=f"{title_name}, {title_contributions}",
         )
