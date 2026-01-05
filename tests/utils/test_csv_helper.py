@@ -27,6 +27,8 @@ from dp_wizard.utils.csv_helper import (
         (b"A,B,C,D\n1,2\n3,4", "A,B,C,D", "A,B", None, False),
         # fewer column headers than values below:
         (b"A,B\n1,2,3,4\n5,6,7,8", "A,B", "A,B", None, False),
+        # totally empty:
+        (b"", "", "", None, False),
         #
         # WARNINGS
         #
@@ -53,8 +55,6 @@ from dp_wizard.utils.csv_helper import (
         #
         # empty header row:
         (b",\nX,1", "", "", "No column names detected", True),
-        # totally empty:
-        (b"", "", "", "No column names detected", True),
         # actually TSV:
         (b"str\tint\nX\t1", "", "", "Tab in column name", True),
         # actually binary:
