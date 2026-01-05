@@ -97,7 +97,7 @@ class NotebookGenerator(AbstractGenerator):
             )
             .fill_values(
                 CONTINGENCY_TABLE_PATH=str(target_path / "contingency.csv"),
-                unless=self.analysis_plan.product != Product.SYNTHETIC_DATA,
+                when=self.analysis_plan.product == Product.SYNTHETIC_DATA,
             )
             .finish()
         )
