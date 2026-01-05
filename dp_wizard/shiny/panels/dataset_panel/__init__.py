@@ -339,9 +339,11 @@ def dataset_server(
 
     @reactive.effect
     def set_is_dataset_selected():
+        info = csv_info()
         is_dataset_selected.set(
             contributions_valid()
-            and not csv_info().get_is_error()
+            and not info.get_is_error()
+            and len(info.get_all_column_names()) > 0
             and not get_row_count_errors(max_rows())
             and (in_cloud or not csv_column_mismatch_calc())
         )
