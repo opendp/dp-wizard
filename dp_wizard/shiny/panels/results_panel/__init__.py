@@ -17,9 +17,9 @@ from dp_wizard.shiny.components.icons import (
 )
 from dp_wizard.shiny.components.outputs import (
     hide_if,
-    info_md_box,
     only_for_screenreader,
     tutorial_box,
+    warning_md_box,
 )
 from dp_wizard.shiny.components.summaries import analysis_summary, dataset_summary
 from dp_wizard.shiny.panels.results_panel.download_options import (
@@ -27,7 +27,7 @@ from dp_wizard.shiny.panels.results_panel.download_options import (
     download_link,
     table_of_contents_md,
 )
-from dp_wizard.types import AppState
+from dp_wizard.types import AppState, ColumnName, Product
 from dp_wizard.utils.code_generators import AnalysisPlan, AnalysisPlanColumn
 from dp_wizard.utils.code_generators.notebook_generator import (
     PLACEHOLDER_CSV_NAME,
@@ -102,8 +102,11 @@ def results_server(
     in_cloud = state.in_cloud
     qa_mode = state.qa_mode
 
-    # Top-level:
+    # Reactive bools:
     is_tutorial_mode = state.is_tutorial_mode
+    # is_dataset_selected = state.is_dataset_selected
+    is_analysis_defined = state.is_analysis_defined
+    is_released = state.is_released
 
     # Dataset choices:
     # initial_private_csv_path = state.initial_private_csv_path
@@ -134,14 +137,11 @@ def results_server(
     # (Again a dict, with ColumnName as the key.)
     group_keys = state.group_keys
 
-    # Release state:
-    released = state.released
-
     @render.ui
     def results_requirements_warning_ui():
         return hide_if(
-            bool(weights()),
-            info_md_box(
+            is_analysis_defined(),
+            warning_md_box(
                 """
                 Please define your analysis on the previous tab
                 before downloading results.
@@ -198,26 +198,36 @@ def results_server(
 
     @render.ui
     def download_results_ui():
-        disabled = not weights()
+        disabled = not is_analysis_defined()
+        downloads = [
+            "README",
+            "Notebook",
+            "HTML",
+            "Script",
+            "Report",
+            "Table",
+        ]
+        if product() == Product.SYNTHETIC_DATA:
+            downloads.append("Contingency Table")
         return (
             ui.markdown(
                 """
-                    When [installed and run
-                    locally](https://pypi.org/project/dp_wizard/),
-                    there are more download options because DP Wizard
-                    can read your private CSV and release differentially
-                    private statistics.
-                    """
+                When [installed and run
+                locally](https://pypi.org/project/dp_wizard/),
+                there are more download options because DP Wizard
+                can read your private CSV and release differentially
+                private statistics.
+                """
             )
             if in_cloud
             else [
                 tutorial_box(
                     is_tutorial_mode(),
                     """
-                        Now you can download a notebook for your analysis.
-                        The Jupyter notebook could be used locally or on Colab,
-                        but the HTML version can be viewed in the brower.
-                        """,
+                    Now you can download a notebook for your analysis.
+                    The Jupyter notebook could be used locally or on Colab,
+                    but the HTML version can be viewed in the brower.
+                    """,
                     responsive=False,
                 ),
                 download_button(
@@ -228,12 +238,15 @@ def results_server(
                 ui.br(),
                 "Contains:",
                 ui.tags.ul(
-                    ui.tags.li(download_link("README", disabled=disabled)),
-                    ui.tags.li(download_link("Notebook", disabled=disabled)),
-                    ui.tags.li(download_link("HTML", disabled=disabled)),
-                    ui.tags.li(download_link("Script", disabled=disabled)),
-                    ui.tags.li(download_link("Report", disabled=disabled)),
-                    ui.tags.li(download_link("Table", disabled=disabled)),
+                    *[
+                        ui.tags.li(
+                            download_link(
+                                download,
+                                disabled=disabled,
+                            )
+                        )
+                        for download in downloads
+                    ]
                 ),
             ]
         )
@@ -264,23 +277,32 @@ def results_server(
             download_button("Notebook Source", disabled=disabled),
         ]
 
+    def analysis_plan_column(name: ColumnName) -> AnalysisPlanColumn | None:
+        try:
+            return AnalysisPlanColumn(
+                statistic_name=statistic_names()[name],
+                # Bounds stat does not have a lower bound:
+                lower_bound=lower_bounds().get(name, 0),
+                upper_bound=upper_bounds()[name],
+                bin_count=int(bin_counts()[name]),
+                weight=int(weights()[name].value),
+            )
+        except KeyError:
+            # Can hit this if the user jumps ahead to results,
+            # without filling out the configuration.
+            return None
+
     @reactive.calc
     def analysis_plan() -> AnalysisPlan:
         # weights().keys() will reflect the desired columns:
         # The others retain inactive columns, so user
         # inputs aren't lost when toggling checkboxes.
         columns = {
-            col: [
-                AnalysisPlanColumn(
-                    statistic_name=statistic_names()[col],
-                    # Bounds stat does not have a lower bound:
-                    lower_bound=lower_bounds().get(col, 0),
-                    upper_bound=upper_bounds()[col],
-                    bin_count=int(bin_counts()[col]),
-                    weight=int(weights()[col].value),
-                )
-            ]
-            for col in weights().keys()
+            # Wrap in list so we can support multiple stats per column,
+            # in the future.
+            name: [column]
+            for name in weights().keys()
+            if (column := analysis_plan_column(name)) is not None
         }
         return AnalysisPlan(
             product=product(),
@@ -371,7 +393,7 @@ def results_server(
         # TODO: reactive.calcs shouldn't have side-effects!
         # (Like writing files that other calcs will depend on.)
         # https://github.com/opendp/dp-wizard/issues/682
-        released.set(True)
+        is_released.set(True)
         plan = analysis_plan()
         return convert_py_to_nb(notebook_py(), title=str(plan), execute=True)
 
@@ -397,6 +419,11 @@ def results_server(
     def table_csv():
         notebook_nb()  # Evaluate just for the side effect of creating report.
         return (_target_path / "report.csv").read_text()
+
+    @reactive.calc
+    def contingency_table_csv():
+        notebook_nb()  # Evaluate just for the side effect of creating report.
+        return (_target_path / "contingency.csv").read_text()
 
     ######################
     #
@@ -481,3 +508,7 @@ def results_server(
     @download(".csv")
     async def download_table_link():
         yield _make_download_or_modal_error(table_csv)
+
+    @download(".contingency.csv")
+    async def download_contingency_table_link():
+        yield _make_download_or_modal_error(contingency_table_csv)

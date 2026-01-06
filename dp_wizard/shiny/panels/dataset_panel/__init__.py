@@ -12,10 +12,10 @@ from dp_wizard.shiny.components.outputs import (
     code_sample,
     col_widths,
     hide_if,
-    info_md_box,
     nav_button,
     only_for_screenreader,
     tutorial_box,
+    warning_md_box,
 )
 from dp_wizard.shiny.panels.dataset_panel import data_source
 from dp_wizard.types import AppState, Product
@@ -107,8 +107,11 @@ def dataset_server(
     is_sample_csv = state.is_sample_csv
     in_cloud = state.in_cloud
 
-    # Top-level:
+    # Reactive bools:
     is_tutorial_mode = state.is_tutorial_mode
+    is_dataset_selected = state.is_dataset_selected
+    # is_analysis_defined = state.is_analysis_defined
+    is_released = state.is_released
 
     # Dataset choices:
     initial_private_csv_path = state.initial_private_csv_path
@@ -138,9 +141,6 @@ def dataset_server(
     # Per-group choices:
     # (Again a dict, with ColumnName as the key.)
     # group_keys = state.group_keys
-
-    # Release state:
-    released = state.released
 
     @reactive.effect
     @reactive.event(input.public_csv_path)
@@ -176,8 +176,8 @@ def dataset_server(
     @render.ui
     def dataset_release_warning_ui():
         return hide_if(
-            not released(),
-            info_md_box(
+            not is_released(),
+            warning_md_box(
                 """
                 After making a differentially private release,
                 changes to the dataset will constitute a new release,
@@ -337,11 +337,13 @@ def dataset_server(
     def contributions_entity_calc() -> str:
         return input.entity()[2:].lower().strip()
 
-    @reactive.calc
-    def button_enabled():
-        return (
+    @reactive.effect
+    def set_is_dataset_selected():
+        info = csv_info()
+        is_dataset_selected.set(
             contributions_valid()
-            and not csv_info().get_is_error()
+            and not info.get_is_error()
+            and len(info.get_all_column_names()) > 0
             and not get_row_count_errors(max_rows())
             and (in_cloud or not csv_column_mismatch_calc())
         )
@@ -355,7 +357,7 @@ def dataset_server(
     def contributions_validation_ui():
         return hide_if(
             contributions_valid(),
-            info_md_box("Contributions must be 1 or greater."),
+            warning_md_box("Contributions must be 1 or greater."),
         )
 
     @render.ui
@@ -393,7 +395,7 @@ def dataset_server(
     def optional_row_count_error_ui():
         error_md = "\n".join(f"- {error}" for error in get_row_count_errors(max_rows()))
         if error_md:
-            return info_md_box(error_md)
+            return warning_md_box(error_md)
 
     @render.ui
     def row_count_bounds_ui():
@@ -430,7 +432,7 @@ def dataset_server(
 
     @render.ui
     def define_analysis_button_ui():
-        enabled = button_enabled()
+        enabled = is_dataset_selected()
         button = nav_button("go_to_analysis", "Define Analysis", disabled=not enabled)
         if enabled:
             return button
