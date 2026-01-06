@@ -126,7 +126,7 @@ class CsvInfo:
         column_names = self._schema.keys()
 
         # Schema errors:
-        if not any(
+        if column_names and not any(
             # startswith("_duplicated_") is there in case there are
             # multiple columns with missing names: Polars will retitle
             # those after the first.
@@ -137,7 +137,9 @@ class CsvInfo:
             return
 
         # Schema warnings:
-        if not any(data_type.is_numeric() for data_type in self._schema.values()):
+        if column_names and not any(
+            data_type.is_numeric() for data_type in self._schema.values()
+        ):
             self._warnings.append("No numeric columns detected.")
         if len(column_names) == 1:
             columns = "".join(column_names)
@@ -180,9 +182,9 @@ class CsvInfo:
                 )
 
     def __repr__(self):
-        if self._errors:
-            return f"CsvInfo(messages={self.get_messages()})"
-        return f"CsvInfo({self.get_schema()})"
+        warnings = self._warnings
+        errors = self._errors
+        return f"CsvInfo({self._schema}, {warnings=}, {errors=})"
 
     def get_schema(self) -> dict[ColumnName, pl.DataType]:
         if self._errors:
