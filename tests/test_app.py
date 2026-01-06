@@ -277,6 +277,8 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     csv_path = package_root.parent / "tests/fixtures/fake.csv"
     page.get_by_label("Choose Public CSV").set_input_files(csv_path.resolve())
 
+    page.get_by_label("DP Synthetic Data").click()
+
     # -- Define Analysis --
     page.get_by_role("button", name="Define Analysis").click()
     screenshot(page, "define-analysis")
@@ -306,7 +308,7 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     # it doesn't make sense to parameterize this test,
     # but that could change.
 
-    expected_stem = "dp_statistics_for_grade_grouped_by_class_year"
+    expected_stem = "dp_synthetic_data_for_grade_grouped_by_class_year"
 
     for option in _download_options.values():
         link_text = f"{option.name} ({option.ext})"
