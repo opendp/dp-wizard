@@ -12,9 +12,9 @@ from dp_wizard.shiny.components.outputs import (
     code_sample,
     col_widths,
     hide_if,
-    info_md_box,
     only_for_screenreader,
     tutorial_box,
+    warning_md_box,
 )
 from dp_wizard.types import ColumnName, Product, StatisticName, Weight
 from dp_wizard.utils.code_generators import make_column_config_block
@@ -26,7 +26,7 @@ from dp_wizard.utils.code_generators.analyses import (
 )
 from dp_wizard.utils.dp_helper import confidence, make_accuracy_histogram
 from dp_wizard.utils.mock_data import ColumnDef, mock_data
-from dp_wizard.utils.shared import plot_bars
+from dp_wizard.utils.shared.plots import plot_bars
 
 default_statistic_name = histogram.name
 label_width = "10em"  # Just wide enough so the text isn't trucated.
@@ -107,10 +107,6 @@ def get_bin_errors(count) -> list[str]:
             "just to keep computation from running too long."
         ]
     return []
-
-
-def error_md_ui(markdown):  # pragma: no cover
-    return info_md_box(markdown)
 
 
 @module.ui
@@ -401,7 +397,7 @@ def column_server(
     @render.ui
     def histogram_preview_ui():
         if error_md := error_md_calc():
-            return error_md_ui(error_md)
+            return warning_md_box(error_md)
         accuracy, histogram = accuracy_histogram()
         return [
             ui.output_plot("histogram_preview_plot", height="300px"),
@@ -419,7 +415,7 @@ def column_server(
 
     def stat_preview_ui():
         if error_md := error_md_calc():
-            return error_md_ui(error_md)
+            return warning_md_box(error_md)
         optional_grouping_message = (
             # TODO: Show bar chart with fake groups?
             # https://github.com/opendp/dp-wizard/issues/493#issuecomment-3000774143
@@ -464,17 +460,21 @@ def column_server(
 
     @render.plot
     def histogram_preview_plot():
-        accuracy, histogram = accuracy_histogram()
+        title_name = (
+            name
+            if public_csv_path
+            else f"Simulated {name} (assuming a normal distribution)"
+        )
+
         contributions_int = contributions()
         s = "s" if contributions_int > 1 else ""
-        title = ", ".join(
-            [
-                name if public_csv_path else f"Simulated {name}: normal distribution",
-                f"{contributions_int} contribution{s} / {contributions_entity()}",
-            ]
+        title_contributions = (
+            f"{contributions_int} contribution{s} / {contributions_entity()}"
         )
+
+        accuracy, histogram = accuracy_histogram()
         return plot_bars(
             histogram,
             error=accuracy,
-            title=title,
+            title=f"{title_name}, {title_contributions}",
         )

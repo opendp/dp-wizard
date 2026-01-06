@@ -7,8 +7,8 @@ from dp_wizard import opendp_version, package_root
 from dp_wizard.shiny.components.outputs import (
     code_sample,
     hide_if,
-    info_md_box,
     tutorial_box,
+    warning_md_box,
 )
 from dp_wizard.utils.argparse_helpers import (
     PRIVATE_TEXT,
@@ -170,4 +170,4 @@ def csv_message_ui(
                 "- Only the private CSV contains: "
                 + ", ".join(f"`{name}`" for name in just_private)
             )
-    return hide_if(not messages, info_md_box("\n".join(messages)))
+    return hide_if(not messages, warning_md_box("\n".join(messages)))

@@ -14,7 +14,7 @@ from dp_wizard.utils.code_generators import (
 )
 from dp_wizard.utils.code_generators.analyses import histogram
 from dp_wizard.utils.dp_helper import confidence
-from dp_wizard.utils.shared import make_cut_points
+from dp_wizard.utils.shared.bins import make_cut_points
 
 template_root = get_template_root(__file__)
 
@@ -69,7 +69,7 @@ class AbstractGenerator(ABC):
         return "".join(f"# {line}\n" for line in comment.splitlines())
 
     def make_py(self, reformat=False):
-        def template():
+        def imports_template():
             import matplotlib.pyplot as plt  # noqa: F401
             import opendp.prelude as dp  # noqa: F401
             import polars as pl  # noqa: F401
@@ -79,6 +79,8 @@ class AbstractGenerator(ABC):
             dp.enable_features("contrib")
 
         extra = self._get_extra()
+        bins_py = (package_root / "utils/shared/bins.py").read_text()
+        plots_py = (package_root / "utils/shared/plots.py").read_text()
 
         code = (
             Template(self._get_root_template(), template_root)
@@ -87,8 +89,8 @@ class AbstractGenerator(ABC):
                 DEPENDENCIES=f"'opendp[{extra}]=={opendp_version}' matplotlib",
             )
             .fill_code_blocks(
-                IMPORTS_BLOCK=Template(template).finish(),
-                UTILS_BLOCK=(package_root / "utils/shared.py").read_text(),
+                IMPORTS_BLOCK=Template(imports_template).finish(),
+                UTILS_BLOCK=bins_py + plots_py,
                 **self._make_extra_blocks(),
             )
             .fill_comment_blocks(
@@ -316,10 +318,10 @@ are ignored because of errors, it will bias results.
         )
 
     def _make_synth_query(self):
-        def template(synth_context, COLUMNS, CUTS, KEYS):
+        def template(synth_context, COLUMNS, CUTS, plot_bars, KEYS):
             synth_query = (
                 synth_context.query()
-                .select(COLUMNS)
+                .select(*COLUMNS)
                 .contingency_table(
                     # Numeric columns will generally require cut points,
                     # unless they contain only a few distinct values.
@@ -341,11 +343,17 @@ are ignored because of errors, it will bias results.
             from math import prod
 
             possible_rows = prod([len(v) for v in contingency_table.keys.values()])
-            (
-                contingency_table.project_melted([COLUMNS])
-                if possible_rows < 100_000
-                else "Too big!"
-            )
+            max_rows = 100_000
+            if possible_rows < max_rows:
+                contingency_table_melted = contingency_table.project_melted(COLUMNS)
+                if possible_rows < 200:
+                    plot_bars(contingency_table_melted, title="Contingency Table")
+            else:
+                contingency_table_melted = (
+                    f"Contingency table could be more than {max_rows} rows; "
+                    "Consider querying for just the information you need."
+                )
+            contingency_table_melted  # pyright: ignore[reportUnusedExpression]
             # -
 
             # Finally, a contingency table can also be used
@@ -360,7 +368,7 @@ are ignored because of errors, it will bias results.
             with warnings.catch_warnings():
                 warnings.simplefilter(action="ignore", category=FutureWarning)
                 synthetic_data = contingency_table.synthesize()
-            synthetic_data  # type: ignore
+            synthetic_data  # pyright: ignore[reportUnusedExpression]
             # -
 
         # The make_cut_points() call could be moved into generated code,
@@ -389,15 +397,10 @@ are ignored because of errors, it will bias results.
             Template(template)
             .fill_expressions(
                 OPENDP_V_VERSION=f"v{opendp_version}",
-                COLUMNS=", ".join(
-                    repr(k)
-                    for k in (
-                        list(self.analysis_plan.columns.keys())
-                        + list(self.analysis_plan.groups.keys())
-                    )
-                ),
             )
             .fill_values(
+                COLUMNS=list(self.analysis_plan.columns.keys())
+                + list(self.analysis_plan.groups.keys()),
                 CUTS=cuts,
                 KEYS=keys,
             )

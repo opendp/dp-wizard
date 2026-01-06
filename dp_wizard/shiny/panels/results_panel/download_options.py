@@ -64,6 +64,12 @@ _download_options = {
             "The same information, but condensed into a CSV.",
         ),
         DownloadOption(
+            "Contingency Table",
+            ".csv",
+            "file-csv",
+            "The synthetic data is derived from this contingency table.",
+        ),
+        DownloadOption(
             "Notebook (unexecuted)",
             ".ipynb",
             "book",
