@@ -14,7 +14,7 @@ from dp_wizard.utils.code_generators import (
 )
 from dp_wizard.utils.code_generators.analyses import histogram
 from dp_wizard.utils.dp_helper import confidence
-from dp_wizard.utils.shared import make_cut_points
+from dp_wizard.utils.shared.bins import make_cut_points
 
 template_root = get_template_root(__file__)
 
@@ -68,8 +68,8 @@ class AbstractGenerator(ABC):
     def _make_comment_cell(self, comment: str) -> str:
         return "".join(f"# {line}\n" for line in comment.splitlines())
 
-    def make_py(self):
-        def template():
+    def make_py(self, reformat=False):
+        def imports_template():
             import matplotlib.pyplot as plt  # noqa: F401
             import opendp.prelude as dp  # noqa: F401
             import polars as pl  # noqa: F401
@@ -79,6 +79,8 @@ class AbstractGenerator(ABC):
             dp.enable_features("contrib")
 
         extra = self._get_extra()
+        bins_py = (package_root / "utils/shared/bins.py").read_text()
+        plots_py = (package_root / "utils/shared/plots.py").read_text()
 
         code = (
             Template(self._get_root_template(), template_root)
@@ -87,8 +89,8 @@ class AbstractGenerator(ABC):
                 DEPENDENCIES=f"'opendp[{extra}]=={opendp_version}' matplotlib",
             )
             .fill_code_blocks(
-                IMPORTS_BLOCK=Template(template).finish(),
-                UTILS_BLOCK=(package_root / "utils/shared.py").read_text(),
+                IMPORTS_BLOCK=Template(imports_template).finish(),
+                UTILS_BLOCK=bins_py + plots_py,
                 **self._make_extra_blocks(),
             )
             .fill_comment_blocks(
@@ -110,7 +112,7 @@ are ignored because of errors, it will bias results.
 """,
                 CUSTOM_NOTE=self.note,
             )
-            .finish()
+            .finish(reformat=reformat)
         )
         return self._clean_up_py(code)
 
@@ -341,12 +343,17 @@ are ignored because of errors, it will bias results.
             from math import prod
 
             possible_rows = prod([len(v) for v in contingency_table.keys.values()])
-            if possible_rows < 100_000:
+            max_rows = 100_000
+            if possible_rows < max_rows:
                 contingency_table_melted = contingency_table.project_melted(COLUMNS)
                 if possible_rows < 200:
                     plot_bars(contingency_table_melted, "Contingency Table")
             else:
-                contingency_table_melted = "Too big!"
+                contingency_table_melted = (
+                    f"Contingency table could be more than {max_rows} rows; "
+                    "Consider querying for just the information you need."
+                )
+            contingency_table_melted  # pyright: ignore[reportUnusedExpression]
             # -
 
             # Finally, a contingency table can also be used

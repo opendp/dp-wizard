@@ -81,7 +81,7 @@ class NotebookGenerator(AbstractGenerator):
                 raise ValueError(self.analysis_plan.product)
         target_path = package_root / ".local-sessions"
 
-        reports_block = (
+        return (
             Template(f"{self._get_synth_or_stats()}_reports", root)
             .fill_expressions(
                 OUTPUTS=outputs_expression,
@@ -101,8 +101,6 @@ class NotebookGenerator(AbstractGenerator):
             )
             .finish()
         )
-
-        return reports_block
 
     def _make_extra_blocks(self):
         match self.analysis_plan.product:
