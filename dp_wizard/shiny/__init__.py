@@ -1,6 +1,5 @@
 from pathlib import Path
 
-import polars as pl
 from htmltools import Tag
 from shiny import App, Inputs, Outputs, Session, reactive, ui
 
@@ -16,9 +15,8 @@ from dp_wizard.types import AppState, Product
 from dp_wizard.utils import config
 from dp_wizard.utils.argparse_helpers import CLIInfo
 from dp_wizard.utils.csv_helper import (
+    CsvInfo,
     make_sample_csv,
-    read_csv_numeric_names,
-    read_polars_schema,
 )
 
 _shiny_root = package_root / "shiny"
@@ -102,15 +100,11 @@ def _make_server(cli_info: CLIInfo):
             initial_contributions = 10
             initial_private_csv_path = package_root / ".local-config/sample.csv"
             make_sample_csv(initial_private_csv_path, initial_contributions)
-            initial_schema = read_polars_schema(Path(initial_private_csv_path))
-            initial_numeric_column_names = read_csv_numeric_names(
-                Path(initial_private_csv_path)
-            )
+            csv_info = CsvInfo(Path(initial_private_csv_path))
         else:
             initial_contributions = 1
             initial_private_csv_path = ""
-            initial_schema = pl.Schema()
-            initial_numeric_column_names = []
+            csv_info = CsvInfo(None)
 
         initial_product = Product.STATISTICS
 
@@ -119,8 +113,11 @@ def _make_server(cli_info: CLIInfo):
             is_sample_csv=cli_info.is_sample_csv,
             in_cloud=cli_info.is_cloud_mode,
             qa_mode=cli_info.is_qa_mode,
-            # Top-level:
+            # Reactive bools:
             is_tutorial_mode=reactive.value(cli_info.get_is_tutorial_mode()),
+            is_dataset_selected=reactive.value(False),
+            is_analysis_defined=reactive.value(False),
+            is_released=reactive.value(False),
             # Dataset choices:
             initial_private_csv_path=str(initial_private_csv_path),
             private_csv_path=reactive.value(str(initial_private_csv_path)),
@@ -132,8 +129,7 @@ def _make_server(cli_info: CLIInfo):
             initial_product=initial_product,
             product=reactive.value(initial_product),
             # Analysis choices:
-            polars_schema=reactive.value(initial_schema),
-            numeric_column_names=reactive.value(initial_numeric_column_names),
+            csv_info=reactive.value(csv_info),
             group_column_names=reactive.value([]),
             epsilon=reactive.value(1.0),
             # Per-column choices:
@@ -145,8 +141,6 @@ def _make_server(cli_info: CLIInfo):
             analysis_errors=reactive.value({}),
             # Per-group choices:
             group_keys=reactive.value({}),
-            # Release state:
-            released=reactive.value(False),
         )
 
         @reactive.effect

@@ -5,7 +5,7 @@ from pathlib import Path
 
 import polars as pl
 
-from dp_wizard.types import ColumnId, ColumnLabel, ColumnName
+from dp_wizard.types import ColumnId, ColumnLabel, ColumnName, CsvInfo
 
 
 def convert_text(text: str, target_type: pl.DataType) -> list[str | float]:
@@ -49,45 +49,24 @@ def convert_text(text: str, target_type: pl.DataType) -> list[str | float]:
     return converted_lines
 
 
-def read_polars_schema(csv_path: Path | bytes) -> pl.Schema:
-    # Polars is overkill, but it is more robust against
-    # variations in encoding than Python stdlib csv.
-    # However, it could be slow:
-    #
-    # > Determining the column names of a LazyFrame requires
-    # > resolving its schema, which is a potentially expensive operation.
-    lf = pl.scan_csv(csv_path)
-    # TODO: What happens if column names are missing?
-    return lf.collect_schema()
-
-
-def read_csv_numeric_names(csv_path: Path) -> list[ColumnName]:  # pragma: no cover
-    lf = pl.scan_csv(csv_path)
-    numeric_names = [
-        name for name, pl_type in lf.collect_schema().items() if pl_type.is_numeric()
-    ]
-    # Exclude columns missing names:
-    return [ColumnName(name) for name in numeric_names if name.strip() != ""]
-
-
 def get_csv_names_mismatch(
     public_csv_path: Path, private_csv_path: Path
 ) -> tuple[set[ColumnName], set[ColumnName]]:
-    public_names = set(ColumnName(name) for name in read_polars_schema(public_csv_path))
-    private_names = set(
-        ColumnName(name) for name in read_polars_schema(private_csv_path)
-    )
+    public_names = set(CsvInfo(public_csv_path).get_all_column_names())
+    private_names = set(CsvInfo(private_csv_path).get_all_column_names())
     extra_public = public_names - private_names
     extra_private = private_names - public_names
     return (extra_public, extra_private)
 
 
 def get_csv_row_count(csv_path: Path) -> int:
-    lf = pl.scan_csv(csv_path)
+    lf = pl.scan_csv(csv_path, ignore_errors=True)
     return lf.select(pl.len()).collect().item()
 
 
-def id_labels_dict_from_schema(schema: pl.Schema) -> dict[ColumnId, ColumnLabel]:
+def id_labels_dict_from_schema(
+    schema: dict[ColumnName, pl.DataType],
+) -> dict[ColumnId, ColumnLabel]:
     """
     >>> id_labels_dict_from_schema(pl.Schema({"abc": pl.Int32}))
     {'...': '1: abc'}
@@ -98,7 +77,9 @@ def id_labels_dict_from_schema(schema: pl.Schema) -> dict[ColumnId, ColumnLabel]
     }
 
 
-def id_names_dict_from_schema(schema: pl.Schema) -> dict[ColumnId, ColumnName]:
+def id_names_dict_from_schema(
+    schema: dict[ColumnName, pl.DataType],
+) -> dict[ColumnId, ColumnName]:
     """
     >>> id_names_dict_from_schema(pl.Schema({"abc": pl.Int32}))
     {'...': 'abc'}
@@ -152,6 +133,31 @@ def make_sample_csv(path: Path, contributions: int) -> None:
                         "self_assessment": self_assessment,
                     }
                 )
+
+
+def infer_csv_info(names_values_str: str) -> CsvInfo:
+    """
+    >>> infer_csv_info("missing\\nstr : foobar\\nint:42")
+    CsvInfo({'missing': String, 'str': String, 'int': Int64}, warnings=[], errors=[])
+    >>> infer_csv_info("")
+    CsvInfo({}, warnings=[], errors=[])
+
+    """
+    names_values_list = [
+        (name_value.split(":") + ["", ""])[:2]
+        for name_value in names_values_str.splitlines()
+    ]
+    names_values_dict = {
+        name.strip(): value.strip() for [name, value] in names_values_list
+    }
+    from tempfile import NamedTemporaryFile
+
+    with NamedTemporaryFile("w") as tmp:
+        tmp.write(",".join(names_values_dict.keys()))
+        tmp.write("\n")
+        tmp.write(",".join(names_values_dict.values()))
+        tmp.flush()
+        return CsvInfo(Path(tmp.name))
 
 
 def _clip(n: float, lower_bound: float, upper_bound: float) -> float:

@@ -1,7 +1,6 @@
 from pathlib import Path
 from typing import Optional
 
-import polars as pl
 from shiny import Inputs, Outputs, Session, reactive, render, ui
 
 from dp_wizard.shiny.components.icons import (
@@ -13,19 +12,15 @@ from dp_wizard.shiny.components.outputs import (
     code_sample,
     col_widths,
     hide_if,
-    info_md_box,
     nav_button,
     only_for_screenreader,
     tutorial_box,
+    warning_md_box,
 )
 from dp_wizard.shiny.panels.dataset_panel import data_source
 from dp_wizard.types import AppState, Product
 from dp_wizard.utils.code_generators import make_privacy_unit_block
-from dp_wizard.utils.csv_helper import (
-    get_csv_names_mismatch,
-    read_csv_numeric_names,
-    read_polars_schema,
-)
+from dp_wizard.utils.csv_helper import CsvInfo, get_csv_names_mismatch, infer_csv_info
 
 dataset_panel_id = "dataset_panel"
 OTHER = "Other"
@@ -112,8 +107,11 @@ def dataset_server(
     is_sample_csv = state.is_sample_csv
     in_cloud = state.in_cloud
 
-    # Top-level:
+    # Reactive bools:
     is_tutorial_mode = state.is_tutorial_mode
+    is_dataset_selected = state.is_dataset_selected
+    # is_analysis_defined = state.is_analysis_defined
+    is_released = state.is_released
 
     # Dataset choices:
     initial_private_csv_path = state.initial_private_csv_path
@@ -127,8 +125,7 @@ def dataset_server(
     product = state.product
 
     # Analysis choices:
-    polars_schema = state.polars_schema
-    numeric_column_names = state.numeric_column_names
+    csv_info = state.csv_info
     # group_column_names = state.group_column_names
     # epsilon = state.epsilon
 
@@ -145,42 +142,25 @@ def dataset_server(
     # (Again a dict, with ColumnName as the key.)
     # group_keys = state.group_keys
 
-    # Release state:
-    released = state.released
-
     @reactive.effect
     @reactive.event(input.public_csv_path)
     def _on_public_csv_path_change():
         path = input.public_csv_path()[0]["datapath"]
         public_csv_path.set(path)
-        polars_schema.set(read_polars_schema(Path(path)))
-        numeric_column_names.set(read_csv_numeric_names(Path(path)))
+        csv_info.set(CsvInfo(Path(path)))
 
     @reactive.effect
     @reactive.event(input.private_csv_path)
     def _on_private_csv_path_change():
         path = input.private_csv_path()[0]["datapath"]
         private_csv_path.set(path)
-        polars_schema.set(read_polars_schema(Path(path)))
-        numeric_column_names.set(read_csv_numeric_names(Path(path)))
+        csv_info.set(CsvInfo(Path(path)))
 
     @reactive.effect
     @reactive.event(input.all_column_names)
     def _on_column_names_change():
         # Only used when the user is supplying column names in cloud mode.
-        # The Polars type comes into play if/when public keys are given.
-        column_names = [
-            clean
-            for line in input.all_column_names().splitlines()
-            if (clean := line.strip())
-        ]
-        # Set schema type as string, so that keys can be set.
-        polars_schema.set(pl.Schema({name: pl.String for name in column_names}))
-        # But inconsistently, assume numeric type, so columns can be selected
-        # for stats.
-        # TODO: Allow types to be specified in the cloud.
-        # https://github.com/opendp/dp-wizard/issues/741
-        numeric_column_names.set(column_names)
+        csv_info.set(infer_csv_info(input.all_column_names()))
 
     @reactive.calc
     def csv_column_mismatch_calc() -> Optional[tuple[set, set]]:
@@ -196,8 +176,8 @@ def dataset_server(
     @render.ui
     def dataset_release_warning_ui():
         return hide_if(
-            not released(),
-            info_md_box(
+            not is_released(),
+            warning_md_box(
                 """
                 After making a differentially private release,
                 changes to the dataset will constitute a new release,
@@ -232,6 +212,7 @@ def dataset_server(
         return data_source.csv_or_columns_ui(
             in_cloud=in_cloud,
             is_tutorial_mode=is_tutorial_mode,
+            csv_info=csv_info,
         )
 
     @render.ui
@@ -244,9 +225,10 @@ def dataset_server(
         )
 
     @render.ui
-    def csv_column_match_ui():
-        return data_source.csv_column_match_ui(
-            csv_column_mismatch_calc,
+    def csv_message_ui():
+        return data_source.csv_message_ui(
+            csv_column_mismatch_calc=csv_column_mismatch_calc,
+            csv_messages=csv_info().get_messages(),
         )
 
     entities = {
@@ -355,12 +337,14 @@ def dataset_server(
     def contributions_entity_calc() -> str:
         return input.entity()[2:].lower().strip()
 
-    @reactive.calc
-    def button_enabled():
-        return (
+    @reactive.effect
+    def set_is_dataset_selected():
+        info = csv_info()
+        is_dataset_selected.set(
             contributions_valid()
+            and not info.get_is_error()
+            and len(info.get_all_column_names()) > 0
             and not get_row_count_errors(max_rows())
-            and len(polars_schema()) > 0
             and (in_cloud or not csv_column_mismatch_calc())
         )
 
@@ -373,7 +357,7 @@ def dataset_server(
     def contributions_validation_ui():
         return hide_if(
             contributions_valid(),
-            info_md_box("Contributions must be 1 or greater."),
+            warning_md_box("Contributions must be 1 or greater."),
         )
 
     @render.ui
@@ -411,7 +395,7 @@ def dataset_server(
     def optional_row_count_error_ui():
         error_md = "\n".join(f"- {error}" for error in get_row_count_errors(max_rows()))
         if error_md:
-            return info_md_box(error_md)
+            return warning_md_box(error_md)
 
     @render.ui
     def row_count_bounds_ui():
@@ -448,7 +432,7 @@ def dataset_server(
 
     @render.ui
     def define_analysis_button_ui():
-        enabled = button_enabled()
+        enabled = is_dataset_selected()
         button = nav_button("go_to_analysis", "Define Analysis", disabled=not enabled)
         if enabled:
             return button

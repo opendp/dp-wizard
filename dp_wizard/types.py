@@ -1,6 +1,7 @@
 import re
 from dataclasses import dataclass
 from enum import Enum, auto
+from pathlib import Path
 
 import polars as pl
 from shiny import reactive
@@ -97,6 +98,116 @@ class ColumnIdentifier(str):
         return str.__new__(cls, identifier)
 
 
+class CsvInfo:
+    def __init__(self, csv_path: Path | None):
+        self._schema = (
+            {
+                ColumnName(k): v
+                for k, v in pl.scan_csv(
+                    csv_path,
+                    # Read the whole CSV:
+                    # Until we hear that this is too slow,
+                    # it's better to be sure the types
+                    # have been accurately inferred.
+                    infer_schema_length=None,
+                    # Default is to raise NoDataError:
+                    # We prefer to validate below and set error.
+                    raise_if_empty=False,
+                )
+                .collect_schema()
+                .items()
+                if k.strip() != ""
+            }
+            if csv_path is not None
+            else {}
+        )
+        self._warnings: list[str] = []
+        self._errors: list[str] = []
+        column_names = self._schema.keys()
+
+        # Schema errors:
+        if column_names and not any(
+            # startswith("_duplicated_") is there in case there are
+            # multiple columns with missing names: Polars will retitle
+            # those after the first.
+            name and not name.startswith("_duplicated_")
+            for name in column_names
+        ):
+            self._errors.append("No column names detected: First row of CSV empty?")
+            return
+
+        # Schema warnings:
+        if column_names and not any(
+            data_type.is_numeric() for data_type in self._schema.values()
+        ):
+            self._warnings.append("No numeric columns detected.")
+        if len(column_names) == 1:
+            columns = "".join(column_names)
+            self._warnings.append(f"Only one column detected: '{columns}'")
+
+        for column_name in column_names:
+
+            # Row errors:
+            tab = "\t"
+            if tab in column_name:
+                escaped_tab = "\\t"
+                self._errors.append(
+                    f"Tab in column name: '{column_name.replace(tab, escaped_tab)}'; "
+                    "Is this actually a TSV rather than a CSV?"
+                )
+                return
+            elif "�" in column_name:
+                self._errors.append(
+                    f"Bad column name: '{column_name}'; Is this a UTF-8 CSV?"
+                )
+                return
+
+            # Row warnings:
+            try:
+                float(column_name)
+                self._warnings.append(
+                    f"Numeric column name: '{column_name}'; "
+                    "Is the CSV missing a header row?"
+                )
+            except ValueError:
+                pass
+            if "_duplicated_" in column_name:
+                self._warnings.append(
+                    f"Column name modified to avoid duplication: '{column_name}'"
+                )
+            if column_name.strip() != column_name:
+                self._warnings.append(
+                    f"Column name is padded: '{column_name}'; "
+                    "Padded numeric values will be treated as strings."
+                )
+
+    def __repr__(self):
+        warnings = self._warnings
+        errors = self._errors
+        return f"CsvInfo({self._schema}, {warnings=}, {errors=})"
+
+    def get_schema(self) -> dict[ColumnName, pl.DataType]:
+        if self._errors:
+            return {}  # pragma: no cover
+        return self._schema
+
+    def get_all_column_names(self) -> list[ColumnName]:
+        if self._errors:
+            return []
+        return list(self._schema.keys())
+
+    def get_numeric_column_names(self) -> list[ColumnName]:
+        if self._errors:
+            return []
+        return [k for k, v in self._schema.items() if v.is_numeric()]
+
+    def get_messages(self) -> list[str]:
+        return self._errors + self._warnings
+
+    def get_is_error(self) -> bool:
+        return bool(self._errors)
+
+
 @dataclass(kw_only=True, frozen=True)
 class AppState:
     # CLI options:
@@ -104,8 +215,11 @@ class AppState:
     in_cloud: bool
     qa_mode: bool
 
-    # Top-level:
+    # Reactive bools:
     is_tutorial_mode: reactive.Value[bool]
+    is_dataset_selected: reactive.Value[bool]
+    is_analysis_defined: reactive.Value[bool]
+    is_released: reactive.Value[bool]
 
     # Dataset choices:
     initial_private_csv_path: str
@@ -119,8 +233,7 @@ class AppState:
     product: reactive.Value[Product]
 
     # Analysis choices:
-    polars_schema: reactive.Value[pl.Schema]
-    numeric_column_names: reactive.Value[list[ColumnName]]
+    csv_info: reactive.Value[CsvInfo]
     group_column_names: reactive.Value[list[ColumnName]]
     epsilon: reactive.Value[float]
 
@@ -135,7 +248,4 @@ class AppState:
 
     # Per-group choices:
     # (Again a dict, with ColumnName as the key.)
-    group_keys: reactive.Value[dict[ColumnName, list[str | float]]]
-
-    # Release state:
-    released: reactive.Value[bool]
+    group_keys: reactive.Value[dict[ColumnName, list[str | float | bool]]]
