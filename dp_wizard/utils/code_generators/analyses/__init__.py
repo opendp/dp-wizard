@@ -1,15 +1,18 @@
 from typing import Protocol
 
+from dp_wizard.types import StatisticName
 from dp_wizard.utils.code_generators.abstract_generator import AbstractGenerator
 
 
-class Analysis(Protocol):  # pragma: no cover
-    # There should also be a "name".
-    # @property can't be combined with @staticmethod,
-    # so we can't make that explicit here.
+class Statistic(Protocol):  # pragma: no cover
+    @property
+    def name(self) -> str: ...
 
-    @staticmethod
-    def has_bins() -> bool: ...
+    @property
+    def blurb_md(self) -> str: ...
+
+    @property
+    def input_names(self) -> list[str]: ...
 
     @staticmethod
     def make_query(
@@ -28,6 +31,9 @@ class Analysis(Protocol):  # pragma: no cover
     ) -> str: ...
 
     @staticmethod
+    def make_plot_note() -> str: ...
+
+    @staticmethod
     def make_report_kv(
         name: str,
         confidence: float,
@@ -43,7 +49,7 @@ class Analysis(Protocol):  # pragma: no cover
     ) -> str: ...
 
 
-def get_analysis_by_name(name) -> Analysis:  # pragma: no cover
+def get_statistic_by_name(name: StatisticName) -> Statistic:  # pragma: no cover
     # Avoid circular import:
     from dp_wizard.utils.code_generators.analyses import histogram, mean, median
 
@@ -55,4 +61,16 @@ def get_analysis_by_name(name) -> Analysis:  # pragma: no cover
         case median.name:
             return median
         case _:
-            raise Exception("Unrecognized analysis")
+            raise Exception("Unrecognized statistic")
+
+
+# These might be redone as methods on a superclass:
+def has_bins(statistic: Statistic) -> bool:
+    """
+    >>> from dp_wizard.utils.code_generators.analyses import histogram, median
+    >>> has_bins(histogram)
+    True
+    >>> has_bins(median)
+    False
+    """
+    return any("bin_count_input" in name for name in statistic.input_names)

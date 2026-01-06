@@ -1,18 +1,50 @@
-from dp_wizard.utils.code_template import Template
+from dp_wizard_templates.code_template import Template
+
+from dp_wizard import get_template_root, opendp_version
+from dp_wizard.types import ColumnIdentifier, StatisticName
+
+name = StatisticName("Median")
+blurb_md = """
+In DP Wizard the median is picked from evenly spaced
+candidates, but the OpenDP library is more flexible.
+Because the median isn't based on the addition of noise,
+we can't estimate the error as we do with the other
+statistics.
+"""
+input_names = [
+    "lower_bound_input",
+    "upper_bound_input",
+    "candidate_count_input",
+]
 
 
-name = "Median"
-
-
-def has_bins():
-    return False  # pragma: no cover
+root = get_template_root(__file__)
 
 
 def make_query(code_gen, identifier, accuracy_name, stats_name):
+    def template(GROUP_NAMES, stats_context, EXPR_NAME):
+        groups = GROUP_NAMES
+        QUERY_NAME = (
+            stats_context.query().group_by(groups).agg(EXPR_NAME).WITH_KEYS
+            if groups
+            else stats_context.query().select(EXPR_NAME)
+        )
+        STATS_NAME = QUERY_NAME.release().collect()
+        STATS_NAME  # type: ignore
+
     return (  # pragma: no cover
-        Template("median_query", __file__)
+        Template(template)
         .fill_values(
-            GROUP_NAMES=code_gen.groups,
+            GROUP_NAMES=list(code_gen.analysis_plan.groups.keys()),
+        )
+        .fill_attributes(
+            WITH_KEYS=(
+                Template("with_keys(pl.LazyFrame(GROUPING_KEYS))")
+                .fill_values(GROUPING_KEYS=g)
+                .finish()
+                if (g := code_gen.analysis_plan.get_groups_with_keys())
+                else None
+            )
         )
         .fill_expressions(
             QUERY_NAME=f"{identifier}_query",
@@ -24,34 +56,46 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
 
 
 def make_output(code_gen, column_name, accuracy_name, stats_name):
-    return Template(
-        f"median_{code_gen.root_template}_output", __file__
-    ).finish()  # pragma: no cover
+    return (
+        Template(f"median_{code_gen._get_notebook_or_script()}_output", root)
+        .fill_expressions(
+            COLUMN_NAME=column_name,
+            STATS_NAME=stats_name,
+        )
+        .finish()  # pragma: no cover
+    )
+
+
+def make_plot_note():
+    return ""
 
 
 def make_report_kv(name, confidence, identifier):
     return (
-        Template("median_report_kv", __file__)
+        Template("median_report_kv", root)
         .fill_values(
             NAME=name,
+        )
+        .fill_expressions(
+            IDENTIFIER_STATS=f"{identifier}_stats",
         )
         .finish()
     )  # pragma: no cover
 
 
 def make_column_config_block(column_name, lower_bound, upper_bound, bin_count):
-    from dp_wizard.utils.code_generators import snake_case
-
-    snake_name = snake_case(column_name)
+    identifier = ColumnIdentifier(column_name)
     return (
-        Template("median_expr", __file__)
+        Template("median_expr", root)
         .fill_expressions(
-            EXPR_NAME=f"{snake_name}_expr",
+            EXPR_NAME=f"{identifier}_expr",
+            OPENDP_V_VERSION=f"v{opendp_version}",
         )
         .fill_values(
             COLUMN_NAME=column_name,
             LOWER_BOUND=lower_bound,
             UPPER_BOUND=upper_bound,
+            BIN_COUNT=bin_count,
         )
         .finish()
     )  # pragma: no cover

@@ -1,5 +1,6 @@
-from dp_wizard.utils.shared import df_to_columns
 import polars as pl
+
+from dp_wizard.utils.shared.plots import df_to_columns
 
 
 def test_two_column_df_to_columns():

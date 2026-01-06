@@ -1,0 +1,35 @@
+# TITLE
+#
+# CUSTOM_NOTE
+
+# Install the following dependencies, if you haven't already:
+# WINDOWS_COMMENT_BLOCK
+#
+# $ pip install DEPENDENCIES
+
+from argparse import ArgumentParser
+
+IMPORTS_BLOCK
+
+UTILS_BLOCK
+
+COLUMNS_BLOCK
+
+
+def get_stats_context_contributions(csv_path):
+    STATS_CONTEXT_BLOCK
+    # CSV_COMMENT_BLOCK
+    return stats_context, contributions
+
+
+if __name__ == "__main__":
+    parser = ArgumentParser(
+        description="Creates a differentially private release from a csv"
+    )
+    parser.add_argument(
+        "--csv", required=True, help="Path to csv containing private data"
+    )
+    args = parser.parse_args()
+    stats_context, contributions = get_stats_context_contributions(csv_path=args.csv)
+
+    STATS_QUERIES_BLOCK

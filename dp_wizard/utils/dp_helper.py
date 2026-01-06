@@ -1,7 +1,7 @@
-import polars as pl
 import opendp.prelude as dp
+import polars as pl
 
-from dp_wizard.utils.shared import make_cut_points
+from dp_wizard.utils.shared.bins import make_cut_points
 
 dp.enable_features("contrib")
 
@@ -60,7 +60,7 @@ def make_accuracy_histogram(
     # sure that we're using the same code in the preview that we
     # use in the generated notebook.
     cut_points = make_cut_points(lower_bound, upper_bound, bin_count)
-    context = dp.Context.compositor(
+    stats_context = dp.Context.compositor(
         data=lf.with_columns(
             # The cut() method returns a Polars categorical type.
             # Cast to string to get the human-readable label.
@@ -80,12 +80,12 @@ def make_accuracy_histogram(
         margins=[
             dp.polars.Margin(  # type: ignore
                 by=["bin"],
-                max_partition_length=row_count,
-                public_info="keys",
+                max_length=row_count,
+                invariant="keys",
             ),
         ],
     )
-    query = context.query().group_by("bin").agg(pl.len().dp.noise())  # type: ignore
+    query = stats_context.query().group_by("bin").agg(pl.len().dp.noise())  # type: ignore
 
     accuracy = query.summarize(alpha=1 - confidence)["accuracy"].item()  # type: ignore
     histogram = query.release().collect()

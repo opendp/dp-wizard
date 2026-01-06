@@ -1,10 +1,15 @@
 from pathlib import Path
-import re
 
-from shiny.run import ShinyAppProc
+import nbformat
+import pytest
+from nbconvert.preprocessors import ExecutePreprocessor
 from playwright.sync_api import Page, expect
 from shiny.pytest import create_app_fixture
+from shiny.run import ShinyAppProc
 
+from dp_wizard import package_root
+from dp_wizard.shiny.panels.results_panel.download_options import _download_options
+from dp_wizard.utils.code_generators.notebook_generator import PLACEHOLDER_CSV_NAME
 
 bp = "BREAKPOINT()".lower()
 if bp in Path(__file__).read_text():
@@ -14,109 +19,123 @@ if bp in Path(__file__).read_text():
         "#run-a-test-from-a-specific-breakpoint"
     )
 
-root_path = Path(__file__).parent.parent
-demo_app = create_app_fixture(root_path / "dp_wizard/app_demo.py")
-cloud_app = create_app_fixture(root_path / "dp_wizard/app_cloud.py")
-local_app = create_app_fixture(root_path / "dp_wizard/app_local.py")
-qa_app = create_app_fixture(root_path / "dp_wizard/app_qa.py")
+local_app = create_app_fixture(package_root / "app.py")
 
-
-tooltip = "#private_csv_path-label svg"
-for_the_demo = "For the demo, we'll imagine"
+test_apps = Path(__file__).parent / "apps"
+sample_app = create_app_fixture(test_apps / "app_sample.py")
+cloud_app = create_app_fixture(test_apps / "app_cloud.py")
+qa_app = create_app_fixture(test_apps / "app_qa.py")
 
 
 def test_cloud_app(page: Page, cloud_app: ShinyAppProc):  # pragma: no cover
     page.goto(cloud_app.url)
+
+    page.locator("#max_rows").fill("10000")
     expect(page).to_have_title("DP Wizard")
     expect(page.get_by_text("Choose Public CSV")).not_to_be_visible()
-    expect(page.get_by_text("CSV Column Names")).to_be_visible()
+    page.get_by_label("CSV Column Names").fill("a_column:1\nb_column:2")
+
+    page.get_by_role("button", name="Define Analysis").click()
+    page.locator(".selectize-input").nth(0).click()
+    page.get_by_text("1: a_column").click()
+    page.get_by_label("Lower").fill("0")
+    page.get_by_label("Upper").fill("10")
+
+    expect(
+        page.get_by_text("Select one or more columns before proceeding.")
+    ).not_to_be_visible()
+    page.locator(".selectize-input").nth(0).click()
+    page.get_by_text("2: b_column").click()
+    page.get_by_text("Select one or more columns before proceeding.")
+    page.get_by_text("2: b_column×").click()
+
+    page.get_by_role("button", name="Download Results").click()
+    with page.expect_download() as download_info:
+        page.get_by_role("link", name="Notebook (unexecuted").click()
+
+    download_path = download_info.value.path()
+
+    # Try to execute the downloaded file:
+    # Based on https://nbconvert.readthedocs.io/en/latest/execute_api.html#example
+    nb = nbformat.read(download_path.open(), as_version=4)
+    ep = ExecutePreprocessor(timeout=600, kernel_name="python3")
+    ep.preprocess(nb)
+
+    # Clean up file in CWD that is created by notebook execution.
+    Path(PLACEHOLDER_CSV_NAME).unlink()
 
 
 def test_qa_app(page: Page, qa_app: ShinyAppProc):  # pragma: no cover
     page.goto(qa_app.url)
-    page.get_by_role("button", name="Define analysis").click()
 
-    page.locator(".selectize-input").nth(1).click()
+    page.locator("#max_rows").fill("10000")
+    page.get_by_role("button", name="Define Analysis").click()
+
+    page.locator(".selectize-input").nth(0).click()
     page.get_by_text(": grade").click()
+    page.get_by_label("Lower").fill("0")
+    page.get_by_label("Upper").fill("10")
 
     page.get_by_role("button", name="Download Results").click()
-    page.get_by_role("link", name="Download Notebook (.ipynb)").click()
-    expect(page.get_by_text("raise Exception('qa_mode!')")).to_be_visible()
-
-
-def test_demo_app(page: Page, demo_app: ShinyAppProc):  # pragma: no cover
-    page.goto(demo_app.url)
-    expect(page).to_have_title("DP Wizard")
-    expect(page.get_by_text(for_the_demo)).not_to_be_visible()
-    page.locator(tooltip).hover()
-    expect(page.get_by_text(for_the_demo)).to_be_visible()
-
-    # -- Define analysis --
-    page.get_by_role("button", name="Define analysis").click()
-    expect(page.get_by_text("This simulation will assume")).to_be_visible()
+    page.get_by_role("link", name="Notebook (.ipynb)").click()
+    expect(page.get_by_text('raise Exception("qa_mode!")')).to_be_visible()
 
 
 def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: no cover
     pick_dataset_text = "How many rows of the CSV"
-    perform_analysis_text = "Select columns to calculate statistics on"
+    perform_analysis_text = "Select numeric columns to calculate statistics on"
     download_results_text = "You can now make a differentially private release"
 
-    def expect_visible(text):
-        expect(page.get_by_text(text)).to_be_visible()
-
-    def expect_not_visible(text):
-        expect(page.get_by_text(text)).not_to_be_visible()
-
-    def expect_no_error():
-        expect(page.locator(".shiny-output-error")).not_to_be_attached()
-
-    # -- Select dataset --
+    # -- Select Dataset --
     page.goto(local_app.url)
     expect(page).to_have_title("DP Wizard")
-    expect(page.locator(tooltip)).to_have_count(0)
-    expect_visible(pick_dataset_text)
-    expect_not_visible(perform_analysis_text)
-    expect_not_visible(download_results_text)
-    page.get_by_label("Contributions").fill("42")
-    page.get_by_text("Code sample: Unit of Privacy").click()
-    expect_visible("contributions = 42")
-    expect_no_error()
+    page.locator("#max_rows").fill("10000")
+    expect(page.get_by_text(pick_dataset_text)).to_be_visible()
+    expect(page.get_by_text(perform_analysis_text)).not_to_be_visible()
+    expect(page.get_by_text(download_results_text)).not_to_be_visible()
+    page.locator("#contributions").fill("123")
+    page.get_by_text("Code Sample: Unit of Privacy").click()
+    expect(page.get_by_text("123")).to_have_class("hljs-number")
+    expect(page.locator(".shiny-output-error")).not_to_be_attached()
 
     # Button disabled until upload:
-    define_analysis_button = page.get_by_role("button", name="Define analysis")
+    define_analysis_button = page.get_by_role("button", name="Define Analysis")
     assert define_analysis_button.is_disabled()
 
     # Now upload:
-    csv_path = Path(__file__).parent / "fixtures" / "fake.csv"
+    csv_path = package_root.parent / "tests/fixtures/fake.csv"
     page.get_by_label("Choose Public CSV").set_input_files(csv_path.resolve())
 
     # Check validation of contributions:
     # Playwright itself won't let us fill non-numbers in this field.
     # "assert define_analysis_button.is_enabled()" has spurious errors.
     # https://github.com/opendp/dp-wizard/issues/221
-    page.get_by_label("Contributions").fill("0")
-    expect_visible("Contributions must be 1 or greater")
-    expect_visible("Specify CSV and the unit of privacy before proceeding")
+    page.locator("#contributions").fill("0")
+    expect(page.get_by_text("Contributions must be 1 or greater")).to_be_visible()
+    expected_error = (
+        "Specify CSV, unit of privacy, and maximum row count before proceeding."
+    )
+    expect(page.get_by_text(expected_error)).to_be_visible()
 
-    page.get_by_label("Contributions").fill("42")
-    expect_not_visible("Contributions must be 1 or greater")
-    expect_not_visible("Specify CSV and the unit of privacy before proceeding")
+    page.locator("#contributions").fill("2")
+    expect(page.get_by_text("Contributions must be 1 or greater")).not_to_be_visible()
+    expect(page.get_by_text(expected_error)).not_to_be_visible()
 
-    expect_no_error()
+    expect(page.locator(".shiny-output-error")).not_to_be_attached()
 
-    # -- Define analysis --
+    # -- Define Analysis --
     define_analysis_button.click()
-    expect_not_visible(pick_dataset_text)
-    expect_visible(perform_analysis_text)
-    expect_not_visible(download_results_text)
+    expect(page.get_by_text(pick_dataset_text)).not_to_be_visible()
+    expect(page.get_by_text(perform_analysis_text)).to_be_visible()
+    expect(page.get_by_text(download_results_text)).not_to_be_visible()
     # Epsilon slider:
-    expect_visible("Epsilon: 1.0")
+    expect(page.get_by_text("(Epsilon): 1.0")).to_be_visible()
     page.locator(".irs-bar").click()
-    expect_visible("Epsilon: 0.316")
+    expect(page.get_by_text("(Epsilon): 0.3")).to_be_visible()
     page.locator(".irs-bar").click()
-    expect_visible("Epsilon: 0.158")
+    expect(page.get_by_text("(Epsilon): 0.2")).to_be_visible()
     # Simulation
-    expect_visible("Because you've provided a public CSV")
+    expect(page.get_by_text("Because you've provided a public CSV")).to_be_visible()
 
     # Button disabled until column selected:
     download_results_button = page.get_by_role("button", name="Download Results")
@@ -126,49 +145,51 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     # but we could have the confidence interval in the text...
     page.get_by_label("Estimated Rows").select_option("1000")
 
-    # Pick grouping:
-    page.locator(".selectize-input").nth(0).click()
-    page.get_by_text("class year").nth(0).click()
     # Pick columns:
+    page.locator(".selectize-input").nth(0).click()
+    page.get_by_text(": grade").click()
+    # Pick grouping:
     page.locator(".selectize-input").nth(1).click()
-    page.get_by_text("grade").nth(1).click()
+    page.get_by_text(": class year").nth(2).click()
 
     # Check that default is set correctly:
     # (Explicit "float()" because sometimes returns "10", sometimes "10.0".
     #  Weird, but not something to spend time on.)
-    assert float(page.get_by_label("Upper").input_value()) == 10.0
+    assert page.get_by_label("Upper").input_value() == ""
 
     # Input validation:
+    page.get_by_label("Number of Bins").fill("-1")
+    expect(page.get_by_text("Number should be a positive integer.")).to_be_visible()
+    # Changing epsilon should not reset column details:
+    page.locator(".irs-bar").click()
+    expect(page.get_by_text("Number should be a positive integer.")).to_be_visible()
+    page.get_by_label("Number of Bins").fill("10")
+
     page.get_by_label("Upper").fill("")
-    expect_visible("Upper bound is required")
+    expect(page.get_by_text("Upper bound is required")).to_be_visible()
     page.get_by_label("Upper").fill("nan")
-    expect_visible("Upper bound should be a number")
+    expect(page.get_by_text("Upper bound should be a number")).to_be_visible()
+    page.get_by_label("Lower").fill("0")
     page.get_by_label("Upper").fill("-1")
-    expect_visible("Lower bound should be less than upper bound")
+    expect(
+        page.get_by_text("Lower bound should be less than upper bound")
+    ).to_be_visible()
 
     new_value = "20"
     page.get_by_label("Upper").fill(new_value)
     assert float(page.get_by_label("Upper").input_value()) == float(new_value)
-    expect_visible("The 95% confidence interval is ±794")
+    expect(page.get_by_text("The 95% confidence interval is ±60.4")).to_be_visible()
     page.get_by_text("Data Table").click()
-    expect_visible(f"({new_value}, inf]")  # Because values are well above the bins.
+    expect(
+        page.get_by_text(f"({new_value}, inf]")
+    ).to_be_visible()  # Because values are well above the bins.
 
     # Add a second column:
-    # page.get_by_label("blank").check()
-    # TODO: Test is flaky?
-    # expect(page.get_by_text("Weight")).to_have_count(2)
-    # TODO: Setting more inputs without checking for updates
-    # causes recalculations to pile up, and these cause timeouts on CI:
-    # It is still rerendering the graph after hitting "Download Results".
-    # https://github.com/opendp/dp-wizard/issues/116
-    expect_no_error()
-
-    # -- Feedback --
-    page.get_by_role("tab", name="Feedback").click()
-    iframe = page.locator("#feedback-iframe")
-    expect(iframe).to_be_visible()
-    expect(iframe.content_frame.get_by_text("DP Wizard Feedback")).to_be_visible()
-    # Text comes from iframe, so this does introduce a dependency on an outside service.
+    page.locator(".selectize-input").nth(0).click()
+    page.get_by_text(": hw-number").first.click()
+    # Previous setting should not be cleared.
+    expect(page.get_by_role("textbox", name="Upper Bound")).to_have_value("20")
+    expect(page.locator(".shiny-output-error")).not_to_be_attached()
 
     # A separate test spends less time on parameter validation
     # and instead exercises all downloads.
@@ -176,7 +197,51 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     # to run tests in parallel.
 
 
+@pytest.fixture(scope="session")
+def browser_context_args(browser_context_args):
+    # Resize browser narrower than default for screenshots.
+    return {
+        **browser_context_args,
+        "viewport": {
+            "width": 900,
+            "height": 600,
+        },
+    }
+
+
 def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no cover
+
+    def screenshot(page, name):
+        from os import environ
+        from shutil import copyfile
+        from time import sleep
+
+        from diffimg import diff
+        from PIL import Image
+
+        sleep(1)  # Might not be fully updated initially.
+
+        def img_path(name, ext=""):
+            return f"{package_root.parent}/docs/screenshots/{name}{ext}.png"
+
+        tmp_path = img_path(name, ".tmp")
+        new_path = img_path(name, ".new")
+        diff_path = img_path(name, ".diff")
+        old_path = img_path(name)
+
+        page.screenshot(path=tmp_path, full_page=True)
+
+        img = Image.open(tmp_path)
+        img = img.quantize(colors=16)
+        img.save(new_path, optimize=True)
+        if environ.get("SCREENSHOTS"):
+            copyfile(new_path, old_path)
+        else:
+            # TODO: When screenshot doesn't include timestamp, diff should be zero.
+            # https://github.com/opendp/dp-wizard/issues/717
+            assert (
+                diff(new_path, old_path, diff_img_file=diff_path) < 0.01
+            ), f"Screenshots changed! {diff_path}"
 
     dataset_release_warning = "changes to the dataset will constitute a new release"
     analysis_release_warning = "changes to the analysis will constitute a new release"
@@ -184,67 +249,100 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     results_requirements_warning = "define your analysis on the previous tab"
 
     page.goto(local_app.url)
+
+    # For more compact screenshots:
+    page.evaluate("document.body.style.zoom=0.66")
+
+    # Turn off tutorial:
+    # TODO: Right now the test instance is using the local installation's config,
+    # so the tutorial mode might be on or off. Would be better if tests and
+    # local installation were isolated.
+    # https://github.com/opendp/dp-wizard/issues/717
+    try:
+        expect(page.get_by_text("DP Wizard makes it easier")).not_to_be_visible()
+    except AssertionError:
+        page.locator("#tutorial_mode").click()
+
+    page.locator("#max_rows").fill("10000")
     expect(page.get_by_text(dataset_release_warning)).not_to_be_visible()
     page.get_by_role("tab", name="Define Analysis").click()
     expect(page.get_by_text(analysis_requirements_warning)).to_be_visible()
     page.get_by_role("tab", name="Download Results").click()
     expect(page.get_by_text(results_requirements_warning)).to_be_visible()
-    page.get_by_role("tab", name="Select Dataset").click()
 
-    # -- Select dataset --
-    csv_path = Path(__file__).parent / "fixtures" / "fake.csv"
+    # -- Select Dataset --
+    page.get_by_role("tab", name="Select Dataset").click()
+    screenshot(page, "select-dataset")
+
+    csv_path = package_root.parent / "tests/fixtures/fake.csv"
     page.get_by_label("Choose Public CSV").set_input_files(csv_path.resolve())
 
-    # -- Define analysis --
-    page.get_by_role("button", name="Define analysis").click()
+    page.get_by_label("DP Synthetic Data").click()
+
+    # -- Define Analysis --
+    page.get_by_role("button", name="Define Analysis").click()
+    screenshot(page, "define-analysis")
+
     expect(page.get_by_text(analysis_release_warning)).not_to_be_visible()
     expect(page.get_by_text(analysis_requirements_warning)).not_to_be_visible()
 
-    # Pick grouping:
-    page.locator(".selectize-input").nth(0).click()
-    page.get_by_text("class year").nth(0).click()
     # Pick columns:
+    page.locator(".selectize-input").nth(0).click()
+    page.get_by_text(": grade").nth(0).click()
+    # Pick grouping:
     page.locator(".selectize-input").nth(1).click()
-    page.get_by_text("grade").nth(1).click()
+    page.get_by_text(": class year").nth(2).click()
+    # Fill inputs:
+    page.get_by_label("Lower").fill("0")
+    page.get_by_label("Upper").fill("10")
+
+    expect(page.get_by_text(results_requirements_warning)).not_to_be_visible()
 
     # -- Download Results --
-    expect(page.get_by_text(results_requirements_warning)).not_to_be_visible()
     page.get_by_role("button", name="Download Results").click()
+    # TODO: Replace custom note, so the screen shot is stable.
+    # https://github.com/opendp/dp-wizard/issues/717
+    screenshot(page, "download-results")
 
     # Right now, the significant test start-up costs mean
     # it doesn't make sense to parameterize this test,
     # but that could change.
-    matches = [
-        re.search(r'button\("([^"]+)", "([^"]+)"', line)
-        for line in (
-            Path(__file__).parent.parent / "dp_wizard" / "shiny" / "results_panel.py"
-        )
-        .read_text()
-        .splitlines()
-    ]
 
-    # Expand all accordions:
-    page.get_by_text("Reports", exact=True).click()
-    page.get_by_text("Unexecuted Notebooks", exact=True).click()
-    page.get_by_text("Scripts", exact=True).click()
+    expected_stem = "dp_synthetic_data_for_grade_grouped_by_class_year"
 
-    for match in matches:
-        if not match:
-            continue
-        name = match.group(1)
-        ext = match.group(2)
-        link_text = f"Download {name} ({ext})"
+    for option in _download_options.values():
+        link_text = f"{option.name} ({option.ext})"
         with page.expect_download() as download_info:
-            page.get_by_text(link_text).click()
+            # .first because the script link is included in both columns.
+            page.get_by_text(link_text).first.click()
 
         download_name = download_info.value.suggested_filename
-        assert download_name.startswith("dp-")
-        assert "grade-histogram" in download_name
-        assert download_name.endswith(ext)
+        assert download_name.endswith(option.ext)
+        if not download_name.startswith("README"):
+            assert download_name.startswith(expected_stem)
 
         download_path = download_info.value.path()
         content = download_path.read_bytes()
         assert content  # Could add assertions for different document types.
+
+    # Check that download name can be changed:
+    stem_locator = page.locator("#custom_download_stem")
+    expect(stem_locator).to_have_value(expected_stem)
+    new_stem = "¡C1ean me!"
+    stem_locator.fill(new_stem)
+    expect(stem_locator).to_have_value(new_stem)
+
+    new_clean_stem = "-C1ean-me-"
+    for option in _download_options.values():
+        link_text = f"{option.name} ({option.ext})"
+        with page.expect_download() as download_info:
+            # .first because the script link is included in both columns.
+            page.get_by_text(link_text).first.click()
+
+        download_name = download_info.value.suggested_filename
+        assert download_name.endswith(option.ext)
+        if not download_name.startswith("README"):
+            assert download_name.startswith(new_clean_stem)
 
     # -- Define Analysis --
     page.get_by_role("tab", name="Define Analysis").click()

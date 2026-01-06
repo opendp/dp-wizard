@@ -1,37 +1,63 @@
+from abc import ABC, abstractmethod
+from math import gcd
+from typing import Iterable
+
+from dp_wizard_templates.code_template import Template
+
+from dp_wizard import get_template_root, opendp_version, package_root
+from dp_wizard.types import ColumnIdentifier, Product
 from dp_wizard.utils.code_generators import (
     AnalysisPlan,
     make_column_config_block,
     make_privacy_loss_block,
     make_privacy_unit_block,
 )
-from dp_wizard.utils.code_template import Template
-from dp_wizard.utils.csv_helper import name_to_identifier
+from dp_wizard.utils.code_generators.analyses import histogram
 from dp_wizard.utils.dp_helper import confidence
+from dp_wizard.utils.shared.bins import make_cut_points
 
-
-import black
-
-
-from abc import ABC, abstractmethod
-from pathlib import Path
-from typing import Iterable
+template_root = get_template_root(__file__)
 
 
 class AbstractGenerator(ABC):
-    root_template = "placeholder"
+    def __init__(self, analysis_plan: AnalysisPlan, note: str):
+        self.analysis_plan = analysis_plan
+        self.note = note
 
-    def __init__(self, analysis_plan: AnalysisPlan):
-        self.csv_path = analysis_plan.csv_path
-        self.contributions = analysis_plan.contributions
-        self.epsilon = analysis_plan.epsilon
-        self.groups = analysis_plan.groups
-        self.columns = analysis_plan.columns
+    def _get_synth_or_stats(self) -> str:
+        match self.analysis_plan.product:
+            case Product.STATISTICS:
+                return "stats"
+            case Product.SYNTHETIC_DATA:
+                return "synth"
+            case _:  # pragma: no cover
+                raise ValueError(self.analysis_plan.product)
+
+    def _get_extra(self) -> str:
+        # Notebooks shouldn't depend on mbi if they don't need it.
+        # (DP Wizard itself will require mbi, because it needs
+        # to be able to execute both kinds of notebooks.)
+        match self.analysis_plan.product:
+            case Product.STATISTICS:
+                return "polars"
+            case Product.SYNTHETIC_DATA:
+                return "mbi"
+            case _:  # pragma: no cover
+                raise ValueError(self.analysis_plan.product)
 
     @abstractmethod
-    def _make_context(self) -> str: ...  # pragma: no cover
+    def _get_notebook_or_script(self) -> str: ...  # pragma: no cover
 
-    def _make_extra_blocks(self):
-        return {}
+    def _get_root_template(self) -> str:
+        adj = self._get_synth_or_stats()
+        noun = self._get_notebook_or_script()
+        return f"{adj}_{noun}"
+
+    @abstractmethod
+    def _make_stats_context(self) -> str: ...  # pragma: no cover
+
+    @abstractmethod
+    def _make_extra_blocks(self) -> dict[str, str]: ...  # pragma: no cover
 
     def _make_python_cell(self, block) -> str:
         """
@@ -42,45 +68,96 @@ class AbstractGenerator(ABC):
     def _make_comment_cell(self, comment: str) -> str:
         return "".join(f"# {line}\n" for line in comment.splitlines())
 
-    def make_py(self):
+    def make_py(self, reformat=False):
+        def imports_template():
+            import matplotlib.pyplot as plt  # noqa: F401
+            import opendp.prelude as dp  # noqa: F401
+            import polars as pl  # noqa: F401
+
+            # The OpenDP team is working to vet the core algorithms.
+            # Until that is complete we need to opt-in to use these features.
+            dp.enable_features("contrib")
+
+        extra = self._get_extra()
+        bins_py = (package_root / "utils/shared/bins.py").read_text()
+        plots_py = (package_root / "utils/shared/plots.py").read_text()
+
         code = (
-            Template(self.root_template, __file__)
-            .fill_expressions(DEPENDENCIES="'opendp[polars]==0.13.0' matplotlib")
-            .fill_blocks(
-                IMPORTS_BLOCK=Template("imports", __file__).finish(),
-                UTILS_BLOCK=(Path(__file__).parent.parent / "shared.py").read_text(),
-                COLUMNS_BLOCK=self._make_columns(),
-                CONTEXT_BLOCK=self._make_context(),
-                QUERIES_BLOCK=self._make_queries(),
+            Template(self._get_root_template(), template_root)
+            .fill_expressions(
+                TITLE=str(self.analysis_plan),
+                DEPENDENCIES=f"'opendp[{extra}]=={opendp_version}' matplotlib",
+            )
+            .fill_code_blocks(
+                IMPORTS_BLOCK=Template(imports_template).finish(),
+                UTILS_BLOCK=bins_py + plots_py,
                 **self._make_extra_blocks(),
             )
-            .finish()
-        )
-        # Line length determined by PDF rendering.
-        return black.format_str(code, mode=black.Mode(line_length=74))  # type: ignore
+            .fill_comment_blocks(
+                WINDOWS_COMMENT_BLOCK="""
+(If installing in the Windows CMD shell,
+use double-quotes instead of single-quotes below.)""",
+                CSV_COMMENT_BLOCK="""
+A note on `utf8-lossy`: CSVs can use different "character encodings" to
+represent characters outside the ASCII character set, but out-of-the-box
+the Polars library only supports UTF8. Specifying `utf8-lossy` preserves as
+much information as possible, and any unrecognized characters will be replaced
+by "�". If this is not sufficient, you will need to preprocess your data to
+reencode it as UTF8.
 
-    def _make_margins_list(self, bin_names: Iterable[str], groups: Iterable[str]):
-        groups_str = ", ".join(f"'{g}'" for g in groups)
-        margins = (
-            [
-                f"""
+We suggest using `ignore_errors=True`. Runtime errors that depend on a single
+value would leak information and violate the DP guarantee,
+so it is safer to ignore them. That said, if a significant number of records
+are ignored because of errors, it will bias results.
+""",
+                CUSTOM_NOTE=self.note,
+            )
+            .finish(reformat=reformat)
+        )
+        return self._clean_up_py(code)
+
+    def _clean_up_py(self, py: str):
+        return py
+
+    def _make_margins_list(
+        self,
+        bin_names: Iterable[str],
+        groups: Iterable[str],
+        max_rows: int,
+    ):
+        import opendp.prelude as dp
+
+        def basic_template(GROUPS, MAX_ROWS):
             # "max_partition_length" should be a loose upper bound,
             # for example, the size of the total population being sampled.
-            # https://docs.opendp.org/en/stable/api/python/opendp.extras.polars.html#opendp.extras.polars.Margin.max_partition_length
+            # https://docs.opendp.org/en/OPENDP_V_VERSION/api/python/opendp.extras.polars.html#opendp.extras.polars.Margin.max_partition_length
             #
-            # In production, "max_num_partitions" should be set by considering the number
-            # of possible values for each grouping column, and taking their product.
-            dp.polars.Margin(by=[{groups_str}], public_info='keys', max_partition_length=1000000, max_num_partitions=100),
-            """  # noqa: B950 (too long!)
-            ]
-            + [
-                f"dp.polars.Margin(by=['{bin_name}', {groups_str}], "
-                "public_info='keys',),"
-                for bin_name in bin_names
-            ]
-        )
+            # In production, "max_groups" should be set by considering
+            # the number of possible values for each grouping column,
+            # and taking their product.
+            dp.polars.Margin(
+                by=list(GROUPS.keys()),
+                invariant="keys",
+                max_length=MAX_ROWS,
+                max_groups=100,
+            )
 
-        margins_list = "[" + "".join(margins) + "\n    ]"
+        def bin_template(GROUPS, BIN_NAME):
+            dp.polars.Margin(by=([BIN_NAME] + list(GROUPS.keys())), invariant="keys")
+
+        margins = [
+            Template(basic_template)
+            .fill_expressions(OPENDP_V_VERSION=f"v{opendp_version}")
+            .fill_values(GROUPS=groups, MAX_ROWS=max_rows)
+            .finish()
+        ] + [
+            Template(bin_template)
+            .fill_values(GROUPS=groups, BIN_NAME=bin_name)
+            .finish()
+            for bin_name in bin_names
+        ]
+
+        margins_list = "[" + ", ".join(margins) + "\n    ]"
         return margins_list
 
     @abstractmethod
@@ -90,92 +167,242 @@ class AbstractGenerator(ABC):
         return {
             name: make_column_config_block(
                 name=name,
-                analysis_type=col.analysis_type,
-                lower_bound=col.lower_bound,
-                upper_bound=col.upper_bound,
-                bin_count=col.bin_count,
+                statistic_name=col[0].statistic_name,
+                lower_bound=col[0].lower_bound,
+                upper_bound=col[0].upper_bound,
+                bin_count=col[0].bin_count,
             )
-            for name, col in self.columns.items()
+            for name, col in self.analysis_plan.columns.items()
         }
 
     def _make_confidence_note(self):
         return f"{int(confidence * 100)}% confidence interval"
 
-    def _make_queries(self):
+    def _make_stats_queries(self):
         to_return = [
             self._make_python_cell(
                 f"confidence = {confidence} # {self._make_confidence_note()}"
             )
         ]
-        for column_name in self.columns.keys():
+        for column_name in self.analysis_plan.columns.keys():
             to_return.append(self._make_query(column_name))
 
         return "\n".join(to_return)
 
     def _make_query(self, column_name):
-        plan = self.columns[column_name]
-        identifier = name_to_identifier(column_name)
+        plan = self.analysis_plan.columns[column_name]
+        identifier = ColumnIdentifier(column_name)
         accuracy_name = f"{identifier}_accuracy"
         stats_name = f"{identifier}_stats"
 
-        from dp_wizard.utils.code_generators.analyses import get_analysis_by_name
+        from dp_wizard.utils.code_generators.analyses import get_statistic_by_name
 
-        analysis = get_analysis_by_name(plan.analysis_type)
-        query = analysis.make_query(
+        statistic = get_statistic_by_name(plan[0].statistic_name)
+        query = statistic.make_query(
             code_gen=self,
             identifier=identifier,
             accuracy_name=accuracy_name,
             stats_name=stats_name,
         )
-        output = analysis.make_output(
+        output = statistic.make_output(
             code_gen=self,
             column_name=column_name,
             accuracy_name=accuracy_name,
             stats_name=stats_name,
         )
+        plot_note = statistic.make_plot_note()
 
         return (
             self._make_comment_cell(f"### Query for `{column_name}`:")
             + self._make_python_cell(query)
             + self._make_python_cell(output)
+            + (self._make_comment_cell(plot_note) if plot_note else "")
         )
 
-    def _make_partial_context(self):
-        weights = [column.weight for column in self.columns.values()]
+    def _make_weights_expression(self):
+        weights_dict = {
+            name: plans[0].weight for name, plans in self.analysis_plan.columns.items()
+        }
+        weights_message = (
+            "Allocate the privacy budget to your queries in this ratio:"
+            if len(weights_dict) > 1
+            else "With only one query, the entire budget is allocated to that query:"
+        )
+        weights_gcd = gcd(*(weights_dict.values()))
+        return (
+            f"[ # {weights_message}\n"
+            + "".join(
+                f"{weight//weights_gcd}, # {name}\n"
+                for name, weight in weights_dict.items()
+            )
+            + "]"
+        )
 
-        from dp_wizard.utils.code_generators.analyses import get_analysis_by_name
+    def _make_partial_stats_context(self):
+
+        from dp_wizard.utils.code_generators.analyses import (
+            get_statistic_by_name,
+            has_bins,
+        )
 
         bin_column_names = [
-            name_to_identifier(name)
-            for name, plan in self.columns.items()
-            if get_analysis_by_name(plan.analysis_type).has_bins()
+            ColumnIdentifier(name)
+            for name, plan in self.analysis_plan.columns.items()
+            if has_bins(get_statistic_by_name(plan[0].statistic_name))
         ]
 
-        privacy_unit_block = make_privacy_unit_block(self.contributions)
-        privacy_loss_block = make_privacy_loss_block(self.epsilon)
+        privacy_unit_block = make_privacy_unit_block(
+            contributions=self.analysis_plan.contributions,
+            contributions_entity=self.analysis_plan.contributions_entity,
+        )
+        privacy_loss_block = make_privacy_loss_block(
+            pure=False,
+            epsilon=self.analysis_plan.epsilon,
+            max_rows=self.analysis_plan.max_rows,
+        )
 
-        margins_list = self._make_margins_list(
-            [f"{name}_bin" for name in bin_column_names],
-            self.groups,
+        is_just_histograms = all(
+            plan_column[0].statistic_name == histogram.name
+            for plan_column in self.analysis_plan.columns.values()
+        )
+        margins_list = (
+            # Histograms don't need margins.
+            "[]"
+            if is_just_histograms
+            else self._make_margins_list(
+                bin_names=[f"{name}_bin" for name in bin_column_names],
+                groups=self.analysis_plan.groups,
+                max_rows=self.analysis_plan.max_rows,
+            )
         )
         extra_columns = ", ".join(
             [
-                f"{name_to_identifier(name)}_bin_expr"
-                for name, plan in self.columns.items()
-                if get_analysis_by_name(plan.analysis_type).has_bins()
+                f"{ColumnIdentifier(name)}_bin_expr"
+                for name, plan in self.analysis_plan.columns.items()
+                if has_bins(get_statistic_by_name(plan[0].statistic_name))
             ]
         )
         return (
-            Template("context", __file__)
+            Template("stats_context", template_root)
             .fill_expressions(
                 MARGINS_LIST=margins_list,
                 EXTRA_COLUMNS=extra_columns,
+                OPENDP_V_VERSION=f"v{opendp_version}",
+                WEIGHTS=self._make_weights_expression(),
             )
-            .fill_values(
-                WEIGHTS=weights,
-            )
-            .fill_blocks(
+            .fill_code_blocks(
                 PRIVACY_UNIT_BLOCK=privacy_unit_block,
                 PRIVACY_LOSS_BLOCK=privacy_loss_block,
             )
+        )
+
+    def _make_partial_synth_context(self):
+        privacy_unit_block = make_privacy_unit_block(
+            contributions=self.analysis_plan.contributions,
+            contributions_entity=self.analysis_plan.contributions_entity,
+        )
+        privacy_loss_block = make_privacy_loss_block(
+            pure=True,
+            epsilon=self.analysis_plan.epsilon,
+            max_rows=self.analysis_plan.max_rows,
+        )
+        return (
+            Template("synth_context", template_root)
+            .fill_expressions(
+                OPENDP_V_VERSION=f"v{opendp_version}",
+            )
+            .fill_code_blocks(
+                PRIVACY_UNIT_BLOCK=privacy_unit_block,
+                PRIVACY_LOSS_BLOCK=privacy_loss_block,
+            )
+        )
+
+    def _make_synth_query(self):
+        def template(synth_context, COLUMNS, CUTS, plot_bars, KEYS):
+            synth_query = (
+                synth_context.query()
+                .select(*COLUMNS)
+                .contingency_table(
+                    # Numeric columns will generally require cut points,
+                    # unless they contain only a few distinct values.
+                    cuts=CUTS,
+                    # If you know the possible values for particular columns,
+                    # supply them here for better results:
+                    keys=KEYS,
+                )
+            )
+            contingency_table = synth_query.release()
+
+            # Calling
+            # [`project_melted()`](https://docs.opendp.org/en/OPENDP_V_VERSION/api/python/opendp.extras.mbi.html#opendp.extras.mbi.ContingencyTable.project_melted)
+            # returns a dataframe with one row per combination of values.
+            # We'll first check the number of possible rows,
+            # to make sure it's not too large:
+
+            # +
+            from math import prod
+
+            possible_rows = prod([len(v) for v in contingency_table.keys.values()])
+            max_rows = 100_000
+            if possible_rows < max_rows:
+                contingency_table_melted = contingency_table.project_melted(COLUMNS)
+                if possible_rows < 200:
+                    plot_bars(contingency_table_melted, "Contingency Table")
+            else:
+                contingency_table_melted = (
+                    f"Contingency table could be more than {max_rows} rows; "
+                    "Consider querying for just the information you need."
+                )
+            contingency_table_melted  # pyright: ignore[reportUnusedExpression]
+            # -
+
+            # Finally, a contingency table can also be used
+            # to create synthetic data by calling
+            # [`synthesize()`](https://docs.opendp.org/en/OPENDP_V_VERSION/api/python/opendp.extras.mbi.html#opendp.extras.mbi.ContingencyTable.synthesize).
+            # (There may be warnings from upstream libraries
+            # which we can ignore for now.)
+
+            # +
+            import warnings
+
+            with warnings.catch_warnings():
+                warnings.simplefilter(action="ignore", category=FutureWarning)
+                synthetic_data = contingency_table.synthesize()
+            synthetic_data  # pyright: ignore[reportUnusedExpression]
+            # -
+
+        # The make_cut_points() call could be moved into generated code,
+        # but that would require more complex templating,
+        # and more reliance on helper functions.
+        cuts = {
+            k: sorted(
+                {
+                    # TODO: Error if float cut points are used with integer data.
+                    # Is an upstream fix possible?
+                    # (Sort the set because we might get int collisions,
+                    # and repeated cut points are also an error.)
+                    int(x)
+                    for x in make_cut_points(
+                        lower_bound=int(v[0].lower_bound),
+                        upper_bound=int(v[0].upper_bound),
+                        # bin_count is not set for mean: default to 10.
+                        bin_count=v[0].bin_count or 10,
+                    )
+                }
+            )
+            for (k, v) in self.analysis_plan.columns.items()
+        }
+        keys = self.analysis_plan.groups
+        return (
+            Template(template)
+            .fill_expressions(
+                OPENDP_V_VERSION=f"v{opendp_version}",
+            )
+            .fill_values(
+                COLUMNS=list(self.analysis_plan.columns.keys())
+                + list(self.analysis_plan.groups.keys()),
+                CUTS=cuts,
+                KEYS=keys,
+            )
+            .finish()
         )

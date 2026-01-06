@@ -1,6 +1,9 @@
 from typing import NamedTuple
+
 import polars as pl
-from scipy.stats import norm
+from numpy import float64
+from numpy.typing import NDArray
+from scipy.stats import norm  # type: ignore
 
 
 class ColumnDef(NamedTuple):
@@ -8,7 +11,7 @@ class ColumnDef(NamedTuple):
     upper_bound: float
 
 
-def mock_data(column_defs: dict[str, ColumnDef], row_count: int = 1000):
+def mock_data(column_defs: dict[str, ColumnDef], row_count: int = 1000) -> pl.DataFrame:
     """
     Return values from the inverse CDF of a normal distribution,
     so in the preview the only noise is from DP,
@@ -33,12 +36,14 @@ def mock_data(column_defs: dict[str, ColumnDef], row_count: int = 1000):
     10.0
     """
     schema = {column_name: float for column_name in column_defs.keys()}
-    data = {column_name: [] for column_name in column_defs.keys()}
+    data: dict[str, list[NDArray[float64]]] = {
+        column_name: [] for column_name in column_defs.keys()
+    }
 
     quantile_width = 95 / 100
     for column_name, column_def in column_defs.items():
-        lower_ppf = norm.ppf((1 - quantile_width) / 2)
-        upper_ppf = norm.ppf(1 - (1 - quantile_width) / 2)
+        lower_ppf = norm.ppf((1 - quantile_width) / 2)  # type: ignore
+        upper_ppf = norm.ppf(1 - (1 - quantile_width) / 2)  # type: ignore
         lower_bound = column_def.lower_bound
         upper_bound = column_def.upper_bound
         slope = (upper_bound - lower_bound) / (upper_ppf - lower_ppf)
@@ -49,7 +54,7 @@ def mock_data(column_defs: dict[str, ColumnDef], row_count: int = 1000):
         # (-inf, 0] bin.
         for i in range(1, row_count + 1):
             quantile = (quantile_width * i / (row_count)) + (1 - quantile_width) / 2
-            ppf = norm.ppf(quantile)
+            ppf = norm.ppf(quantile)  # type: ignore
             value = slope * ppf + intercept
             data[column_name].append(value)
     return pl.DataFrame(data=data, schema=schema)

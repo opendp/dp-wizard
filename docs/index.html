@@ -1,0 +1,1011 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title>Introduction to differential privacy with OpenDP and DP Wizard</title>
+  <style type="text/css">
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" type="text/css" media="screen, projection, print"
+    href="https://www.w3.org/Talks/Tools/Slidy2/styles/slidy.css" />
+  <script src="https://www.w3.org/Talks/Tools/Slidy2/scripts/slidy.js"
+    charset="utf-8" type="text/javascript"></script>
+</head>
+<body>
+<style>
+td {
+    vertical-align: top;
+}
+</style>
+
+<div class="background" style="float: right;">
+    <img src="images/opendp-logo-scaled.png" style="padding: 0.5em;">
+</div>
+<div class="slide titlepage">
+  <h1 class="title">Introduction to differential privacy with OpenDP and
+DP Wizard</h1>
+</div>
+<div id="outline" class="slide section level2">
+<h1>Outline</h1>
+<table>
+<tr>
+<td>
+<h3
+id="introduction-to-differential-privacy-with-opendp-and-dp-wizard">Introduction
+to differential privacy with OpenDP and DP Wizard</h3>
+<p>These slides: <code>https://opendp.github.io/dp-wizard</code></p>
+<p>(“✋” = class participation!)</p>
+</td>
+<td>
+<!-- Linking by ID overrides the slideshow JS, but only works in a new window. -->
+<ul>
+<li><a target="_blank" href="#class-grades-problem">Class grades
+problem</a></li>
+<li><a target="_blank" href="#lets-do-differential-privacy">Let’s do
+differential privacy! ✋</a></li>
+<li><a target="_blank" href="#what-does-this-mean-1">Interpretation of
+DP results ✋</a></li>
+<li><a target="_blank" href="#privacy-budgets-and-epsilon">Privacy
+budgets and epsilon ✋</a></li>
+<li><a target="_blank" href="#dp-wizard-preview-select-dataset">DP
+Wizard demo ✋</a></li>
+<li><a target="_blank" href="#introduction-to-the-opendp-library">Walk
+through OpenDP notebook</a></li>
+<li><a target="_blank" href="#what-else-can-we-do-with-dp">Wider
+view</a></li>
+</ul>
+</td>
+</tr>
+</table>
+<!--
+
+## Who should care about privacy?
+
+And what is my background?
+
+### Harvard Herbaria (2013-2014)
+
+Rare plants might only be known to grow in one location.
+What geographic information can be public without giving too much detail to poachers?
+
+### Gehlenborg Lab at HMS (DBMI) (2016-2022)
+
+Medical knowledge advances by generalizing from unique stories.
+How can we respect the privacy of individuals while still supporting research?
+Can labs without access to the original data still reproduce results?
+
+### OpenDP Team at SEAS (2023-present)
+
+Why I'm here!
+
+### Old North Church (2023-present)
+
+Debates about taxation and representation were central to the revolution! Taxes and the apportionment of representatives depend on personal information, information that people may be reluctant to volunteer.
+
+-->
+</div>
+<div id="class-grades-problem" class="slide section level2">
+<h1>Class grades problem</h1>
+<p>I’m in a class of 40 people, and the class average at midterm is 90.
+I drop the class, and the teacher announces the average is now 91. Can
+the other students figure out my grade?</p>
+</div>
+<div id="class-grades-solution" class="slide section level2">
+<h1>Class grades solution</h1>
+<p>I’m in a class of 40 people, and the class average at midterm is 90.
+I drop the class, and the teacher announces the average is now 91. Can
+the other students figure out my grade?</p>
+<p><strong>Yes!</strong></p>
+<pre><code>&gt;&gt;&gt; class_size = 40
+&gt;&gt;&gt; mean_with_me = 90.0
+&gt;&gt;&gt; mean_without_me = 91.0
+
+&gt;&gt;&gt; # total_without_me / (class_size - 1) = mean_without_me
+&gt;&gt;&gt; total_without_me = (class_size - 1) * mean_without_me
+&gt;&gt;&gt; total_without_me
+3549.0
+
+&gt;&gt;&gt; # (me + total_without_me) / class_size = mean_with_me
+&gt;&gt;&gt; me = mean_with_me * class_size - total_without_me
+&gt;&gt;&gt; me
+51.0
+</code></pre>
+<p>This “solution” is a problem! What could the teacher have done
+instead?</p>
+<p><em>Differential privacy</em> suggests adding calibrated noise before
+releasing statistics.</p>
+</div>
+<div id="class-grades-solution-problem-solution-problems"
+class="slide section level2">
+<h1>Class grades solution problem solution problems!</h1>
+<p>Ok, but what does “adding calibrated noise” even mean?</p>
+<ul>
+<li>What probability distribution?
+<ul>
+<li>Typically Laplace or Gaussian</li>
+<li>Hopefully this is handled for you by a library!</li>
+</ul></li>
+<li>How is it calibrated?
+<ul>
+<li>With math!</li>
+<li>There’s a tradeoff between accuracy and privacy.</li>
+<li>The right balance will depend on context.</li>
+</ul></li>
+<li>What if there is another release (perhaps before the exam)?
+<ul>
+<li>We need to set a privacy budget and allocate it among queries.</li>
+<li>Reuse information you already have to conserve your budget.</li>
+</ul></li>
+</ul>
+</div>
+<div id="whats-differential-about-differential-privacy"
+class="slide section level2">
+<h1>What’s “differential” about differential privacy?</h1>
+<table>
+<tr>
+<td>
+<p>An algorithm is differentially private if by looking at the output,
+you can’t tell whether any individual’s data was included in the
+original dataset or not.</p>
+<p>Or: The behavior of the algorithm hardly changes when a single
+individual joins or leaves the dataset.</p>
+<p><img src="images/differential.drawio.svg" /></p>
+<p>We need to bound the contributions of individuals: For grades, that
+is easy, but it isn’t always!</p>
+</td>
+<td>
+<!-- Pr[A(D1) in S] / Pr[A(D2) in S] <= e^epsilon ... OBVIOUSLY. -->
+<p><img src="images/ted-rall-p74-cc-by-nc-nd.jpg" /></p>
+<p>By Ted Rall (CC-BY-NC-ND). In <a
+href="https://mitpress.mit.edu/9780262551656/differential-privacy/"><em>Differential
+Privacy</em> by Simson L. Garfinkel from MIT Press</a></p>
+</td>
+</tr>
+</table>
+</div>
+<div id="randomized-response" class="slide section level2">
+<h1>Randomized response ✋</h1>
+<p>Ideas that we now identify as “DP” were in use before the term was
+coined: <a href="https://www.jstor.org/stable/2283137">Stanley L.
+Warner: “Randomized Response: A Survey Technique for Eliminating Evasive
+Answer Bias” (1965)</a></p>
+<p>Here’s a question I might not feel comfortable answering
+honestly:</p>
+<blockquote>
+<p>Are you here mostly for the free food?</p>
+</blockquote>
+<ul>
+<li>Decide on your answer.</li>
+<li>Then flip a coin.</li>
+<li>If it’s tails, flip once more.</li>
+<li>Use this table for your public response (either “A” or “B”):</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>final:</th>
+<th>heads (either flip)</th>
+<th>tails (just last flip)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>yes</strong></td>
+<td>A</td>
+<td>B</td>
+</tr>
+<tr>
+<td><strong>no</strong></td>
+<td>B</td>
+<td>A</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>And let’s count the “A”s and “B”s.</li>
+</ul>
+</div>
+<div id="lets-do-differential-privacy" class="slide section level2">
+<h1>Let’s do differential privacy!</h1>
+<p>What does it look like in the limit?</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>heads</th>
+<th>tails</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>yes</strong></td>
+<td>3/4 are A</td>
+<td>1/4 are B</td>
+</tr>
+<tr>
+<td><strong>no</strong></td>
+<td>3/4 are B</td>
+<td>1/4 are A</td>
+</tr>
+</tbody>
+</table>
+<p>Given the percentage “A”, solve for percentage “Yes”.</p>
+<pre><code>A% = 3/4 * Yes% + 1/4 * No%
+A% = 3/4 * Yes% + 1/4 * (1 - Yes%)
+A% = 1/2 * Yes% + 1/4
+2 * (A% - 1/4) = Yes%</code></pre>
+<table>
+<thead>
+<tr>
+<th>A%</th>
+<th>Yes%</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>25%</td>
+<td>0%</td>
+<td></td>
+</tr>
+<tr>
+<td>50%</td>
+<td>50%</td>
+<td>👉 These are noisy estimates!</td>
+</tr>
+<tr>
+<td>75%</td>
+<td>100%</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="hold-on-we-could-get-a-negative-number-back"
+class="slide section level2">
+<h1>Hold on… We could get a negative number back?!</h1>
+<table>
+<tr>
+<td>
+<table>
+<thead>
+<tr>
+<th>A%</th>
+<th>Yes%</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0%</td>
+<td>-50%</td>
+</tr>
+<tr>
+<td>25%</td>
+<td>0%</td>
+</tr>
+<tr>
+<td>50%</td>
+<td>50%</td>
+</tr>
+<tr>
+<td>75%</td>
+<td>100%</td>
+</tr>
+<tr>
+<td>100%</td>
+<td>150%</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td>
+<h3 id="what-does-this-mean">(1) What does this mean?</h3>
+<h3 id="how-do-we-explain-it-to-users">(2) How do we explain it to
+users?</h3>
+<h3 id="how-can-we-make-it-more-accurate">(3) How can we make it more
+accurate?</h3>
+</td>
+</tr>
+</table>
+</div>
+<div id="what-does-this-mean-1" class="slide section level2">
+<h1>(1) What does this mean?</h1>
+<table>
+<tr>
+<td>
+<table>
+<thead>
+<tr>
+<th>A%</th>
+<th>Yes%</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0%</td>
+<td>-50%</td>
+</tr>
+<tr>
+<td>25%</td>
+<td>0%</td>
+</tr>
+<tr>
+<td>50%</td>
+<td>50%</td>
+</tr>
+<tr>
+<td>75%</td>
+<td>100%</td>
+</tr>
+<tr>
+<td>100%</td>
+<td>150%</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td>
+<h3 id="this-is-one-draw-from-a-random-distribution.">This is one draw
+from a random distribution.</h3>
+<!-- If the true value is 0, we could still draw a value here or here! -->
+<p><img src="images/distribution.drawio.svg" /></p>
+<h3
+id="if-we-combine-this-number-with-others-negative-values-produce-more-accurate-results.">If
+we combine this number with others, negative values produce more
+accurate results.</h3>
+<p>Imagine all the sessions make their own DP estimate: If we clipped
+each value at zero, the mean will be biased.</p>
+</td>
+</tr>
+</table>
+</div>
+<div id="how-do-we-explain-it-to-users-1" class="slide section level2">
+<h1>(2) How do we explain it to users? ✋</h1>
+<table>
+<tr>
+<td>
+<table>
+<thead>
+<tr>
+<th>A%</th>
+<th>Yes%</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0%</td>
+<td>-50%</td>
+</tr>
+<tr>
+<td>25%</td>
+<td>0%</td>
+</tr>
+<tr>
+<td>50%</td>
+<td>50%</td>
+</tr>
+<tr>
+<td>75%</td>
+<td>100%</td>
+</tr>
+<tr>
+<td>100%</td>
+<td>150%</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td>
+<h3 id="this-is-hard">This is hard!</h3>
+<p><a
+href="https://www.bloomberg.com/news/articles/2021-08-12/data-scientists-ask-can-we-trust-the-2020-census">Bloomberg,
+August 12, 2021: “Data Scientists Square Off Over Trust and Privacy in
+2020 Census”</a></p>
+<blockquote>
+<p>New York’s Liberty Island, population 0, has emerged as the unlikely
+center of a tug-of-war over the U.S census.</p>
+<p>Aside from the Statue of Liberty, no one’s called the island home
+since 2012, when the former superintendent’s home was destroyed by
+Hurricane Sandy, leaving Liberty Island unoccupied for the first time in
+hundreds of years.</p>
+<p>Quasi-officially, though, the current population for the 12-acre
+island stands at 48.</p>
+</blockquote>
+<h3 id="exercise">Exercise ✋:</h3>
+<ul>
+<li>Pair up, and in your own words explain our here-for-the-free-lunch
+stat.</li>
+<li>Brainstorm how could we make it more accurate.</li>
+</ul>
+</td>
+</tr>
+</table>
+</div>
+<div id="how-can-we-make-it-more-accurate-1"
+class="slide section level2">
+<h1>(3) How can we make it more accurate?</h1>
+<table>
+<tr>
+<td>
+<table>
+<thead>
+<tr>
+<th>A%</th>
+<th>Yes%</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0%</td>
+<td>-50%</td>
+</tr>
+<tr>
+<td>25%</td>
+<td>0%</td>
+</tr>
+<tr>
+<td>50%</td>
+<td>50%</td>
+</tr>
+<tr>
+<td>75%</td>
+<td>100%</td>
+</tr>
+<tr>
+<td>100%</td>
+<td>150%</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td>
+<ul>
+<li>Recruit more study participants.
+<ul>
+<li>May not be an option.</li>
+<li>But, sampling itself is a source of randomness: “privacy
+amplification”</li>
+</ul></li>
+<li>Instead of having every person randomize their response, we could
+collect all the data, and then only apply noise once.
+<ul>
+<li>This is changing the model, from <strong>local</strong> to
+<strong>central</strong> DP.</li>
+</ul></li>
+</ul>
+<table>
+<tr>
+<td>
+<p>Who do we trust?</p>
+</td>
+<td>
+<table>
+<thead>
+<tr>
+<th>Individuals</th>
+<th>Authority</th>
+<th>Public</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>✓</td>
+<td></td>
+<td></td>
+<td>Local DP</td>
+</tr>
+<tr>
+<td>✓</td>
+<td>✓</td>
+<td></td>
+<td>Central DP</td>
+</tr>
+<tr>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>No DP!</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</table>
+<ul>
+<li>Instead of using a fair coin, we could randomize the response less
+than 50% of the time.
+<ul>
+<li>We’re changing the trade-off between privacy and accuracy, the
+“Privacy Budget”.</li>
+</ul></li>
+</ul>
+</td>
+</tr>
+</table>
+</div>
+<div id="privacy-budgets-and-epsilon" class="slide section level2">
+<h1>Privacy budgets and epsilon</h1>
+<table>
+<tr>
+<td>
+<!-- Pr[A(D1) in S] / Pr[A(D2) in S] <= e^epsilon ... OBVIOUSLY. -->
+<p><img src="images/ted-rall-p74-cc-by-nc-nd.jpg" /></p>
+<p>odds ratio ≤ e<sup>ε</sub></p>
+<p><i>log</i>(odds ratio) ≤ ε</p>
+</td>
+<td>
+<ul>
+<li>ε is on a log scale, and smaller values are safer.</li>
+<li>If two calculations consume ε<sub>1</sub> and ε<sub>2</sub>,
+together they consume ε<sub>1</sub> + ε<sub>2</sub>.</li>
+<li>ε is proven worst case bound: Research is tightening the bounds on
+existing mechanisms, and developing new mechanisms which are more
+efficient.</li>
+<li>The “right” value of ε in a given situation is social question.</li>
+<li>We can use the <a
+href="https://registry.opendp.org/deployments-registry/">Privacy
+Deployments Registry</a> to see what other people have used.</li>
+</ul>
+</td>
+</tr>
+</table>
+</div>
+<div id="privacy-deployments-registry-and-a-discussion"
+class="slide section level2">
+<h1>Privacy Deployments Registry, and a discussion ✋</h1>
+<p>A sample from <a
+href="https://registry.opendp.org/deployments-registry/"><code>registry.opendp.org</code></a>:</p>
+<table>
+<colgroup>
+<col width="43%" />
+<col width="28%" />
+<col width="28%" />
+</colgroup>
+<thead>
+<tr>
+<th>Organization</th>
+<th>Epsilon</th>
+<th>Context</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Microsoft</td>
+<td>0.1</td>
+<td><a href="https://arxiv.org/pdf/2103.14035">Broadband Coverage
+Estimates</a></td>
+</tr>
+<tr>
+<td>Wikimedia Foundation</td>
+<td>1.0</td>
+<td><a href="https://arxiv.org/abs/2308.16298">Wikipedia Usage
+Data</a></td>
+</tr>
+<tr>
+<td>US Census</td>
+<td>19.61</td>
+<td><a
+href="https://www.census.gov/newsroom/press-releases/2021/2020-census-key-parameters.html">Disclosure
+Avoidance System for Redistricting Data</a></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Five minute discussion ✋:</strong> Break into groups
+and…</p>
+<ul>
+<li>Give examples of private data with public applications, ideally
+something from your own experience.</li>
+<li>Pick one of these and identify who would be interested in more
+accurate statistics, and who would prefer more privacy.</li>
+<li>Finally, how can these two competing interests be represented? Does
+everyone have a seat at the table?</li>
+</ul>
+</div>
+<div id="dp-wizard-preview-select-dataset" class="slide section level2">
+<h1>DP Wizard preview: Select Dataset</h1>
+<p><img src="screenshots/select-dataset.png" /></p>
+</div>
+<div id="dp-wizard-preview-define-analysis"
+class="slide section level2">
+<h1>DP Wizard preview: Define Analysis</h1>
+<p><img src="screenshots/define-analysis.png" /></p>
+</div>
+<div id="dp-wizard-preview-download-results"
+class="slide section level2">
+<h1>DP Wizard preview: Download Results</h1>
+<p><img src="screenshots/download-results.png" /></p>
+</div>
+<div id="return-to-the-class-grades-example"
+class="slide section level2">
+<h1>Return to the class grades example ✋</h1>
+<table>
+<tr>
+<td>
+<p>Divide into four teams, and on one computer either:</p>
+<table>
+<tr>
+<td>
+<p><strong><a
+href="https://pypi.org/project/dp_wizard/"><code>pip install 'dp_wizard[app]'</code></a><br><code>dp_wizard --cloud</code><br><small>(requires
+Python&gt;=3.10)</small></strong></p>
+</td>
+<td>
+<p><strong>… or go to: <a
+href="https://mccalluc-dp-wizard.share.connect.posit.cloud/"><code>tinyurl.com/dp-wizard</code></a></strong></p>
+</td>
+</tr>
+</table>
+</td>
+<td>
+<p><img src="images/dp-wizard-cloud-qr-code.png" /></p>
+</td>
+</tr>
+</table>
+<p>Then:</p>
+<table>
+<tr>
+<td>
+<ul>
+<li>1: On “Select Dataset”:
+<ul>
+<li>Under “CSV Columns”, enter <code>grade</code>.</li>
+<li>Leave the “Unit of Privacy” at 1.</li>
+<li>Click “Define Analysis”.</li>
+</ul></li>
+</ul>
+</td>
+<td>
+<ul>
+<li>2: On “Define Analysis”:
+<ul>
+<li>Select <code>grade</code> in “Columns”.</li>
+<li>Leave “Group By” empty.</li>
+<li>Leave “Privacy Budget” at 1, and “Number of Rows” at 100.</li>
+</ul></li>
+<li>3: On the histogram:
+<ul>
+<li>Change the upper bound to 100.</li>
+</ul></li>
+</ul>
+</td>
+</tr>
+</table>
+</div>
+<div id="dp-wizard-experiments" class="slide section level2">
+<h1>DP Wizard experiments</h1>
+<p>For 5 minutes, experiment with one parameter, and then pick someone
+to summarize the result of your changes on the <em>accuracy</em> of the
+DP statistics.</p>
+<table>
+<tr>
+<td>
+<p><strong>Team A:</strong> Imagine that rather than protecting the
+privacy of individual students, we’re interested in the privacy of
+student groups. What do we need to know, and what would we change?</p>
+<p><strong>Team B:</strong> Imagine we were just interested in pass/fail
+instead of letter grades. What can we change?</p>
+</td>
+<td>
+<p><strong>Team C:</strong> Given what we know about the typical
+distribution of grades, is there something we can change to use our
+privacy budget more efficiently?</p>
+<p><strong>Team D:</strong> How does accuracy change if we collect the
+same statistic across the entire school with a population of 1000,
+instead of a class of 100?</p>
+</td>
+</tr>
+</table>
+</div>
+<div id="generating-opendp-library-code-with-dp-wizard"
+class="slide section level2">
+<h1>Generating OpenDP Library code with DP Wizard</h1>
+<p>The preview visualization uses the OpenDP Library under the hood, but
+we can also generate OpenDP code.</p>
+<ul>
+<li>Click on “Download Results”</li>
+<li>Then click on “Download HTML”</li>
+</ul>
+<p>We’re going to walk though this notebook.</p>
+</div>
+<div id="introduction-to-the-opendp-library"
+class="slide section level2">
+<h1>Introduction to the OpenDP library</h1>
+<h3 id="opendp-demo">OpenDP Demo</h3>
+<p>This is a demonstration of how the OpenDP Library can be used to
+create a differentially private release. To learn more about what’s
+going on here, see the documentation for OpenDP:
+https://docs.opendp.org/</p>
+<h4 id="prerequisites">Prerequisites</h4>
+<p>First install and import the required dependencies:</p>
+<pre><code>%pip install &#39;opendp[polars]==0.14.1&#39; matplotlib</code></pre>
+<pre><code>&gt;&gt;&gt; import matplotlib.pyplot as plt
+&gt;&gt;&gt; import opendp.prelude as dp
+&gt;&gt;&gt; import polars as pl
+&gt;&gt;&gt;
+&gt;&gt;&gt; # The OpenDP team is working to vet the core algorithms.
+&gt;&gt;&gt; # Until that is complete we need to opt-in to use these features.
+&gt;&gt;&gt; dp.enable_features(&quot;contrib&quot;)
+</code></pre>
+</div>
+<div id="utility-functions" class="slide section level2">
+<h1>Utility functions</h1>
+<p>Then define some utility functions to handle dataframes and plot
+results:</p>
+<pre><code>&gt;&gt;&gt; # These functions are used both in the application
+&gt;&gt;&gt; # and in generated notebooks.
+&gt;&gt;&gt;
+&gt;&gt;&gt; def round_2(number) -&gt; float:
+...     return float(f&quot;{number:.2g}&quot;)
+&gt;&gt;&gt;
+&gt;&gt;&gt; def make_cut_points(
+...     lower_bound: float, upper_bound: float, bin_count: int
+... ) -&gt; list[float]:
+...     bin_width = (upper_bound - lower_bound) / bin_count
+...     return sorted({round_2(lower_bound + i * bin_width) for i in range(bin_count + 1)})
+</code></pre>
+</div>
+<div id="analysis" class="slide section level2">
+<h1>Analysis</h1>
+<p>Based on the input you provided, for each column we’ll create a
+Polars expression that describes how we want to summarize that
+column.</p>
+<h3 id="expression-for-grade">Expression for <code>grade</code></h3>
+<pre><code>&gt;&gt;&gt; # See the OpenDP Library docs for more on making private histograms:
+&gt;&gt;&gt; # https://docs.opendp.org/en/v0.14.1/getting-started/examples/histograms.html
+&gt;&gt;&gt;
+&gt;&gt;&gt; # Use the public information to make cut points for &#39;grade&#39;:
+&gt;&gt;&gt; grade_cut_points = make_cut_points(
+...     lower_bound=0.0,
+...     upper_bound=100.0,
+...     bin_count=10,
+... )
+&gt;&gt;&gt;
+&gt;&gt;&gt; # Use these cut points to add a new binned column to the table:
+&gt;&gt;&gt; grade_bin_expr = (
+...     pl.col(&quot;grade&quot;)
+...     .cut(grade_cut_points)  # Use &quot;left_closed=True&quot; to switch endpoint inclusion.
+...     .alias(&quot;grade_bin&quot;)  # Give the new column a name.
+...     .cast(pl.String)
+... )
+</code></pre>
+</div>
+<div id="context" class="slide section level2">
+<h1>Context</h1>
+<p>Next, we’ll define our Context. This is where we set the privacy
+budget, and set the weight for each query under that overall budget.</p>
+<pre><code>&gt;&gt;&gt; contributions = 1
+&gt;&gt;&gt; privacy_unit = dp.unit_of(contributions=contributions)
+&gt;&gt;&gt;
+&gt;&gt;&gt; privacy_loss = dp.loss_of(
+...     epsilon=1.0,
+...     delta=1 / max(1e7, 100000),
+... )
+&gt;&gt;&gt;
+&gt;&gt;&gt; # See the OpenDP Library docs for more on Context:
+&gt;&gt;&gt; # https://docs.opendp.org/en/v0.14.1/api/user-guide/context/index.html#context
+&gt;&gt;&gt; stats_context = dp.Context.compositor(
+...     data=pl.scan_csv(
+...         &quot;docs/fill-in-correct-path.csv&quot;,
+...         encoding=&quot;utf8-lossy&quot;,
+...         ignore_errors=True,
+...     ).with_columns(grade_bin_expr),
+...     privacy_unit=privacy_unit,
+...     privacy_loss=privacy_loss,
+...     split_by_weights=[  # With only one query, the entire budget is allocated to that query:
+...         1,  # grade
+...     ],
+...     margins=[],
+... )
+</code></pre>
+</div>
+<div id="results" class="slide section level2">
+<h1>Results</h1>
+<p>Finally, we run the queries and plot the results.</p>
+<pre><code>&gt;&gt;&gt; confidence = 0.95  # 95% confidence interval
+</code></pre>
+<p>Query for grade:</p>
+<pre><code>&gt;&gt;&gt; groups = [&quot;grade_bin&quot;] + []
+&gt;&gt;&gt; grade_query = (
+...     stats_context.query().group_by(groups).agg(pl.len().dp.noise().alias(&quot;count&quot;))
+... )
+&gt;&gt;&gt; grade_accuracy = grade_query.summarize(alpha=1 - confidence)[&quot;accuracy&quot;].item()
+&gt;&gt;&gt; grade_stats = grade_query.release().collect()
+</code></pre>
+<p>If we try to run more queries at this point, it will error. Once the
+privacy budget is consumed, the library prevents you from running more
+queries with that Queryable.</p>
+</div>
+<div id="opendp-architecture" class="slide section level2">
+<h1>OpenDP architecture</h1>
+<p><img src="images/stack.drawio.svg" /></p>
+<ul>
+<li>Solid implementations of algorithms; component architecture that
+ensures correctness… but it does have a learning curve.</li>
+<li>OpenDP is designed to support multiple languages, but Python is the
+most well developed.</li>
+<li>It is being used in the real-world!</li>
+</ul>
+</div>
+<div id="what-else-can-we-do-with-dp" class="slide section level2">
+<h1>What else can we do with DP?</h1>
+<table>
+<tr>
+<td>
+<h3 id="with-dp-wizard">With DP Wizard</h3>
+<ul>
+<li>Grouping</li>
+<li>Means</li>
+<li>Medians</li>
+<li>Synthetic Data</li>
+</ul>
+</td>
+<td>
+<h3 id="with-opendp">With OpenDP</h3>
+<ul>
+<li>(<a
+href="https://docs.opendp.org/en/v0.14.1/api/user-guide/transformations/aggregation-quantile.html">Quantiles</a>)</li>
+<li>(<a
+href="https://docs.opendp.org/en/v0.14.1/getting-started/statistical-modeling/pca.html">PCA</a>)</li>
+<li>(<a
+href="https://docs.opendp.org/en/v0.14.1/api/python/opendp.measurements.html#opendp.measurements.make_randomized_response_bitvec">RAPPOR</a>)</li>
+<li>(<a
+href="https://docs.opendp.org/en/v0.14.1/api/python/opendp.extras.sklearn.linear_model.html">Linear
+regression</a>)</li>
+</ul>
+</td>
+<td>
+<h3 id="other-libraries">Other libraries</h3>
+<ul>
+<li>Stochastic gradient descent</li>
+<li>SQL interfaces</li>
+</ul>
+</td>
+</tr>
+</table>
+</div>
+<div id="dp-tradeoffs" class="slide section level2">
+<h1>DP tradeoffs</h1>
+<h3 id="less-accurate-stats">Less accurate stats</h3>
+<p>What is the alternative? If people believe their privacy has not been
+protected, then they may be less willing to participate in the
+future.</p>
+<p>Other anonymization and grouping techniques are more fragile, and
+might introduce biases that are less well chacterized.</p>
+<h3 id="less-flexible-workflow">Less flexible workflow</h3>
+<p>If you let yourself be too flexible, there’s a risk of p-hacking. The
+methodology that DP imposes is similar to what we should be doing in any
+case if we want our research to be reproducible.</p>
+<p><small>(But there is work adapting DP for exploratory analysis: <a
+href="https://arxiv.org/abs/2406.01964"><em>Measure-Observe-Remeasure</em></a>.)</small></p>
+</div>
+<div id="dp-limits" class="slide section level2">
+<h1>DP limits</h1>
+<h3 id="requires-bounds-on-sensitivity">Requires bounds on
+sensitivity</h3>
+<p>For stats like income, try histograms or quantiles with varying step
+sizes?</p>
+<p>Multi-step workflows: Spend a little of your budget first, just to
+understand distributions.</p>
+<h3 id="cant-anonymize-arbitrary-data">Can’t anonymize arbitrary
+data</h3>
+<p>Text or image data can’t just be dropped into DP.</p>
+<p>Even if it can be reduced to a feature vector, can you define a unit
+of privacy?</p>
+<h3 id="requires-trust">Requires trust</h3>
+<p>With local DP, do you trust the software and hardware that it runs
+on?</p>
+<p>With central DP, do you trust the authority to abide by their
+commitments?</p>
+</div>
+<div id="other-pets" class="slide section level2">
+<h1>Other PETs</h1>
+<p>DP is one of a number of privacy enhancing technologies (PETs), and
+in applications at scale these will be combined, utilizing the best
+parts of each.</p>
+<p>Other PETs protect privacy during computation, but don’t preserve
+privacy in results.</p>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Homomorphic_encryption">Fully
+homomorphic encryption</a></li>
+<li><a
+href="https://en.wikipedia.org/wiki/Secure_multi-party_computation">Secure
+multi-party computation</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Federated_learning">Federated
+learning</a></li>
+<li><a
+href="https://en.wikipedia.org/wiki/Trusted_execution_environment">Trusted
+execution environment</a></li>
+<li>and more!</li>
+</ul>
+</div>
+<div id="thank-you-and-stay-in-touch" class="slide section level2">
+<h1>Thank you, and stay in touch!</h1>
+<table>
+<colgroup>
+<col width="13%" />
+<col width="36%" />
+<col width="50%" />
+</colgroup>
+<thead>
+<tr>
+<th></th>
+<th>OpenDP</th>
+<th>DP Wizard</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>email:</td>
+<td>info@opendp.org</td>
+<td>cmccallum@g.harvard.edu</td>
+</tr>
+<tr>
+<td>docs:</td>
+<td><a href="https://docs.opendp.org">docs.opendp.org</a></td>
+<td><a
+href="https://opendp.github.io/dp-wizard">opendp.github.io/dp-wizard</a></td>
+</tr>
+<tr>
+<td>source:</td>
+<td><a
+href="https://github.com/opendp/opendp/">github.com/opendp/opendp</a></td>
+<td><a
+href="https://github.com/opendp/dp-wizard/">github.com/opendp/dp-wizard</a></td>
+</tr>
+</tbody>
+</table>
+<table>
+<colgroup>
+<col width="100%" />
+</colgroup>
+<thead>
+<tr>
+<th>Books!</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a
+href="https://direct.mit.edu/books/book/5935/Differential-Privacy"><em>Differential
+Privacy</em>, by Simson Garfinkel</a>: From MIT Press. Available as free
+PDF, this is a great intro to the social context of DP, and is light on
+math.</td>
+</tr>
+<tr>
+<td><a href="https://programming-dp.com/"><em>Programming Differential
+Privacy</em>, by Joe Near and Chiké Abuah</a>: Free ebook. The examples
+use Python, and do not assume any particular library. If you intend to
+use DP in production, you should not be implementing algorithms
+yourself!</td>
+</tr>
+<tr>
+<td><a
+href="https://www.oreilly.com/library/view/hands-on-differential-privacy/9781492097730/"><em>Hands-On
+Differential Privacy: Introduction to the Theory and Practice Using
+OpenDP</em></a>: From O’Reilly, this covers a wide range of topics, and
+the discussion is tied to the OpenDP Library.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</body>
+</html>

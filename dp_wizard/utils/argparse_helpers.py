@@ -1,17 +1,6 @@
-from sys import argv
-from pathlib import Path
 import argparse
+from sys import argv
 from typing import NamedTuple
-
-
-def _existing_csv_type(arg: str) -> Path:
-    path = Path(arg)
-    if not path.exists():
-        raise argparse.ArgumentTypeError(f"No such file: {arg}")
-    if path.suffix != ".csv":
-        raise argparse.ArgumentTypeError(f'Must have ".csv" extension: {arg}')
-    return path
-
 
 PUBLIC_TEXT = """if you have a public data set, and are curious how
 DP can be applied: The preview visualizations will use your public data."""
@@ -25,27 +14,28 @@ visualizations will be made with the public data, but the release will
 be made with private data."""
 
 
-def _get_arg_parser():
+def _get_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description="DP Wizard makes it easier to get started with "
         "Differential Privacy.",
         epilog=f"""
-Unless you have set "--demo" or "--cloud", you will specify a CSV
+Unless you have set "--sample" or "--cloud", you will specify a CSV
 inside the application.
 
-Provide a "Public CSV" {PUBLIC_TEXT}
-
 Provide a "Private CSV" {PRIVATE_TEXT}
+
+Provide a "Public CSV" {PUBLIC_TEXT}
 
 Provide both {PUBLIC_PRIVATE_TEXT}
 """,
     )
     group = parser.add_mutually_exclusive_group()
     group.add_argument(
-        "--demo",
+        "--sample",
         action="store_true",
-        help="Use generated fake CSV for a quick demo",
+        help="Generate a sample CSV: "
+        "See how DP Wizard works without providing your own data",
     )
     group.add_argument(
         "--cloud",
@@ -55,10 +45,10 @@ Provide both {PUBLIC_PRIVATE_TEXT}
     return parser
 
 
-def _get_args():
+def _get_args() -> argparse.Namespace:
     """
     >>> _get_args()
-    Namespace(demo=False, cloud=False)
+    Namespace(sample=False, cloud=False)
     """
     arg_parser = _get_arg_parser()
 
@@ -74,11 +64,16 @@ def _get_args():
 
 
 class CLIInfo(NamedTuple):
-    is_demo: bool
-    in_cloud: bool
-    qa_mode: bool
+    is_sample_csv: bool
+    is_cloud_mode: bool
+    is_qa_mode: bool
+
+    def get_is_tutorial_mode(self) -> bool:
+        return self.is_sample_csv or self.is_cloud_mode  # pragma: no cover
 
 
 def get_cli_info() -> CLIInfo:  # pragma: no cover
     args = _get_args()
-    return CLIInfo(is_demo=args.demo, in_cloud=args.cloud, qa_mode=False)
+    return CLIInfo(
+        is_sample_csv=args.sample, is_cloud_mode=args.cloud, is_qa_mode=False
+    )

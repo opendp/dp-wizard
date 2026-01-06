@@ -7,6 +7,9 @@ flake8
 flake8-bugbear
 pre-commit
 tomlkit
+isort
+black
+autoflake8
 
 # Testing:
 pytest
@@ -14,6 +17,7 @@ pytest-playwright
 pyright
 pytest-cov
 pytest-xdist
+diffimg
 
 # App dependencies:
 -r requirements.in

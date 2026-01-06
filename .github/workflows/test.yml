@@ -27,6 +27,11 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Install pandoc
+        uses: pandoc/actions/setup@v1
+        with:
+          version: 3.6.4
+
       - name: Install flit
         run: pip install flit
 
@@ -35,6 +40,9 @@ jobs:
 
       - name: Install dev dependencies
         run: pip install -r ${{ matrix.requirements-file }}
+
+      - name: Install pre-commit
+        run: pre-commit install
 
       - name: Install browsers
         # Install just one browser instead of the default three.

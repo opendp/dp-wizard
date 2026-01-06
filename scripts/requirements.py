@@ -4,13 +4,24 @@
 # but by design they are both simple tools that do one job.
 # TODO: See if pip-tools or poetry can handle this?
 
+from os import chdir
 from pathlib import Path
 from subprocess import check_call
 
-from tomlkit import dumps, parse
+from tomlkit import array, dumps, parse
+
+from dp_wizard import package_root
 
 
-def echo_check_call(cmd):  # pragma: no cover
+def echo_check_call(cmd):
+    """
+    >>> echo_check_call("echo 'Hello!'")
+    Running: echo 'Hello!'
+    >>> echo_check_call("intended-failure")
+    Traceback (most recent call last):
+    ...
+    subprocess.CalledProcessError: Command 'intended-failure' returned non-zero exit status 127.
+    """  # noqa: B950 (line too long)
     print(f"Running: {cmd}")
     # Usually avoid "shell=True",
     # but using it here so we can quote the sed expression.
@@ -27,24 +38,62 @@ def pip_compile_install(file_name):  # pragma: no cover
     echo_check_call(f"sed -i '' 's:/.*/dp-wizard/:.../dp-wizard/:' {txt_file_name}")
 
 
-def parse_requirements(file_name):  # pragma: no cover
-    requirements_path = Path(__file__).parent / file_name
-    lines = requirements_path.read_text().splitlines()
+def parse_requirements(file_name):
+    """
+    >>> print(parse_requirements("requirements.txt"))
+    [...opendp...]
+    """
+    cwd_root()
+    lines = Path(file_name).read_text().splitlines()
     return sorted(line for line in lines if line and not line.strip().startswith("#"))
 
 
+def to_toml_array(file_name):
+    """
+    Just given a list, the TOML array is a single line,
+    which makes the diff hard to read.
+    This will format the array with one entry per line.
+
+    >>> print(dumps(to_toml_array("requirements.txt")))
+    [
+    ...
+        "opendp[...]==...",
+    ...
+    ]
+    """
+    toml_array = array()
+    for dependency in parse_requirements(file_name):
+        toml_array.add_line(dependency)
+    toml_array.add_line(indent="")
+    return toml_array
+
+
+def get_new_pyproject_toml():
+    """
+    >>> print(get_new_pyproject_toml())
+    [build-system]
+    ...
+    [project]
+    ...
+    """
+    cwd_root()
+    pyproject = parse(Path("pyproject.toml").read_text())
+    pyproject["project"]["dependencies"] = to_toml_array(  # type:ignore
+        "requirements.in"
+    )
+    pyproject["project"]["optional-dependencies"]["app"] = to_toml_array(  # type:ignore
+        "requirements.txt"
+    )
+    return dumps(pyproject)
+
+
 def rewrite_pyproject_toml():  # pragma: no cover
-    pyproject_path = Path(__file__).parent / "pyproject.toml"
-    pyproject = parse(pyproject_path.read_text())
-    # TODO: Can we split it to have one dependency per line?
-    # https://tomlkit.readthedocs.io/en/latest/api/#tomlkit.items.Array
-    pyproject["project"]["dependencies"] = parse_requirements(
-        "requirements.in",
-    )
-    pyproject["project"]["optional-dependencies"]["app"] = parse_requirements(
-        "requirements.txt",
-    )
-    pyproject_path.write_text(dumps(pyproject))
+    cwd_root()
+    Path("pyproject.toml").write_text(get_new_pyproject_toml())
+
+
+def cwd_root():
+    chdir(package_root.parent)
 
 
 def main():  # pragma: no cover

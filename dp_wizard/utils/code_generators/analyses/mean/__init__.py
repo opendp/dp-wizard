@@ -1,18 +1,48 @@
-from dp_wizard.utils.code_template import Template
+from dp_wizard_templates.code_template import Template
+
+from dp_wizard import get_template_root, opendp_version
+from dp_wizard.types import ColumnIdentifier, StatisticName
+
+name = StatisticName("Mean")
+blurb_md = """
+Choosing tighter bounds will mean less noise added
+to the statistics, but if you pick bounds that
+are too tight, you'll miss the contributions of
+outliers.
+"""
+input_names = [
+    "lower_bound_input",
+    "upper_bound_input",
+]
 
 
-name = "Mean"
-
-
-def has_bins():
-    return False
+root = get_template_root(__file__)
 
 
 def make_query(code_gen, identifier, accuracy_name, stats_name):
+    def template(GROUP_NAMES, stats_context, EXPR_NAME):
+        groups = GROUP_NAMES
+        QUERY_NAME = (
+            stats_context.query().group_by(groups).agg(EXPR_NAME).WITH_KEYS
+            if groups
+            else stats_context.query().select(EXPR_NAME)
+        )
+        STATS_NAME = QUERY_NAME.release().collect()
+        STATS_NAME  # type: ignore
+
     return (
-        Template("mean_query", __file__)
+        Template(template)
         .fill_values(
-            GROUP_NAMES=code_gen.groups,
+            GROUP_NAMES=list(code_gen.analysis_plan.groups.keys()),
+        )
+        .fill_attributes(
+            WITH_KEYS=(
+                Template("with_keys(pl.LazyFrame(GROUPING_KEYS))")
+                .fill_values(GROUPING_KEYS=g)
+                .finish()
+                if (g := code_gen.analysis_plan.get_groups_with_keys())
+                else None
+            )
         )
         .fill_expressions(
             QUERY_NAME=f"{identifier}_query",
@@ -25,7 +55,7 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
 
 def make_output(code_gen, column_name, accuracy_name, stats_name):
     return (
-        Template(f"mean_{code_gen.root_template}_output", __file__)
+        Template(f"mean_{code_gen._get_notebook_or_script()}_output", root)
         .fill_expressions(
             COLUMN_NAME=column_name,
             STATS_NAME=stats_name,
@@ -34,9 +64,13 @@ def make_output(code_gen, column_name, accuracy_name, stats_name):
     )
 
 
+def make_plot_note():
+    return ""
+
+
 def make_report_kv(name, confidence, identifier):
     return (
-        Template("mean_report_kv", __file__)
+        Template("mean_report_kv", root)
         .fill_values(
             NAME=name,
         )
@@ -48,13 +82,12 @@ def make_report_kv(name, confidence, identifier):
 
 
 def make_column_config_block(column_name, lower_bound, upper_bound, bin_count):
-    from dp_wizard.utils.code_generators import snake_case
-
-    snake_name = snake_case(column_name)
+    identifier = ColumnIdentifier(column_name)
     return (
-        Template("mean_expr", __file__)
+        Template("mean_expr", root)
         .fill_expressions(
-            EXPR_NAME=f"{snake_name}_expr",
+            EXPR_NAME=f"{identifier}_expr",
+            OPENDP_V_VERSION=f"v{opendp_version}",
         )
         .fill_values(
             COLUMN_NAME=column_name,

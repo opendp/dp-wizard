@@ -1,19 +1,57 @@
-from dp_wizard.utils.code_template import Template
+from dp_wizard_templates.code_template import Template
+
+from dp_wizard import opendp_version
+from dp_wizard.types import ColumnIdentifier, StatisticName
+from dp_wizard.utils.code_generators.abstract_generator import get_template_root
+
+name = StatisticName("Histogram")
+blurb_md = """
+Choosing a smaller number of bins will conserve your
+privacy budget and give you more accurate counts.
+While the bins are evenly spaced in DP Wizard,
+the OpenDP library lets you pick arbitrary cut points.
+"""
+input_names = [
+    "lower_bound_input",
+    "upper_bound_input",
+    "bin_count_input",
+]
 
 
-name = "Histogram"
-
-
-def has_bins():
-    return True
+root = get_template_root(__file__)
 
 
 def make_query(code_gen, identifier, accuracy_name, stats_name):
+    import polars as pl
+
+    def template(BIN_NAME, GROUP_NAMES, stats_context, confidence):
+        groups = [BIN_NAME] + GROUP_NAMES
+        QUERY_NAME = (
+            stats_context.query()
+            .group_by(groups)
+            .agg(pl.len().dp.noise().alias("count"))  # type: ignore
+            .WITH_KEYS
+        )
+        ACCURACY_NAME = QUERY_NAME.summarize(alpha=1 - confidence)[  # noqa: F841
+            "accuracy"
+        ].item()
+        STATS_NAME = QUERY_NAME.release().collect()
+        STATS_NAME  # type: ignore
+
     return (
-        Template("histogram_query", __file__)
+        Template(template)
         .fill_values(
             BIN_NAME=f"{identifier}_bin",
-            GROUP_NAMES=code_gen.groups,
+            GROUP_NAMES=list(code_gen.analysis_plan.groups.keys()),
+        )
+        .fill_attributes(
+            WITH_KEYS=(
+                Template("with_keys(pl.LazyFrame(GROUPING_KEYS))")
+                .fill_values(GROUPING_KEYS=g)
+                .finish()
+                if (g := code_gen.analysis_plan.get_groups_with_keys())
+                else None
+            )
         )
         .fill_expressions(
             QUERY_NAME=f"{identifier}_query",
@@ -26,9 +64,10 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
 
 def make_output(code_gen, column_name, accuracy_name, stats_name):
     return (
-        Template(f"histogram_{code_gen.root_template}_output", __file__)
+        Template(f"histogram_{code_gen._get_notebook_or_script()}_output", root)
         .fill_values(
             COLUMN_NAME=column_name,
+            GROUP_NAMES=list(code_gen.analysis_plan.groups.keys()),
         )
         .fill_expressions(
             ACCURACY_NAME=accuracy_name,
@@ -39,9 +78,16 @@ def make_output(code_gen, column_name, accuracy_name, stats_name):
     )
 
 
+def make_plot_note():
+    return (
+        "`None` values above may indicate strings "
+        "which could not be converted to numbers."
+    )
+
+
 def make_report_kv(name, confidence, identifier):
     return (
-        Template("histogram_report_kv", __file__)
+        Template("histogram_report_kv", root)
         .fill_values(
             NAME=name,
             CONFIDENCE=confidence,
@@ -55,21 +101,20 @@ def make_report_kv(name, confidence, identifier):
 
 
 def make_column_config_block(column_name, lower_bound, upper_bound, bin_count):
-    from dp_wizard.utils.code_generators import snake_case
-
-    snake_name = snake_case(column_name)
+    identifier = ColumnIdentifier(column_name)
     return (
-        Template("histogram_expr", __file__)
+        Template("histogram_expr", root)
         .fill_expressions(
-            CUT_LIST_NAME=f"{snake_name}_cut_points",
-            BIN_EXPR_NAME=f"{snake_name}_bin_expr",
+            CUT_LIST_NAME=f"{identifier}_cut_points",
+            BIN_EXPR_NAME=f"{identifier}_bin_expr",
+            OPENDP_V_VERSION=f"v{opendp_version}",
         )
         .fill_values(
             LOWER_BOUND=lower_bound,
             UPPER_BOUND=upper_bound,
             BIN_COUNT=bin_count,
             COLUMN_NAME=column_name,
-            BIN_COLUMN_NAME=f"{snake_name}_bin",
+            BIN_COLUMN_NAME=f"{identifier}_bin",
         )
         .finish()
     )

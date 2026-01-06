@@ -1,0 +1,100 @@
+/*
+Add more whitespace.
+*/
+body {
+    margin: 2em;
+}
+
+#top_level_nav {
+    margin-bottom: 1em;
+}
+
+/*
+Reduce whitespace.
+*/
+code {
+    padding: 0 !important;
+}
+
+p:last-of-type {
+    /* Inside tutorial boxes: */
+    margin-bottom: 0;
+}
+ul:last-of-type {
+    /* Lists of errors: */
+    margin-bottom: 0;
+}
+
+/*
+Improve readability of popover.
+*/
+.tooltip-inner {
+    text-align: left;
+    color: black;
+    background-color: lightgray;
+    opacity: 100%;
+}
+/*
+Arrow color should be consistent with background of tooltip-inner.
+The tooltip is positioned to avoid falling outside of the window,
+so any of these might be applied.
+*/
+.bs-tooltip-auto[data-popper-placement^="right"] .tooltip-arrow::before {
+    border-right-color: lightgrey;
+}
+.bs-tooltip-auto[data-popper-placement^="bottom"] .tooltip-arrow::before {
+    border-bottom-color: lightgray;
+}
+.bs-tooltip-auto[data-popper-placement^="left"] .tooltip-arrow::before {
+    border-left-color: lightgrey;
+}
+.bs-tooltip-auto[data-popper-placement^="top"] .tooltip-arrow::before {
+    border-top-color: lightgray;
+}
+
+/*
+Selectize menus should overflow the containing card.
+*/
+.card, .card-body { overflow: visible !important; }
+
+/*
+The tutorial mode toggle in the navbar is positioned slightly too high.
+*/
+.shiny-input-container:has(#tutorial_mode) {
+    margin-top: 0.15em;
+    margin-bottom: -0.15em;
+}
+
+/*
+Recommended by W3C when content should only be visible to screenreaders.
+https://www.w3.org/WAI/tutorials/forms/labels/#note-on-hiding-elements
+*/
+.only-for-screenreaders {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}
+/* Override the inline-block provided by Shiny: Uses too much space. */
+label:has(.only-for-screenreaders) {
+    display: inline;
+}
+
+/* Disabled download links should look like normal text. */
+a[disabled] {
+    cursor: text;
+    text-decoration: none;
+    color: var(--bs-body-color);
+}
+
+/* Increase default margin on icons. */
+.fa {
+    margin-right: 0.4em !important;
+}
+.card-header > .fa {
+    margin-right: 0.8em !important;
+}
