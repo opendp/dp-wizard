@@ -182,7 +182,7 @@ plans_all_combos = [
 # but make sure it's relatively prime so we have coverage.
 mod = 7
 assert len(plans_all_combos) % mod != 0
-plans = [plan for i, plan in enumerate(plans_all_combos) if i % 7 == 0]
+plans = [plan for i, plan in enumerate(plans_all_combos) if i % mod == 0]
 
 
 expected_urls = [
