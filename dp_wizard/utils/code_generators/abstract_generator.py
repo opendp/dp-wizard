@@ -79,10 +79,8 @@ class AbstractGenerator(ABC):
             dp.enable_features("contrib")
 
         extra = self._get_extra()
-
-        utils_block = (package_root / "utils/shared/bins.py").read_text()
-        if self.analysis_plan.product == Product.STATISTICS:
-            utils_block += (package_root / "utils/shared/plots.py").read_text()
+        bins_py = (package_root / "utils/shared/bins.py").read_text()
+        plots_py = (package_root / "utils/shared/plots.py").read_text()
 
         code = (
             Template(self._get_root_template(), template_root)
@@ -92,7 +90,7 @@ class AbstractGenerator(ABC):
             )
             .fill_code_blocks(
                 IMPORTS_BLOCK=Template(imports_template).finish(),
-                UTILS_BLOCK=utils_block,
+                UTILS_BLOCK=bins_py + plots_py,
                 **self._make_extra_blocks(),
             )
             .fill_comment_blocks(
@@ -320,7 +318,7 @@ are ignored because of errors, it will bias results.
         )
 
     def _make_synth_query(self):
-        def template(synth_context, COLUMNS, CUTS, KEYS):
+        def template(synth_context, COLUMNS, CUTS, plot_bars, KEYS):
             synth_query = (
                 synth_context.query()
                 .select(*COLUMNS)
@@ -346,12 +344,15 @@ are ignored because of errors, it will bias results.
 
             possible_rows = prod([len(v) for v in contingency_table.keys.values()])
             max_rows = 100_000
-            contingency_table_melted = (
-                contingency_table.project_melted(COLUMNS)
-                if possible_rows < max_rows
-                else f"Contingency table could be more than {max_rows} rows; "
-                "Consider querying for just the information you need."
-            )
+            if possible_rows < max_rows:
+                contingency_table_melted = contingency_table.project_melted(COLUMNS)
+                if possible_rows < 200:
+                    plot_bars(contingency_table_melted, "Contingency Table")
+            else:
+                contingency_table_melted = (
+                    f"Contingency table could be more than {max_rows} rows; "
+                    "Consider querying for just the information you need."
+                )
             contingency_table_melted  # pyright: ignore[reportUnusedExpression]
             # -
 

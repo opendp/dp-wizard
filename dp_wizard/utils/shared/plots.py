@@ -34,7 +34,10 @@ def df_to_columns(df: DataFrame):
 
 
 def plot_bars(
-    df: DataFrame, error: float, cutoff: float, title: str
+    df: DataFrame,
+    title: str,
+    error: float = 0,
+    cutoff: float = 0,
 ):  # pragma: no cover
     """
     Given a Dataframe, make a bar plot of the data in the last column,
