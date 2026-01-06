@@ -25,7 +25,7 @@ def test_three_column_string_df_to_columns():
         }
     )
     assert df_to_columns(df) == (
-        ("(0, 1] A", "(0, 1] B", "(1, 2] A", "(1, 2] B"),
+        ("(0, 1]; A", "(0, 1]; B", "(1, 2]; A", "(1, 2]; B"),
         (0, 20, 10, 30),
     )
 
@@ -39,7 +39,7 @@ def test_three_column_numeric_df_to_columns():
         }
     )
     assert df_to_columns(df) == (
-        ("(0, 1] 1", "(0, 1] 2", "(1, 2] 1", "(1, 2] 2"),
+        ("(0, 1]; 1", "(0, 1]; 2", "(1, 2]; 1", "(1, 2]; 2"),
         (0, 20, 10, 30),
     )
 

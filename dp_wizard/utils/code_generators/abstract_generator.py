@@ -347,7 +347,7 @@ are ignored because of errors, it will bias results.
             if possible_rows < max_rows:
                 contingency_table_melted = contingency_table.project_melted(COLUMNS)
                 if possible_rows < 200:
-                    plot_bars(contingency_table_melted, "Contingency Table")
+                    plot_bars(contingency_table_melted, title="Contingency Table")
             else:
                 contingency_table_melted = (
                     f"Contingency table could be more than {max_rows} rows; "
