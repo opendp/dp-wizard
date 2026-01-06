@@ -4,7 +4,7 @@
 opendp[mbi]==0.14.1
 
 # Templating and notebook generation:
-dp-wizard-templates>=0.5.0
+dp-wizard-templates>=0.7.0
 
 # Shiny:
 shiny
