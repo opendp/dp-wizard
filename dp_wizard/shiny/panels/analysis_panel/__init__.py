@@ -1,31 +1,24 @@
 from math import pow
-from pathlib import Path
 from typing import Iterable
 
 from shiny import Inputs, Outputs, Session, reactive, render, ui
 
-from dp_wizard import registry_url
 from dp_wizard.shiny.components.icons import (
-    budget_icon,
     columns_icon,
     groups_icon,
-    simulation_icon,
 )
-from dp_wizard.shiny.components.inputs import log_slider
 from dp_wizard.shiny.components.outputs import (
-    code_sample,
     hide_if,
     nav_button,
     tutorial_box,
     warning_md_box,
 )
 from dp_wizard.shiny.components.summaries import dataset_summary
+from dp_wizard.shiny.panels.analysis_panel import privacy_budget, simulation
 from dp_wizard.shiny.panels.analysis_panel.column_module import column_server, column_ui
 from dp_wizard.shiny.panels.analysis_panel.group_module import group_server, group_ui
 from dp_wizard.types import AppState, ColumnId
-from dp_wizard.utils.code_generators import make_privacy_loss_block
 from dp_wizard.utils.csv_helper import (
-    get_csv_row_count,
     id_labels_dict_from_schema,
     id_names_dict_from_schema,
 )
@@ -68,33 +61,8 @@ def analysis_ui():
                 ),
                 ui.output_ui("groups_selectize_tutorial_ui"),
             ),
-            ui.card(
-                ui.card_header(budget_icon, "Privacy Budget"),
-                ui.markdown(
-                    f"""
-                    What is your privacy budget for this release?
-                    Many factors including the sensitivity of your data,
-                    the frequency of DP releases,
-                    and the regulatory landscape can be considered.
-                    Consider how your budget compares to that of
-                    <a href="{registry_url}"
-                       target="_blank">other projects</a>.
-                    """
-                ),
-                log_slider(
-                    "log_epsilon_slider",
-                    lower_bound=0.1,
-                    upper_bound=10.0,
-                    lower_message="Better Privacy",
-                    upper_message="Better Accuracy",
-                ),
-                ui.output_ui("epsilon_ui"),
-                ui.output_ui("privacy_loss_python_ui"),
-            ),
-            ui.card(
-                ui.card_header(simulation_icon, "Simulation"),
-                ui.output_ui("simulation_card_ui"),
-            ),
+            ui.output_ui("privacy_budget_card_ui", fillable=True),
+            ui.output_ui("simulation_card_ui", fillable=True),
             col_widths={
                 "sm": [12, 12, 12, 12],  # 4 rows
                 "md": [6, 6, 6, 6],  # 2 rows
@@ -306,61 +274,33 @@ def analysis_server(
         )
 
     @render.ui
-    def simulation_card_ui():
-        help = (
-            tutorial_box(
-                is_tutorial_mode(),
-                """
-                Unlike the other settings on this page,
-                this estimate **is not used** in the final calculation.
-
-                Until you make a release, your CSV will not be
-                read except to determine the names of columns,
-                but the number of rows does have implications for the
-                accuracy which DP can provide with a given privacy budget.
-                """,
-                responsive=False,
-            ),
+    def privacy_budget_card_ui():
+        return privacy_budget.privacy_budget_card_ui(
+            epsilon=epsilon,
+            max_rows=max_rows,
+            is_tutorial_mode=is_tutorial_mode,
         )
-        if public_csv_path():
-            row_count_str = str(get_csv_row_count(Path(public_csv_path())))
-            return [
-                ui.markdown(
-                    f"""
-                    Because you've provided a public CSV,
-                    it *will be read* to generate previews.
 
-                    The confidence interval depends on the number of rows.
-                    Your public CSV has {row_count_str} rows,
-                    but if you believe the private CSV will be
-                    much larger or smaller, please update.
-                    """
-                ),
-                ui.input_select(
-                    "row_count",
-                    "Estimated Rows",
-                    choices=[row_count_str, "100", "1000", "10000"],
-                    selected=row_count_str,
-                ),
-                help,
-            ]
-        else:
-            return [
-                ui.markdown(
-                    """
-                    What is the approximate number of rows in the dataset?
-                    This number is only used for the simulation
-                    and not the final calculation.
-                    """
-                ),
-                ui.input_select(
-                    "row_count",
-                    "Estimated Rows",
-                    choices=["100", "1000", "10000"],
-                    selected="100",
-                ),
-                help,
-            ]
+    @render.ui
+    def epsilon_ui():
+        return privacy_budget.epsilon_ui(
+            epsilon=epsilon,
+            is_tutorial_mode=is_tutorial_mode,
+        )
+
+    @render.ui
+    def privacy_loss_python_ui():
+        return privacy_budget.privacy_loss_python_ui(
+            epsilon=epsilon,
+            max_rows=max_rows,
+        )
+
+    @render.ui
+    def simulation_card_ui():
+        return simulation.simulation_card_ui(
+            is_tutorial_mode=is_tutorial_mode,
+            public_csv_path=public_csv_path,
+        )
 
     @render.ui
     def columns_ui():
@@ -414,42 +354,6 @@ def analysis_server(
     @reactive.event(input.log_epsilon_slider)
     def _set_epsilon():
         epsilon.set(_trunc_pow(input.log_epsilon_slider()))
-
-    @render.ui
-    def epsilon_ui():
-        e_value = epsilon()
-        extra = ""
-        if e_value >= 5:
-            extra = (
-                ": The use of a value this **large** is discouraged "
-                "because it may compromise privacy."
-            )
-        if e_value <= 0.2:
-            extra = (
-                ": The use of a value this **small** is discouraged "
-                "because the additional noise will lower the accuracy of results."
-            )
-        return [
-            ui.markdown(f"Privacy Budget (Epsilon): {e_value}{extra}"),
-            tutorial_box(
-                is_tutorial_mode(),
-                """
-                If you set epsilon above one, you'll see that the distribution
-                becomes less noisy, and the confidence intervals become smaller...
-                but increased accuracy risks revealing personal information.
-                """,
-                responsive=False,
-            ),
-        ]
-
-    @render.ui
-    def privacy_loss_python_ui():
-        return code_sample(
-            "Privacy Loss",
-            make_privacy_loss_block(
-                pure=False, epsilon=epsilon(), max_rows=int(max_rows())
-            ),
-        )
 
     @reactive.effect
     @reactive.event(input.go_to_results)
