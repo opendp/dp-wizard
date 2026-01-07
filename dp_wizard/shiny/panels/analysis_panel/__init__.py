@@ -1,5 +1,4 @@
 from math import pow
-from pathlib import Path
 from typing import Iterable
 
 from shiny import Inputs, Outputs, Session, reactive, render, ui
@@ -20,12 +19,12 @@ from dp_wizard.shiny.components.outputs import (
     warning_md_box,
 )
 from dp_wizard.shiny.components.summaries import dataset_summary
+from dp_wizard.shiny.panels.analysis_panel import simulation
 from dp_wizard.shiny.panels.analysis_panel.column_module import column_server, column_ui
 from dp_wizard.shiny.panels.analysis_panel.group_module import group_server, group_ui
 from dp_wizard.types import AppState, ColumnId
 from dp_wizard.utils.code_generators import make_privacy_loss_block
 from dp_wizard.utils.csv_helper import (
-    get_csv_row_count,
     id_labels_dict_from_schema,
     id_names_dict_from_schema,
 )
@@ -307,60 +306,10 @@ def analysis_server(
 
     @render.ui
     def simulation_card_ui():
-        help = (
-            tutorial_box(
-                is_tutorial_mode(),
-                """
-                Unlike the other settings on this page,
-                this estimate **is not used** in the final calculation.
-
-                Until you make a release, your CSV will not be
-                read except to determine the names of columns,
-                but the number of rows does have implications for the
-                accuracy which DP can provide with a given privacy budget.
-                """,
-                responsive=False,
-            ),
+        return simulation.simulation_card_ui(
+            is_tutorial_mode=is_tutorial_mode,
+            public_csv_path=public_csv_path,
         )
-        if public_csv_path():
-            row_count_str = str(get_csv_row_count(Path(public_csv_path())))
-            return [
-                ui.markdown(
-                    f"""
-                    Because you've provided a public CSV,
-                    it *will be read* to generate previews.
-
-                    The confidence interval depends on the number of rows.
-                    Your public CSV has {row_count_str} rows,
-                    but if you believe the private CSV will be
-                    much larger or smaller, please update.
-                    """
-                ),
-                ui.input_select(
-                    "row_count",
-                    "Estimated Rows",
-                    choices=[row_count_str, "100", "1000", "10000"],
-                    selected=row_count_str,
-                ),
-                help,
-            ]
-        else:
-            return [
-                ui.markdown(
-                    """
-                    What is the approximate number of rows in the dataset?
-                    This number is only used for the simulation
-                    and not the final calculation.
-                    """
-                ),
-                ui.input_select(
-                    "row_count",
-                    "Estimated Rows",
-                    choices=["100", "1000", "10000"],
-                    selected="100",
-                ),
-                help,
-            ]
 
     @render.ui
     def columns_ui():
