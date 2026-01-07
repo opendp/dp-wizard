@@ -7,6 +7,7 @@ import polars as pl
 import polars.testing as pl_testing
 import pytest
 
+from dp_wizard.types import scan_csv_kwargs
 from dp_wizard.utils.csv_helper import (
     CsvInfo,
     convert_text,
@@ -160,9 +161,8 @@ def test_csv_loading(write_encoding):
                 read_lf.collect()
 
         # THIS IS THE RIGHT PATTERN!
-        # Not perfect, but "utf8-lossy" retains as much info as possible.
-        # "ignore_errors" true will skip values that don't match inferred type.
-        read_lf = pl.scan_csv(fp.name, encoding="utf8-lossy", ignore_errors=True)
+        # Not perfect, but "utf8-lossy" retains as much info as possible..
+        read_lf = pl.scan_csv(fp.name, **scan_csv_kwargs)  # type: ignore
         if write_encoding == "latin1":
             # Not equal, but the only differce is the "�".
             pl_testing.assert_frame_not_equal(write_lf, read_lf)

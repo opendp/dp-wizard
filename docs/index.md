@@ -554,7 +554,7 @@ Next, we'll define our Context. This is where we set the privacy budget, and set
 ...     data=pl.scan_csv(
 ...         "docs/fill-in-correct-path.csv",
 ...         encoding="utf8-lossy",
-...         ignore_errors=True,
+...         infer_schema_length=None,
 ...     ).with_columns(grade_bin_expr),
 ...     privacy_unit=privacy_unit,
 ...     privacy_loss=privacy_loss,
