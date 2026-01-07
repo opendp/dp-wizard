@@ -109,6 +109,7 @@ scan_csv_kwargs = {
     # We prefer to validate below and set error.
     "raise_if_empty": False,
 }
+scan_csv_kwargs_expression = "encoding='utf8-lossy', infer_schema_length=None"
 
 
 class CsvInfo:
