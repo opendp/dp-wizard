@@ -2,6 +2,7 @@ from pathlib import Path
 
 from shiny import reactive, ui
 
+from dp_wizard.shiny.components.icons import simulation_icon
 from dp_wizard.shiny.components.outputs import tutorial_box
 from dp_wizard.utils.csv_helper import get_csv_row_count
 
@@ -27,7 +28,7 @@ def simulation_card_ui(
     )
     if public_csv_path():
         row_count_str = str(get_csv_row_count(Path(public_csv_path())))
-        return [
+        inner = [
             ui.markdown(
                 f"""
                 Because you've provided a public CSV,
@@ -48,7 +49,7 @@ def simulation_card_ui(
             help,
         ]
     else:
-        return [
+        inner = [
             ui.markdown(
                 """
                 What is the approximate number of rows in the dataset?
@@ -64,3 +65,7 @@ def simulation_card_ui(
             ),
             help,
         ]
+    return ui.card(
+        ui.card_header(simulation_icon, "Simulation"),
+        inner,
+    )
