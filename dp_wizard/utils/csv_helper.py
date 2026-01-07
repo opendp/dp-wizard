@@ -5,7 +5,7 @@ from pathlib import Path
 
 import polars as pl
 
-from dp_wizard.types import ColumnId, ColumnLabel, ColumnName, CsvInfo
+from dp_wizard.types import ColumnId, ColumnLabel, ColumnName, CsvInfo, scan_csv_kwargs
 
 
 def convert_text(text: str, target_type: pl.DataType) -> list[str | float]:
@@ -60,7 +60,7 @@ def get_csv_names_mismatch(
 
 
 def get_csv_row_count(csv_path: Path) -> int:
-    lf = pl.scan_csv(csv_path, ignore_errors=True)
+    lf = pl.scan_csv(csv_path, **scan_csv_kwargs)  # type: ignore
     return lf.select(pl.len()).collect().item()
 
 

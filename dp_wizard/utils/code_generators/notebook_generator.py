@@ -1,7 +1,7 @@
 from dp_wizard_templates.code_template import Template
 
 from dp_wizard import package_root
-from dp_wizard.types import ColumnIdentifier, Product
+from dp_wizard.types import ColumnIdentifier, Product, scan_csv_kwargs_expression
 from dp_wizard.utils.code_generators.abstract_generator import (
     AbstractGenerator,
     get_template_root,
@@ -28,6 +28,7 @@ class NotebookGenerator(AbstractGenerator):
             partial_context.fill_values(
                 CSV_PATH=self.analysis_plan.get_absolute_csv_path(),
             )
+            .fill_expressions(SCAN_CSV_KWARGS=scan_csv_kwargs_expression)
             .fill_code_blocks(
                 OPTIONAL_CSV_BLOCK=(
                     "# Write to placeholder CSV so the notebook can still execute:\n"

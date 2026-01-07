@@ -1,6 +1,6 @@
 import re
 
-from dp_wizard.types import Product
+from dp_wizard.types import Product, scan_csv_kwargs_expression
 from dp_wizard.utils.code_generators.abstract_generator import AbstractGenerator
 
 
@@ -23,7 +23,9 @@ class ScriptGenerator(AbstractGenerator):
     def _make_stats_context(self):
         return (
             self._make_partial_stats_context()
-            .fill_expressions(CSV_PATH="csv_path")
+            .fill_expressions(
+                CSV_PATH="csv_path", SCAN_CSV_KWARGS=scan_csv_kwargs_expression
+            )
             .fill_code_blocks(OPTIONAL_CSV_BLOCK="")
             .finish()
         )
@@ -31,7 +33,9 @@ class ScriptGenerator(AbstractGenerator):
     def _make_synth_context(self):
         return (
             self._make_partial_synth_context()
-            .fill_expressions(CSV_PATH="csv_path")
+            .fill_expressions(
+                CSV_PATH="csv_path", SCAN_CSV_KWARGS=scan_csv_kwargs_expression
+            )
             .fill_code_blocks(OPTIONAL_CSV_BLOCK="")
             .finish()
         )

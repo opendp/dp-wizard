@@ -806,7 +806,7 @@ budget, and set the weight for each query under that overall budget.</p>
 ...     data=pl.scan_csv(
 ...         &quot;docs/fill-in-correct-path.csv&quot;,
 ...         encoding=&quot;utf8-lossy&quot;,
-...         ignore_errors=True,
+...         infer_schema_length=None,
 ...     ).with_columns(grade_bin_expr),
 ...     privacy_unit=privacy_unit,
 ...     privacy_loss=privacy_loss,
