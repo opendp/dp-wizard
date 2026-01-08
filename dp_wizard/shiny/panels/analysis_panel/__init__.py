@@ -22,7 +22,7 @@ from dp_wizard.shiny.components.outputs import (
 from dp_wizard.shiny.components.summaries import dataset_summary
 from dp_wizard.shiny.panels.analysis_panel.column_module import column_server, column_ui
 from dp_wizard.shiny.panels.analysis_panel.group_module import group_server, group_ui
-from dp_wizard.types import AppState, ColumnId
+from dp_wizard.types import AppState, ColumnId, Product
 from dp_wizard.utils.code_generators import make_privacy_loss_block
 from dp_wizard.utils.csv_helper import (
     get_csv_row_count,
@@ -279,7 +279,12 @@ def analysis_server(
 
     @render.ui
     def select_columns_message_ui():
-        return ui.markdown("Select numeric columns to calculate statistics on.")
+        match product():
+            case Product.STATISTICS:
+                message = "Select numeric columns to calculate statistics on."
+            case Product.SYNTHETIC_DATA:
+                message = "Select numeric columns to generate synthetic data for."
+        return ui.markdown(message)
 
     @render.ui
     def select_groups_message_ui():
