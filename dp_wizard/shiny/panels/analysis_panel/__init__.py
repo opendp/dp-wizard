@@ -288,15 +288,21 @@ def analysis_server(
 
     @render.ui
     def select_groups_message_ui():
-        return ui.markdown(
-            """
-            Select columns to group by, or leave empty
-            to calculate statistics across the entire dataset.
+        match product():
+            case Product.STATISTICS:
+                message = """
+                Select columns to group by, or leave empty
+                to calculate statistics across the entire dataset.
 
-            Groups aren't applied to the previews on this page
-            but will be used in the final release.
-            """
-        )
+                Groups aren't applied to the previews on this page
+                but will be used in the final release.
+                """
+
+            case Product.SYNTHETIC_DATA:
+                message = """
+                Select additional string columns to include in the synthetic data.
+                """
+        return ui.markdown(message)
 
     @reactive.effect
     @reactive.event(input.columns_selectize)
