@@ -59,7 +59,7 @@ def _columns_card_ui():
     return (
         ui.card(
             ui.card_header(columns_icon, "Columns"),
-            ui.markdown("Select numeric columns to calculate statistics on."),
+            ui.output_ui("select_columns_message_ui"),
             ui.input_selectize(
                 "columns_selectize",
                 "Columns",
@@ -75,15 +75,7 @@ def _grouping_card_ui():
     return (
         ui.card(
             ui.card_header(groups_icon, "Grouping"),
-            ui.markdown(
-                """
-            Select columns to group by, or leave empty
-            to calculate statistics across the entire dataset.
-
-            Groups aren't applied to the previews on this page
-            but will be used in the final release.
-            """
-            ),
+            ui.output_ui("select_groups_message_ui"),
             ui.input_selectize(
                 "groups_selectize",
                 "Group by",
@@ -101,14 +93,14 @@ def _privacy_card_ui():
             ui.card_header(budget_icon, "Privacy Budget"),
             ui.markdown(
                 f"""
-            What is your privacy budget for this release?
-            Many factors including the sensitivity of your data,
-            the frequency of DP releases,
-            and the regulatory landscape can be considered.
-            Consider how your budget compares to that of
-            <a href="{registry_url}"
-                target="_blank">other projects</a>.
-            """
+                What is your privacy budget for this release?
+                Many factors including the sensitivity of your data,
+                the frequency of DP releases,
+                and the regulatory landscape can be considered.
+                Consider how your budget compares to that of
+                <a href="{registry_url}"
+                    target="_blank">other projects</a>.
+                """
             ),
             log_slider(
                 "log_epsilon_slider",
@@ -284,6 +276,22 @@ def analysis_server(
     @render.ui
     def previous_summary_ui():
         return dataset_summary(state)
+
+    @render.ui
+    def select_columns_message_ui():
+        return ui.markdown("Select numeric columns to calculate statistics on.")
+
+    @render.ui
+    def select_groups_message_ui():
+        return ui.markdown(
+            """
+            Select columns to group by, or leave empty
+            to calculate statistics across the entire dataset.
+
+            Groups aren't applied to the previews on this page
+            but will be used in the final release.
+            """
+        )
 
     @reactive.effect
     @reactive.event(input.columns_selectize)
