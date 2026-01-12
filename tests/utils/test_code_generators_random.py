@@ -11,7 +11,7 @@ from dp_wizard.utils.code_generators.analyses import mean
 from dp_wizard.utils.code_generators.notebook_generator import NotebookGenerator
 from dp_wizard.utils.constraints import (
     MAX_BOUND,
-    MAX_EPSION,
+    MAX_EPSILON,
     MAX_ROW_COUNT,
     MIN_BOUND,
     MIN_EPSILON,
@@ -37,7 +37,7 @@ good_floats = st.floats(
 @settings(deadline=None)
 @given(
     bin_count=st.integers(),
-    epsilon=st.floats(min_value=MIN_EPSILON, max_value=MAX_EPSION),
+    epsilon=st.floats(min_value=MIN_EPSILON, max_value=MAX_EPSILON),
     lower_upper=st.tuples(good_floats, good_floats).filter(
         lambda l_u: MIN_BOUND <= l_u[0] < l_u[1] <= MAX_BOUND
     ),
