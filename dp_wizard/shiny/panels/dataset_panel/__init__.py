@@ -45,7 +45,7 @@ def get_pos_int_error(
     'is required'
     >>> get_pos_int_error('100.1')
     'should be an integer'
-    """
+    """  # noqa: B950
     if number_str is None or number_str == "":
         return "is required"
     try:
