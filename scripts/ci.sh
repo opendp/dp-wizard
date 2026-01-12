@@ -13,6 +13,6 @@ if [ -z ${CI+x} ]; then
     eval "$SHARED --numprocesses=auto --cov=."
 else
     echo "Run tests in single process to avoid surprises."
-    eval "coverage run -m $SHARED -k 'not random'"
+    eval "coverage run -m $SHARED"
     coverage report
 fi
