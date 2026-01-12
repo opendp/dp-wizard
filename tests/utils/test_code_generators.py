@@ -8,8 +8,6 @@ import polars as pl
 import pytest
 import requests
 from dp_wizard_templates.converters import convert_nb_to_html, convert_py_to_nb
-from hypothesis import given, settings
-from hypothesis import strategies as st
 
 from dp_wizard import opendp_version, package_root
 from dp_wizard.types import ColumnName, CsvInfo, Product, StatisticName

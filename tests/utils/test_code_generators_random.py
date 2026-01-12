@@ -2,13 +2,14 @@ from hypothesis import given, settings
 from hypothesis import strategies as st
 
 from dp_wizard import package_root
-from dp_wizard.types import ColumnName, CsvInfo, Product, StatisticName
+from dp_wizard.types import ColumnName, Product
 from dp_wizard.utils.code_generators import (
     AnalysisPlan,
     AnalysisPlanColumn,
 )
-from dp_wizard.utils.code_generators.analyses import histogram, mean, median
+from dp_wizard.utils.code_generators.analyses import mean
 from dp_wizard.utils.code_generators.notebook_generator import NotebookGenerator
+from dp_wizard.utils.constraints import MAX_BOUND, MIN_BOUND
 
 abc_csv_path = str((package_root.parent / "tests/fixtures/abc.csv").absolute())
 
@@ -20,13 +21,18 @@ def number_lines(text: str):
     )
 
 
-good_floats = st.floats(allow_nan=False, allow_infinity=False)
+good_floats = st.floats(
+    allow_nan=False,
+    allow_infinity=False,
+)
 
 
 @settings(deadline=None)
 @given(
     bin_count=st.integers(),
-    lower_upper=st.tuples(good_floats, good_floats).filter(lambda l_u: l_u[0] < l_u[1]),
+    lower_upper=st.tuples(good_floats, good_floats).filter(
+        lambda l_u: MIN_BOUND <= l_u[0] < l_u[1] <= MAX_BOUND
+    ),
 )
 def test_make_random_notebook(bin_count, lower_upper):
     lower_bound, upper_bound = lower_upper
