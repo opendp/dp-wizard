@@ -36,7 +36,9 @@ def get_pos_int_error(
     so the "should be a number" errors may not be seen in practice.
     >>> get_pos_int_error('100')
     >>> get_pos_int_error('0')
-    'should be at least 100'
+    'should not be less than 100: For very small data sets, too much noise would be required'
+    >>> get_pos_int_error('1_000_000_001')
+    'should not be greater than 1,000,000,000: Larger values may cause overflow during calcuations'
     >>> get_pos_int_error(None)
     'is required'
     >>> get_pos_int_error('')
@@ -52,12 +54,12 @@ def get_pos_int_error(
         return "should be an integer"
     if number < minimum:
         return (
-            f"should not be less than {minimum}: "
+            f"should not be less than {minimum:,}: "
             "For very small data sets, too much noise would be required"
         )
     if number > maximum:
         return (
-            f"should not be greater than {maximum}: "
+            f"should not be greater than {maximum:,}: "
             "Larger values may cause overflow during calcuations"
         )
     return None
