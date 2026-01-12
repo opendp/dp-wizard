@@ -55,10 +55,6 @@ def make_accuracy_histogram(
     │ (8, 10] ┆ ... │
     └─────────┴─────┘
     """
-    # TODO: https://github.com/opendp/dp-wizard/issues/219
-    # When this is stable, merge it to templates, so we can be
-    # sure that we're using the same code in the preview that we
-    # use in the generated notebook.
     cut_points = make_cut_points(lower_bound, upper_bound, bin_count)
     stats_context = dp.Context.compositor(
         data=lf.with_columns(
