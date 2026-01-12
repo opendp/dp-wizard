@@ -30,11 +30,12 @@ good_floats = st.floats(
 @settings(deadline=None)
 @given(
     bin_count=st.integers(),
+    epsilon=st.floats(min_value=0.1, max_value=10.0),
     lower_upper=st.tuples(good_floats, good_floats).filter(
         lambda l_u: MIN_BOUND <= l_u[0] < l_u[1] <= MAX_BOUND
     ),
 )
-def test_make_random_notebook(bin_count, lower_upper):
+def test_make_random_notebook(bin_count, epsilon, lower_upper):
     lower_bound, upper_bound = lower_upper
     mean_plan_column = AnalysisPlanColumn(
         statistic_name=mean.name,
@@ -50,7 +51,7 @@ def test_make_random_notebook(bin_count, lower_upper):
         contributions=1,
         contributions_entity="Family",
         csv_path=abc_csv_path,
-        epsilon=1,
+        epsilon=epsilon,
         max_rows=100_000,
     )
     notebook_py = NotebookGenerator(plan, "Note goes here!").make_py(reformat=True)
