@@ -9,7 +9,12 @@ from dp_wizard.utils.code_generators import (
 )
 from dp_wizard.utils.code_generators.analyses import mean
 from dp_wizard.utils.code_generators.notebook_generator import NotebookGenerator
-from dp_wizard.utils.constraints import MAX_BOUND, MIN_BOUND
+from dp_wizard.utils.constraints import (
+    MAX_BOUND,
+    MAX_ROW_COUNT,
+    MIN_BOUND,
+    MIN_ROW_COUNT,
+)
 
 abc_csv_path = str((package_root.parent / "tests/fixtures/abc.csv").absolute())
 
@@ -34,8 +39,9 @@ good_floats = st.floats(
     lower_upper=st.tuples(good_floats, good_floats).filter(
         lambda l_u: MIN_BOUND <= l_u[0] < l_u[1] <= MAX_BOUND
     ),
+    max_rows=st.integers(min_value=MIN_ROW_COUNT, max_value=MAX_ROW_COUNT),
 )
-def test_make_random_notebook(bin_count, epsilon, lower_upper):
+def test_make_random_notebook(bin_count, epsilon, lower_upper, max_rows):
     lower_bound, upper_bound = lower_upper
     mean_plan_column = AnalysisPlanColumn(
         statistic_name=mean.name,
@@ -52,7 +58,7 @@ def test_make_random_notebook(bin_count, epsilon, lower_upper):
         contributions_entity="Family",
         csv_path=abc_csv_path,
         epsilon=epsilon,
-        max_rows=100_000,
+        max_rows=max_rows,
     )
     notebook_py = NotebookGenerator(plan, "Note goes here!").make_py(reformat=True)
     print(number_lines(notebook_py))

@@ -20,13 +20,16 @@ from dp_wizard.shiny.components.outputs import (
 from dp_wizard.shiny.panels.dataset_panel import data_source
 from dp_wizard.types import AppState, Product
 from dp_wizard.utils.code_generators import make_privacy_unit_block
+from dp_wizard.utils.constraints import MAX_ROW_COUNT, MIN_ROW_COUNT
 from dp_wizard.utils.csv_helper import CsvInfo, get_csv_names_mismatch, infer_csv_info
 
 dataset_panel_id = "dataset_panel"
 OTHER = "Other"
 
 
-def get_pos_int_error(number_str, minimum=100) -> str | None:
+def get_pos_int_error(
+    number_str, minimum=MIN_ROW_COUNT, maximum=MAX_ROW_COUNT
+) -> str | None:
     """
     If the inputs are numeric, I think shiny converts
     any strings that can't be parsed to numbers into None,
@@ -48,7 +51,15 @@ def get_pos_int_error(number_str, minimum=100) -> str | None:
     except (TypeError, ValueError, OverflowError):
         return "should be an integer"
     if number < minimum:
-        return f"should be at least {minimum}"
+        return (
+            f"should not be less than {minimum}: "
+            "For very small data sets, too much noise would be required"
+        )
+    if number > maximum:
+        return (
+            f"should not be greater than {maximum}: "
+            "Larger values may cause overflow during calcuations"
+        )
     return None
 
 
