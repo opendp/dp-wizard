@@ -20,5 +20,8 @@ pytest-xdist
 diffimg
 hypothesis
 
+# Dependabot warnings:
+filelock>=3.20.1
+
 # App dependencies:
 -r requirements.in

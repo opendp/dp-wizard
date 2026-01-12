@@ -92,8 +92,10 @@ faicons==0.2.2
     # via -r .../dp-wizard/requirements.in
 fastjsonschema==2.21.1
     # via nbformat
-filelock==3.18.0
-    # via virtualenv
+filelock==3.20.2
+    # via
+    #   -r requirements-dev.in
+    #   virtualenv
 flake8==7.2.0
     # via
     #   -r requirements-dev.in

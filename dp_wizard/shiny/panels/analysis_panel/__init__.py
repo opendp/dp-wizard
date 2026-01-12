@@ -418,19 +418,24 @@ def analysis_server(
     @render.ui
     def epsilon_ui():
         e_value = epsilon()
-        extra = ""
+        optional_warning = None
         if e_value >= 5:
-            extra = (
-                ": The use of a value this **large** is discouraged "
-                "because it may compromise privacy."
+            optional_warning = warning_md_box(
+                """
+                The use of a value this large is discouraged
+                because high accuracy may compromise privacy.
+                """
             )
         if e_value <= 0.2:
-            extra = (
-                ": The use of a value this **small** is discouraged "
-                "because the additional noise will lower the accuracy of results."
+            optional_warning = warning_md_box(
+                """
+                The use of a value this small is discouraged
+                because added noise will lower the accuracy of results.
+                """
             )
         return [
-            ui.markdown(f"Privacy Budget (Epsilon): {e_value}{extra}"),
+            ui.markdown(f"Privacy Budget (Epsilon): {e_value}"),
+            optional_warning,
             tutorial_box(
                 is_tutorial_mode(),
                 """
