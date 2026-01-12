@@ -18,6 +18,7 @@ pyright
 pytest-cov
 pytest-xdist
 diffimg
+hypothesis
 
 # App dependencies:
 -r requirements.in
