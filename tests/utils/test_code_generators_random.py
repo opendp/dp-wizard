@@ -1,3 +1,5 @@
+import warnings
+
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
@@ -42,8 +44,9 @@ good_floats = st.floats(
         lambda l_u: MIN_BOUND <= l_u[0] < l_u[1] <= MAX_BOUND
     ),
     max_rows=st.integers(min_value=MIN_ROW_COUNT, max_value=MAX_ROW_COUNT),
+    notebook_note=st.text(),
 )
-def test_make_random_notebook(bin_count, epsilon, lower_upper, max_rows):
+def test_make_random_notebook(bin_count, epsilon, lower_upper, max_rows, notebook_note):
     lower_bound, upper_bound = lower_upper
     mean_plan_column = AnalysisPlanColumn(
         statistic_name=mean.name,
@@ -62,10 +65,14 @@ def test_make_random_notebook(bin_count, epsilon, lower_upper, max_rows):
         epsilon=epsilon,
         max_rows=max_rows,
     )
-    notebook_py = NotebookGenerator(plan, "Note goes here!").make_py(reformat=True)
+    notebook_py = NotebookGenerator(plan, notebook_note).make_py(reformat=True)
     print(number_lines(notebook_py))
     globals = {}
-    exec(notebook_py, globals)
+
+    with warnings.catch_warnings():
+        # Ignore future warning and epsilon > 5
+        warnings.simplefilter(action="ignore")
+        exec(notebook_py, globals)
 
     # Close plots to avoid this warning:
     # > RuntimeWarning: More than 20 figures have been opened.
