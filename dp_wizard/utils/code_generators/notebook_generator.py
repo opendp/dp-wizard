@@ -80,7 +80,8 @@ class NotebookGenerator(AbstractGenerator):
             case _:  # pragma: no cover
                 raise ValueError(self.analysis_plan.product)
         target_path = package_root / ".local-sessions"
-        reports_block = (
+
+        return (
             Template(f"{self._get_synth_or_stats()}_reports", root)
             .fill_expressions(
                 OUTPUTS=outputs_expression,
@@ -94,9 +95,12 @@ class NotebookGenerator(AbstractGenerator):
                 TXT_REPORT_PATH=str(target_path / "report.txt"),
                 CSV_REPORT_PATH=str(target_path / "report.csv"),
             )
+            .fill_values(
+                CONTINGENCY_TABLE_PATH=str(target_path / "contingency.csv"),
+                when=self.analysis_plan.product == Product.SYNTHETIC_DATA,
+            )
             .finish()
         )
-        return reports_block
 
     def _make_extra_blocks(self):
         match self.analysis_plan.product:
