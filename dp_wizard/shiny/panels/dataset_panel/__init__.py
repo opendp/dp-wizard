@@ -20,7 +20,7 @@ from dp_wizard.shiny.components.outputs import (
 from dp_wizard.shiny.panels.dataset_panel import data_source
 from dp_wizard.types import AppState, Product
 from dp_wizard.utils.code_generators import make_privacy_unit_block
-from dp_wizard.utils.constraints import MAX_ROW_COUNT, MIN_ROW_COUNT
+from dp_wizard.utils.constraints import MAX_CONTRIBUTIONS, MAX_ROW_COUNT, MIN_ROW_COUNT
 from dp_wizard.utils.csv_helper import CsvInfo, get_csv_names_mismatch, infer_csv_info
 
 dataset_panel_id = "dataset_panel"
@@ -330,6 +330,7 @@ def dataset_server(
                     only_for_screenreader("Maximum number of rows contributed"),
                     contributions(),
                     min=1,
+                    max=MAX_CONTRIBUTIONS,
                 ),
                 [],  # Column placeholder
                 col_widths=col_widths,  # type: ignore
@@ -354,7 +355,7 @@ def dataset_server(
     def set_is_dataset_selected():
         info = csv_info()
         is_dataset_selected.set(
-            contributions_valid()
+            not contributions_message()
             and not info.get_is_error()
             and len(info.get_all_column_names()) > 0
             and not get_row_count_errors(max_rows())
@@ -362,15 +363,27 @@ def dataset_server(
         )
 
     @reactive.calc
-    def contributions_valid():
+    def contributions_message():
         contributions = input.contributions()
-        return isinstance(contributions, int) and contributions >= 1
+        assert isinstance(contributions, int)
+        if contributions < 1:
+            return "Rows per contributor must be at least 1."
+        if contributions > MAX_CONTRIBUTIONS:
+            return f"""
+                Rows per contributor limited to {MAX_CONTRIBUTIONS}.
+                Because the noise will be scaled by this number,
+                it is much better to aggregate during preprocessing
+                or to use OpenDP's truncation in your code
+                than to use a large value here.
+                """
+        return ""
 
     @render.ui
     def contributions_validation_ui():
+        message = contributions_message()
         return hide_if(
-            contributions_valid(),
-            warning_md_box("Contributions must be 1 or greater."),
+            not message,
+            warning_md_box(message),
         )
 
     @render.ui
