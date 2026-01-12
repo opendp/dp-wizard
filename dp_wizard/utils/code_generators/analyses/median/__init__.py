@@ -34,7 +34,8 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
 
         # Because the median is based on selection from candidate values,
         # it does not have an accuracy, unlike histogram and mean.
-        # More on [`summarize()` in the OpenDP docs](https://docs.opendp.org/en/stable/api/python/opendp.extras.polars.html#opendp.extras.polars.LazyFrameQuery.summarize).
+        # More on [`summarize()` in the OpenDP
+        # docs](https://docs.opendp.org/en/OPENDP_V_VERSION/api/python/opendp.extras.polars.html#opendp.extras.polars.LazyFrameQuery.summarize).
 
         # +
 
@@ -67,6 +68,7 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
             QUERY_NAME=f"{identifier}_query",
             STATS_NAME=stats_name,
             EXPR_NAME=f"{identifier}_expr",
+            OPENDP_V_VERSION=f"v{opendp_version}",
         )
         .finish()
     )
