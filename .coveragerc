@@ -2,8 +2,10 @@
 # All files under source are checked, even if not otherwise referenced.
 source = .
 
+# Random tests are run locally but not in CI: Exclude from coverage.
 omit =
   tests/fixtures/*
+  tests/utils/test_code_generators_random.py
 
 # More strict: Check transitions between lines, not just individual lines.
 branch = True
