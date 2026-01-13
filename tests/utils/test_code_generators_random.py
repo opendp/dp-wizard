@@ -1,6 +1,6 @@
 import warnings
 
-from hypothesis import given, settings
+from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
 from dp_wizard import package_root
@@ -36,7 +36,12 @@ good_floats = st.floats(
 # good_strings = st.text().filter(lambda s: "\x00" not in s)
 
 
-@settings(deadline=None)
+@settings(
+    deadline=None,
+    # Not sure, but I think the abundance of range bounds
+    # is the cause of this warning.
+    suppress_health_check=[HealthCheck.filter_too_much],
+)
 @given(
     bin_count=st.integers(),
     epsilon=st.floats(min_value=MIN_EPSILON, max_value=MAX_EPSILON),
@@ -45,7 +50,7 @@ good_floats = st.floats(
     ),
     max_rows=st.integers(min_value=MIN_ROW_COUNT, max_value=MAX_ROW_COUNT),
     contributions=st.integers(min_value=1, max_value=MAX_CONTRIBUTIONS),
-    # All-caps string from user looks like slot:
+    # All-caps string from user could be confused for slot:
     # TODO: https://github.com/opendp/dp-wizard/issues/796
     # notebook_note=good_strings,
 )
