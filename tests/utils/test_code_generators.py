@@ -16,7 +16,7 @@ from dp_wizard.utils.code_generators import (
     AnalysisPlanColumn,
     make_column_config_block,
 )
-from dp_wizard.utils.code_generators.analyses import histogram, mean, median
+from dp_wizard.utils.code_generators.analyses import bounds, histogram, mean, median
 from dp_wizard.utils.code_generators.notebook_generator import NotebookGenerator
 from dp_wizard.utils.code_generators.script_generator import ScriptGenerator
 
@@ -139,6 +139,13 @@ median_plan_column = AnalysisPlanColumn(
     bin_count=10,
     weight=4,
 )
+bounds_plan_column = AnalysisPlanColumn(
+    statistic_name=bounds.name,
+    lower_bound=0,  # Unused
+    upper_bound=10000,
+    bin_count=0,  # Unused
+    weight=4,
+)
 
 
 def id_for_plan(plan: AnalysisPlan):
@@ -168,11 +175,13 @@ plans_all_combos = [
         {ColumnName("2B"): [histogram_plan_column]},
         {ColumnName("2B"): [mean_plan_column]},
         {ColumnName("2B"): [median_plan_column]},
+        {ColumnName("2B"): [bounds_plan_column]},
         # Multiple:
         {
             ColumnName("2B"): [histogram_plan_column],
             ColumnName("3C"): [mean_plan_column],
             ColumnName("4D"): [median_plan_column],
+            ColumnName("5E"): [bounds_plan_column],
         },
     ]
 ]
@@ -226,7 +235,18 @@ def test_make_notebook(plan):
     assert isinstance(globals[context_global], dp.Context)
 
     notebook_nb = convert_py_to_nb(notebook_py, "Title placeholder")
-    notebook_html = convert_nb_to_html(notebook_nb)
+
+    # TODO: clean up upstream, and this simplify this.
+    # https://github.com/opendp/dp-wizard-templates/issues/30
+    import warnings
+
+    import nbformat.warnings
+
+    with warnings.catch_warnings():
+        warnings.simplefilter(
+            action="ignore", category=nbformat.warnings.DuplicateCellId
+        )
+        notebook_html = convert_nb_to_html(notebook_nb)
     # Parsing HTML with an RE is usually not the right solution,
     # but since these are generated from the markdown,
     # BeautifulSoup seems like overkill.
