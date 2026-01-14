@@ -47,9 +47,9 @@ def get_float_error(number_str) -> str | None:
     >>> get_float_error('nan')
     'should be a number'
     >>> get_float_error('1_000_000_000_001')
-    'should not be greater than 1,000,000,000,000'
+    'should not be greater than 100,000,000,000'
     >>> get_float_error('-1_000_000_000_001')
-    'should not be less than -1,000,000,000,000'
+    'should not be less than -100,000,000,000'
     """
     if number_str is None or number_str == "":
         return "is required"
