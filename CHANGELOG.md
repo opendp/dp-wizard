@@ -1,5 +1,44 @@
 # CHANGELOG
 
+## 0.7.0
+
+Highlights:
+
+- color bars by the first group [#780](https://github.com/opendp/dp-wizard/pull/780)
+- Show plot for contingency table [#765](https://github.com/opendp/dp-wizard/pull/765)
+- Contingency table download [#759](https://github.com/opendp/dp-wizard/pull/759)
+- Public grouping keys [#737](https://github.com/opendp/dp-wizard/pull/737)
+
+Also includes:
+
+- Random tests, and better input validation [#795](https://github.com/opendp/dp-wizard/pull/795)
+- Yellow warning box for high/low epsilon [#787](https://github.com/opendp/dp-wizard/pull/787)
+- Security upgrade [#789](https://github.com/opendp/dp-wizard/pull/789)
+- replace constant with varible in tests [#788](https://github.com/opendp/dp-wizard/pull/788)
+- remove TODO we will not do [#784](https://github.com/opendp/dp-wizard/pull/784)
+- use template `when` feature [#772](https://github.com/opendp/dp-wizard/pull/772)
+- Elevate to yellow for warning [#777](https://github.com/opendp/dp-wizard/pull/777)
+- split bin and plot utils [#761](https://github.com/opendp/dp-wizard/pull/761)
+- Consistent handling of validity checks [#782](https://github.com/opendp/dp-wizard/pull/782)
+- warn if no numeric columns [#776](https://github.com/opendp/dp-wizard/pull/776)
+- typo fixes and quality of life improvements [#773](https://github.com/opendp/dp-wizard/pull/773)
+- Warn about bad CSVs [#755](https://github.com/opendp/dp-wizard/pull/755)
+- Check that example code in slides is up to date [#753](https://github.com/opendp/dp-wizard/pull/753)
+- "analysis" to "statistic", except keep "AnalysisPlan", and "analysis tab" [#750](https://github.com/opendp/dp-wizard/pull/750)
+- public keys for synthetic data [#748](https://github.com/opendp/dp-wizard/pull/748)
+- Add warning colors on epsilon slider [#746](https://github.com/opendp/dp-wizard/pull/746)
+- upgrade urllib for dependabot [#747](https://github.com/opendp/dp-wizard/pull/747)
+- remove unneeded ".cast(float)" [#735](https://github.com/opendp/dp-wizard/pull/735)
+- absolute paths in notebooks [#749](https://github.com/opendp/dp-wizard/pull/749)
+- rename to make_plot_note for clarity [#751](https://github.com/opendp/dp-wizard/pull/751)
+- User ColumnIdentifier consistently [#745](https://github.com/opendp/dp-wizard/pull/745)
+- Tidy up results page UI [#731](https://github.com/opendp/dp-wizard/pull/731)
+- Misc: Weight enum, testing improvements [#739](https://github.com/opendp/dp-wizard/pull/739)
+- dependabot: upgrade fonttools [#744](https://github.com/opendp/dp-wizard/pull/744)
+- Move CSV util out of shiny init [#724](https://github.com/opendp/dp-wizard/pull/724)
+- Testing: Compare screenshots [#720](https://github.com/opendp/dp-wizard/pull/720)
+- Relocate test-only apps [#721](https://github.com/opendp/dp-wizard/pull/721)
+
 ## 0.6.0
 
 Highlights:
