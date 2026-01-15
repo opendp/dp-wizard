@@ -74,11 +74,9 @@ class CLIInfo(NamedTuple):
 
 
 def get_cli_info() -> CLIInfo:  # pragma: no cover
-
-    print(environ)
-    # Environment variable configured here:
-    # https://connect.posit.cloud/mccalluc/content/01966942-7eab-da99-0887-a7c483756aa8/settings/variables
-    if environ.get("RUNNING_IN_CLOUD"):
+    # This works, but haven't found anything in the posit docs that says this is stable.
+    if environ.get("USER") == "connect":
+        print("Starting cloud mode...")
         return CLIInfo(
             is_sample_csv=False,
             is_cloud_mode=True,
