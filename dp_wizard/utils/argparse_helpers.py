@@ -1,4 +1,5 @@
 import argparse
+from os import environ
 from sys import argv
 from typing import NamedTuple
 
@@ -73,7 +74,19 @@ class CLIInfo(NamedTuple):
 
 
 def get_cli_info() -> CLIInfo:  # pragma: no cover
+
+    print(environ)
+    # Environment variable configured here:
+    # https://connect.posit.cloud/mccalluc/content/01966942-7eab-da99-0887-a7c483756aa8/settings/variables
+    if environ.get("RUNNING_IN_CLOUD"):
+        return CLIInfo(
+            is_sample_csv=False,
+            is_cloud_mode=True,
+            is_qa_mode=False,
+        )
     args = _get_args()
     return CLIInfo(
-        is_sample_csv=args.sample, is_cloud_mode=args.cloud, is_qa_mode=False
+        is_sample_csv=args.sample,
+        is_cloud_mode=args.cloud,
+        is_qa_mode=False,
     )
