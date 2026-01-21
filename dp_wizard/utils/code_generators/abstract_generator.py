@@ -61,9 +61,9 @@ class AbstractGenerator(ABC):
 
     def _make_python_cell(self, block) -> str:
         """
-        Default to just pass through.
+        Default to just add padding.
         """
-        return block
+        return f"\n{block}\n"
 
     def _make_comment_cell(self, comment: str) -> str:
         return "".join(f"# {line}\n" for line in comment.splitlines())
@@ -91,7 +91,7 @@ class AbstractGenerator(ABC):
             .fill_blocks(
                 IMPORTS_BLOCK=Template(imports_template).finish(),
                 UTILS_BLOCK=bins_py + plots_py,
-                **self._make_extra_blocks(),
+                **self._make_extra_blocks(),  # type: ignore
             )
             .fill_blocks(
                 WINDOWS_COMMENT_BLOCK="""

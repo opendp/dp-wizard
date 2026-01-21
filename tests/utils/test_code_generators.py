@@ -225,8 +225,8 @@ def test_make_notebook(plan):
             raise ValueError(plan.product)
     assert isinstance(globals[context_global], dp.Context)
 
-    notebook_nb = convert_to_notebook(notebook_py, "Title placeholder")
-    notebook_html = convert_from_notebook(notebook_nb)
+    notebook_dict = convert_to_notebook(notebook_py, "Title placeholder")
+    notebook_html = convert_from_notebook(notebook_dict)
     # Parsing HTML with an RE is usually not the right solution,
     # but since these are generated from the markdown,
     # BeautifulSoup seems like overkill.
