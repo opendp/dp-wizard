@@ -7,7 +7,7 @@ import opendp.prelude as dp
 import polars as pl
 import pytest
 import requests
-from dp_wizard_templates.converters import convert_nb_to_html, convert_py_to_nb
+from dp_wizard_templates.converters import convert_from_notebook, convert_to_notebook
 
 from dp_wizard import opendp_version, package_root
 from dp_wizard.types import ColumnName, CsvInfo, Product, StatisticName
@@ -225,8 +225,8 @@ def test_make_notebook(plan):
             raise ValueError(plan.product)
     assert isinstance(globals[context_global], dp.Context)
 
-    notebook_nb = convert_py_to_nb(notebook_py, "Title placeholder")
-    notebook_html = convert_nb_to_html(notebook_nb)
+    notebook_nb = convert_to_notebook(notebook_py, "Title placeholder")
+    notebook_html = convert_from_notebook(notebook_nb)
     # Parsing HTML with an RE is usually not the right solution,
     # but since these are generated from the markdown,
     # BeautifulSoup seems like overkill.

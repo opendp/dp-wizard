@@ -1,12 +1,10 @@
+import json
 import re
 from pathlib import Path
 from shutil import make_archive
 from tempfile import TemporaryDirectory
 
-from dp_wizard_templates.converters import (
-    convert_nb_to_html,
-    convert_py_to_nb,
-)
+from dp_wizard_templates.converters import convert_from_notebook, convert_to_notebook
 from shiny import Inputs, Outputs, Session, reactive, render, types, ui
 
 from dp_wizard import package_root
@@ -332,7 +330,7 @@ def results_server(
             stem = input.custom_download_stem()
 
             (zip_root_dir / "README.txt").write_text(readme_txt())
-            (zip_root_dir / f"{stem}.ipynb").write_text(notebook_nb())
+            (zip_root_dir / f"{stem}.ipynb").write_text(json.dumps(notebook_nb()))
             (zip_root_dir / f"{stem}.html").write_text(notebook_html())
             (zip_root_dir / f"{stem}.py").write_text(script_py())
             # This is a little bit redundant, since these have already
@@ -394,20 +392,20 @@ def results_server(
         # https://github.com/opendp/dp-wizard/issues/682
         is_released.set(True)
         plan = analysis_plan()
-        return convert_py_to_nb(notebook_py(), title=str(plan), execute=True)
+        return convert_to_notebook(notebook_py(), title=str(plan), execute=True)
 
     @reactive.calc
     def notebook_nb_unexecuted():
         plan = analysis_plan()
-        return convert_py_to_nb(notebook_py(), title=str(plan), execute=False)
+        return convert_to_notebook(notebook_py(), title=str(plan), execute=False)
 
     @reactive.calc
     def notebook_html():
-        return convert_nb_to_html(notebook_nb())
+        return convert_from_notebook(notebook_nb())
 
     @reactive.calc
     def notebook_html_unexecuted():
-        return convert_nb_to_html(notebook_nb_unexecuted())
+        return convert_from_notebook(notebook_nb_unexecuted())
 
     @reactive.calc
     def report_txt():

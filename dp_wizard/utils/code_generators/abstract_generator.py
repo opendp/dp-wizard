@@ -88,12 +88,12 @@ class AbstractGenerator(ABC):
                 TITLE=str(self.analysis_plan),
                 DEPENDENCIES=f"'opendp[{extra}]=={opendp_version}' matplotlib",
             )
-            .fill_code_blocks(
+            .fill_blocks(
                 IMPORTS_BLOCK=Template(imports_template).finish(),
                 UTILS_BLOCK=bins_py + plots_py,
                 **self._make_extra_blocks(),
             )
-            .fill_comment_blocks(
+            .fill_blocks(
                 WINDOWS_COMMENT_BLOCK="""
 (If installing in the Windows CMD shell,
 use double-quotes instead of single-quotes below.)""",
@@ -290,7 +290,7 @@ are ignored because of errors, it will bias results.
                 OPENDP_V_VERSION=f"v{opendp_version}",
                 WEIGHTS=self._make_weights_expression(),
             )
-            .fill_code_blocks(
+            .fill_blocks(
                 PRIVACY_UNIT_BLOCK=privacy_unit_block,
                 PRIVACY_LOSS_BLOCK=privacy_loss_block,
             )
@@ -311,7 +311,7 @@ are ignored because of errors, it will bias results.
             .fill_expressions(
                 OPENDP_V_VERSION=f"v{opendp_version}",
             )
-            .fill_code_blocks(
+            .fill_blocks(
                 PRIVACY_UNIT_BLOCK=privacy_unit_block,
                 PRIVACY_LOSS_BLOCK=privacy_loss_block,
             )

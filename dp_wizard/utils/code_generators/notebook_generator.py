@@ -28,7 +28,7 @@ class NotebookGenerator(AbstractGenerator):
             partial_context.fill_values(
                 CSV_PATH=self.analysis_plan.get_absolute_csv_path(),
             )
-            .fill_code_blocks(
+            .fill_blocks(
                 OPTIONAL_CSV_BLOCK=(
                     "# Write to placeholder CSV so the notebook can still execute:\n"
                     "from pathlib import Path\n"

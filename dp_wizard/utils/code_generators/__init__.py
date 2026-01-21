@@ -157,7 +157,7 @@ def make_privacy_loss_block(pure: bool, epsilon: float, max_rows: int):
             EPSILON=epsilon,
             MAX_ROWS=max_rows,
         )
-        .fill_comment_blocks(
+        .fill_blocks(
             EPSILON_COMMENT_BLOCK=f"""
 Your privacy budget is captured in the "epsilon" parameter.
 Larger values increase the risk that personal data could be
