@@ -28,17 +28,20 @@ IMPORTS_BLOCK
 UTILS_BLOCK
 # -
 
+# + [markdown] tags=["Full_Tutorial"]
 # ### Context
 #
 # Next, we'll define our Context. This is where we set the privacy budget,
 # and the columns that will be part of the synthetic dataset.
 
-# +
+# + tags=["Full_Tutorial"]
 SYNTH_CONTEXT_BLOCK
 # -
 
+# + [markdown] tags=["Full_Tutorial"]
 # CSV_COMMENT_BLOCK
-#
+# -
+
 # ## Results
 #
 # First, we'll release a contingency table, a data structure which can give us

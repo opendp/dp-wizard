@@ -29,24 +29,32 @@ IMPORTS_BLOCK
 UTILS_BLOCK
 # -
 
+# + [markdown] tags=["Full_Tutorial"]
 # ## Analysis
 #
 # Based on the input you provided, for each column we'll create a Polars expression
 # that describes how we want to summarize that column.
+# -
 
+# + tags=["Full_Tutorial"]
 COLUMNS_BLOCK
+# -
 
+# + [markdown] tags=["Full_Tutorial"]
 # ### Context
 #
 # Next, we'll define our Context. This is where we set the privacy budget,
 # and set the weight for each query under that overall budget.
+# -
 
-# +
+# + tags=["Full_Tutorial"]
 STATS_CONTEXT_BLOCK
 # -
 
+# + [markdown] tags=["Full_Tutorial"]
 # CSV_COMMENT_BLOCK
-#
+# -
+
 # ## Results
 #
 # Finally, we run the queries and plot the results.
