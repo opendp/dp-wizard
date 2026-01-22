@@ -1,9 +1,8 @@
-from dp_wizard_templates.code_template import Template
-
 from dp_wizard import package_root
 from dp_wizard.types import ColumnIdentifier, Product
 from dp_wizard.utils.code_generators.abstract_generator import (
     AbstractGenerator,
+    DefaultsTemplate,
     get_template_root,
 )
 from dp_wizard.utils.dp_helper import confidence
@@ -67,7 +66,7 @@ class NotebookGenerator(AbstractGenerator):
 
         match self.analysis_plan.product:
             case Product.SYNTHETIC_DATA:
-                outputs_expression = Template(template).finish()
+                outputs_expression = DefaultsTemplate(template).finish()
             case Product.STATISTICS:
                 outputs_expression = (
                     "{"
@@ -82,7 +81,7 @@ class NotebookGenerator(AbstractGenerator):
         target_path = package_root / ".local-sessions"
 
         return (
-            Template(f"{self._get_synth_or_stats()}_reports", root)
+            DefaultsTemplate(f"{self._get_synth_or_stats()}_reports", root)
             .fill_expressions(
                 OUTPUTS=outputs_expression,
                 COLUMNS={

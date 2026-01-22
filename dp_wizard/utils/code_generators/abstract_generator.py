@@ -2,12 +2,11 @@ from abc import ABC, abstractmethod
 from math import gcd
 from typing import Iterable
 
-from dp_wizard_templates.code_template import Template
-
 from dp_wizard import get_template_root, opendp_version, package_root
 from dp_wizard.types import ColumnIdentifier, Product
 from dp_wizard.utils.code_generators import (
     AnalysisPlan,
+    DefaultsTemplate,
     make_column_config_block,
     make_privacy_loss_block,
     make_privacy_unit_block,
@@ -83,13 +82,13 @@ class AbstractGenerator(ABC):
         plots_py = (package_root / "utils/shared/plots.py").read_text()
 
         code = (
-            Template(self._get_root_template(), template_root)
+            DefaultsTemplate(self._get_root_template(), template_root)
             .fill_expressions(
                 TITLE=str(self.analysis_plan),
                 DEPENDENCIES=f"'opendp[{extra}]=={opendp_version}' matplotlib",
             )
             .fill_blocks(
-                IMPORTS_BLOCK=Template(imports_template).finish(),
+                IMPORTS_BLOCK=DefaultsTemplate(imports_template).finish(),
                 UTILS_BLOCK=bins_py + plots_py,
                 **self._make_extra_blocks(),  # type: ignore
             )
@@ -146,12 +145,11 @@ are ignored because of errors, it will bias results.
             dp.polars.Margin(by=([BIN_NAME] + list(GROUPS.keys())), invariant="keys")
 
         margins = [
-            Template(basic_template)
-            .fill_expressions(OPENDP_V_VERSION=f"v{opendp_version}")
+            DefaultsTemplate(basic_template)
             .fill_values(GROUPS=groups, MAX_ROWS=max_rows)
             .finish()
         ] + [
-            Template(bin_template)
+            DefaultsTemplate(bin_template)
             .fill_values(GROUPS=groups, BIN_NAME=bin_name)
             .finish()
             for bin_name in bin_names
@@ -283,11 +281,10 @@ are ignored because of errors, it will bias results.
             ]
         )
         return (
-            Template("stats_context", template_root)
+            DefaultsTemplate("stats_context", template_root)
             .fill_expressions(
                 MARGINS_LIST=margins_list,
                 EXTRA_COLUMNS=extra_columns,
-                OPENDP_V_VERSION=f"v{opendp_version}",
                 WEIGHTS=self._make_weights_expression(),
             )
             .fill_blocks(
@@ -306,15 +303,9 @@ are ignored because of errors, it will bias results.
             epsilon=self.analysis_plan.epsilon,
             max_rows=self.analysis_plan.max_rows,
         )
-        return (
-            Template("synth_context", template_root)
-            .fill_expressions(
-                OPENDP_V_VERSION=f"v{opendp_version}",
-            )
-            .fill_blocks(
-                PRIVACY_UNIT_BLOCK=privacy_unit_block,
-                PRIVACY_LOSS_BLOCK=privacy_loss_block,
-            )
+        return DefaultsTemplate("synth_context", template_root).fill_blocks(
+            PRIVACY_UNIT_BLOCK=privacy_unit_block,
+            PRIVACY_LOSS_BLOCK=privacy_loss_block,
         )
 
     def _make_synth_query(self):
@@ -394,10 +385,7 @@ are ignored because of errors, it will bias results.
         }
         keys = self.analysis_plan.groups
         return (
-            Template(template)
-            .fill_expressions(
-                OPENDP_V_VERSION=f"v{opendp_version}",
-            )
+            DefaultsTemplate(template)
             .fill_values(
                 COLUMNS=list(self.analysis_plan.columns.keys())
                 + list(self.analysis_plan.groups.keys()),

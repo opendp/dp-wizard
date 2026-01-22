@@ -9,6 +9,15 @@ from dp_wizard import __version__, opendp_version, registry_url
 from dp_wizard.types import ColumnName, Product, StatisticName
 
 
+class DefaultsTemplate(Template):
+    def finish(self, reformat=False):
+        self.fill_expressions(
+            OPENDP_V_VERSION=f"v{opendp_version}",
+            optional=True,
+        )
+        return super().finish(reformat)
+
+
 class AnalysisPlanColumn(NamedTuple):
     statistic_name: StatisticName
     lower_bound: float
@@ -95,7 +104,7 @@ def make_privacy_unit_block(
         privacy_unit = dp.unit_of(contributions=contributions)  # noqa: F841
 
     return (
-        Template(template)
+        DefaultsTemplate(template)
         .fill_values(CONTRIBUTIONS=contributions)
         .fill_expressions(CONTRIBUTIONS_ENTITY=contributions_entity)
         .finish()
@@ -149,10 +158,7 @@ def make_privacy_loss_block(pure: bool, epsilon: float, max_rows: int):
             )
 
     return (
-        Template(template)
-        .fill_expressions(
-            OPENDP_V_VERSION=f"v{opendp_version}",
-        )
+        DefaultsTemplate(template)
         .fill_values(
             EPSILON=epsilon,
             MAX_ROWS=max_rows,
