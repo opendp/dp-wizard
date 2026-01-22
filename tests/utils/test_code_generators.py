@@ -233,6 +233,12 @@ def test_make_notebook(plan):
     urls = set(re.findall(r'<a[^>]+href="(http[^"]+)[^>]+>', notebook_html))
     assert urls <= set(expected_urls)
 
+    assert "tags=" not in notebook_html, "Missing '# +' in jupytext source?"
+    assert set(re.findall(r"celltag_\w+", notebook_html)) == {
+        "celltag_Full_Tutorial",
+        "celltag_Postprocessing",
+    }, "Typo in tag?"
+
 
 @pytest.mark.parametrize("plan", plans, ids=id_for_plan)
 def test_make_script(plan):
@@ -243,6 +249,7 @@ def test_make_script(plan):
     # https://jupytext.readthedocs.io/en/latest/formats-scripts.html#the-light-format
     assert "# -" not in script
     assert "# +" not in script
+    assert "tags=" not in script
 
     with NamedTemporaryFile(mode="w") as fp:
         fp.write(script)
