@@ -54,8 +54,10 @@ STATS_CONTEXT_BLOCK
 # -
 
 # ## Results
-#
+
+# + [markdown] tags=["Full_Tutorial"]
 # Finally, we run the queries and plot the results.
+# -
 
 STATS_QUERIES_BLOCK
 
