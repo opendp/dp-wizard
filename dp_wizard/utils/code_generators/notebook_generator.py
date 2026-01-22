@@ -40,12 +40,20 @@ class NotebookGenerator(AbstractGenerator):
         )
 
     def _make_python_cell(self, block):
-        return f"\n# +\n{block}\n# -\n"
+        return f"\n{block}\n"
 
     def _make_columns(self):
         column_config_dict = self._make_column_config_dict()
         return "\n".join(
-            f"# ### Expression for `{name}`\n{self._make_python_cell(block)}"
+            f"""
+# + [markdown] tags=["Full_Tutorial"]
+# ### Expression for `{name}`
+# -
+
+# + tags=["Full_Tutorial"]
+{self._make_python_cell(block)}
+# -
+"""
             for name, block in column_config_dict.items()
         )
 

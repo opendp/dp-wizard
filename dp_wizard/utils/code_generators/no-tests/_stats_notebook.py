@@ -36,9 +36,7 @@ UTILS_BLOCK
 # that describes how we want to summarize that column.
 # -
 
-# + tags=["Full_Tutorial"]
 COLUMNS_BLOCK
-# -
 
 # + [markdown] tags=["Full_Tutorial"]
 # ### Context
