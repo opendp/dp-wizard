@@ -1,3 +1,4 @@
+import html
 import re
 from pathlib import Path
 from shutil import make_archive
@@ -372,7 +373,11 @@ def results_server(
             return "raise Exception('qa_mode!')"
         return NotebookGenerator(
             analysis_plan(),
-            input.custom_download_note(),
+            # The custom download note is inserted as a comment,
+            # and jupytext copies it verbatim to a markdown cell,
+            # and nbconvert does not sanitize MD before converting to HTML.
+            # Sanitizing HTML would be more complicated, and potentially lossy.
+            html.escape(input.custom_download_note(), quote=False),
         ).make_py()
 
     @reactive.calc
