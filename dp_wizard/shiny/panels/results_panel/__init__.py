@@ -356,7 +356,6 @@ def results_server(
     def readme_txt():
         note = input.custom_download_note()
         toc = table_of_contents_md()
-        column_names = csv_info().get_all_column_names()
         return "\n\n".join(
             [
                 f"# {analysis_plan()}",
