@@ -315,6 +315,7 @@ def results_server(
             # We *do* need to allow empty v: support grouping w/o keys.
             groups={k: v for k, v in group_keys().items() if k in group_column_names()},
             analysis_columns=columns,
+            schema_columns=csv_info().get_schema(),
         )
 
     ################################

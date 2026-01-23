@@ -3,6 +3,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import NamedTuple, Optional
 
+import polars as pl
 from dp_wizard_templates.code_template import Template
 
 from dp_wizard import __version__, opendp_version, registry_url
@@ -29,7 +30,11 @@ class AnalysisPlan(NamedTuple):
     ...     groups={'grouping_col': ['expected', 'values']},
     ...     analysis_columns={
     ...         'data_col': [AnalysisPlanColumn('Histogram', 0, 100, 10, 1)]
-    ...     })
+    ...     },
+    ...     schema_columns={
+    ...         'data_col': pl.Int32(),
+    ...     },
+    ... )
     >>> print(plan)
     DP Statistics for `data_col` grouped by `grouping_col`
     >>> print(plan.to_stem())
@@ -47,6 +52,7 @@ class AnalysisPlan(NamedTuple):
     max_rows: int
     groups: dict[ColumnName, list[str | float]]
     analysis_columns: dict[ColumnName, list[AnalysisPlanColumn]]
+    schema_columns: dict[ColumnName, pl.DataType]
 
     def __str__(self) -> str:
         def md_list(names) -> str:
