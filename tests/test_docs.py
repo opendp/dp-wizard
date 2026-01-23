@@ -38,7 +38,7 @@ def test_doc_examples_up_to_date():
     plan = AnalysisPlan(
         product=Product.STATISTICS,
         groups={},
-        columns={
+        analysis_columns={
             ColumnName("grade"): [
                 AnalysisPlanColumn(
                     statistic_name=histogram.name,

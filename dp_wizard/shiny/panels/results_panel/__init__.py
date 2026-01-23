@@ -314,7 +314,7 @@ def results_server(
             # group_keys may contains groups which are not currently selected.
             # We *do* need to allow empty v: support grouping w/o keys.
             groups={k: v for k, v in group_keys().items() if k in group_column_names()},
-            columns=columns,
+            analysis_columns=columns,
         )
 
     ################################

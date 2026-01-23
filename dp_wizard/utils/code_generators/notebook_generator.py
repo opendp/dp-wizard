@@ -23,7 +23,7 @@ class NotebookGenerator(AbstractGenerator):
         return self._fill_partial_context(self._make_partial_synth_context())
 
     def _fill_partial_context(self, partial_context):
-        placeholder_csv_content = ",".join(self.analysis_plan.columns)
+        placeholder_csv_content = ",".join(self.analysis_plan.analysis_columns)
         return (
             partial_context.fill_values(
                 CSV_PATH=self.analysis_plan.get_absolute_csv_path(),
@@ -73,7 +73,7 @@ class NotebookGenerator(AbstractGenerator):
                     "{"
                     + ",".join(
                         self._make_report_kv(name, plan[0].statistic_name)
-                        for name, plan in self.analysis_plan.columns.items()
+                        for name, plan in self.analysis_plan.analysis_columns.items()
                     )
                     + "}"
                 )
@@ -86,7 +86,8 @@ class NotebookGenerator(AbstractGenerator):
             .fill_expressions(
                 OUTPUTS=outputs_expression,
                 COLUMNS={
-                    k: v[0]._asdict() for k, v in self.analysis_plan.columns.items()
+                    k: v[0]._asdict()
+                    for k, v in self.analysis_plan.analysis_columns.items()
                 },
             )
             .fill_values(

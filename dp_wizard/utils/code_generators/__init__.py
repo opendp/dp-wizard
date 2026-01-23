@@ -27,7 +27,7 @@ class AnalysisPlan(NamedTuple):
     ...     epsilon=2.0,
     ...     max_rows=1000,
     ...     groups={'grouping_col': ['expected', 'values']},
-    ...     columns={
+    ...     analysis_columns={
     ...         'data_col': [AnalysisPlanColumn('Histogram', 0, 100, 10, 1)]
     ...     })
     >>> print(plan)
@@ -46,13 +46,13 @@ class AnalysisPlan(NamedTuple):
     epsilon: float
     max_rows: int
     groups: dict[ColumnName, list[str | float]]
-    columns: dict[ColumnName, list[AnalysisPlanColumn]]
+    analysis_columns: dict[ColumnName, list[AnalysisPlanColumn]]
 
     def __str__(self) -> str:
         def md_list(names) -> str:
             return ", ".join(f"`{name}`" for name in names)
 
-        columns_md = md_list(self.columns.keys()) or "TBD"
+        columns_md = md_list(self.analysis_columns.keys()) or "TBD"
         groups_md = md_list(self.groups)
         grouped_by = f" grouped by {groups_md}" if groups_md else ""
         return f"{self.product} for {columns_md}{grouped_by}"
