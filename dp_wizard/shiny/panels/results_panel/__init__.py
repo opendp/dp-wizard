@@ -158,11 +158,11 @@ def results_server(
 
     @reactive.calc
     def download_stem() -> str:
-        return analysis_plan().to_stem()
+        return analysis_plan().get_stem()
 
     @reactive.calc
     def download_note() -> str:
-        return analysis_plan().to_note()
+        return analysis_plan().get_note()
 
     @render.ui
     def download_options_ui():
@@ -363,7 +363,6 @@ def results_server(
                 note,
                 "Contains:",
                 toc,
-                f"Original CSV columns: {', '.join(column_names)}",
             ]
         )
 
