@@ -68,7 +68,7 @@ def test_make_random_notebook(bin_count, epsilon, lower_upper, max_rows, contrib
         product=Product.STATISTICS,
         groups={},
         analysis_columns={ColumnName("2B"): [mean_plan_column]},
-        schema_columns={ColumnName("2B"): pl.Float32},
+        schema_columns={ColumnName("2B"): pl.Float32()},
         contributions=contributions,
         contributions_entity="PLACEHOLDER",  # TODO: enum?
         csv_path=abc_csv_path,
