@@ -35,6 +35,10 @@ WORKDIR /app
 #     --uid "${UID}" \
 #     appuser
 
+# Copy only requirements.txt, so other changes won't blow the cache:
+COPY requirements.txt requirements.txt
+RUN pip install -r requirements.txt
+
 COPY . .
 RUN pip install --editable '.[app]'
 
