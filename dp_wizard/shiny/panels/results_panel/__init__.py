@@ -204,7 +204,6 @@ def results_server(
             "Notebook",
             "HTML",
             "Script",
-            "Report",
             "Table",
         ]
         if product() == Product.SYNTHETIC_DATA:
@@ -339,7 +338,6 @@ def results_server(
             # been written out as files, but it's safer to start
             # from a clean slate, rather than rely on the side effect
             # of a reactive.calc.
-            (zip_root_dir / f"{stem}.txt").write_text(report_txt())
             (zip_root_dir / f"{stem}.csv").write_text(table_csv())
 
             base_name = f"{tmp_dir}/{stem}"
@@ -408,11 +406,6 @@ def results_server(
     @reactive.calc
     def notebook_html_unexecuted():
         return convert_nb_to_html(notebook_nb_unexecuted())
-
-    @reactive.calc
-    def report_txt():
-        notebook_nb()  # Evaluate just for the side effect of creating report.
-        return (_target_path / "report.txt").read_text()
 
     @reactive.calc
     def table_csv():
@@ -499,10 +492,6 @@ def results_server(
     @download(".unexecuted.html")
     async def download_html_unexecuted_button():
         yield _make_download_or_modal_error(notebook_html_unexecuted)
-
-    @download(".txt")
-    async def download_report_link():
-        yield _make_download_or_modal_error(report_txt)
 
     @download(".csv")
     async def download_table_link():

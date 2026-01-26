@@ -48,16 +48,6 @@ _download_options = {
             "The same content, but exported as HTML.",
         ),
         DownloadOption(
-            "Report",
-            ".txt",
-            "file-lines",
-            """
-            A report which includes your parameter choices and the results.
-            Intended to be human-readable, but it does use YAML,
-            so it can be parsed by other programs.
-            """,
-        ),
-        DownloadOption(
             "Table",
             ".csv",
             "file-csv",
@@ -115,7 +105,7 @@ def table_of_contents_md():
     ...
     - Table (.csv): The same information, but condensed into a CSV.
     """
-    included_names = ["README", "Notebook", "HTML", "Script", "Report", "Table"]
+    included_names = ["README", "Notebook", "HTML", "Script", "Table"]
     included_options = [_download_options[name] for name in included_names]
     return "\n".join(
         f"- {opt.name} ({opt.ext}): {opt.clean_description_md}"
