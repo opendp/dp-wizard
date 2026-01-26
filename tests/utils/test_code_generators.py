@@ -285,3 +285,9 @@ def test_pums():
     print(number_lines(notebook_py))
     globals = {}
     exec(notebook_py, globals)
+
+
+@pytest.mark.parametrize("plan", plans, ids=id_for_plan)
+def test_analysis_plan_yaml(plan):
+    # TODO: Support round trips.
+    plan.serialize()

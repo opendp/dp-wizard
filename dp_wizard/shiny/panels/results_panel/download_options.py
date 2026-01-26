@@ -112,7 +112,6 @@ def table_of_contents_md():
     >>> print(table_of_contents_md())
     - README (.txt): A short description of the analysis, and a table of contents.
     ...
-    - Table (.csv): The same information, but condensed into a CSV.
     """
     included_names = ["README", "Notebook", "HTML", "Script", "Table", "Configuration"]
     included_options = [_download_options[name] for name in included_names]

@@ -3,7 +3,6 @@ from pathlib import Path
 from shutil import make_archive
 from tempfile import TemporaryDirectory
 
-import yaml
 from dp_wizard_templates.converters import (
     convert_nb_to_html,
     convert_py_to_nb,
@@ -422,11 +421,7 @@ def results_server(
 
     @reactive.calc
     def configuration_yaml():
-        # TODO: namedtuples lose field names in yaml serialization.
-        # Would dataclasses be better?
-        # NOTE: safe_dump does not work here: I think we do eventually
-        # want to support round trips, and if we trust the CLI user that's ok.
-        return yaml.dump(analysis_plan())
+        return analysis_plan().serialize()
 
     ######################
     #
