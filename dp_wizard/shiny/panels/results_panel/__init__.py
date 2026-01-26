@@ -3,6 +3,7 @@ from pathlib import Path
 from shutil import make_archive
 from tempfile import TemporaryDirectory
 
+import yaml
 from dp_wizard_templates.converters import (
     convert_nb_to_html,
     convert_py_to_nb,
@@ -205,6 +206,7 @@ def results_server(
             "HTML",
             "Script",
             "Table",
+            "Configuration",
         ]
         if product() == Product.SYNTHETIC_DATA:
             downloads.append("Contingency Table")
@@ -339,6 +341,7 @@ def results_server(
             # from a clean slate, rather than rely on the side effect
             # of a reactive.calc.
             (zip_root_dir / f"{stem}.csv").write_text(table_csv())
+            (zip_root_dir / f"{stem}.yaml").write_text(configuration_yaml())
 
             base_name = f"{tmp_dir}/{stem}"
             ext = "zip"
@@ -417,6 +420,14 @@ def results_server(
         notebook_nb()  # Evaluate just for the side effect of creating report.
         return (_target_path / "contingency.csv").read_text()
 
+    @reactive.calc
+    def configuration_yaml():
+        # TODO: namedtuples lose field names in yaml serialization.
+        # Would dataclasses be better?
+        # NOTE: safe_dump does not work here: I think we do eventually
+        # want to support round trips, and if we trust the CLI user that's ok.
+        return yaml.dump(analysis_plan())
+
     ######################
     #
     # Handle the downloads
@@ -440,6 +451,7 @@ def results_server(
             "html": "text/html",
             "csv": "text/csv",
             "txt": "text/plain",
+            "yaml": "application/yaml",
         }.get(last_ext)
         if mime is None:
             raise Exception(f"No MIME type for {ext}")
@@ -492,6 +504,10 @@ def results_server(
     @download(".unexecuted.html")
     async def download_html_unexecuted_button():
         yield _make_download_or_modal_error(notebook_html_unexecuted)
+
+    @download(".yaml")
+    async def download_configuration_link():
+        yield _make_download_or_modal_error(configuration_yaml)
 
     @download(".csv")
     async def download_table_link():

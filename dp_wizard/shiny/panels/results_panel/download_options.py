@@ -94,6 +94,15 @@ _download_options = {
             Primarily of interest to DP Wizard developers.
             """,
         ),
+        DownloadOption(
+            "Configuration",
+            ".yaml",
+            "sliders",
+            """
+            Analysis configuration as YAML. Except for the contents of
+            your input CSV, this captures all the details of your analysis.
+            """,
+        ),
     ]
 }
 
@@ -105,7 +114,7 @@ def table_of_contents_md():
     ...
     - Table (.csv): The same information, but condensed into a CSV.
     """
-    included_names = ["README", "Notebook", "HTML", "Script", "Table"]
+    included_names = ["README", "Notebook", "HTML", "Script", "Table", "Configuration"]
     included_options = [_download_options[name] for name in included_names]
     return "\n".join(
         f"- {opt.name} ({opt.ext}): {opt.clean_description_md}"
