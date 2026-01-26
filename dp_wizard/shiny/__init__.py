@@ -6,9 +6,9 @@ from shiny import App, Inputs, Outputs, Session, reactive, ui
 from dp_wizard import package_root
 from dp_wizard.shiny.components.icons import tutorial_icon
 from dp_wizard.shiny.panels import (
-    about_panel,
     analysis_panel,
     dataset_panel,
+    faq_panel,
     results_panel,
 )
 from dp_wizard.types import AppState, Product
@@ -58,7 +58,7 @@ def _make_app_ui(cli_info: CLIInfo) -> Tag:
             ui.include_js(_shiny_root / "vendor/highlight.js/11.11.1/highlight.min.js"),
         ),
         ui.navset_tab(
-            about_panel.about_ui(),
+            faq_panel.about_ui(),
             dataset_panel.dataset_ui(),
             analysis_panel.analysis_ui(),
             results_panel.results_ui(),
@@ -157,7 +157,7 @@ def _make_server(cli_info: CLIInfo):
             # Do not set state: Nothing downstream needs this.
             config.set_is_dark_mode(dark_mode == "dark")
 
-        about_panel.about_server(input, output, session)
+        faq_panel.about_server(input, output, session)
         dataset_panel.dataset_server(input, output, session, state)
         analysis_panel.analysis_server(input, output, session, state)
         results_panel.results_server(input, output, session, state)

@@ -12,14 +12,14 @@ the [OpenDP Library](https://docs.opendp.org/).
 
 Yes and no.
 
-Interpretted narrowly, anonymization describes a particular way of protecting sensitive information, by dropping any identifying information before beginning an analysis, while differential privacy (as implemented by DP Wizard) adds noise to the final results.
+Interpretted narrowly, anonymization describes a particular way of protecting sensitive information, by dropping identifiers before beginning an analysis, while differential privacy (as implemented by DP Wizard) adds noise to the final results.
 They are different approaches.
 
-However, if you don't select any columns with identifying information for analysis in DP Wizard, you are effectively using anonymization _and_ differential privacy: The techniques can be combined.
+However, if you don't select any identifier columns for analysis in DP Wizard, you are effectively using anonymization _and_ differential privacy: The techniques can be combined.
 
 Moreover, anonymization should not be taken as a gold standard:
 Even if the obvious identifiers have been stripped, there may be combinations of fields that can link records back to individuals or small groups.
-In this light, if there is a requirement for anonymization it is worth asking if the intent is to prescribe a particular approach, or to ensure that personal information is protected by some means.
+In this light, if there is a requirement for anonymization it is worth asking if the intent is to prescribe a particular approach, or to ensure that personal information is protected by the best means available.
 
 ### Where can I learn more?
 
