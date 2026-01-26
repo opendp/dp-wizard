@@ -51,7 +51,7 @@ _download_options = {
             "Table",
             ".csv",
             "file-csv",
-            "The same information, but condensed into a CSV.",
+            "Just the results as a CSV.",
         ),
         DownloadOption(
             "Contingency Table",
