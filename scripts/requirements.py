@@ -81,8 +81,10 @@ def get_new_pyproject_toml():
     pyproject["project"]["dependencies"] = to_toml_array(  # type:ignore
         "requirements.in"
     )
-    pyproject["project"]["optional-dependencies"]["app"] = to_toml_array(  # type:ignore
-        "requirements.txt"
+    pyproject["project"]["optional-dependencies"]["pins"] = (
+        to_toml_array(  # type:ignore
+            "requirements.txt"
+        )
     )
     return dumps(pyproject)
 

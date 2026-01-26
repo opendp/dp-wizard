@@ -12,7 +12,7 @@
 - Publish: `flit publish --pypirc .pypirc`
 
 This project is configured so there are two different install possibilities from pypi:
-- `pip install 'dp_wizard[app]'` pins all dependencies, and is the best route for most users.
+- `pip install 'dp_wizard[pins]'` pins all dependencies, and is the best route for most users.
 - `pip install dp_wizard` does not pin dependencies, and is best if you're using `dp_wizard` as a library.
 
 

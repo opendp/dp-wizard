@@ -61,7 +61,7 @@ strict = [
 profile = "black"
 
 [project.optional-dependencies]
-app = [
+pins = [
     "absl-py==2.3.1",
     "anyio==4.9.0",
     "appdirs==1.4.4",
