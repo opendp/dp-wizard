@@ -85,14 +85,9 @@ class NotebookGenerator(AbstractGenerator):
             Template(f"{self._get_synth_or_stats()}_reports", root)
             .fill_expressions(
                 OUTPUTS=outputs_expression,
-                COLUMNS={
-                    k: v[0]._asdict() for k, v in self.analysis_plan.columns.items()
-                },
+                when=self.analysis_plan.product == Product.STATISTICS,
             )
             .fill_values(
-                CSV_PATH=self.analysis_plan.get_absolute_csv_path(),
-                EPSILON=self.analysis_plan.epsilon,
-                TXT_REPORT_PATH=str(target_path / "report.txt"),
                 CSV_REPORT_PATH=str(target_path / "report.csv"),
             )
             .fill_values(

@@ -204,8 +204,8 @@ def results_server(
             "Notebook",
             "HTML",
             "Script",
-            "Report",
             "Table",
+            "Configuration",
         ]
         if product() == Product.SYNTHETIC_DATA:
             downloads.append("Contingency Table")
@@ -339,8 +339,8 @@ def results_server(
             # been written out as files, but it's safer to start
             # from a clean slate, rather than rely on the side effect
             # of a reactive.calc.
-            (zip_root_dir / f"{stem}.txt").write_text(report_txt())
             (zip_root_dir / f"{stem}.csv").write_text(table_csv())
+            (zip_root_dir / f"{stem}.yaml").write_text(configuration_yaml())
 
             base_name = f"{tmp_dir}/{stem}"
             ext = "zip"
@@ -410,11 +410,6 @@ def results_server(
         return convert_nb_to_html(notebook_nb_unexecuted())
 
     @reactive.calc
-    def report_txt():
-        notebook_nb()  # Evaluate just for the side effect of creating report.
-        return (_target_path / "report.txt").read_text()
-
-    @reactive.calc
     def table_csv():
         notebook_nb()  # Evaluate just for the side effect of creating report.
         return (_target_path / "report.csv").read_text()
@@ -423,6 +418,10 @@ def results_server(
     def contingency_table_csv():
         notebook_nb()  # Evaluate just for the side effect of creating report.
         return (_target_path / "contingency.csv").read_text()
+
+    @reactive.calc
+    def configuration_yaml():
+        return analysis_plan().serialize()
 
     ######################
     #
@@ -447,6 +446,7 @@ def results_server(
             "html": "text/html",
             "csv": "text/csv",
             "txt": "text/plain",
+            "yaml": "application/yaml",
         }.get(last_ext)
         if mime is None:
             raise Exception(f"No MIME type for {ext}")
@@ -500,9 +500,9 @@ def results_server(
     async def download_html_unexecuted_button():
         yield _make_download_or_modal_error(notebook_html_unexecuted)
 
-    @download(".txt")
-    async def download_report_link():
-        yield _make_download_or_modal_error(report_txt)
+    @download(".yaml")
+    async def download_configuration_link():
+        yield _make_download_or_modal_error(configuration_yaml)
 
     @download(".csv")
     async def download_table_link():
