@@ -98,22 +98,26 @@ class ColumnIdentifier(str):
         return str.__new__(cls, identifier)
 
 
+scan_csv_kwargs = {
+    "encoding": "utf8-lossy",
+    # Read the whole CSV:
+    # Until we hear that this is too slow,
+    # it's better to be sure the types
+    # have been accurately inferred.
+    "infer_schema_length": None,
+    # Default is to raise NoDataError:
+    # We prefer to validate below and set error.
+    "raise_if_empty": False,
+}
+scan_csv_kwargs_expression = "encoding='utf8-lossy', infer_schema_length=None"
+
+
 class CsvInfo:
     def __init__(self, csv_path: Path | None):
         self._schema = (
             {
                 ColumnName(k): v
-                for k, v in pl.scan_csv(
-                    csv_path,
-                    # Read the whole CSV:
-                    # Until we hear that this is too slow,
-                    # it's better to be sure the types
-                    # have been accurately inferred.
-                    infer_schema_length=None,
-                    # Default is to raise NoDataError:
-                    # We prefer to validate below and set error.
-                    raise_if_empty=False,
-                )
+                for k, v in pl.scan_csv(csv_path, **scan_csv_kwargs)  # type: ignore
                 .collect_schema()
                 .items()
                 if k.strip() != ""

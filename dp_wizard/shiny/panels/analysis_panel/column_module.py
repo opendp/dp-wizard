@@ -16,7 +16,7 @@ from dp_wizard.shiny.components.outputs import (
     tutorial_box,
     warning_md_box,
 )
-from dp_wizard.types import ColumnName, Product, StatisticName, Weight
+from dp_wizard.types import ColumnName, Product, StatisticName, Weight, scan_csv_kwargs
 from dp_wizard.utils.code_generators import make_column_config_block
 from dp_wizard.utils.code_generators.analyses import (
     get_statistic_by_name,
@@ -213,7 +213,7 @@ def column_server(
         # but I'd guess this is dominated by the DP operations,
         # so not worth optimizing.
         lf = (
-            pl.scan_csv(public_csv_path, ignore_errors=True)
+            pl.scan_csv(public_csv_path, **scan_csv_kwargs)  # type: ignore
             if public_csv_path
             else pl.LazyFrame(
                 mock_data({name: ColumnDef(lower_x, upper_x)}, row_count=row_count)
