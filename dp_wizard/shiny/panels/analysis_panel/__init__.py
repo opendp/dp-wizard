@@ -147,7 +147,6 @@ def analysis_server(
 ):  # pragma: no cover
     # CLI options:
     is_sample_csv = state.is_sample_csv
-    # in_cloud = state.in_cloud
 
     # Reactive bools:
     is_tutorial_mode = state.is_tutorial_mode

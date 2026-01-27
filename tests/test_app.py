@@ -23,46 +23,7 @@ local_app = create_app_fixture(package_root / "app.py")
 
 test_apps = Path(__file__).parent / "apps"
 sample_app = create_app_fixture(test_apps / "app_sample.py")
-cloud_app = create_app_fixture(test_apps / "app_cloud.py")
 qa_app = create_app_fixture(test_apps / "app_qa.py")
-
-
-def test_cloud_app(page: Page, cloud_app: ShinyAppProc):  # pragma: no cover
-    page.goto(cloud_app.url)
-
-    page.locator("#max_rows").fill("10000")
-    expect(page).to_have_title("DP Wizard")
-    expect(page.get_by_text("Choose Public CSV")).not_to_be_visible()
-    page.get_by_label("CSV Column Names").fill("a_column:1\nb_column:2")
-
-    page.get_by_role("button", name="Define Analysis").click()
-    page.locator(".selectize-input").nth(0).click()
-    page.get_by_text("1: a_column").click()
-    page.get_by_label("Lower").fill("0")
-    page.get_by_label("Upper").fill("10")
-
-    expect(
-        page.get_by_text("Select one or more columns before proceeding.")
-    ).not_to_be_visible()
-    page.locator(".selectize-input").nth(0).click()
-    page.get_by_text("2: b_column").click()
-    page.get_by_text("Select one or more columns before proceeding.")
-    page.get_by_text("2: b_column×").click()
-
-    page.get_by_role("button", name="Download Results").click()
-    with page.expect_download() as download_info:
-        page.get_by_role("link", name="Notebook (unexecuted").click()
-
-    download_path = download_info.value.path()
-
-    # Try to execute the downloaded file:
-    # Based on https://nbconvert.readthedocs.io/en/latest/execute_api.html#example
-    nb = nbformat.read(download_path.open(), as_version=4)
-    ep = ExecutePreprocessor(timeout=600, kernel_name="python3")
-    ep.preprocess(nb)
-
-    # Clean up file in CWD that is created by notebook execution.
-    Path(PLACEHOLDER_CSV_NAME).unlink()
 
 
 def test_qa_app(page: Page, qa_app: ShinyAppProc):  # pragma: no cover

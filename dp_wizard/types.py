@@ -212,7 +212,6 @@ class CsvInfo:
 class AppState:
     # CLI options:
     is_sample_csv: bool
-    in_cloud: bool
     qa_mode: bool
 
     # Reactive bools:
