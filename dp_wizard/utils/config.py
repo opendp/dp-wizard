@@ -25,7 +25,8 @@ def _init_config():
 
 
 # TODO: This is only called at application start.
-# We'd like to call this when a new session starts.
+# We'd like to call this when the page is reloaded, too.
+# https://github.com/opendp/dp-wizard/issues/830
 _init_config()
 
 
