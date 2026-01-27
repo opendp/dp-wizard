@@ -118,7 +118,6 @@ def dataset_server(
 ):  # pragma: no cover
     # CLI options:
     is_sample_csv = state.is_sample_csv
-    in_cloud = state.in_cloud
 
     # Reactive bools:
     is_tutorial_mode = state.is_tutorial_mode
@@ -169,12 +168,6 @@ def dataset_server(
         private_csv_path.set(path)
         csv_info.set(CsvInfo(Path(path)))
 
-    @reactive.effect
-    @reactive.event(input.all_column_names)
-    def _on_column_names_change():
-        # Only used when the user is supplying column names in cloud mode.
-        csv_info.set(infer_csv_info(input.all_column_names()))
-
     @reactive.calc
     def csv_column_mismatch_calc() -> Optional[tuple[set, set]]:
         public = public_csv_path()
@@ -223,7 +216,6 @@ def dataset_server(
     @render.ui
     def csv_or_columns_ui():
         return data_source.csv_or_columns_ui(
-            in_cloud=in_cloud,
             is_tutorial_mode=is_tutorial_mode,
             csv_info=csv_info,
         )
@@ -359,7 +351,7 @@ def dataset_server(
             and not info.get_is_error()
             and len(info.get_all_column_names()) > 0
             and not get_row_count_errors(max_rows())
-            and (in_cloud or not csv_column_mismatch_calc())
+            and not csv_column_mismatch_calc()
         )
 
     @reactive.calc
@@ -388,26 +380,13 @@ def dataset_server(
 
     @render.ui
     def python_tutorial_ui():
-        cloud_extra_markdown = (
-            """
-            Because this instance of DP Wizard is running in the cloud,
-            we don't allow private data to be uploaded.
-            When run locally, DP Wizard can also run an analysis
-            on your data and return results,
-            and not just an unexecuted notebook.
-            """
-            if in_cloud
-            else ""
-        )
         return tutorial_box(
             is_tutorial_mode(),
-            f"""
+            """
             Along the way, code samples demonstrate
             how the information you provide is used in the
             OpenDP Library, and at the end you can download
             a notebook for the entire calculation.
-
-            {cloud_extra_markdown}
             """,
             responsive=False,
         )
@@ -465,7 +444,7 @@ def dataset_server(
         return [
             button,
             f"""
-            Specify {'columns' if in_cloud else 'CSV'}, unit of privacy,
+            Specify CSV, unit of privacy,
             and maximum row count before proceeding.
             """,
         ]

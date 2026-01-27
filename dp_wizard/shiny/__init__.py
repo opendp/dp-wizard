@@ -111,7 +111,6 @@ def _make_server(cli_info: CLIInfo):
         state = AppState(
             # CLI options:
             is_sample_csv=cli_info.is_sample_csv,
-            in_cloud=cli_info.is_cloud_mode,
             qa_mode=cli_info.is_qa_mode,
             # Reactive bools:
             is_tutorial_mode=reactive.value(cli_info.get_is_tutorial_mode()),

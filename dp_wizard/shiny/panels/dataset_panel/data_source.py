@@ -19,57 +19,21 @@ from dp_wizard.utils.csv_helper import CsvInfo
 
 
 def csv_or_columns_ui(
-    in_cloud: bool,
     is_tutorial_mode: reactive.Value[bool],
     csv_info: reactive.Value[CsvInfo],
 ):  # pragma: no cover
-    if in_cloud:
-        content = [
-            ui.markdown(
-                """
-                Provide the names of columns you'll use in your analysis,
-                one per line, with a sample value for each. For example:
-
-                ```
-                name: Chuck
-                age: 48
-                ```
-                """
-            ),
-            tutorial_box(
-                is_tutorial_mode(),
-                """
-                When [installed and run
-                locally](https://pypi.org/project/dp_wizard/),
-                DP Wizard allows you to specify a private and public CSV,
-                but for the safety of your data, in the cloud
-                DP Wizard only accepts column names.
-
-                If you don't have other ideas, we can imagine
-                a CSV of student quiz grades: Enter `student_id`,
-                `quiz_id`, `grade`, and `class_year_str` below,
-                each on a separate line.
-                """,
-                responsive=False,
-            ),
-            ui.input_text_area("all_column_names", "CSV Column Names", rows=5),
-        ]
-    else:
-        content = [
-            ui.markdown(
-                f"""
+    return [
+        ui.markdown(
+            f"""
 Choose **Private CSV** {PRIVATE_TEXT}
 
 Choose **Public CSV** {PUBLIC_TEXT}
 
 Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
-                """
-            ),
-            ui.output_ui("input_files_ui"),
-            ui.output_ui("csv_message_ui"),
-        ]
-
-    content += [
+            """
+        ),
+        ui.output_ui("input_files_ui"),
+        ui.output_ui("csv_message_ui"),
         code_sample(
             "Context",
             Template(
@@ -98,7 +62,6 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
         ),
         ui.output_ui("python_tutorial_ui"),
     ]
-    return content
 
 
 def input_files_ui(
