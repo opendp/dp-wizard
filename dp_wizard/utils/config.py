@@ -10,7 +10,10 @@ class _Config(NamedTuple):
     is_dark_mode: bool | None
 
 
-_config_path = Path(os.path.expanduser("~")) / ".dp-wizard-config.yaml"
+config_root = Path(os.path.expanduser("~")) / ".dp-wizard"
+if not config_root.exists():
+    config_root.mkdir()  # pragma: no cover
+_config_path = config_root / ".config.yaml"
 _config: _Config
 
 

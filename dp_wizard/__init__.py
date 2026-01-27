@@ -3,6 +3,8 @@
 from logging import warning
 from pathlib import Path
 
+from dp_wizard.utils.config import config_root
+
 package_root = Path(__file__).parent
 __version__ = (package_root / "VERSION").read_text().strip()
 opendp_version = "0.14.1"
@@ -34,7 +36,7 @@ def main() -> None:  # pragma: no cover
     # and to validate inputs before starting the server.
     get_cli_info()
 
-    not_first_run_path = package_root / ".local-config/not-first-run.txt"
+    not_first_run_path = config_root / "not-first-run.txt"
     if not not_first_run_path.exists():
         warning("┌──────────────────────────────────┐")
         warning("│ First startup may take a minute! │")
