@@ -2,8 +2,14 @@
 
 set -euo pipefail
 
-docker build -t opendp/dp-wizard .
-docker run --name dp-wizard -p 8000:8000 opendp/dp-wizard
+TAG='opendp/dp-wizard'
+NAME='dp-wizard'
+docker build -t $TAG .
+docker run --name $NAME -p 8000:8000 $TAG  || \
+    echo "If already running, run: docker rm $NAME"
+
+# Since we're not running as daemon, clean up on shutdown.
+docker rm $NAME
 
 # TODO: The image starts successfully,
 # but I'm not able to connect to http://localhost:8000/

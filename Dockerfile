@@ -5,7 +5,7 @@
 # https://docs.docker.com/engine/reference/builder/
 
 ARG PYTHON_VERSION=3.13
-FROM python:${PYTHON_VERSION}-slim as base
+FROM python:${PYTHON_VERSION}-slim AS base
 
 # Prevents Python from writing pyc files.
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -60,4 +60,4 @@ RUN pip install --editable '.[app]'
 EXPOSE 8000
 
 # Run the application.
-CMD dp-wizard
+CMD ["dp-wizard"]
