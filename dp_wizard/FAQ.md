@@ -10,16 +10,46 @@ the [OpenDP Library](https://docs.opendp.org/).
 
 ### Does differential privacy provide anonymization?
 
-Yes and no.
+This is one definition of anonymization:
 
-Interpretted narrowly, anonymization describes a particular way of protecting sensitive information, by dropping identifiers before beginning an analysis, while differential privacy (as implemented by DP Wizard) adds noise to the final results.
-They are different approaches.
+> Anonymisation is the way in which you turn personal data into anonymous information, so that it then falls outside the scope of data protection law. You can consider data to be effectively anonymised if people are not (or are no longer) identifiable.
+>
+> We use the broad term ‘anonymisation’ to cover the techniques and approaches you can use to prevent identifying people that the data relates to.
 
-However, if you don't select any identifier columns for analysis in DP Wizard, you are effectively using anonymization _and_ differential privacy: The techniques can be combined.
+(From the UK Information Commissioner's Office [_Introduction to Anonymisation_](https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/data-sharing/anonymisation/introduction-to-anonymisation/#whatisanonymisation))
 
-Moreover, anonymization should not be taken as a gold standard:
-Even if the obvious identifiers have been stripped, there may be combinations of fields that can link records back to individuals or small groups.
-In this light, if there is a requirement for anonymization it is worth asking if the intent is to prescribe a particular approach, or to ensure that personal information is protected by the best means available.
+Differential privacy, used appropriately, may provide anonymization, but just as with other anonymization techniques it needs to be applied carefully.
+
+It may be helpful to compare the vulnerabilities of different anonymization techniques:
+If indentifying values are dropped from datasets for anonymization, that may not be sufficient if other combinations of individual characteristics are still distinctive.
+In contrast, differential privacy does not have this particular vulnerability, but it does present other challenges: successive DP releases on the same dataset will expose incrementally more information and consume a larger privacy budget.
+
+Anonymization requirements vary legal regimes, data domains, and end uses, and any approach to anonymization should be reviewed by an expert who understands your particular requirements.
+
+### How do I choose a privacy budget?
+
+It may be helpful to make transparent the competing needs for accuracy and privacy.
+Accuracy may be the easier one:
+The confidence margins that result from additional noise can often be precisely characterized.
+You should not use a larger budget than necessary for your analysis.
+
+The privacy requirements on the other hand can not be reduced to a number.
+Although the epsilon value has a definition as a log-odds ratio, it embodies worst case assumptions, and doesn't take into account legal requirements, or possible harms to the individuals involved.
+
+These tradeoffs are not unique to differential privacy: _Any_ disclosure of information carries with it a risk of revealing personal information. One strength of differential privacy is that it makes this tradeoff more clear.
+
+### Can synthetic data from DP Wizard be used for analysis?
+
+Synthetic data has certainly been used for analysis when individual privacy needs to be preserved. The 2020 US Census is a notable example of a synthetic data product.
+
+However, conducting an analysis on synthetic data is not the only possibility:
+It can also be used as a proxy.
+Analyses can be prepared against the synthetic dataset, and then once the bugs have been worked out, the analysis can be run against the real data in a protected environment.
+Whether this is feasible will depend on your organizational constraints.
+
+One thing to remember is that the synthetic data is derived from the contingency table, and if a question can be answered directly from the contingency table, that is usually better.
+Contingency tables also make assumptions like bin ranges transparent to the user.
+
 
 ### Where can I learn more?
 
