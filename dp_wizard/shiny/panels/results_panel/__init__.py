@@ -158,11 +158,11 @@ def results_server(
 
     @reactive.calc
     def download_stem() -> str:
-        return analysis_plan().to_stem()
+        return analysis_plan().get_stem()
 
     @reactive.calc
     def download_note() -> str:
-        return analysis_plan().to_note()
+        return analysis_plan().get_note()
 
     @render.ui
     def download_options_ui():
@@ -314,7 +314,8 @@ def results_server(
             # group_keys may contains groups which are not currently selected.
             # We *do* need to allow empty v: support grouping w/o keys.
             groups={k: v for k, v in group_keys().items() if k in group_column_names()},
-            columns=columns,
+            analysis_columns=columns,
+            schema_columns=csv_info().get_schema(),
         )
 
     ################################
@@ -355,14 +356,12 @@ def results_server(
     def readme_txt():
         note = input.custom_download_note()
         toc = table_of_contents_md()
-        column_names = csv_info().get_all_column_names()
         return "\n\n".join(
             [
                 f"# {analysis_plan()}",
                 note,
                 "Contains:",
                 toc,
-                f"Original CSV columns: {', '.join(column_names)}",
             ]
         )
 
