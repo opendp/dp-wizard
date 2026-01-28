@@ -60,10 +60,6 @@ deprecated==1.2.18
     # via opendp
 dp-wizard-templates==0.7.0
     # via -r requirements.in
-exceptiongroup==1.3.0
-    # via
-    #   anyio
-    #   ipython
 executing==2.2.0
     # via stack-data
 faicons==0.2.2
@@ -88,12 +84,12 @@ ipykernel==6.29.5
     # via dp-wizard-templates
 ipython==8.35.0
     # via ipykernel
-jax==0.6.2
+jax==0.9.0
     # via
     #   chex
     #   mbi
     #   optax
-jaxlib==0.6.2
+jaxlib==0.9.0
     # via
     #   chex
     #   jax
@@ -301,10 +297,6 @@ threadpoolctl==3.6.0
     # via scikit-learn
 tinycss2==1.4.0
     # via bleach
-tomli==2.2.1
-    # via
-    #   black
-    #   jupytext
 toolz==1.0.0
     # via chex
 tornado==6.5.1
@@ -326,18 +318,13 @@ traitlets==5.14.3
 typing-extensions==4.13.2
     # via
     #   anyio
-    #   asgiref
     #   beautifulsoup4
-    #   black
     #   chex
-    #   exceptiongroup
     #   htmltools
     #   ipython
-    #   mistune
     #   referencing
     #   shiny
     #   starlette
-    #   uvicorn
 tzdata==2025.2
     # via pandas
 uc-micro-py==1.0.3
