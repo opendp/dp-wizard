@@ -2,8 +2,9 @@
 
 set -euo pipefail
 
-TAG='opendp/dp-wizard'
-NAME='dp-wizard'
+NAME="dp-wizard"
+TAG="opendp/$NAME"
+
 docker build -t $TAG .
 # Remove any previous container with the same name (ignore errors)
 docker rm -f "$NAME" >/dev/null 2>&1 || true
