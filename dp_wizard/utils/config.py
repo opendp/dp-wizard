@@ -1,8 +1,8 @@
-import os
-from pathlib import Path
 from typing import NamedTuple
 
 import yaml
+
+from dp_wizard import config_root
 
 
 class _Config(NamedTuple):
@@ -10,9 +10,6 @@ class _Config(NamedTuple):
     is_dark_mode: bool | None
 
 
-config_root = Path(os.path.expanduser("~")) / ".dp-wizard"
-if not config_root.exists():
-    config_root.mkdir()  # pragma: no cover
 _config_path = config_root / ".config.yaml"
 _config: _Config
 

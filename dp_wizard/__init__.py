@@ -1,14 +1,16 @@
 """DP Wizard makes it easier to get started with Differential Privacy."""
 
+import os
 from logging import warning
 from pathlib import Path
-
-from dp_wizard.utils.config import config_root
 
 package_root = Path(__file__).parent
 __version__ = (package_root / "VERSION").read_text().strip()
 opendp_version = "0.14.1"
 registry_url = "https://registry.opendp.org/deployments-registry/"
+config_root = Path(os.path.expanduser("~")) / ".dp-wizard"
+if not config_root.exists():
+    config_root.mkdir()  # pragma: no cover
 
 
 def get_template_root(path: str) -> Path:
