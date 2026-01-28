@@ -28,7 +28,7 @@ dependencies = [
 ]
 
 [options]
-python_requires = ">=3.10"
+python_requires = ">=3.11"
 
 [project.scripts]
 # Prefer dash in name where allowed (repo named and executable)
@@ -84,7 +84,6 @@ app = [
     "defusedxml==0.7.1",
     "deprecated==1.2.18",
     "dp-wizard-templates==0.7.0",
-    "exceptiongroup==1.3.0",
     "executing==2.2.0",
     "faicons==0.2.2",
     "fastjsonschema==2.21.1",
@@ -94,8 +93,8 @@ app = [
     "idna==3.10",
     "ipykernel==6.29.5",
     "ipython==8.35.0",
-    "jax==0.6.2",
-    "jaxlib==0.6.2",
+    "jax==0.9.0",
+    "jaxlib==0.9.0",
     "jedi==0.19.2",
     "jinja2==3.1.6",
     "joblib==1.4.2",
@@ -164,7 +163,6 @@ app = [
     "starlette==0.49.1",
     "threadpoolctl==3.6.0",
     "tinycss2==1.4.0",
-    "tomli==2.2.1",
     "toolz==1.0.0",
     "tornado==6.5.1",
     "traitlets==5.14.3",

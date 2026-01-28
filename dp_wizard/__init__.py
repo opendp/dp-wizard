@@ -19,7 +19,7 @@ def get_template_root(path: str) -> Path:
 def main() -> None:  # pragma: no cover
     import sys
 
-    min_version = "3.10"
+    min_version = "3.11"
     if sys.version_info < tuple(int(v) for v in min_version.split(".")):
         raise Exception(
             f"DP Wizard requires Python {min_version}"

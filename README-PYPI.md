@@ -32,7 +32,7 @@ Download Results:
 
 ## Usage
 
-DP Wizard requires Python 3.10 or later.
+DP Wizard requires Python 3.11 or later.
 You can check your current version with `python --version`.
 The exact upgrade process will depend on your environment and operating system.
 
