@@ -32,7 +32,7 @@ Download Results:
 
 ## Usage
 
-DP Wizard requires Python 3.10 or later.
+DP Wizard requires Python 3.11 or later.
 You can check your current version with `python --version`.
 The exact upgrade process will depend on your environment and operating system.
 
@@ -91,8 +91,8 @@ DP-Wizard will run across multiple Python versions, but for the fewest surprises
 ```shell
 $ git clone https://github.com/opendp/dp-wizard.git
 $ cd dp-wizard
-$ brew install python@3.10
-$ python3.10 -m venv .venv
+$ brew install python@3.11
+$ python3.11 -m venv .venv
 $ source .venv/bin/activate
 ```
 
