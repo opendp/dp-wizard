@@ -8,14 +8,12 @@ DP Wizard demonstrates how to calculate DP statistics or create a synthetic data
 
 (If differential privacy is new to you, [these slides](https://opendp.github.io/dp-wizard/) provide some background, and explain how DP Wizard works.)
 
-You can run DP Wizard locally and upload your own CSV,
-or use the [cloud deployment](https://mccalluc-dp-wizard.share.connect.posit.cloud/) and only provide column names to protect your private data.
-In either case, you'll be prompted to describe your privacy budget and the analysis you need.
-With that information, DP Wizard provides:
+Options for running DP Wizard:
 
-- A Jupyter notebook which demonstrates how to use the [OpenDP Library](https://docs.opendp.org/).
-- A plain Python script.
-- Text and CSV reports.
+- No install [online demo](https://mccalluc-dp-wizard.share.connect.posit.cloud/): Does not support data upload.
+- Install from [Docker](https://hub.docker.com/repository/docker/mccalluc/dp-wizard/general): `docker run -p 8000:8000 mccalluc/dp-wizard`
+- Install from [PyPI](https://pypi.org/project/dp-wizard/): `pip install 'dp-wizard[app]'; dp-wizard`
+- Install from [source](https://github.com/opendp/dp-wizard): See developer instructions.
 
 ## Screenshots
 
