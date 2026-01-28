@@ -59,6 +59,8 @@ strict = [
 
 [tool.isort]
 profile = "black"
+skip_glob = [".venv*/*"]
+
 
 [project.optional-dependencies]
 app = [
