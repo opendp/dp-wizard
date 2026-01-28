@@ -1,9 +1,8 @@
 from pathlib import Path
 
-from dp_wizard_templates.code_template import Template
 from shiny import reactive, ui
 
-from dp_wizard import opendp_version, package_root
+from dp_wizard import package_root
 from dp_wizard.shiny.components.outputs import (
     code_sample,
     hide_if,
@@ -15,6 +14,7 @@ from dp_wizard.utils.argparse_helpers import (
     PUBLIC_PRIVATE_TEXT,
     PUBLIC_TEXT,
 )
+from dp_wizard.utils.code_generators import DefaultsTemplate
 from dp_wizard.utils.csv_helper import CsvInfo
 
 
@@ -72,7 +72,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
     content += [
         code_sample(
             "Context",
-            Template(
+            DefaultsTemplate(
                 # NOTE: If stats vs. synth is moved to the top of the flow,
                 # then we can show the appropriate template here.
                 "stats_context",
@@ -82,10 +82,9 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             .fill_expressions(
                 MARGINS_LIST="margins",
                 EXTRA_COLUMNS="extra_columns",
-                OPENDP_V_VERSION=f"v{opendp_version}",
                 WEIGHTS="weights",
             )
-            .fill_code_blocks(
+            .fill_blocks(
                 PRIVACY_UNIT_BLOCK="",
                 PRIVACY_LOSS_BLOCK="",
                 OPTIONAL_CSV_BLOCK=(
