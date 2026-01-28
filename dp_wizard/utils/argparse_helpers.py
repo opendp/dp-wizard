@@ -73,7 +73,7 @@ Provide both {PUBLIC_PRIVATE_TEXT}
 def _get_args() -> argparse.Namespace:
     """
     >>> _get_args()
-    Namespace(sample=False, cloud=False)
+    Namespace(sample=False, cloud=False, host='127.0.0.1', port=8000, ...)
     """
     arg_parser = _get_arg_parser()
 

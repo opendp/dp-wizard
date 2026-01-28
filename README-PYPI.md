@@ -39,15 +39,18 @@ The exact upgrade process will depend on your environment and operating system.
 Install with `pip install 'dp_wizard[app]'` and you can start DP Wizard from the command line.
 
 ```
-usage: dp-wizard [-h] [--sample | --cloud]
+usage: dp-wizard [-h] [--sample | --cloud] [--host HOST] [--port PORT] [--no_browser] [--reload]
 
 DP Wizard makes it easier to get started with Differential Privacy.
 
 options:
-  -h, --help  show this help message and exit
-  --sample    Generate a sample CSV: See how DP Wizard works without providing
-              your own data
-  --cloud     Prompt for column names instead of CSV upload
+  -h, --help    show this help message and exit
+  --sample      Generate a sample CSV: See how DP Wizard works without providing your own data
+  --cloud       Prompt for column names instead of CSV upload
+  --host HOST   Bind socket to this host
+  --port PORT   Bind socket to this port. If 0, a random port will be used.
+  --no_browser  By default, a browser is started; Enable this for no browser.
+  --reload      Enable to watch source directory and reload on changes.
 
 Unless you have set "--sample" or "--cloud", you will specify a CSV
 inside the application.
