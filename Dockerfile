@@ -60,4 +60,4 @@ RUN pip install --editable '.[app]'
 EXPOSE 8000
 
 # Run the application.
-CMD ["dp-wizard"]
+CMD ["dp-wizard", "--no_browser", "--host", "0.0.0.0"]
