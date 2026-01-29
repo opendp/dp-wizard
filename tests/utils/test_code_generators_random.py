@@ -1,5 +1,6 @@
 import warnings
 
+import polars as pl
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
@@ -66,7 +67,8 @@ def test_make_random_notebook(bin_count, epsilon, lower_upper, max_rows, contrib
     plan = AnalysisPlan(
         product=Product.STATISTICS,
         groups={},
-        columns={ColumnName("2B"): [mean_plan_column]},
+        analysis_columns={ColumnName("2B"): [mean_plan_column]},
+        schema_columns={ColumnName("2B"): pl.Float32()},
         contributions=contributions,
         contributions_entity="PLACEHOLDER",  # TODO: enum?
         csv_path=abc_csv_path,

@@ -1,3 +1,5 @@
+import polars as pl
+
 from dp_wizard import package_root
 from dp_wizard.types import ColumnName, Product
 from dp_wizard.utils.code_generators import AnalysisPlan, AnalysisPlanColumn
@@ -38,7 +40,7 @@ def test_doc_examples_up_to_date():
     plan = AnalysisPlan(
         product=Product.STATISTICS,
         groups={},
-        columns={
+        analysis_columns={
             ColumnName("grade"): [
                 AnalysisPlanColumn(
                     statistic_name=histogram.name,
@@ -49,6 +51,7 @@ def test_doc_examples_up_to_date():
                 )
             ],
         },
+        schema_columns={ColumnName("grade"): pl.Float32()},
         contributions=1,
         contributions_entity="Individual",
         csv_path=csv_path,
