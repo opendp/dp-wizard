@@ -236,8 +236,8 @@ def test_make_notebook(plan):
 
     assert "tags=" not in notebook_html, "Missing '# +' in jupytext source?"
     assert set(re.findall(r"celltag_\w+", notebook_html)) == {
-        "celltag_Full_Tutorial",
-        "celltag_Postprocessing",
+        "celltag_tutorial",
+        "celltag_postprocessing",
     }, "Typo in tag?"
 
 
