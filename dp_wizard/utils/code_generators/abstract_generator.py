@@ -170,7 +170,7 @@ are ignored because of errors, it will bias results.
                 upper_bound=col[0].upper_bound,
                 bin_count=col[0].bin_count,
             )
-            for name, col in self.analysis_plan.columns.items()
+            for name, col in self.analysis_plan.analysis_columns.items()
         }
 
     def _make_confidence_note(self):
@@ -182,13 +182,13 @@ are ignored because of errors, it will bias results.
                 f"confidence = {confidence} # {self._make_confidence_note()}"
             )
         ]
-        for column_name in self.analysis_plan.columns.keys():
+        for column_name in self.analysis_plan.analysis_columns.keys():
             to_return.append(self._make_query(column_name))
 
         return "\n".join(to_return)
 
     def _make_query(self, column_name):
-        plan = self.analysis_plan.columns[column_name]
+        plan = self.analysis_plan.analysis_columns[column_name]
         identifier = ColumnIdentifier(column_name)
         accuracy_name = f"{identifier}_accuracy"
         stats_name = f"{identifier}_stats"
@@ -219,7 +219,8 @@ are ignored because of errors, it will bias results.
 
     def _make_weights_expression(self):
         weights_dict = {
-            name: plans[0].weight for name, plans in self.analysis_plan.columns.items()
+            name: plans[0].weight
+            for name, plans in self.analysis_plan.analysis_columns.items()
         }
         weights_message = (
             "Allocate the privacy budget to your queries in this ratio:"
@@ -245,7 +246,7 @@ are ignored because of errors, it will bias results.
 
         bin_column_names = [
             ColumnIdentifier(name)
-            for name, plan in self.analysis_plan.columns.items()
+            for name, plan in self.analysis_plan.analysis_columns.items()
             if has_bins(get_statistic_by_name(plan[0].statistic_name))
         ]
 
@@ -261,7 +262,7 @@ are ignored because of errors, it will bias results.
 
         is_just_histograms = all(
             plan_column[0].statistic_name == histogram.name
-            for plan_column in self.analysis_plan.columns.values()
+            for plan_column in self.analysis_plan.analysis_columns.values()
         )
         margins_list = (
             # Histograms don't need margins.
@@ -276,7 +277,7 @@ are ignored because of errors, it will bias results.
         extra_columns = ", ".join(
             [
                 f"{ColumnIdentifier(name)}_bin_expr"
-                for name, plan in self.analysis_plan.columns.items()
+                for name, plan in self.analysis_plan.analysis_columns.items()
                 if has_bins(get_statistic_by_name(plan[0].statistic_name))
             ]
         )
@@ -381,13 +382,13 @@ are ignored because of errors, it will bias results.
                     )
                 }
             )
-            for (k, v) in self.analysis_plan.columns.items()
+            for (k, v) in self.analysis_plan.analysis_columns.items()
         }
         keys = self.analysis_plan.groups
         return (
             DefaultsTemplate(template)
             .fill_values(
-                COLUMNS=list(self.analysis_plan.columns.keys())
+                COLUMNS=list(self.analysis_plan.analysis_columns.keys())
                 + list(self.analysis_plan.groups.keys()),
                 CUTS=cuts,
                 KEYS=keys,

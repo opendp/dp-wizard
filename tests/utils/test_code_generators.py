@@ -149,7 +149,8 @@ plans_all_combos = [
     AnalysisPlan(
         product=product,
         groups=groups,
-        columns=columns,
+        analysis_columns=columns,
+        schema_columns={k: pl.Float32() for k in columns.keys()},
         contributions=contributions,
         contributions_entity="Family",
         csv_path=abc_csv_path,
@@ -271,7 +272,7 @@ def test_pums():
     plan = AnalysisPlan(
         product=Product.STATISTICS,
         groups={},
-        columns={
+        analysis_columns={
             ColumnName("income"): [
                 AnalysisPlanColumn(
                     mean.name,
@@ -281,6 +282,9 @@ def test_pums():
                     weight=1,
                 )
             ]
+        },
+        schema_columns={
+            ColumnName("income"): pl.Int32(),
         },
         contributions=1,
         contributions_entity="Family",
