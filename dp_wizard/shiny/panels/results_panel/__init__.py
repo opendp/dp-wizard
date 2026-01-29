@@ -1,12 +1,10 @@
+import json
 import re
 from pathlib import Path
 from shutil import make_archive
 from tempfile import TemporaryDirectory
 
-from dp_wizard_templates.converters import (
-    convert_nb_to_html,
-    convert_py_to_nb,
-)
+from dp_wizard_templates.converters import convert_from_notebook, convert_to_notebook
 from shiny import Inputs, Outputs, Session, reactive, render, types, ui
 
 from dp_wizard import package_root
@@ -158,11 +156,11 @@ def results_server(
 
     @reactive.calc
     def download_stem() -> str:
-        return analysis_plan().to_stem()
+        return analysis_plan().get_stem()
 
     @reactive.calc
     def download_note() -> str:
-        return analysis_plan().to_note()
+        return analysis_plan().get_note()
 
     @render.ui
     def download_options_ui():
@@ -314,7 +312,8 @@ def results_server(
             # group_keys may contains groups which are not currently selected.
             # We *do* need to allow empty v: support grouping w/o keys.
             groups={k: v for k, v in group_keys().items() if k in group_column_names()},
-            columns=columns,
+            analysis_columns=columns,
+            schema_columns=csv_info().get_schema(),
         )
 
     ################################
@@ -332,7 +331,7 @@ def results_server(
             stem = input.custom_download_stem()
 
             (zip_root_dir / "README.txt").write_text(readme_txt())
-            (zip_root_dir / f"{stem}.ipynb").write_text(notebook_nb())
+            (zip_root_dir / f"{stem}.ipynb").write_text(notebook_json())
             (zip_root_dir / f"{stem}.html").write_text(notebook_html())
             (zip_root_dir / f"{stem}.py").write_text(script_py())
             # This is a little bit redundant, since these have already
@@ -355,14 +354,12 @@ def results_server(
     def readme_txt():
         note = input.custom_download_note()
         toc = table_of_contents_md()
-        column_names = csv_info().get_all_column_names()
         return "\n\n".join(
             [
                 f"# {analysis_plan()}",
                 note,
                 "Contains:",
                 toc,
-                f"Original CSV columns: {', '.join(column_names)}",
             ]
         )
 
@@ -383,7 +380,7 @@ def results_server(
         ).make_py()
 
     @reactive.calc
-    def notebook_nb():
+    def notebook_dict():
         # This creates the notebook, and evaluates it,
         # and drops reports in the local-sessions dir.
         # Could be slow!
@@ -394,29 +391,37 @@ def results_server(
         # https://github.com/opendp/dp-wizard/issues/682
         is_released.set(True)
         plan = analysis_plan()
-        return convert_py_to_nb(notebook_py(), title=str(plan), execute=True)
+        return convert_to_notebook(notebook_py(), title=str(plan), execute=True)
 
     @reactive.calc
-    def notebook_nb_unexecuted():
+    def notebook_dict_unexecuted():
         plan = analysis_plan()
-        return convert_py_to_nb(notebook_py(), title=str(plan), execute=False)
+        return convert_to_notebook(notebook_py(), title=str(plan), execute=False)
+
+    @reactive.calc
+    def notebook_json():
+        return json.dumps(notebook_dict())
+
+    @reactive.calc
+    def notebook_json_unexecuted():
+        return json.dumps(notebook_dict_unexecuted())
 
     @reactive.calc
     def notebook_html():
-        return convert_nb_to_html(notebook_nb())
+        return convert_from_notebook(notebook_dict())
 
     @reactive.calc
     def notebook_html_unexecuted():
-        return convert_nb_to_html(notebook_nb_unexecuted())
+        return convert_from_notebook(notebook_dict_unexecuted())
 
     @reactive.calc
     def table_csv():
-        notebook_nb()  # Evaluate just for the side effect of creating report.
+        notebook_dict()  # Evaluate just for the side effect of creating report.
         return (_target_path / "report.csv").read_text()
 
     @reactive.calc
     def contingency_table_csv():
-        notebook_nb()  # Evaluate just for the side effect of creating report.
+        notebook_dict()  # Evaluate just for the side effect of creating report.
         return (_target_path / "contingency.csv").read_text()
 
     @reactive.calc
@@ -486,11 +491,11 @@ def results_server(
 
     @download(".ipynb")
     async def download_notebook_link():
-        yield _make_download_or_modal_error(notebook_nb)
+        yield _make_download_or_modal_error(notebook_json)
 
     @download(".unexecuted.ipynb")
     async def download_notebook_unexecuted_button():
-        yield _make_download_or_modal_error(notebook_nb_unexecuted)
+        yield _make_download_or_modal_error(notebook_json_unexecuted)
 
     @download(".html")
     async def download_html_link():
