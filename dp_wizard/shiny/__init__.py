@@ -3,7 +3,7 @@ from pathlib import Path
 from htmltools import Tag
 from shiny import App, Inputs, Outputs, Session, reactive, ui
 
-from dp_wizard import package_root
+from dp_wizard import config_root, package_root
 from dp_wizard.shiny.components.icons import tutorial_icon
 from dp_wizard.shiny.panels import (
     about_panel,
@@ -98,7 +98,7 @@ def _make_server(cli_info: CLIInfo):
     def server(input: Inputs, output: Outputs, session: Session):  # pragma: no cover
         if cli_info.is_sample_csv:
             initial_contributions = 10
-            initial_private_csv_path = package_root / ".local-config/sample.csv"
+            initial_private_csv_path = config_root / "sample.csv"
             make_sample_csv(initial_private_csv_path, initial_contributions)
             csv_info = CsvInfo(Path(initial_private_csv_path))
         else:
