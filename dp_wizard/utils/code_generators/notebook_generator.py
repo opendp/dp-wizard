@@ -1,9 +1,8 @@
-from dp_wizard_templates.code_template import Template
-
 from dp_wizard import package_root
 from dp_wizard.types import ColumnIdentifier, Product
 from dp_wizard.utils.code_generators.abstract_generator import (
     AbstractGenerator,
+    DefaultsTemplate,
     get_template_root,
 )
 from dp_wizard.utils.dp_helper import confidence
@@ -23,12 +22,12 @@ class NotebookGenerator(AbstractGenerator):
         return self._fill_partial_context(self._make_partial_synth_context())
 
     def _fill_partial_context(self, partial_context):
-        placeholder_csv_content = ",".join(self.analysis_plan.columns)
+        placeholder_csv_content = ",".join(self.analysis_plan.analysis_columns)
         return (
             partial_context.fill_values(
                 CSV_PATH=self.analysis_plan.get_absolute_csv_path(),
             )
-            .fill_code_blocks(
+            .fill_blocks(
                 OPTIONAL_CSV_BLOCK=(
                     "# Write to placeholder CSV so the notebook can still execute:\n"
                     "from pathlib import Path\n"
@@ -41,12 +40,20 @@ class NotebookGenerator(AbstractGenerator):
         )
 
     def _make_python_cell(self, block):
-        return f"\n# +\n{block}\n# -\n"
+        return f"\n{block}\n"
 
     def _make_columns(self):
         column_config_dict = self._make_column_config_dict()
         return "\n".join(
-            f"# ### Expression for `{name}`\n{self._make_python_cell(block)}"
+            f"""
+# + [markdown] tags=["tutorial"]
+# ### Expression for `{name}`
+# -
+
+# + tags=["tutorial"]
+{self._make_python_cell(block)}
+# -
+"""
             for name, block in column_config_dict.items()
         )
 
@@ -67,13 +74,13 @@ class NotebookGenerator(AbstractGenerator):
 
         match self.analysis_plan.product:
             case Product.SYNTHETIC_DATA:
-                outputs_expression = Template(template).finish()
+                outputs_expression = DefaultsTemplate(template).finish()
             case Product.STATISTICS:
                 outputs_expression = (
                     "{"
                     + ",".join(
                         self._make_report_kv(name, plan[0].statistic_name)
-                        for name, plan in self.analysis_plan.columns.items()
+                        for name, plan in self.analysis_plan.analysis_columns.items()
                     )
                     + "}"
                 )
@@ -82,11 +89,12 @@ class NotebookGenerator(AbstractGenerator):
         target_path = package_root / ".local-sessions"
 
         return (
-            Template(f"{self._get_synth_or_stats()}_reports", root)
+            DefaultsTemplate(f"{self._get_synth_or_stats()}_reports", root)
             .fill_expressions(
                 OUTPUTS=outputs_expression,
                 COLUMNS={
-                    k: v[0]._asdict() for k, v in self.analysis_plan.columns.items()
+                    k: v[0]._asdict()
+                    for k, v in self.analysis_plan.analysis_columns.items()
                 },
             )
             .fill_values(

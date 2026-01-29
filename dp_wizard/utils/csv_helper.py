@@ -68,7 +68,7 @@ def id_labels_dict_from_schema(
     schema: dict[ColumnName, pl.DataType],
 ) -> dict[ColumnId, ColumnLabel]:
     """
-    >>> id_labels_dict_from_schema(pl.Schema({"abc": pl.Int32}))
+    >>> id_labels_dict_from_schema(pl.Schema({"abc": pl.Int32()}))
     {'...': '1: abc'}
     """
     return {
@@ -81,7 +81,7 @@ def id_names_dict_from_schema(
     schema: dict[ColumnName, pl.DataType],
 ) -> dict[ColumnId, ColumnName]:
     """
-    >>> id_names_dict_from_schema(pl.Schema({"abc": pl.Int32}))
+    >>> id_names_dict_from_schema(pl.Schema({"abc": pl.Int32()}))
     {'...': 'abc'}
     """
     return {ColumnId(name): ColumnName(name) for name in schema.keys()}
