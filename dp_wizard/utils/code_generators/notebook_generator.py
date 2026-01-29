@@ -46,11 +46,11 @@ class NotebookGenerator(AbstractGenerator):
         column_config_dict = self._make_column_config_dict()
         return "\n".join(
             f"""
-# + [markdown] tags=["Full_Tutorial"]
+# + [markdown] tags=["tutorial"]
 # ### Expression for `{name}`
 # -
 
-# + tags=["Full_Tutorial"]
+# + tags=["tutorial"]
 {self._make_python_cell(block)}
 # -
 """

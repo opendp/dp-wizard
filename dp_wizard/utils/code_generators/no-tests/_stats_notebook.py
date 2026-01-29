@@ -1,8 +1,14 @@
+# {"tagmap":{
+#   "Brief Report": [],
+#   "Full Tutorial": ["tutorial"],
+#   "Include Postprocessing": ["tutorial", "postprocessing"]
+# }}
+
 # # TITLE
 #
 # CUSTOM_NOTE
 
-# + [markdown] tags=["Full_Tutorial"]
+# + [markdown] tags=["tutorial"]
 # Jump ahead:
 # - [Analysis](#Analysis)
 # - [Results](#Results)
@@ -13,23 +19,23 @@
 # WINDOWS_COMMENT_BLOCK
 # -
 
-# + tags=["Full_Tutorial"]
+# + tags=["tutorial"]
 # %pip install DEPENDENCIES
 # -
 
-# + tags=["Full_Tutorial"]
+# + tags=["tutorial"]
 IMPORTS_BLOCK
 # -
 
-# + [markdown] tags=["Full_Tutorial"]
+# + [markdown] tags=["tutorial"]
 # Then define some utility functions to handle dataframes and plot results:
 # -
 
-# + tags=["Full_Tutorial"]
+# + tags=["tutorial"]
 UTILS_BLOCK
 # -
 
-# + [markdown] tags=["Full_Tutorial"]
+# + [markdown] tags=["tutorial"]
 # ## Analysis
 #
 # Based on the input you provided, for each column we'll create a Polars expression
@@ -38,39 +44,39 @@ UTILS_BLOCK
 
 COLUMNS_BLOCK
 
-# + [markdown] tags=["Full_Tutorial"]
+# + [markdown] tags=["tutorial"]
 # ### Context
 #
 # Next, we'll define our Context. This is where we set the privacy budget,
 # and set the weight for each query under that overall budget.
 # -
 
-# + tags=["Full_Tutorial"]
+# + tags=["tutorial"]
 STATS_CONTEXT_BLOCK
 # -
 
-# + [markdown] tags=["Full_Tutorial"]
+# + [markdown] tags=["tutorial"]
 # CSV_COMMENT_BLOCK
 # -
 
 # ## Results
 
-# + [markdown] tags=["Full_Tutorial"]
+# + [markdown] tags=["tutorial"]
 # Finally, we run the queries and plot the results.
 # -
 
 STATS_QUERIES_BLOCK
 
-# + [markdown] tags=["Full_Tutorial"]
+# + [markdown] tags=["tutorial"]
 # If we try to run more queries at this point, it will error. Once the privacy budget
 # is consumed, the library prevents you from running any more queries.
 # -
 
-# + [markdown] tags=["Postprocessing"]
+# + [markdown] tags=["postprocessing"]
 # ## Postprocessing
 # This code produces the other files that are part of the package.
 # -
 
-# + tags=["Postprocessing"]
+# + tags=["postprocessing"]
 STATS_REPORTS_BLOCK
 # -

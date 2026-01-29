@@ -1,8 +1,14 @@
+# {"tagmap":{
+#   "Brief Report": [],
+#   "Full Tutorial": ["tutorial"],
+#   "Include Postprocessing": ["tutorial", "postprocessing"]
+# }}
+
 # # TITLE
 #
 # CUSTOM_NOTE
 
-# + [markdown] tags=["Full_Tutorial"]
+# + [markdown] tags=["tutorial"]
 # Jump ahead:
 # - [Results](#Results)
 #
@@ -12,33 +18,33 @@
 # WINDOWS_COMMENT_BLOCK
 # -
 
-# + tags=["Full_Tutorial"]
+# + tags=["tutorial"]
 # %pip install DEPENDENCIES
 # -
 
-# + tags=["Full_Tutorial"]
+# + tags=["tutorial"]
 IMPORTS_BLOCK
 # -
 
-# + [markdown] tags=["Full_Tutorial"]
+# + [markdown] tags=["tutorial"]
 # Then define some utility functions to handle dataframes and plot results:
 # -
 
-# + tags=["Full_Tutorial"]
+# + tags=["tutorial"]
 UTILS_BLOCK
 # -
 
-# + [markdown] tags=["Full_Tutorial"]
+# + [markdown] tags=["tutorial"]
 # ### Context
 #
 # Next, we'll define our Context. This is where we set the privacy budget,
 # and the columns that will be part of the synthetic dataset.
 
-# + tags=["Full_Tutorial"]
+# + tags=["tutorial"]
 SYNTH_CONTEXT_BLOCK
 # -
 
-# + [markdown] tags=["Full_Tutorial"]
+# + [markdown] tags=["tutorial"]
 # CSV_COMMENT_BLOCK
 # -
 
@@ -58,16 +64,16 @@ SYNTH_QUERY_BLOCK
 # - Filling in the "keys" kwarg
 # - Preprocessing to combine keys which occur a small number of times
 
-# + [markdown] tags=["Full_Tutorial"]
+# + [markdown] tags=["tutorial"]
 # If we try to run more queries at this point, it will error. Once the privacy budget
 # is consumed, the library prevents you from running any more queries.
 # -
 
-# + [markdown] tags=["Postprocessing"]
+# + [markdown] tags=["postprocessing"]
 # ## Postprocessing
 # This code produces the other files that are part of the package.
 # -
 
-# + tags=["Postprocessing"]
+# + tags=["postprocessing"]
 SYNTH_REPORTS_BLOCK
 # -
