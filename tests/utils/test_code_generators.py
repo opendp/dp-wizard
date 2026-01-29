@@ -7,7 +7,7 @@ import opendp.prelude as dp
 import polars as pl
 import pytest
 import requests
-from dp_wizard_templates.converters import convert_nb_to_html, convert_py_to_nb
+from dp_wizard_templates.converters import convert_from_notebook, convert_to_notebook
 
 from dp_wizard import opendp_version, package_root
 from dp_wizard.types import ColumnName, CsvInfo, Product, StatisticName
@@ -226,13 +226,19 @@ def test_make_notebook(plan):
             raise ValueError(plan.product)
     assert isinstance(globals[context_global], dp.Context)
 
-    notebook_nb = convert_py_to_nb(notebook_py, "Title placeholder")
-    notebook_html = convert_nb_to_html(notebook_nb)
+    notebook_dict = convert_to_notebook(notebook_py, "Title placeholder")
+    notebook_html = convert_from_notebook(notebook_dict)
     # Parsing HTML with an RE is usually not the right solution,
     # but since these are generated from the markdown,
     # BeautifulSoup seems like overkill.
     urls = set(re.findall(r'<a[^>]+href="(http[^"]+)[^>]+>', notebook_html))
     assert urls <= set(expected_urls)
+
+    assert "tags=" not in notebook_html, "Missing '# +' in jupytext source?"
+    assert set(re.findall(r"celltag_\w+", notebook_html)) == {
+        "celltag_tutorial",
+        "celltag_postprocessing",
+    }, "Typo in tag?"
 
 
 @pytest.mark.parametrize("plan", plans, ids=id_for_plan)
@@ -244,6 +250,7 @@ def test_make_script(plan):
     # https://jupytext.readthedocs.io/en/latest/formats-scripts.html#the-light-format
     assert "# -" not in script
     assert "# +" not in script
+    assert "tags=" not in script
 
     with NamedTemporaryFile(mode="w") as fp:
         fp.write(script)
