@@ -1,8 +1,8 @@
-from dp_wizard_templates.code_template import Template
-
-from dp_wizard import opendp_version
 from dp_wizard.types import ColumnIdentifier, StatisticName
-from dp_wizard.utils.code_generators.abstract_generator import get_template_root
+from dp_wizard.utils.code_generators.abstract_generator import (
+    DefaultsTemplate,
+    get_template_root,
+)
 
 name = StatisticName("Histogram")
 blurb_md = """
@@ -39,14 +39,14 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
         STATS_NAME  # type: ignore
 
     return (
-        Template(template)
+        DefaultsTemplate(template)
         .fill_values(
             BIN_NAME=f"{identifier}_bin",
             GROUP_NAMES=list(code_gen.analysis_plan.groups.keys()),
         )
         .fill_attributes(
             WITH_KEYS=(
-                Template("with_keys(pl.LazyFrame(GROUPING_KEYS))")
+                DefaultsTemplate("with_keys(pl.LazyFrame(GROUPING_KEYS))")
                 .fill_values(GROUPING_KEYS=g)
                 .finish()
                 if (g := code_gen.analysis_plan.get_groups_with_keys())
@@ -64,7 +64,7 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
 
 def make_output(code_gen, column_name, accuracy_name, stats_name):
     return (
-        Template(f"histogram_{code_gen._get_notebook_or_script()}_output", root)
+        DefaultsTemplate(f"histogram_{code_gen._get_notebook_or_script()}_output", root)
         .fill_values(
             COLUMN_NAME=column_name,
             GROUP_NAMES=list(code_gen.analysis_plan.groups.keys()),
@@ -87,7 +87,7 @@ def make_plot_note():
 
 def make_report_kv(name, confidence, identifier):
     return (
-        Template("histogram_report_kv", root)
+        DefaultsTemplate("histogram_report_kv", root)
         .fill_values(
             NAME=name,
             CONFIDENCE=confidence,
@@ -103,11 +103,10 @@ def make_report_kv(name, confidence, identifier):
 def make_column_config_block(column_name, lower_bound, upper_bound, bin_count):
     identifier = ColumnIdentifier(column_name)
     return (
-        Template("histogram_expr", root)
+        DefaultsTemplate("histogram_expr", root)
         .fill_expressions(
             CUT_LIST_NAME=f"{identifier}_cut_points",
             BIN_EXPR_NAME=f"{identifier}_bin_expr",
-            OPENDP_V_VERSION=f"v{opendp_version}",
         )
         .fill_values(
             LOWER_BOUND=lower_bound,
