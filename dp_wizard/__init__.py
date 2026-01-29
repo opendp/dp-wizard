@@ -30,9 +30,7 @@ def main() -> None:  # pragma: no cover
 
     from dp_wizard.utils.argparse_helpers import get_cli_info
 
-    # We only call this here so "--help" is handled,
-    # and to validate inputs before starting the server.
-    get_cli_info()
+    cli_info = get_cli_info()
 
     not_first_run_path = package_root / ".local-config/not-first-run.txt"
     if not not_first_run_path.exists():
@@ -44,6 +42,8 @@ def main() -> None:  # pragma: no cover
 
     shiny.run_app(
         app="dp_wizard.app",
-        launch_browser=True,
-        reload=True,
+        host=cli_info.host,
+        port=cli_info.port,
+        launch_browser=cli_info.launch_browser,
+        reload=cli_info.reload,
     )

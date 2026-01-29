@@ -1,4 +1,3 @@
-import subprocess
 import sys
 import urllib.parse
 
@@ -9,33 +8,12 @@ from dp_wizard import __version__
 from dp_wizard.shiny.components.outputs import nav_button
 
 
-def _run(cmd) -> str:
-    """
-    >>> _run("echo hello")
-    '    hello'
-    """
-    # Do not check exit status:
-    # If there is a problem, we don't want to worry about it.
-    return "\n".join(
-        f"    {line}"
-        for line in subprocess.run(cmd.split(" "), capture_output=True)
-        .stdout.decode()
-        .splitlines()
-    )
-
-
 def _get_info() -> str:
-    git_status = _run("git status")
-    pip_freeze = _run("pip freeze")
     return f"""
 DP Wizard v{__version__}
 python: {sys.version}
 arguments: {' '.join(sys.argv[1:])}
-git status:
-{git_status}
-pip freeze:
-{pip_freeze}
-    """
+"""
 
 
 def _make_issue_url(info) -> str:
