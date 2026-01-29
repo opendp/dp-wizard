@@ -6,8 +6,6 @@ DP Wizard makes it easier to get started with differential privacy,
 the addition of calibrated noise to aggregate statistics to protect the privacy of individuals.
 DP Wizard demonstrates how to calculate DP statistics or create a synthetic dataset from the data you provide.
 
-(If differential privacy is new to you, [these slides](https://opendp.github.io/dp-wizard/) provide some background, and explain how DP Wizard works.)
-
 You can run DP Wizard locally and upload your own CSV,
 or use the [cloud deployment](https://mccalluc-dp-wizard.share.connect.posit.cloud/) and only provide column names to protect your private data.
 In either case, you'll be prompted to describe your privacy budget and the analysis you need.
@@ -16,6 +14,8 @@ With that information, DP Wizard provides:
 - A Jupyter notebook which demonstrates how to use the [OpenDP Library](https://docs.opendp.org/).
 - A plain Python script.
 - Text and CSV reports.
+
+See the [FAQ](https://github.com/opendp/dp-wizard/blob/main/dp_wizard/FAQ.md) for more information.
 
 ## Screenshots
 
