@@ -24,6 +24,7 @@ from dp_wizard.shiny.panels.analysis_panel.column_module import column_server, c
 from dp_wizard.shiny.panels.analysis_panel.group_module import group_server, group_ui
 from dp_wizard.types import AppState, ColumnId, Product
 from dp_wizard.utils.code_generators import make_privacy_loss_block
+from dp_wizard.utils.constraints import MAX_EPSILON, MIN_EPSILON
 from dp_wizard.utils.csv_helper import (
     get_csv_row_count,
     id_labels_dict_from_schema,
@@ -104,8 +105,8 @@ def _privacy_card_ui():
             ),
             log_slider(
                 "log_epsilon_slider",
-                lower_bound=0.1,
-                upper_bound=10.0,
+                lower_bound=MIN_EPSILON,
+                upper_bound=MAX_EPSILON,
                 lower_message="Better Privacy",
                 upper_message="Better Accuracy",
             ),
@@ -461,19 +462,24 @@ def analysis_server(
     @render.ui
     def epsilon_ui():
         e_value = epsilon()
-        extra = ""
+        optional_warning = None
         if e_value >= 5:
-            extra = (
-                ": The use of a value this **large** is discouraged "
-                "because it may compromise privacy."
+            optional_warning = warning_md_box(
+                """
+                The use of a value this large is discouraged
+                because high accuracy may compromise privacy.
+                """
             )
         if e_value <= 0.2:
-            extra = (
-                ": The use of a value this **small** is discouraged "
-                "because the additional noise will lower the accuracy of results."
+            optional_warning = warning_md_box(
+                """
+                The use of a value this small is discouraged
+                because added noise will lower the accuracy of results.
+                """
             )
         return [
-            ui.markdown(f"Privacy Budget (Epsilon): {e_value}{extra}"),
+            ui.markdown(f"Privacy Budget (Epsilon): {e_value}"),
+            optional_warning,
             tutorial_box(
                 is_tutorial_mode(),
                 """

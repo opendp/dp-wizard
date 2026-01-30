@@ -24,6 +24,7 @@ from dp_wizard.utils.code_generators.analyses import (
     mean,
     median,
 )
+from dp_wizard.utils.constraints import MAX_BOUND, MIN_BOUND
 from dp_wizard.utils.dp_helper import confidence, make_accuracy_histogram
 from dp_wizard.utils.mock_data import ColumnDef, mock_data
 from dp_wizard.utils.shared.plots import plot_bars
@@ -45,15 +46,21 @@ def get_float_error(number_str) -> str | None:
     >>> get_float_error('1.1')
     >>> get_float_error('nan')
     'should be a number'
-    >>> get_float_error('inf')
-    'should be a number'
+    >>> get_float_error('1_000_000_000_001')
+    'should not be greater than 100,000,000,000'
+    >>> get_float_error('-1_000_000_000_001')
+    'should not be less than -100,000,000,000'
     """
     if number_str is None or number_str == "":
         return "is required"
     try:
-        int(float(number_str))
+        number = int(float(number_str))
     except (TypeError, ValueError, OverflowError):
         return "should be a number"
+    if number > MAX_BOUND:
+        return f"should not be greater than {MAX_BOUND:,}"
+    if number < MIN_BOUND:
+        return f"should not be less than {MIN_BOUND:,}"
     return None
 
 

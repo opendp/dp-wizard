@@ -111,14 +111,16 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     # "assert define_analysis_button.is_enabled()" has spurious errors.
     # https://github.com/opendp/dp-wizard/issues/221
     page.locator("#contributions").fill("0")
-    expect(page.get_by_text("Contributions must be 1 or greater")).to_be_visible()
+    expect(page.get_by_text("Rows per contributor must be at least 1")).to_be_visible()
     expected_error = (
         "Specify CSV, unit of privacy, and maximum row count before proceeding."
     )
     expect(page.get_by_text(expected_error)).to_be_visible()
 
     page.locator("#contributions").fill("2")
-    expect(page.get_by_text("Contributions must be 1 or greater")).not_to_be_visible()
+    expect(
+        page.get_by_text("Rows per contributor must be at least 1")
+    ).not_to_be_visible()
     expect(page.get_by_text(expected_error)).not_to_be_visible()
 
     expect(page.locator(".shiny-output-error")).not_to_be_attached()
