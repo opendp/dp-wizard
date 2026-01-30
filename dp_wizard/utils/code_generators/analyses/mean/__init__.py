@@ -27,22 +27,20 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
             else stats_context.query().select(EXPR_NAME)
         )
 
-        # -
-
+        # + [markdown] tags=["tutorial"]
         # If we summarize the statistic, we see that a mean is composed
         # of a sum and a length, each with their own accuracy.
         # More on [`summarize()` in the OpenDP
         # docs](https://docs.opendp.org/en/OPENDP_V_VERSION/api/python/opendp.extras.polars.html#opendp.extras.polars.LazyFrameQuery.summarize).
-
-        # +
-
-        QUERY_NAME.summarize(alpha=1 - confidence)
-
         # -
 
-        # Proceding to the DP release:
+        # + tags=["tutorial"]
+        QUERY_NAME.summarize(alpha=1 - confidence)
+        # -
 
-        # +
+        # + [markdown] tags=["tutorial"]
+        # Proceding to the DP release:
+        # -
 
         STATS_NAME = QUERY_NAME.release().collect()
         STATS_NAME  # type: ignore

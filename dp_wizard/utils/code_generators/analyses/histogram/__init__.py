@@ -33,22 +33,20 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
             .WITH_KEYS
         )
 
-        # -
-
+        # + [markdown] tags=["tutorial"]
         # We can summarize the statistic to get the accuracy.
         # More on [`summarize()` in the OpenDP
         # docs](https://docs.opendp.org/en/OPENDP_V_VERSION/api/python/opendp.extras.polars.html#opendp.extras.polars.LazyFrameQuery.summarize).
-
-        # +
-
-        summary = QUERY_NAME.summarize(alpha=1 - confidence)
-        summary
-
         # -
 
-        # Proceding to the DP release:
+        # + tags=["tutorial"]
+        summary = QUERY_NAME.summarize(alpha=1 - confidence)
+        summary
+        # -
 
-        # +
+        # + [markdown] tags=["tutorial"]
+        # Proceding to the DP release:
+        # -
 
         ACCURACY_NAME = summary["accuracy"].item()  # noqa: F841
         STATS_NAME = QUERY_NAME.release().collect()
