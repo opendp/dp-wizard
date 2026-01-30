@@ -19,13 +19,29 @@ root = get_template_root(__file__)
 
 
 def make_query(code_gen, identifier, accuracy_name, stats_name):
-    def template(GROUP_NAMES, stats_context, EXPR_NAME):
+    def template(GROUP_NAMES, stats_context, EXPR_NAME, confidence):
         groups = GROUP_NAMES
         QUERY_NAME = (
             stats_context.query().group_by(groups).agg(EXPR_NAME).WITH_KEYS
             if groups
             else stats_context.query().select(EXPR_NAME)
         )
+
+        # + [markdown] tags=["tutorial"]
+        # If we summarize the statistic, we see that a mean is composed
+        # of a sum and a length, each with their own accuracy.
+        # More on [`summarize()` in the OpenDP
+        # docs](https://docs.opendp.org/en/OPENDP_V_VERSION/api/python/opendp.extras.polars.html#opendp.extras.polars.LazyFrameQuery.summarize).
+        # -
+
+        # + tags=["tutorial"]
+        QUERY_NAME.summarize(alpha=1 - confidence)
+        # -
+
+        # + [markdown] tags=["tutorial"]
+        # Proceding to the DP release:
+        # -
+
         STATS_NAME = QUERY_NAME.release().collect()
         STATS_NAME  # type: ignore
 

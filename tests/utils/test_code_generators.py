@@ -189,6 +189,7 @@ plans = [plan for i, plan in enumerate(plans_all_combos) if i % mod == 0]
 expected_urls = [
     "https://docs.opendp.org/",
     "https://github.com/opendp/dp-wizard",
+    "https://docs.opendp.org/en/v0.14.1/api/python/opendp.extras.polars.html#opendp.extras.polars.LazyFrameQuery.summarize",
     "https://docs.opendp.org/en/v0.14.1/api/python/opendp.extras.mbi.html#opendp.extras.mbi.ContingencyTable.synthesize",
     "https://docs.opendp.org/en/v0.14.1/api/python/opendp.extras.mbi.html#opendp.extras.mbi.ContingencyTable.project_melted",
 ]
