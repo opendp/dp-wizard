@@ -1,7 +1,6 @@
-from dp_wizard_templates.code_template import Template
-
-from dp_wizard import get_template_root, opendp_version
+from dp_wizard import get_template_root
 from dp_wizard.types import ColumnIdentifier, StatisticName
+from dp_wizard.utils.code_generators import DefaultsTemplate
 
 name = StatisticName("Mean")
 blurb_md = """
@@ -49,13 +48,13 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
         STATS_NAME  # type: ignore
 
     return (
-        Template(template)
+        DefaultsTemplate(template)
         .fill_values(
             GROUP_NAMES=list(code_gen.analysis_plan.groups.keys()),
         )
         .fill_attributes(
             WITH_KEYS=(
-                Template("with_keys(pl.LazyFrame(GROUPING_KEYS))")
+                DefaultsTemplate("with_keys(pl.LazyFrame(GROUPING_KEYS))")
                 .fill_values(GROUPING_KEYS=g)
                 .finish()
                 if (g := code_gen.analysis_plan.get_groups_with_keys())
@@ -74,7 +73,7 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
 
 def make_output(code_gen, column_name, accuracy_name, stats_name):
     return (
-        Template(f"mean_{code_gen._get_notebook_or_script()}_output", root)
+        DefaultsTemplate(f"mean_{code_gen._get_notebook_or_script()}_output", root)
         .fill_expressions(
             COLUMN_NAME=column_name,
             STATS_NAME=stats_name,
@@ -89,7 +88,7 @@ def make_plot_note():
 
 def make_report_kv(name, confidence, identifier):
     return (
-        Template("mean_report_kv", root)
+        DefaultsTemplate("mean_report_kv", root)
         .fill_values(
             NAME=name,
         )
@@ -103,10 +102,9 @@ def make_report_kv(name, confidence, identifier):
 def make_column_config_block(column_name, lower_bound, upper_bound, bin_count):
     identifier = ColumnIdentifier(column_name)
     return (
-        Template("mean_expr", root)
+        DefaultsTemplate("mean_expr", root)
         .fill_expressions(
             EXPR_NAME=f"{identifier}_expr",
-            OPENDP_V_VERSION=f"v{opendp_version}",
         )
         .fill_values(
             COLUMN_NAME=column_name,

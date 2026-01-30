@@ -24,6 +24,7 @@ from dp_wizard.shiny.panels.analysis_panel.column_module import column_server, c
 from dp_wizard.shiny.panels.analysis_panel.group_module import group_server, group_ui
 from dp_wizard.types import AppState, ColumnId
 from dp_wizard.utils.code_generators import make_privacy_loss_block
+from dp_wizard.utils.constraints import MAX_EPSILON, MIN_EPSILON
 from dp_wizard.utils.csv_helper import (
     get_csv_row_count,
     id_labels_dict_from_schema,
@@ -83,8 +84,8 @@ def analysis_ui():
                 ),
                 log_slider(
                     "log_epsilon_slider",
-                    lower_bound=0.1,
-                    upper_bound=10.0,
+                    lower_bound=MIN_EPSILON,
+                    upper_bound=MAX_EPSILON,
                     lower_message="Better Privacy",
                     upper_message="Better Accuracy",
                 ),
