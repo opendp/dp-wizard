@@ -63,7 +63,6 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
             QUERY_NAME=f"{identifier}_query",
             STATS_NAME=stats_name,
             EXPR_NAME=f"{identifier}_expr",
-            OPENDP_V_VERSION=f"v{opendp_version}",
         )
         .finish()
     )
