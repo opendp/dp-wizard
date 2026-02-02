@@ -34,7 +34,7 @@ DP Wizard requires Python 3.10 or later.
 You can check your current version with `python --version`.
 The exact upgrade process will depend on your environment and operating system.
 
-Install with `pip install 'dp_wizard[app]'` and you can start DP Wizard from the command line.
+Install with `pip install 'dp_wizard[pins]'` and you can start DP Wizard from the command line.
 
 ```
 usage: dp-wizard [-h] [--sample | --cloud] [--host HOST] [--port PORT] [--no_browser] [--reload]
