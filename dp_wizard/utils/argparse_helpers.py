@@ -14,6 +14,10 @@ visualizations will be made with the public data, but the release will
 be made with private data."""
 
 
+_default_host = "127.0.0.1"
+_default_port = 8000
+
+
 def _get_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -42,13 +46,34 @@ Provide both {PUBLIC_PRIVATE_TEXT}
         action="store_true",
         help="Prompt for column names instead of CSV upload",
     )
+
+    parser.add_argument(
+        "--host",
+        default=_default_host,
+        help="Bind socket to this host",
+    )
+    parser.add_argument(
+        "--port",
+        default=_default_port,
+        help="Bind socket to this port. If 0, a random port will be used.",
+    )
+    parser.add_argument(
+        "--no_browser",
+        action="store_true",
+        help="By default, a browser is started; Enable this for no browser.",
+    )
+    parser.add_argument(
+        "--reload",
+        action="store_true",
+        help="Enable to watch source directory and reload on changes.",
+    )
     return parser
 
 
 def _get_args() -> argparse.Namespace:
     """
     >>> _get_args()
-    Namespace(sample=False, cloud=False)
+    Namespace(sample=False, cloud=False, host='127.0.0.1', port=8000, ...)
     """
     arg_parser = _get_arg_parser()
 
@@ -67,13 +92,39 @@ class CLIInfo(NamedTuple):
     is_sample_csv: bool
     is_cloud_mode: bool
     is_qa_mode: bool
+    host: str
+    port: int
+    launch_browser: bool
+    reload: bool
 
     def get_is_tutorial_mode(self) -> bool:
         return self.is_sample_csv or self.is_cloud_mode  # pragma: no cover
 
 
+def cli_info_defaults(
+    is_sample_csv: bool,
+    is_cloud_mode: bool,
+    is_qa_mode: bool,
+) -> CLIInfo:
+    return CLIInfo(
+        is_sample_csv=is_sample_csv,
+        is_cloud_mode=is_cloud_mode,
+        is_qa_mode=is_qa_mode,
+        host=_default_host,
+        port=_default_port,
+        launch_browser=False,
+        reload=False,
+    )
+
+
 def get_cli_info() -> CLIInfo:  # pragma: no cover
     args = _get_args()
     return CLIInfo(
-        is_sample_csv=args.sample, is_cloud_mode=args.cloud, is_qa_mode=False
+        is_sample_csv=args.sample,
+        is_cloud_mode=args.cloud,
+        is_qa_mode=False,
+        host=args.host,
+        port=args.port,
+        launch_browser=not args.no_browser,
+        reload=args.reload,
     )
