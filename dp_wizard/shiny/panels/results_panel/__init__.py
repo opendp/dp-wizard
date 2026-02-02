@@ -251,7 +251,7 @@ def results_server(
 
     @render.ui
     def download_code_ui():
-        disabled = not weights()
+        disabled = not is_analysis_defined()
         return [
             tutorial_box(
                 is_tutorial_mode(),
