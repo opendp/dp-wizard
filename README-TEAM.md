@@ -2,6 +2,8 @@
 
 ## Release
 
+### PyPI
+
 - Make sure you're up to date, and have the git-ignored credentials file `.pypirc`.
 - Make one last feature branch with the new version number in the name:
   - Run `scripts/changelog.py` to update the `CHANGELOG.md`.
@@ -12,12 +14,18 @@
 - Publish: `flit publish --pypirc .pypirc`
 
 This project is configured so there are two different install possibilities from pypi:
-- `pip install 'dp_wizard[app]'` pins all dependencies, and is the best route for most users.
+- `pip install 'dp_wizard[pins]'` pins all dependencies, and is the best route for most users.
 - `pip install dp_wizard` does not pin dependencies, and is best if you're using `dp_wizard` as a library.
 
+### Posit Cloud
 
 The cloud deployment is [configured](https://connect.posit.cloud/mccalluc/content/01966942-7eab-da99-0887-a7c483756aa8/edit) to update on pushes to the `cloud-deployment` branch.
 If you are on `main`, with no local changes, run `scripts/deploy.sh`.
+
+### Docker Hub
+
+Run `scripts/docker.sh`: This will build and start a new image.
+Confirm that it works, and then follow the instructions in the output to push to Docker Hub.
 
 ## Conventions
 
