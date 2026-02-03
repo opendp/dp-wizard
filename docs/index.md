@@ -388,7 +388,7 @@ Divide into four teams, and on one computer either:
 <tr>
 <td>
 
-**[`pip install 'dp_wizard[app]'`](https://pypi.org/project/dp_wizard/)<br>`dp_wizard --cloud`<br><small>(requires Python>=3.10)</small>**
+**[`pip install 'dp_wizard[pins]'`](https://pypi.org/project/dp_wizard/)<br>`dp_wizard --cloud`<br><small>(requires Python>=3.10)</small>**
 
 </td>
 <td>
