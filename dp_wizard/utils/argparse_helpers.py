@@ -1,4 +1,5 @@
 import argparse
+from os import environ
 from sys import argv
 from typing import NamedTuple
 
@@ -118,6 +119,14 @@ def cli_info_defaults(
 
 
 def get_cli_info() -> CLIInfo:  # pragma: no cover
+    # This works, but haven't found anything in the posit docs that says this is stable.
+    if environ.get("USER") == "connect":
+        print("Starting cloud mode...")
+        return cli_info_defaults(
+            is_sample_csv=False,
+            is_cloud_mode=True,
+            is_qa_mode=False,
+        )
     args = _get_args()
     return CLIInfo(
         is_sample_csv=args.sample,
