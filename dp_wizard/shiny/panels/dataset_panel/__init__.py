@@ -230,19 +230,49 @@ Choose **Public CSV** {PUBLIC_TEXT}
 Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             """
             ),
-            ui.output_ui("input_files_ui"),
+            ui.output_ui("input_files_tutorial_ui"),
+            ui.output_ui("input_files_upload_ui"),
             ui.output_ui("csv_message_ui"),
             data_source.context_code_sample(),
             ui.output_ui("python_tutorial_ui"),
         ]
 
     @render.ui
-    def input_files_ui():
-        return data_source.input_files_ui(
-            is_tutorial_mode=is_tutorial_mode,
-            is_sample_csv=is_sample_csv,
-            initial_private_csv_path=initial_private_csv_path,
-            initial_public_csv_path=initial_public_csv_path,
+    def input_files_tutorial_ui():
+        return tutorial_box(
+            is_tutorial_mode(),
+            (
+                """
+                For the tutorial, we've provided the grades
+                on assignments for a school class in `sample.csv`.
+                You don't need to upload an additional file.
+                """
+                if is_sample_csv
+                else """
+                If you don't have a CSV on hand to work with,
+                quit and restart with `dp-wizard --sample`,
+                and DP Wizard will provide a sample CSV
+                for the tutorial.
+                """
+            ),
+            responsive=False,
+        )
+
+    @render.ui
+    def input_files_upload_ui():
+        return ui.row(
+            ui.input_file(
+                "private_csv_path",
+                "Choose Private CSV",
+                accept=[".csv"],
+                placeholder=Path(initial_private_csv_path).name,
+            ),
+            ui.input_file(
+                "public_csv_path",
+                "Choose Public CSV",
+                accept=[".csv"],
+                placeholder=Path(initial_public_csv_path).name,
+            ),
         )
 
     @render.ui
