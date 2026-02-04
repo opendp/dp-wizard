@@ -27,7 +27,7 @@ def context_code_sample():
             "stats_context",
             package_root / "utils/code_generators/no-tests",
         )
-        .fill_values(CSV_PATH="sample.csv")
+        .fill_values(CSV_PATH="demo.csv")
         .fill_expressions(
             MARGINS_LIST="margins",
             EXTRA_COLUMNS="extra_columns",

@@ -16,7 +16,7 @@ from dp_wizard.utils import config
 from dp_wizard.utils.argparse_helpers import CLIInfo
 from dp_wizard.utils.csv_helper import (
     CsvInfo,
-    make_sample_csv,
+    make_demo_csv,
 )
 
 _shiny_root = package_root / "shiny"
@@ -96,10 +96,10 @@ def ctrl_c_reminder() -> None:  # pragma: no cover
 
 def _make_server(cli_info: CLIInfo):
     def server(input: Inputs, output: Outputs, session: Session):  # pragma: no cover
-        if cli_info.is_sample_csv:
+        if cli_info.is_demo_csv:
             initial_contributions = 10
-            initial_private_csv_path = config_root / "sample.csv"
-            make_sample_csv(initial_private_csv_path, initial_contributions)
+            initial_private_csv_path = config_root / "demo.csv"
+            make_demo_csv(initial_private_csv_path, initial_contributions)
             csv_info = CsvInfo(Path(initial_private_csv_path))
         else:
             initial_contributions = 1
@@ -110,7 +110,7 @@ def _make_server(cli_info: CLIInfo):
 
         state = AppState(
             # CLI options:
-            is_sample_csv=cli_info.is_sample_csv,
+            is_demo_csv=cli_info.is_demo_csv,
             qa_mode=cli_info.is_qa_mode,
             # Reactive bools:
             is_tutorial_mode=reactive.value(cli_info.get_is_tutorial_mode()),

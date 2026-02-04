@@ -211,7 +211,7 @@ class CsvInfo:
 @dataclass(kw_only=True, frozen=True)
 class AppState:
     # CLI options:
-    is_sample_csv: bool
+    is_demo_csv: bool
     qa_mode: bool
 
     # Reactive bools:

@@ -97,7 +97,7 @@ def results_server(
     state: AppState,
 ):  # pragma: no cover
     # CLI options:
-    # is_sample_csv = state.is_sample_csv
+    # is_demo_csv = state.is_demo_csv
     qa_mode = state.qa_mode
 
     # Reactive bools:

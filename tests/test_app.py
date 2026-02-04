@@ -19,7 +19,7 @@ if bp in Path(__file__).read_text():
 local_app = create_app_fixture(package_root / "app.py")
 
 test_apps = Path(__file__).parent / "apps"
-sample_app = create_app_fixture(test_apps / "app_sample.py")
+demo_app = create_app_fixture(test_apps / "app_demo.py")
 qa_app = create_app_fixture(test_apps / "app_qa.py")
 
 

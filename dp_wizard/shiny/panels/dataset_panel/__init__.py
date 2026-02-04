@@ -122,7 +122,7 @@ def dataset_server(
     state: AppState,
 ):  # pragma: no cover
     # CLI options:
-    is_sample_csv = state.is_sample_csv
+    is_demo_csv = state.is_demo_csv
 
     # Reactive bools:
     is_tutorial_mode = state.is_tutorial_mode
@@ -231,7 +231,7 @@ def dataset_server(
                     Run DP Wizard locally to process your own data.
                     """
                 )
-                if is_sample_csv
+                if is_demo_csv
                 else [
                     ui.markdown(
                         f"""
@@ -257,8 +257,8 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             is_tutorial_mode(),
             """
             If you don't have a CSV on hand to work with,
-            quit and restart with `dp-wizard --sample`,
-            and DP Wizard will provide a sample CSV
+            quit and restart with `dp-wizard --demo`,
+            and DP Wizard will provide a demo CSV
             for the tutorial.
             """,
             responsive=False,
@@ -360,9 +360,9 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 to the released statistics, to ensure that
                 the contribution of any single individual is masked.
                 """,
-                is_sample_csv,
+                is_demo_csv,
                 """
-                The `sample.csv` simulates 10 assignments
+                The `demo.csv` simulates 10 assignments
                 over the course of the term for each student,
                 so enter `10` here.
                 """,
