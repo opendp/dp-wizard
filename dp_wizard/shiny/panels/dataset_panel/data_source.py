@@ -1,21 +1,10 @@
-from pathlib import Path
-
-from shiny import reactive, ui
-
 from dp_wizard import package_root
 from dp_wizard.shiny.components.outputs import (
     code_sample,
     hide_if,
-    tutorial_box,
     warning_md_box,
 )
-from dp_wizard.utils.argparse_helpers import (
-    PRIVATE_TEXT,
-    PUBLIC_PRIVATE_TEXT,
-    PUBLIC_TEXT,
-)
 from dp_wizard.utils.code_generators import DefaultsTemplate
-from dp_wizard.utils.csv_helper import CsvInfo
 
 
 def context_code_sample():
