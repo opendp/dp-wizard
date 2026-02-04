@@ -106,6 +106,9 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     csv_path = package_root.parent / "tests/fixtures/fake.csv"
     page.get_by_label("Choose Public CSV").set_input_files(csv_path.resolve())
 
+    # Toggle tutorial: (CSV should not clear!)
+    page.locator("#tutorial_mode").click()
+
     # Check validation of contributions:
     # Playwright itself won't let us fill non-numbers in this field.
     # "assert define_analysis_button.is_enabled()" has spurious errors.
