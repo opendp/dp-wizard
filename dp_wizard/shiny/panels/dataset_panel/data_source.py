@@ -7,7 +7,7 @@ from dp_wizard.shiny.components.outputs import (
 from dp_wizard.utils.code_generators import DefaultsTemplate
 
 
-def context_code_sample():
+def context_code_sample():  # pragma: no cover
     return code_sample(
         "Context",
         DefaultsTemplate(
