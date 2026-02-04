@@ -221,14 +221,18 @@ def dataset_server(
     @render.ui
     def csv_upload_ui():
         return [
-            ui.markdown(
-                f"""
+            (
+                None
+                if is_sample_csv
+                else ui.markdown(
+                    f"""
 Choose **Private CSV** {PRIVATE_TEXT}
 
 Choose **Public CSV** {PUBLIC_TEXT}
 
 Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             """
+                )
             ),
             ui.output_ui("input_files_tutorial_ui"),
             ui.output_ui("input_files_upload_ui"),
@@ -239,27 +243,30 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
 
     @render.ui
     def input_files_tutorial_ui():
-        return tutorial_box(
-            is_tutorial_mode(),
-            (
+        if not is_sample_csv:
+            return tutorial_box(
+                is_tutorial_mode(),
                 """
-                For the tutorial, we've provided the grades
-                on assignments for a school class in `sample.csv`.
-                You don't need to upload an additional file.
-                """
-                if is_sample_csv
-                else """
                 If you don't have a CSV on hand to work with,
                 quit and restart with `dp-wizard --sample`,
                 and DP Wizard will provide a sample CSV
                 for the tutorial.
-                """
-            ),
-            responsive=False,
-        )
+                """,
+                responsive=False,
+            )
 
     @render.ui
     def input_files_upload_ui():
+        if is_sample_csv:
+            return warning_md_box(
+                """
+                So that private data is not accidentally uploaded,
+                the demo provides a private CSV, and does not support
+                data upload.
+
+                Run DP Wizard locally to process your own data.
+                """
+            )
         return ui.row(
             ui.input_file(
                 "private_csv_path",
