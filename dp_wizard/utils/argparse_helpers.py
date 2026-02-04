@@ -25,8 +25,7 @@ def _get_arg_parser() -> argparse.ArgumentParser:
         description="DP Wizard makes it easier to get started with "
         "Differential Privacy.",
         epilog=f"""
-Unless you have set "--sample" or "--cloud", you will specify a CSV
-inside the application.
+Unless you have set "--demo", you will specify a CSV inside the application.
 
 Provide a "Private CSV" {PRIVATE_TEXT}
 
@@ -37,17 +36,11 @@ Provide both {PUBLIC_PRIVATE_TEXT}
     )
     group = parser.add_mutually_exclusive_group()
     group.add_argument(
-        "--sample",
+        "--demo",
         action="store_true",
-        help="Generate a sample CSV: "
+        help="Generate a demo CSV: "
         "See how DP Wizard works without providing your own data",
     )
-    group.add_argument(
-        "--cloud",
-        action="store_true",
-        help="Prompt for column names instead of CSV upload",
-    )
-
     parser.add_argument(
         "--host",
         default=_default_host,
@@ -74,7 +67,7 @@ Provide both {PUBLIC_PRIVATE_TEXT}
 def _get_args() -> argparse.Namespace:
     """
     >>> _get_args()
-    Namespace(sample=False, cloud=False, host='127.0.0.1', port=8000, ...)
+    Namespace(demo=False, host='127.0.0.1', port=8000, ...)
     """
     arg_parser = _get_arg_parser()
 
@@ -90,8 +83,7 @@ def _get_args() -> argparse.Namespace:
 
 
 class CLIInfo(NamedTuple):
-    is_sample_csv: bool
-    is_cloud_mode: bool
+    is_demo_csv: bool
     is_qa_mode: bool
     host: str
     port: int
@@ -99,17 +91,15 @@ class CLIInfo(NamedTuple):
     reload: bool
 
     def get_is_tutorial_mode(self) -> bool:
-        return self.is_sample_csv or self.is_cloud_mode  # pragma: no cover
+        return self.is_demo_csv  # pragma: no cover
 
 
 def cli_info_defaults(
-    is_sample_csv: bool,
-    is_cloud_mode: bool,
+    is_demo_csv: bool,
     is_qa_mode: bool,
 ) -> CLIInfo:
     return CLIInfo(
-        is_sample_csv=is_sample_csv,
-        is_cloud_mode=is_cloud_mode,
+        is_demo_csv=is_demo_csv,
         is_qa_mode=is_qa_mode,
         host=_default_host,
         port=_default_port,
@@ -121,16 +111,13 @@ def cli_info_defaults(
 def get_cli_info() -> CLIInfo:  # pragma: no cover
     # This works, but haven't found anything in the posit docs that says this is stable.
     if environ.get("USER") == "connect":
-        print("Starting cloud mode...")
         return cli_info_defaults(
-            is_sample_csv=False,
-            is_cloud_mode=True,
+            is_demo_csv=True,
             is_qa_mode=False,
         )
     args = _get_args()
     return CLIInfo(
-        is_sample_csv=args.sample,
-        is_cloud_mode=args.cloud,
+        is_demo_csv=args.demo,
         is_qa_mode=False,
         host=args.host,
         port=args.port,

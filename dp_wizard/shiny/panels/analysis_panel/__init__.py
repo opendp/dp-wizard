@@ -146,8 +146,7 @@ def analysis_server(
     state: AppState,
 ):  # pragma: no cover
     # CLI options:
-    is_sample_csv = state.is_sample_csv
-    # in_cloud = state.in_cloud
+    is_demo_csv = state.is_demo_csv
 
     # Reactive bools:
     is_tutorial_mode = state.is_tutorial_mode
@@ -279,9 +278,9 @@ def analysis_server(
             DP Wizard only supports the analysis of numeric data,
             but string values can be used for grouping.
             """,
-            is_sample_csv,
+            is_demo_csv,
             """
-            With `sample.csv` you can select `class_year_str`
+            With `demo.csv` you can select `class_year_str`
             to group results by class year.
             """,
             responsive=False,
@@ -298,10 +297,10 @@ def analysis_server(
             each column has a smaller share of the privacy budget,
             and the accuracy of results will decline.
             """,
-            is_sample_csv,
+            is_demo_csv,
             """
             Not all columns need analysis.
-            With `sample.csv`, you could just select `grade`.
+            With `demo.csv`, you could just select `grade`.
             """,
             responsive=False,
         )
@@ -385,7 +384,7 @@ def analysis_server(
                 bin_counts=bin_counts,
                 weights=weights,
                 is_tutorial_mode=is_tutorial_mode,
-                is_sample_csv=is_sample_csv,
+                is_demo_csv=is_demo_csv,
                 is_single_column=len(column_ids) == 1,
             )
         return [column_ui(column_id) for column_id in column_ids]

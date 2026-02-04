@@ -87,13 +87,13 @@ def id_names_dict_from_schema(
     return {ColumnId(name): ColumnName(name) for name in schema.keys()}
 
 
-def make_sample_csv(path: Path, contributions: int) -> None:
+def make_demo_csv(path: Path, contributions: int) -> None:
     """
     >>> import tempfile
     >>> from pathlib import Path
     >>> import csv
     >>> with tempfile.NamedTemporaryFile() as temp:
-    ...     make_sample_csv(Path(temp.name), 10)
+    ...     make_demo_csv(Path(temp.name), 10)
     ...     with open(temp.name, newline="") as csv_handle:
     ...         reader = csv.DictReader(csv_handle)
     ...         reader.fieldnames
@@ -105,7 +105,7 @@ def make_sample_csv(path: Path, contributions: int) -> None:
     dict_values(['100', 'sophomore', '10', '78', '0'])
     """
     random.seed(0)  # So the mock data will be stable across runs.
-    with path.open("w", newline="") as sample_csv_handle:
+    with path.open("w", newline="") as demo_csv_handle:
         fields = [
             "student_id",
             "class_year_str",
@@ -114,7 +114,7 @@ def make_sample_csv(path: Path, contributions: int) -> None:
             "self_assessment",
         ]
         class_year_map = ["first year", "sophomore", "junior", "senior"]
-        writer = csv.DictWriter(sample_csv_handle, fieldnames=fields)
+        writer = csv.DictWriter(demo_csv_handle, fieldnames=fields)
         writer.writeheader()
         for student_id in range(1, 101):
             class_year = int(_clip(random.gauss(1, 1), 0, 3))
