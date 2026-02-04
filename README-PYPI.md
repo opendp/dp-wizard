@@ -6,7 +6,7 @@ DP Wizard makes it easier to get started with differential privacy,
 the addition of calibrated noise to aggregate statistics to protect the privacy of individuals.
 DP Wizard demonstrates how to calculate DP statistics or create a synthetic dataset from the data you provide.
 
-(If differential privacy is new to you, [these slides](https://opendp.github.io/dp-wizard/) provide some background, and explain how DP Wizard works.)
+If differential privacy is new to you, [these slides](https://opendp.github.io/dp-wizard/) provide some background, and explain how DP Wizard works.
 
 Options for running DP Wizard:
 
@@ -14,6 +14,8 @@ Options for running DP Wizard:
 - Install from [Docker](https://hub.docker.com/repository/docker/mccalluc/dp-wizard/general): `docker run -p 8000:8000 mccalluc/dp-wizard`
 - Install from [PyPI](https://pypi.org/project/dp-wizard/): `pip install 'dp-wizard[app]'; dp-wizard`
 - Install from [source](https://github.com/opendp/dp-wizard): See developer instructions.
+
+See the [FAQ](https://github.com/opendp/dp-wizard/blob/main/dp_wizard/FAQ.md) for more information.
 
 ## Screenshots
 
