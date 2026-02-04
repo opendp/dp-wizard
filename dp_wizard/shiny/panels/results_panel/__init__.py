@@ -98,7 +98,6 @@ def results_server(
 ):  # pragma: no cover
     # CLI options:
     # is_sample_csv = state.is_sample_csv
-    in_cloud = state.in_cloud
     qa_mode = state.qa_mode
 
     # Reactive bools:
@@ -208,47 +207,35 @@ def results_server(
         ]
         if product() == Product.SYNTHETIC_DATA:
             downloads.append("Contingency Table")
-        return (
-            ui.markdown(
+        return [
+            tutorial_box(
+                is_tutorial_mode(),
                 """
-                When [installed and run
-                locally](https://pypi.org/project/dp_wizard/),
-                there are more download options because DP Wizard
-                can read your private CSV and release differentially
-                private statistics.
-                """
-            )
-            if in_cloud
-            else [
-                tutorial_box(
-                    is_tutorial_mode(),
-                    """
-                    Now you can download a notebook for your analysis.
-                    The Jupyter notebook could be used locally or on Colab,
-                    but the HTML version can be viewed in the brower.
-                    """,
-                    responsive=False,
-                ),
-                download_button(
-                    "Package",
-                    primary=True,
-                    disabled=disabled,
-                ),
-                ui.br(),
-                "Contains:",
-                ui.tags.ul(
-                    *[
-                        ui.tags.li(
-                            download_link(
-                                download,
-                                disabled=disabled,
-                            )
+                Now you can download a notebook for your analysis.
+                The Jupyter notebook could be used locally or on Colab,
+                but the HTML version can be viewed in the brower.
+                """,
+                responsive=False,
+            ),
+            download_button(
+                "Package",
+                primary=True,
+                disabled=disabled,
+            ),
+            ui.br(),
+            "Contains:",
+            ui.tags.ul(
+                *[
+                    ui.tags.li(
+                        download_link(
+                            download,
+                            disabled=disabled,
                         )
-                        for download in downloads
-                    ]
-                ),
-            ]
-        )
+                    )
+                    for download in downloads
+                ]
+            ),
+        ]
 
     @render.ui
     def download_code_ui():
@@ -256,18 +243,11 @@ def results_server(
         return [
             tutorial_box(
                 is_tutorial_mode(),
-                (
-                    """
-                    In the cloud, DP Wizard only provides unexecuted
-                    notebooks and scripts.
-                    """
-                    if in_cloud
-                    else """
-                    Alternatively, you can download a script or unexecuted
-                    notebook that demonstrates the steps of your analysis,
-                    but does not contain any data or analysis results.
-                    """
-                ),
+                """
+                Alternatively, you can download a script or unexecuted
+                notebook that demonstrates the steps of your analysis,
+                but does not contain any data or analysis results.
+                """,
                 responsive=False,
             ),
             download_button("Notebook (unexecuted)", disabled=disabled),
