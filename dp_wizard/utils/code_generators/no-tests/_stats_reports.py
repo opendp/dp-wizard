@@ -35,19 +35,7 @@ def flatten_dict(dictionary, parent_key=""):
     return dict(items)
 
 
-report = {
-    "inputs": {
-        "data": CSV_PATH,
-        "epsilon": EPSILON,
-        "columns": COLUMNS,
-        "contributions": contributions,
-    },
-    "outputs": OUTPUTS,
-}
-
-Path(TXT_REPORT_PATH).write_text(dump(report))
-
-flat_report = flatten_dict(report)
+flat_report = flatten_dict(OUTPUTS)
 with Path(CSV_REPORT_PATH).open(mode="w", newline="") as handle:
     writer = csv.writer(handle)
     for kv_pair in flat_report.items():
