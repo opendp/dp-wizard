@@ -94,7 +94,8 @@ def dataset_ui():
             ui.card(
                 ui.card_header(data_source_icon, "Data Source"),
                 ui.output_ui("csv_upload_ui"),
-                ui.output_ui("row_count_bounds_ui"),
+                ui.output_ui("row_count_bounds_tutorial_ui"),
+                ui.output_ui("row_count_bounds_input_ui"),
             ),
             [
                 ui.card(
@@ -455,7 +456,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             return warning_md_box(error_md)
 
     @render.ui
-    def row_count_bounds_ui():
+    def row_count_bounds_tutorial_ui():
         return (
             ui.markdown("What is the **maximum row count** of your CSV?"),
             tutorial_box(
@@ -475,6 +476,11 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 """,
                 responsive=False,
             ),
+        )
+
+    @render.ui
+    def row_count_bounds_input_ui():
+        return (
             ui.layout_columns(
                 ui.input_text(
                     "max_rows",
