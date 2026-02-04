@@ -2,7 +2,7 @@ from typing import NamedTuple
 
 import yaml
 
-from dp_wizard import package_root
+from dp_wizard import config_root
 
 
 class _Config(NamedTuple):
@@ -10,7 +10,7 @@ class _Config(NamedTuple):
     is_dark_mode: bool | None
 
 
-_config_path = package_root / "utils/.config.yaml"
+_config_path = config_root / ".config.yaml"
 _config: _Config
 
 
@@ -24,6 +24,9 @@ def _init_config():
     _config = _Config(**config_dict)
 
 
+# TODO: This is only called at application start.
+# We'd like to call this when the page is reloaded, too.
+# https://github.com/opendp/dp-wizard/issues/830
 _init_config()
 
 
