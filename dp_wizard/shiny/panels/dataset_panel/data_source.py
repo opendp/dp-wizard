@@ -18,49 +18,32 @@ from dp_wizard.utils.code_generators import DefaultsTemplate
 from dp_wizard.utils.csv_helper import CsvInfo
 
 
-def csv_or_columns_ui(
-    is_tutorial_mode: reactive.Value[bool],
-    csv_info: reactive.Value[CsvInfo],
-):  # pragma: no cover
-    return [
-        ui.markdown(
-            f"""
-Choose **Private CSV** {PRIVATE_TEXT}
-
-Choose **Public CSV** {PUBLIC_TEXT}
-
-Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
-            """
-        ),
-        ui.output_ui("input_files_ui"),
-        ui.output_ui("csv_message_ui"),
-        code_sample(
-            "Context",
-            DefaultsTemplate(
-                # NOTE: If stats vs. synth is moved to the top of the flow,
-                # then we can show the appropriate template here.
-                "stats_context",
-                package_root / "utils/code_generators/no-tests",
-            )
-            .fill_values(CSV_PATH="sample.csv")
-            .fill_expressions(
-                MARGINS_LIST="margins",
-                EXTRA_COLUMNS="extra_columns",
-                WEIGHTS="weights",
-            )
-            .fill_blocks(
-                PRIVACY_UNIT_BLOCK="",
-                PRIVACY_LOSS_BLOCK="",
-                OPTIONAL_CSV_BLOCK=(
-                    "# More of these slots will be filled in\n"
-                    "# as you move through DP Wizard.\n"
-                ),
-            )
-            .finish()
-            .strip(),
-        ),
-        ui.output_ui("python_tutorial_ui"),
-    ]
+def context_code_sample():
+    return code_sample(
+        "Context",
+        DefaultsTemplate(
+            # NOTE: If stats vs. synth is moved to the top of the flow,
+            # then we can show the appropriate template here.
+            "stats_context",
+            package_root / "utils/code_generators/no-tests",
+        )
+        .fill_values(CSV_PATH="sample.csv")
+        .fill_expressions(
+            MARGINS_LIST="margins",
+            EXTRA_COLUMNS="extra_columns",
+            WEIGHTS="weights",
+        )
+        .fill_blocks(
+            PRIVACY_UNIT_BLOCK="",
+            PRIVACY_LOSS_BLOCK="",
+            OPTIONAL_CSV_BLOCK=(
+                "# More of these slots will be filled in\n"
+                "# as you move through DP Wizard.\n"
+            ),
+        )
+        .finish()
+        .strip(),
+    )
 
 
 def input_files_ui(

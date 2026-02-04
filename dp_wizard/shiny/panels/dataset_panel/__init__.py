@@ -19,6 +19,11 @@ from dp_wizard.shiny.components.outputs import (
 )
 from dp_wizard.shiny.panels.dataset_panel import data_source
 from dp_wizard.types import AppState, Product
+from dp_wizard.utils.argparse_helpers import (
+    PRIVATE_TEXT,
+    PUBLIC_PRIVATE_TEXT,
+    PUBLIC_TEXT,
+)
 from dp_wizard.utils.code_generators import make_privacy_unit_block
 from dp_wizard.utils.constraints import MAX_CONTRIBUTIONS, MAX_ROW_COUNT, MIN_ROW_COUNT
 from dp_wizard.utils.csv_helper import CsvInfo, get_csv_names_mismatch
@@ -88,7 +93,7 @@ def dataset_ui():
         ui.layout_columns(
             ui.card(
                 ui.card_header(data_source_icon, "Data Source"),
-                ui.output_ui("csv_or_columns_ui"),
+                ui.output_ui("csv_upload_ui"),
                 ui.output_ui("row_count_bounds_ui"),
             ),
             [
@@ -214,11 +219,22 @@ def dataset_server(
         )
 
     @render.ui
-    def csv_or_columns_ui():
-        return data_source.csv_or_columns_ui(
-            is_tutorial_mode=is_tutorial_mode,
-            csv_info=csv_info,
-        )
+    def csv_upload_ui():
+        return [
+            ui.markdown(
+                f"""
+Choose **Private CSV** {PRIVATE_TEXT}
+
+Choose **Public CSV** {PUBLIC_TEXT}
+
+Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
+            """
+            ),
+            ui.output_ui("input_files_ui"),
+            ui.output_ui("csv_message_ui"),
+            data_source.context_code_sample(),
+            ui.output_ui("python_tutorial_ui"),
+        ]
 
     @render.ui
     def input_files_ui():
