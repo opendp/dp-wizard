@@ -1,4 +1,4 @@
-from dp_wizard import package_root
+from dp_wizard import config_root
 from dp_wizard.types import ColumnIdentifier, Product
 from dp_wizard.utils.code_generators.abstract_generator import (
     AbstractGenerator,
@@ -86,7 +86,6 @@ class NotebookGenerator(AbstractGenerator):
                 )
             case _:  # pragma: no cover
                 raise ValueError(self.analysis_plan.product)
-        target_path = package_root / ".local-sessions"
 
         return (
             DefaultsTemplate(f"{self._get_synth_or_stats()}_reports", root)
@@ -95,10 +94,10 @@ class NotebookGenerator(AbstractGenerator):
                 when=self.analysis_plan.product == Product.STATISTICS,
             )
             .fill_values(
-                CSV_REPORT_PATH=str(target_path / "report.csv"),
+                CSV_REPORT_PATH=str(config_root / "report.csv"),
             )
             .fill_values(
-                CONTINGENCY_TABLE_PATH=str(target_path / "contingency.csv"),
+                CONTINGENCY_TABLE_PATH=str(config_root / "contingency.csv"),
                 when=self.analysis_plan.product == Product.SYNTHETIC_DATA,
             )
             .finish()
