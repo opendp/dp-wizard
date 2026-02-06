@@ -339,16 +339,16 @@ def test_local_app_downloads(
     stem_locator.fill(new_stem)
     expect(stem_locator).to_have_value(new_stem)
 
-    download_option.requires_release
+    warning_expected = download_option.requires_release
 
     # -- Define Analysis --
     page.get_by_role("tab", name="Define Analysis").click()
     expect(page.get_by_text(analysis_release_warning)).to_be_visible(
-        visible=download_option.requires_release
+        visible=warning_expected
     )
 
     # -- Select Dataset --
     page.get_by_role("tab", name="Select Dataset").click()
     expect(page.get_by_text(dataset_release_warning)).to_be_visible(
-        visible=download_option.requires_release
+        visible=warning_expected
     )
