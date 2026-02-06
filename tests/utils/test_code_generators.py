@@ -25,8 +25,6 @@ python_paths = package_root.glob("**/*.py")
 
 @pytest.mark.parametrize("python_path", python_paths, ids=lambda path: path.name)
 def test_no_unparameterized_docs_urls(python_path: Path):
-    if ".local-sessions" in str(python_path):
-        return  # pragma: no cover
     python_code = python_path.read_text()
     assert not re.search(r"docs\.opendp\.org/en/[^O{]", python_code)
 
