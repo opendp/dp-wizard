@@ -8,7 +8,10 @@ from shiny.pytest import create_app_fixture
 from shiny.run import ShinyAppProc
 
 from dp_wizard import package_root
-from dp_wizard.shiny.panels.results_panel.download_options import _download_options
+from dp_wizard.shiny.panels.results_panel.download_options import (
+    DownloadOption,
+    _download_options,
+)
 from dp_wizard.utils.code_generators.notebook_generator import PLACEHOLDER_CSV_NAME
 
 bp = "BREAKPOINT()".lower()
@@ -211,7 +214,14 @@ def browser_context_args(browser_context_args):
     }
 
 
-def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no cover
+@pytest.mark.parametrize(
+    "download_option",
+    _download_options.values(),
+    ids=lambda opt: f"{opt.name}{opt.ext}",
+)
+def test_local_app_downloads(
+    page: Page, local_app: ShinyAppProc, download_option: DownloadOption
+):  # pragma: no cover
 
     def screenshot(page, name):
         from os import environ
@@ -306,26 +316,21 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     # https://github.com/opendp/dp-wizard/issues/717
     screenshot(page, "download-results")
 
-    # Right now, the significant test start-up costs mean
-    # it doesn't make sense to parameterize this test,
-    # but that could change.
-
     expected_stem = "dp_synthetic_data_for_grade_grouped_by_class_year"
 
-    for option in _download_options.values():
-        link_text = f"{option.name} ({option.ext})"
-        with page.expect_download() as download_info:
-            # .first because the script link is included in both columns.
-            page.get_by_text(link_text).first.click()
+    link_text = f"{download_option.name} ({download_option.ext})"
+    with page.expect_download() as download_info:
+        # .first because the script link is included in both columns.
+        page.get_by_text(link_text).first.click()
 
-        download_name = download_info.value.suggested_filename
-        assert download_name.endswith(option.ext)
-        if not download_name.startswith("README"):
-            assert download_name.startswith(expected_stem)
+    download_name = download_info.value.suggested_filename
+    assert download_name.endswith(download_option.ext)
+    if not download_name.startswith("README"):
+        assert download_name.startswith(expected_stem)
 
-        download_path = download_info.value.path()
-        content = download_path.read_bytes()
-        assert content  # Could add assertions for different document types.
+    download_path = download_info.value.path()
+    content = download_path.read_bytes()
+    assert content  # Could add assertions for different document types.
 
     # Check that download name can be changed:
     stem_locator = page.locator("#custom_download_stem")
@@ -334,22 +339,16 @@ def test_local_app_downloads(page: Page, local_app: ShinyAppProc):  # pragma: no
     stem_locator.fill(new_stem)
     expect(stem_locator).to_have_value(new_stem)
 
-    new_clean_stem = "-C1ean-me-"
-    for option in _download_options.values():
-        link_text = f"{option.name} ({option.ext})"
-        with page.expect_download() as download_info:
-            # .first because the script link is included in both columns.
-            page.get_by_text(link_text).first.click()
-
-        download_name = download_info.value.suggested_filename
-        assert download_name.endswith(option.ext)
-        if not download_name.startswith("README"):
-            assert download_name.startswith(new_clean_stem)
+    download_option.requires_release
 
     # -- Define Analysis --
     page.get_by_role("tab", name="Define Analysis").click()
-    expect(page.get_by_text(analysis_release_warning)).to_be_visible()
+    expect(page.get_by_text(analysis_release_warning)).to_be_visible(
+        visible=download_option.requires_release
+    )
 
     # -- Select Dataset --
     page.get_by_role("tab", name="Select Dataset").click()
-    expect(page.get_by_text(dataset_release_warning)).to_be_visible()
+    expect(page.get_by_text(dataset_release_warning)).to_be_visible(
+        visible=download_option.requires_release
+    )
