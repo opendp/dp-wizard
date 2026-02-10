@@ -19,9 +19,14 @@ from dp_wizard.shiny.components.outputs import (
 )
 from dp_wizard.shiny.panels.dataset_panel import data_source
 from dp_wizard.types import AppState, Product
+from dp_wizard.utils.argparse_helpers import (
+    PRIVATE_TEXT,
+    PUBLIC_PRIVATE_TEXT,
+    PUBLIC_TEXT,
+)
 from dp_wizard.utils.code_generators import make_privacy_unit_block
 from dp_wizard.utils.constraints import MAX_CONTRIBUTIONS, MAX_ROW_COUNT, MIN_ROW_COUNT
-from dp_wizard.utils.csv_helper import CsvInfo, get_csv_names_mismatch, infer_csv_info
+from dp_wizard.utils.csv_helper import CsvInfo, get_csv_names_mismatch
 
 dataset_panel_id = "dataset_panel"
 OTHER = "Other"
@@ -88,8 +93,9 @@ def dataset_ui():
         ui.layout_columns(
             ui.card(
                 ui.card_header(data_source_icon, "Data Source"),
-                ui.output_ui("csv_or_columns_ui"),
-                ui.output_ui("row_count_bounds_ui"),
+                ui.output_ui("csv_upload_ui"),
+                ui.output_ui("row_count_bounds_tutorial_ui"),
+                ui.output_ui("row_count_bounds_input_ui"),
             ),
             [
                 ui.card(
@@ -117,8 +123,7 @@ def dataset_server(
     state: AppState,
 ):  # pragma: no cover
     # CLI options:
-    is_sample_csv = state.is_sample_csv
-    in_cloud = state.in_cloud
+    is_demo_csv = state.is_demo_csv
 
     # Reactive bools:
     is_tutorial_mode = state.is_tutorial_mode
@@ -169,12 +174,6 @@ def dataset_server(
         private_csv_path.set(path)
         csv_info.set(CsvInfo(Path(path)))
 
-    @reactive.effect
-    @reactive.event(input.all_column_names)
-    def _on_column_names_change():
-        # Only used when the user is supplying column names in cloud mode.
-        csv_info.set(infer_csv_info(input.all_column_names()))
-
     @reactive.calc
     def csv_column_mismatch_calc() -> Optional[tuple[set, set]]:
         public = public_csv_path()
@@ -221,20 +220,66 @@ def dataset_server(
         )
 
     @render.ui
-    def csv_or_columns_ui():
-        return data_source.csv_or_columns_ui(
-            in_cloud=in_cloud,
-            is_tutorial_mode=is_tutorial_mode,
-            csv_info=csv_info,
+    def csv_upload_ui():
+        return [
+            (
+                warning_md_box(
+                    """
+                    So that private data is not accidentally uploaded,
+                    the demo provides a private CSV, and does not support
+                    data upload.
+
+                    Run DP Wizard locally to process your own data.
+                    """
+                )
+                if is_demo_csv
+                else [
+                    ui.markdown(
+                        f"""
+Choose **Private CSV** {PRIVATE_TEXT}
+
+Choose **Public CSV** {PUBLIC_TEXT}
+
+Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
+                        """
+                    ),
+                    ui.output_ui("input_files_tutorial_ui"),
+                    ui.output_ui("input_files_upload_ui"),
+                ]
+            ),
+            ui.output_ui("csv_message_ui"),
+            data_source.context_code_sample(),
+            ui.output_ui("python_tutorial_ui"),
+        ]
+
+    @render.ui
+    def input_files_tutorial_ui():
+        return tutorial_box(
+            is_tutorial_mode(),
+            """
+            If you don't have a CSV on hand to work with,
+            quit and restart with `dp-wizard --demo`,
+            and DP Wizard will provide a demo CSV
+            for the tutorial.
+            """,
+            responsive=False,
         )
 
     @render.ui
-    def input_files_ui():
-        return data_source.input_files_ui(
-            is_tutorial_mode=is_tutorial_mode,
-            is_sample_csv=is_sample_csv,
-            initial_private_csv_path=initial_private_csv_path,
-            initial_public_csv_path=initial_public_csv_path,
+    def input_files_upload_ui():
+        return ui.row(
+            ui.input_file(
+                "private_csv_path",
+                "Choose Private CSV",
+                accept=[".csv"],
+                placeholder=Path(initial_private_csv_path).name,
+            ),
+            ui.input_file(
+                "public_csv_path",
+                "Choose Public CSV",
+                accept=[".csv"],
+                placeholder=Path(initial_public_csv_path).name,
+            ),
         )
 
     @render.ui
@@ -316,9 +361,9 @@ def dataset_server(
                 to the released statistics, to ensure that
                 the contribution of any single individual is masked.
                 """,
-                is_sample_csv,
+                is_demo_csv,
                 """
-                The `sample.csv` simulates 10 assignments
+                The `demo.csv` simulates 10 assignments
                 over the course of the term for each student,
                 so enter `10` here.
                 """,
@@ -359,7 +404,7 @@ def dataset_server(
             and not info.get_is_error()
             and len(info.get_all_column_names()) > 0
             and not get_row_count_errors(max_rows())
-            and (in_cloud or not csv_column_mismatch_calc())
+            and not csv_column_mismatch_calc()
         )
 
     @reactive.calc
@@ -388,26 +433,13 @@ def dataset_server(
 
     @render.ui
     def python_tutorial_ui():
-        cloud_extra_markdown = (
-            """
-            Because this instance of DP Wizard is running in the cloud,
-            we don't allow private data to be uploaded.
-            When run locally, DP Wizard can also run an analysis
-            on your data and return results,
-            and not just an unexecuted notebook.
-            """
-            if in_cloud
-            else ""
-        )
         return tutorial_box(
             is_tutorial_mode(),
-            f"""
+            """
             Along the way, code samples demonstrate
             how the information you provide is used in the
             OpenDP Library, and at the end you can download
             a notebook for the entire calculation.
-
-            {cloud_extra_markdown}
             """,
             responsive=False,
         )
@@ -424,7 +456,7 @@ def dataset_server(
             return warning_md_box(error_md)
 
     @render.ui
-    def row_count_bounds_ui():
+    def row_count_bounds_tutorial_ui():
         return (
             ui.markdown("What is the **maximum row count** of your CSV?"),
             tutorial_box(
@@ -444,6 +476,11 @@ def dataset_server(
                 """,
                 responsive=False,
             ),
+        )
+
+    @render.ui
+    def row_count_bounds_input_ui():
+        return (
             ui.layout_columns(
                 ui.input_text(
                     "max_rows",
@@ -464,8 +501,8 @@ def dataset_server(
             return button
         return [
             button,
-            f"""
-            Specify {'columns' if in_cloud else 'CSV'}, unit of privacy,
+            """
+            Specify CSV, unit of privacy,
             and maximum row count before proceeding.
             """,
         ]

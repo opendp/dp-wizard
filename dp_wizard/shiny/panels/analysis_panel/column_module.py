@@ -147,7 +147,7 @@ def column_server(
     bin_counts: reactive.Value[dict[ColumnName, int]],
     weights: reactive.Value[dict[ColumnName, Weight]],
     is_tutorial_mode: reactive.Value[bool],
-    is_sample_csv: bool,
+    is_demo_csv: bool,
     is_single_column: bool,
 ):  # pragma: no cover
     @reactive.effect
@@ -283,7 +283,7 @@ def column_server(
                     we should try never to look directly at the data,
                     not even to set bounds! This can be hard.
                     """,
-                    is_sample_csv,
+                    is_demo_csv,
                     """
                     Given what we know _a priori_ about grading scales,
                     you could limit `grade` to values between 0 and 100.

@@ -19,8 +19,6 @@ def dataset_summary(state: AppState):  # pragma: no cover
         sources.append("Private CSV")
     if state.public_csv_path():
         sources.append("Public CSV")
-    if state.in_cloud:
-        sources.append("Field List")
 
     contributions = state.contributions()
     entity = state.contributions_entity()
