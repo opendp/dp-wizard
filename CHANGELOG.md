@@ -1,5 +1,28 @@
 # CHANGELOG
 
+## 0.8.0
+
+Highlights:
+
+- Add FAQ [#824](https://github.com/opendp/dp-wizard/pull/824)
+- `[app]` -> `[pins]` for clarity [#823](https://github.com/opendp/dp-wizard/pull/823)
+- Docker [#819](https://github.com/opendp/dp-wizard/pull/819)
+- Upgrade dp-wizard-template: Toggle between summary and tutorial in HTML export [#805](https://github.com/opendp/dp-wizard/pull/805)
+- Analysis details in the generated README [#815](https://github.com/opendp/dp-wizard/pull/815)
+
+Also includes:
+
+- Fix tutorial toggle clearing file selector [#842](https://github.com/opendp/dp-wizard/pull/842)
+- use config_root for scratch files [#845](https://github.com/opendp/dp-wizard/pull/845)
+- Split playwright downloads into separate tests [#844](https://github.com/opendp/dp-wizard/pull/844)
+- tighter RE [#843](https://github.com/opendp/dp-wizard/pull/843)
+- Remove text report; replace with YAML config download [#825](https://github.com/opendp/dp-wizard/pull/825)
+
+- Store config in user home dir [#829](https://github.com/opendp/dp-wizard/pull/829)
+- fix cloud deployment [#801](https://github.com/opendp/dp-wizard/pull/801)
+- html escape user-provided text [#809](https://github.com/opendp/dp-wizard/pull/809)
+- use is_analysis_defined instead of weights for button state [#808](https://github.com/opendp/dp-wizard/pull/808)
+
 ## 0.7.0
 
 Highlights:
