@@ -8,7 +8,7 @@ from tempfile import TemporaryDirectory
 from dp_wizard_templates.converters import convert_from_notebook, convert_to_notebook
 from shiny import Inputs, Outputs, Session, reactive, render, types, ui
 
-from dp_wizard import package_root
+from dp_wizard import config_root
 from dp_wizard.shiny.components.icons import (
     download_code_icon,
     download_config_icon,
@@ -35,7 +35,6 @@ from dp_wizard.utils.code_generators.notebook_generator import (
 from dp_wizard.utils.code_generators.script_generator import ScriptGenerator
 
 _wait_message = "Please wait."
-_target_path = package_root / ".local-sessions"
 
 
 def _strip_ansi(e) -> str:
@@ -367,7 +366,7 @@ def results_server(
     @reactive.calc
     def notebook_dict():
         # This creates the notebook, and evaluates it,
-        # and drops reports in the local-sessions dir.
+        # and drops reports in the config_root.
         # Could be slow!
         # Luckily, reactive calcs are lazy.
 
@@ -402,12 +401,12 @@ def results_server(
     @reactive.calc
     def table_csv():
         notebook_dict()  # Evaluate just for the side effect of creating report.
-        return (_target_path / "report.csv").read_text()
+        return (config_root / "report.csv").read_text()
 
     @reactive.calc
     def contingency_table_csv():
         notebook_dict()  # Evaluate just for the side effect of creating report.
-        return (_target_path / "contingency.csv").read_text()
+        return (config_root / "contingency.csv").read_text()
 
     @reactive.calc
     def configuration_yaml():
