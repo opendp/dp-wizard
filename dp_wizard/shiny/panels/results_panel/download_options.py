@@ -10,6 +10,7 @@ class DownloadOption(NamedTuple):
     ext: str
     icon: str
     description_md: str
+    requires_release: bool = True
 
     @property
     def clean_description_md(self) -> str:
@@ -25,6 +26,7 @@ _download_options = {
             ".txt",
             "file",
             "A short description of the analysis, and a table of contents.",
+            requires_release=False,
         ),
         DownloadOption(
             "Package",
@@ -69,12 +71,14 @@ _download_options = {
             It can also be updated with the path
             to a private CSV and executed locally.
             """,
+            requires_release=False,
         ),
         DownloadOption(
             "HTML (unexecuted)",
             ".html",
             "file-code",
             "The same content, but exported as HTML.",
+            requires_release=False,
         ),
         DownloadOption(
             "Script",
@@ -84,6 +88,7 @@ _download_options = {
             The same code as the notebooks, but extracted into
             a Python script which can be run from the command line.
             """,
+            requires_release=False,
         ),
         DownloadOption(
             "Notebook Source",
@@ -93,6 +98,7 @@ _download_options = {
             Python source code converted by jupytext into notebook.
             Primarily of interest to DP Wizard developers.
             """,
+            requires_release=False,
         ),
         DownloadOption(
             "Configuration",
@@ -102,6 +108,7 @@ _download_options = {
             Analysis configuration as YAML. Except for the contents of
             your input CSV, this captures all the details of your analysis.
             """,
+            requires_release=False,
         ),
     ]
 }
