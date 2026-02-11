@@ -59,6 +59,6 @@ At the end there are suggestions for further reading.
 
 ### How can I report bugs or request features?
 
-If you are not on github, feel free to [email the maintainer](cmccallum@g.harvard.edu) directly.
-If you are on github, please [file an issue](https://github.com/opendp/dp-wizard/issues/new/choose).
+If you are not on GitHub, feel free to [email the maintainer](cmccallum@g.harvard.edu) directly.
+If you are on GitHub, please [file an issue](https://github.com/opendp/dp-wizard/issues/new/choose).
 Thank you for the feedback!

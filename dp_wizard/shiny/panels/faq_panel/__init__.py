@@ -54,8 +54,8 @@ def about_ui():
         "FAQ",
         ui.card(
             ui.markdown((package_root / "FAQ.md").read_text())
-            + "If you are on Github, the form below captures environment information "
-            "and pre-fills a Github issue:",
+            + "If you are on GitHub, the form below captures environment information "
+            "and pre-fills a GitHub issue:",
             ui.accordion(
                 ui.accordion_panel(
                     "Pre-fill Issue",
