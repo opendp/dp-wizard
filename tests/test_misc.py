@@ -129,15 +129,15 @@ def test_common_typos():
         rel_path = path.relative_to(package_root.parent)
         try:
             text = path.read_text()
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             pytest.fail(f"Exception reading {path}: {e}")
         for pattern, expected in expected_pairs:
             for match in re.findall(rf"(.*)({pattern})(.*)", text):
-                if match[1] not in expected:
+                if match[1] not in expected:  # pragma: no cover
                     options = " or ".join(f'"{e}"' for e in expected)
                     failures.append(
                         f"Expected {options} in {rel_path}, not:"
                         f"\n> {''.join(match)}"
                     )
-    if failures:
+    if failures:  # pragma: no cover
         pytest.fail("\n".join(failures))
