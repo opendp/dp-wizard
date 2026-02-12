@@ -109,6 +109,20 @@ def test_common_typos():
         (r"github(?!\.com)(?!\.io)(?!/workflows)", ["GitHub"]),
         (r"dp.wizard\[[^]]+\]", ["dp_wizard[pins]"]),
         (r"pip install --editable \S+", ["pip install --editable '.[pins]'"]),
+        (
+            r"pip install \S+",
+            [
+                "pip install 'dp_wizard[pins]'",
+                "pip install 'dp_wizard[pins]';",
+                "pip install 'dp_wizard[pins]'`",
+                "pip install DEPENDENCIES",
+                "pip install -r",
+                "pip install --editable",
+                "pip install flit",
+                "pip install pytest",  # In test fixtures
+                'pip install pytest"',
+            ],
+        ),
     ]
     failures = []
     for path in get_file_paths():
