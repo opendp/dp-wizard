@@ -102,7 +102,7 @@ You can now install dependencies, and the application itself, and start a tutori
 $ pip install -r requirements-dev.txt
 $ pre-commit install
 $ playwright install
-$ pip install --editable .
+$ pip install --editable '.[pins]'
 $ dp-wizard --demo
 ```
 

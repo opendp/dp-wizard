@@ -108,6 +108,7 @@ def test_common_typos():
     expected_pairs = [
         (r"github(?!\.com)(?!\.io)(?!/workflows)", ["GitHub"]),
         (r"dp.wizard\[[^]]+\]", ["dp_wizard[pins]"]),
+        (r"pip install --editable \S+", ["pip install --editable '.[pins]'"]),
     ]
     failures = []
     for path in get_file_paths():
