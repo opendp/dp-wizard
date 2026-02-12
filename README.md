@@ -12,7 +12,7 @@ Options for running DP Wizard:
 
 - No install [online demo](https://mccalluc-dp-wizard.share.connect.posit.cloud/): Does not support data upload.
 - Install from [Docker](https://hub.docker.com/repository/docker/mccalluc/dp-wizard/general): `docker run -p 8000:8000 mccalluc/dp-wizard`
-- Install from [PyPI](https://pypi.org/project/dp-wizard/): `pip install 'dp-wizard[app]'; dp-wizard`
+- Install from [PyPI](https://pypi.org/project/dp-wizard/): `pip install 'dp_wizard[pins]'; dp-wizard`
 - Install from [source](https://github.com/opendp/dp-wizard): See developer instructions.
 
 See the [FAQ](https://github.com/opendp/dp-wizard/blob/main/dp_wizard/FAQ.md) for more information.
@@ -102,7 +102,7 @@ You can now install dependencies, and the application itself, and start a tutori
 $ pip install -r requirements-dev.txt
 $ pre-commit install
 $ playwright install
-$ pip install --editable .
+$ pip install --editable '.[pins]'
 $ dp-wizard --demo
 ```
 
