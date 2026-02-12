@@ -106,7 +106,8 @@ def get_file_paths() -> list[Path]:
 
 def test_common_typos():
     expected_pairs = [
-        (r"github(?!\.com)(?!\.io)(?!/workflows)", "GitHub"),
+        (r"github(?!\.com)(?!\.io)(?!/workflows)", ["GitHub"]),
+        (r"dp.wizard\[[^]]+\]", ["dp_wizard[pins]"]),
     ]
     failures = []
     for path in get_file_paths():
@@ -117,9 +118,10 @@ def test_common_typos():
             pytest.fail(f"Exception reading {path}: {e}")
         for pattern, expected in expected_pairs:
             for match in re.findall(rf"(.*)({pattern})(.*)", text):
-                if match[1] != expected:
+                if match[1] not in expected:
+                    options = " or ".join(f'"{e}"' for e in expected)
                     failures.append(
-                        f"Expected '{expected}' in {rel_path}, not:"
+                        f"Expected {options} in {rel_path}, not:"
                         f"\n> {''.join(match)}"
                     )
     if failures:
