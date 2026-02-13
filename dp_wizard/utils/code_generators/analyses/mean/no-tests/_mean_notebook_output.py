@@ -1,3 +1,8 @@
+title = (
+    f"DP means for COLUMN_NAME, "
+    f"assuming {contributions} contributions per individual"
+)
+
 if groups:
     title = (
         f"DP means for COLUMN_NAME, "
