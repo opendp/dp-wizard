@@ -6,7 +6,7 @@ from dp_wizard.shiny.components.icons import (
     data_source_icon,
     groups_icon,
     product_icon,
-    unit_of_privacy_icon,
+    unit_of_protection_icon,
 )
 from dp_wizard.types import AppState
 
@@ -23,15 +23,15 @@ def dataset_summary(state: AppState):  # pragma: no cover
     contributions = state.contributions()
     entity = state.contributions_entity()
     s = "s" if contributions > 1 else ""
-    unit_of_privacy = f"{contributions} row{s} / {entity}"
+    unit_of_protection = f"{contributions} row{s} / {entity}"
 
     product = state.product()
 
     return tags.small(
         data_source_icon,
         f"Data Source: {', '.join(sources)}; ",
-        unit_of_privacy_icon,
-        f"Unit of Privacy: {unit_of_privacy}; ",
+        unit_of_protection_icon,
+        f"Unit of Protection: {unit_of_protection}; ",
         product_icon,
         f"Product: {product}.",
         style=_css,
