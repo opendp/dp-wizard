@@ -427,10 +427,10 @@ def analysis_server(
                 """
             )
         if e_value <= 0.2:
-            optional_warning = warning_md_box(
+            optional_warning = ui.markdown(
                 """
-                The use of a value this small is discouraged
-                because added noise will lower the accuracy of results.
+                Small values will better preserve privacy,
+                but as a consequence, statistics will be less accurate.
                 """
             )
         return [
