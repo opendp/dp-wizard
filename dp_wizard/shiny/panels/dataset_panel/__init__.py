@@ -351,7 +351,6 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             ui.markdown(
                 f"""
                 How many **rows** of the CSV can {entity_phrase} contribute to?
-                This is the "unit of protection" which will be protected.
                 """
             ),
             tutorial_box(
