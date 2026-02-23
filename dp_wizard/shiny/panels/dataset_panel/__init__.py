@@ -357,9 +357,8 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             tutorial_box(
                 is_tutorial_mode(),
                 """
-                A larger number here will add more noise
-                to the released statistics, to ensure that
-                the contribution of any single individual is masked.
+                For privacy to be protected, this number needs to an upper bound,
+                even if not all contributors will have this many rows.
                 """,
                 is_demo_csv,
                 """
