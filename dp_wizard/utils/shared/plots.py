@@ -3,13 +3,13 @@
 from polars import DataFrame
 
 
-def interval_bottom(interval: str) -> float:
+def get_interval_bottom(interval: str) -> float:
     """
-    >>> interval_bottom("(10, 20]")
+    >>> get_interval_bottom("(10, 20]")
     10.0
-    >>> interval_bottom("-10")
+    >>> get_interval_bottom("-10")
     -10.0
-    >>> interval_bottom("unexpected")
+    >>> get_interval_bottom("unexpected")
     0.0
     """
     # Intervals from Polars default to open on the left,
@@ -23,8 +23,16 @@ def interval_bottom(interval: str) -> float:
 delim = "; "
 
 
-def first(merged):
-    return merged.split(delim)[0]
+def get_group(merged):
+    """
+    >>> get_group("value")
+    ''
+    >>> get_group("group 1; value")
+    'group 1'
+    >>> get_group("group 1; group 2; value")
+    'group 1; group 2'
+    """
+    return delim.join(merged.split(delim)[:-1])
 
 
 def df_to_columns(df: DataFrame):
@@ -35,7 +43,7 @@ def df_to_columns(df: DataFrame):
     merged_key_rows = [
         (delim.join(str(k) for k in keys), value) for (*keys, value) in df.rows()
     ]
-    sorted_rows = sorted(merged_key_rows, key=lambda row: interval_bottom(row[0]))
+    sorted_rows = sorted(merged_key_rows, key=lambda row: get_interval_bottom(row[0]))
     transposed = tuple(zip(*sorted_rows))
     return transposed if transposed else (tuple(), tuple())
 
@@ -51,9 +59,9 @@ def plot_bars(df: DataFrame, title: str, error: float = 0):  # pragma: no cover
 
     bins, values = df_to_columns(df)
     _figure, axes = plt.subplots()
-    top_bins = list({first(b) for b in bins})
+    top_bins = list({get_group(b) for b in bins})
     cmap = plt.cm.tab10  # pyright: ignore[reportAttributeAccessIssue]
-    bar_colors = [cmap(top_bins.index(first(b)) % cmap.N) for b in bins]
+    bar_colors = [cmap(top_bins.index(get_group(b)) % cmap.N) for b in bins]
     axes.bar(bins, values, color=bar_colors, yerr=error)
     axes.set_xticks(bins, bins, rotation=45)
     axes.set_ylim(bottom=0)
