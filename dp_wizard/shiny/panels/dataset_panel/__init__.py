@@ -32,57 +32,53 @@ dataset_panel_id = "dataset_panel"
 OTHER = "Other"
 
 
-def get_row_count_error(
-    number_str, minimum=MIN_ROW_COUNT, maximum=MAX_ROW_COUNT
+def get_str_int_error(
+    number_str: str,
+    minimum: int,
+    maximum: int,
+    min_message: str,
+    max_message: str,
 ) -> str | None:
-    """
-    If the inputs are numeric, I think shiny converts
-    any strings that can't be parsed to numbers into None,
-    so the "should be a number" errors may not be seen in practice.
-    >>> get_row_count_error('100')
-    >>> get_row_count_error('0')
-    'should not be less than 100: For very small data sets, too much noise would be required'
-    >>> get_row_count_error('1_000_000_001')
-    'should not be greater than 1,000,000,000: Larger values may cause overflow during calcuations'
-    >>> get_row_count_error(None)
-    'is required'
-    >>> get_row_count_error('')
-    'is required'
-    >>> get_row_count_error('100.1')
-    'should be an integer'
-    """  # noqa: B950
-    if number_str is None or number_str == "":
+    if number_str == "":
         return "is required"
     try:
         number = int(number_str)
     except (TypeError, ValueError, OverflowError):
         return "should be an integer"
     if number < minimum:
-        return (
-            f"should not be less than {minimum:,}: "
-            "For very small data sets, too much noise would be required"
-        )
+        return f"should not be less than {minimum:,}: {min_message}"
     if number > maximum:
-        return (
-            f"should not be greater than {maximum:,}: "
-            "Larger values may cause overflow during calcuations"
-        )
+        return f"should not be greater than {maximum:,}: {max_message}"
     return None
 
 
-def get_row_count_errors(max_rows) -> list[str]:
-    """
-    >>> get_row_count_errors(100)
-    []
-    >>> get_row_count_errors('xyz')
-    ['Maximum row count should be an integer.']
-    >>> get_row_count_errors(None)
-    ['Maximum row count is required.']
-    """
-    messages = []
-    if error := get_row_count_error(max_rows):
-        messages.append(f"Maximum row count {error}.")
-    return messages
+def get_row_count_error(number_str) -> str | None:
+    message = get_str_int_error(
+        number_str=number_str,
+        minimum=MIN_ROW_COUNT,
+        maximum=MAX_ROW_COUNT,
+        min_message="For very small data sets, too much noise would be required",
+        max_message="Larger values may cause overflow during calcuations",
+    )
+    if message:
+        return f"Maximum row count {message}."
+
+
+def get_contibutions_error(number_str) -> str | None:
+    message = get_str_int_error(
+        number_str=number_str,
+        minimum=1,
+        maximum=MAX_CONTRIBUTIONS,
+        min_message="must be at least 1",
+        max_message="""
+            Because the noise will be scaled by this number,
+            it is much better to aggregate during preprocessing
+            or to use OpenDP's truncation in your code
+            than to use a large value here.
+        """,
+    )
+    if message:
+        return f"Rows per contributor {message}."
 
 
 def dataset_ui():
@@ -373,7 +369,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 ui.input_text(
                     "contributions",
                     only_for_screenreader("Maximum number of rows contributed"),
-                    "0",
+                    "",
                 ),
                 [],  # Column placeholder
                 col_widths=col_widths,  # type: ignore
@@ -399,41 +395,18 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
     def set_is_dataset_selected():
         info = csv_info()
         is_dataset_selected.set(
-            not contributions_message()
+            not get_contibutions_error(input.contributions())
             and not info.get_is_error()
             and len(info.get_all_column_names()) > 0
-            and not get_row_count_errors(max_rows())
+            and not get_row_count_error(input.max_rows())
             and not csv_column_mismatch_calc()
         )
 
-    @reactive.calc
-    def contributions_message():
-        number_str = input.contributions()
-        if number_str is None or number_str == "":
-            return "Rows per contributor is required."
-        try:
-            contributions = int(number_str)
-        except (TypeError, ValueError, OverflowError):
-            return "Rows per contributor should be an integer."
-        if contributions < 1:
-            return "Rows per contributor must be at least 1."
-        if contributions > MAX_CONTRIBUTIONS:
-            return f"""
-                Rows per contributor limited to {MAX_CONTRIBUTIONS}.
-                Because the noise will be scaled by this number,
-                it is much better to aggregate during preprocessing
-                or to use OpenDP's truncation in your code
-                than to use a large value here.
-                """
-        return ""
-
     @render.ui
     def contributions_validation_ui():
-        message = contributions_message()
-        return hide_if(
-            not message,
-            warning_md_box(message),
-        )
+        error = get_contibutions_error(input.contributions())
+        if error:
+            return warning_md_box(error)
 
     @render.ui
     def python_tutorial_ui():
@@ -455,7 +428,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
 
     @render.ui
     def optional_row_count_error_ui():
-        error_md = "\n".join(f"- {error}" for error in get_row_count_errors(max_rows()))
+        error_md = get_row_count_error(max_rows())
         if error_md:
             return warning_md_box(error_md)
 
@@ -489,7 +462,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 ui.input_text(
                     "max_rows",
                     only_for_screenreader("Maximum number of rows in CSV"),
-                    "0",
+                    "",
                 ),
                 [],  # column placeholder
                 col_widths=col_widths,  # type: ignore
