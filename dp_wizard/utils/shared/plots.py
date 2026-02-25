@@ -21,7 +21,10 @@ def interval_bottom(interval: str) -> float:
 
 
 delim = "; "
-first = lambda merged: merged.split(delim)[0]  # noqa: E731
+
+
+def first(merged):
+    return merged.split(delim)[0]
 
 
 def df_to_columns(df: DataFrame):
