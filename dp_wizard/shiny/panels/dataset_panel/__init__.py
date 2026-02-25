@@ -32,23 +32,23 @@ dataset_panel_id = "dataset_panel"
 OTHER = "Other"
 
 
-def get_pos_int_error(
+def get_row_count_error(
     number_str, minimum=MIN_ROW_COUNT, maximum=MAX_ROW_COUNT
 ) -> str | None:
     """
     If the inputs are numeric, I think shiny converts
     any strings that can't be parsed to numbers into None,
     so the "should be a number" errors may not be seen in practice.
-    >>> get_pos_int_error('100')
-    >>> get_pos_int_error('0')
+    >>> get_row_count_error('100')
+    >>> get_row_count_error('0')
     'should not be less than 100: For very small data sets, too much noise would be required'
-    >>> get_pos_int_error('1_000_000_001')
+    >>> get_row_count_error('1_000_000_001')
     'should not be greater than 1,000,000,000: Larger values may cause overflow during calcuations'
-    >>> get_pos_int_error(None)
+    >>> get_row_count_error(None)
     'is required'
-    >>> get_pos_int_error('')
+    >>> get_row_count_error('')
     'is required'
-    >>> get_pos_int_error('100.1')
+    >>> get_row_count_error('100.1')
     'should be an integer'
     """  # noqa: B950
     if number_str is None or number_str == "":
@@ -80,7 +80,7 @@ def get_row_count_errors(max_rows) -> list[str]:
     ['Maximum row count is required.']
     """
     messages = []
-    if error := get_pos_int_error(max_rows):
+    if error := get_row_count_error(max_rows):
         messages.append(f"Maximum row count {error}.")
     return messages
 
@@ -370,12 +370,10 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 responsive=False,
             ),
             ui.layout_columns(
-                ui.input_numeric(
+                ui.input_text(
                     "contributions",
                     only_for_screenreader("Maximum number of rows contributed"),
-                    contributions(),
-                    min=1,
-                    max=MAX_CONTRIBUTIONS,
+                    "0",
                 ),
                 [],  # Column placeholder
                 col_widths=col_widths,  # type: ignore
@@ -394,6 +392,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
 
     @reactive.calc
     def contributions_entity_calc() -> str:
+        # The "[2:]" removes the leading emoji and space.
         return input.entity()[2:].lower().strip()
 
     @reactive.effect
@@ -409,8 +408,13 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
 
     @reactive.calc
     def contributions_message():
-        contributions = input.contributions()
-        assert isinstance(contributions, int)
+        number_str = input.contributions()
+        if number_str is None or number_str == "":
+            return "Rows per contributor is required."
+        try:
+            contributions = int(number_str)
+        except (TypeError, ValueError, OverflowError):
+            return "Rows per contributor should be an integer."
         if contributions < 1:
             return "Rows per contributor must be at least 1."
         if contributions > MAX_CONTRIBUTIONS:
