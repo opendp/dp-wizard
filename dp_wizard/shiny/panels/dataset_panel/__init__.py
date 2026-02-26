@@ -27,6 +27,7 @@ from dp_wizard.utils.argparse_helpers import (
 from dp_wizard.utils.code_generators import make_privacy_unit_block
 from dp_wizard.utils.constraints import MAX_CONTRIBUTIONS, MAX_ROW_COUNT, MIN_ROW_COUNT
 from dp_wizard.utils.csv_helper import CsvInfo, get_csv_names_mismatch
+from dp_wizard.utils.shared.convert import convert_to_csv
 
 dataset_panel_id = "dataset_panel"
 OTHER = "Other"
@@ -164,16 +165,20 @@ def dataset_server(
     @reactive.effect
     @reactive.event(input.public_path)
     def _on_public_path_change():
-        path = input.public_path()[0]["datapath"]
-        public_path.set(path)
-        csv_info.set(CsvInfo(Path(path)))
+        path = Path(input.public_path()[0]["datapath"])
+        if path.suffix != ".csv":
+            # Histogram preview will try to read this file.
+            # Convert at the start, rather than in the middle.
+            path = convert_to_csv(path)
+        public_path.set(str(path))
+        csv_info.set(CsvInfo(path))
 
     @reactive.effect
     @reactive.event(input.private_path)
     def _on_private_path_change():
-        path = input.private_path()[0]["datapath"]
-        private_path.set(path)
-        csv_info.set(CsvInfo(Path(path)))
+        path = Path(input.private_path()[0]["datapath"])
+        private_path.set(str(path))
+        csv_info.set(CsvInfo(path))
 
     @reactive.calc
     def csv_column_mismatch_calc() -> Optional[tuple[set, set]]:
