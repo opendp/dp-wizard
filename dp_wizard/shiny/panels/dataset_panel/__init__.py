@@ -32,6 +32,14 @@ dataset_panel_id = "dataset_panel"
 OTHER = "Other"
 
 
+def int_or_zero(number_str: str) -> int:
+    try:
+        number = int(number_str)
+    except (TypeError, ValueError, OverflowError):
+        return 0
+    return number
+
+
 def get_str_int_error(
     number_str: str,
     minimum: int,
@@ -52,7 +60,7 @@ def get_str_int_error(
     return None
 
 
-def get_row_count_error(number_str) -> str | None:
+def get_max_rows_error(number_str) -> str | None:
     message = get_str_int_error(
         number_str=number_str,
         minimum=MIN_ROW_COUNT,
@@ -90,8 +98,8 @@ def dataset_ui():
             ui.card(
                 ui.card_header(data_source_icon, "Data Source"),
                 ui.output_ui("csv_upload_ui"),
-                ui.output_ui("row_count_bounds_tutorial_ui"),
-                ui.output_ui("row_count_bounds_input_ui"),
+                ui.output_ui("max_rows_tutorial_ui"),
+                ui.output_ui("max_rows_input_ui"),
             ),
             [
                 ui.card(
@@ -379,7 +387,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
     @reactive.effect
     @reactive.event(input.contributions)
     def _on_contributions_change():
-        contributions.set(input.contributions())
+        contributions.set(int_or_zero(input.contributions()))
 
     @reactive.effect
     @reactive.event(input.entity)
@@ -398,7 +406,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             not get_contibutions_error(input.contributions())
             and not info.get_is_error()
             and len(info.get_all_column_names()) > 0
-            and not get_row_count_error(input.max_rows())
+            and not get_max_rows_error(input.max_rows())
             and not csv_column_mismatch_calc()
         )
 
@@ -424,16 +432,16 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
     @reactive.effect
     @reactive.event(input.max_rows)
     def _on_max_rows_change():
-        max_rows.set(input.max_rows())
+        max_rows.set(int_or_zero(input.max_rows()))
 
     @render.ui
-    def optional_row_count_error_ui():
-        error_md = get_row_count_error(max_rows())
+    def max_rows_validation_ui():
+        error_md = get_max_rows_error(input.max_rows())
         if error_md:
             return warning_md_box(error_md)
 
     @render.ui
-    def row_count_bounds_tutorial_ui():
+    def max_rows_tutorial_ui():
         return (
             ui.markdown("What is the **maximum row count** of your CSV?"),
             tutorial_box(
@@ -456,7 +464,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
         )
 
     @render.ui
-    def row_count_bounds_input_ui():
+    def max_rows_input_ui():
         return (
             ui.layout_columns(
                 ui.input_text(
@@ -467,7 +475,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
                 [],  # column placeholder
                 col_widths=col_widths,  # type: ignore
             ),
-            ui.output_ui("optional_row_count_error_ui"),
+            ui.output_ui("max_rows_validation_ui"),
         )
 
     @render.ui
