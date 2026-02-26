@@ -27,6 +27,7 @@ class NotebookGenerator(AbstractGenerator):
         if (path := self.analysis_plan.path) is None:
             return ""
         if path.endswith(".csv"):
+            # Already CSV! No conversion needed.
             return ""
 
         def template(UTIL_BLOCK, convert_to_csv, PATH):

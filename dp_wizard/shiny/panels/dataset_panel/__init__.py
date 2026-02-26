@@ -168,7 +168,8 @@ def dataset_server(
         path = Path(input.public_path()[0]["datapath"])
         if path.suffix != ".csv":
             # Histogram preview will try to read this file.
-            # Convert at the start, rather than in the middle.
+            # Convert at the start, rather than in the downstream.
+            # For private files, the conversion is done in the notebook.
             path = convert_to_csv(path)
         public_path.set(str(path))
         csv_info.set(CsvInfo(path))
