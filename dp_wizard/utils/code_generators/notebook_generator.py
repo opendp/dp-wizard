@@ -32,8 +32,10 @@ class NotebookGenerator(AbstractGenerator):
         def template(UTIL_BLOCK, convert_to_csv, PATH):
             UTIL_BLOCK  # type: ignore
 
-            # Convert the provided file to CSV:
-            convert_to_csv(PATH)
+            # Convert the provided file:
+            from pathlib import Path
+
+            convert_to_csv(Path(PATH))
 
         return (
             DefaultsTemplate(template)

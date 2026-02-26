@@ -260,6 +260,38 @@ def test_make_script(plan):
         assert result.returncode == 0
 
 
+def test_tsv():
+    path = Path(__file__).parent.parent / "fixtures/fake.tsv"
+
+    plan = AnalysisPlan(
+        product=Product.STATISTICS,
+        groups={},
+        analysis_columns={
+            ColumnName("class year"): [
+                AnalysisPlanColumn(
+                    mean.name,
+                    lower_bound=0,
+                    upper_bound=100000,
+                    bin_count=0,
+                    weight=1,
+                )
+            ]
+        },
+        schema_columns={
+            ColumnName("class year"): pl.Int32(),
+        },
+        contributions=1,
+        contributions_entity="Family",
+        path=str(path),
+        epsilon=1,
+        max_rows=1000,
+    )
+    notebook_py = NotebookGenerator(plan, "Note goes here!").make_py()
+    print(number_lines(notebook_py))
+    globals = {}
+    exec(notebook_py, globals)
+
+
 def test_pums():
     path = Path(__file__).parent.parent / "fixtures/pums_1000.csv"
 
