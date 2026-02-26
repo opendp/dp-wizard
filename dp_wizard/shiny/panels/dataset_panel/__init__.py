@@ -6,7 +6,7 @@ from shiny import Inputs, Outputs, Session, reactive, render, ui
 from dp_wizard.shiny.components.icons import (
     data_source_icon,
     product_icon,
-    unit_of_privacy_icon,
+    unit_of_protection_icon,
 )
 from dp_wizard.shiny.components.outputs import (
     code_sample,
@@ -99,11 +99,11 @@ def dataset_ui():
             ),
             [
                 ui.card(
-                    ui.card_header(unit_of_privacy_icon, "Unit of Privacy"),
+                    ui.card_header(unit_of_protection_icon, "Unit of Protection"),
                     ui.output_ui("input_entity_ui"),
                     ui.output_ui("input_contributions_ui"),
                     ui.output_ui("contributions_validation_ui"),
-                    ui.output_ui("unit_of_privacy_python_ui"),
+                    ui.output_ui("unit_of_protection_python_ui"),
                 ),
                 ui.card(
                     ui.card_header(product_icon, "Product"),
@@ -351,7 +351,6 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
             ui.markdown(
                 f"""
                 How many **rows** of the CSV can {entity_phrase} contribute to?
-                This is the "unit of privacy" which will be protected.
                 """
             ),
             tutorial_box(
@@ -502,15 +501,15 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
         return [
             button,
             """
-            Specify CSV, unit of privacy,
+            Specify CSV, unit of protection,
             and maximum row count before proceeding.
             """,
         ]
 
     @render.ui
-    def unit_of_privacy_python_ui():
+    def unit_of_protection_python_ui():
         return code_sample(
-            "Unit of Privacy",
+            "Unit of Protection",
             make_privacy_unit_block(
                 contributions=contributions(),
                 contributions_entity=contributions_entity_calc(),
