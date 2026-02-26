@@ -116,10 +116,17 @@ class AnalysisPlan:
         grouped_by = f" grouped by {groups_md}" if groups_md else ""
         return f"{self.product} for {columns_md}{grouped_by}"
 
-    def get_absolute_path(self) -> str:
+    def get_absolute_orig_path(self) -> str:
         if self.path is None:
             return ""  # pragma: no cover
         return str(Path(self.path).absolute())
+
+    def get_absolute_csv_path(self) -> str:
+        if self.path is None:
+            return ""  # pragma: no cover
+        path = Path(self.path)
+        csv_path = path.parent / f"{path.stem}.csv"
+        return str(csv_path.absolute())
 
     def get_stem(self) -> str:
         return re.sub(r"\W+", " ", str(self)).strip().replace(" ", "_").lower()

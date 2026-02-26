@@ -1,4 +1,6 @@
-from dp_wizard import config_root
+from pathlib import Path
+
+from dp_wizard import config_root, package_root
 from dp_wizard.types import ColumnIdentifier, Product
 from dp_wizard.utils.code_generators.abstract_generator import (
     AbstractGenerator,
@@ -21,11 +23,34 @@ class NotebookGenerator(AbstractGenerator):
     def _make_synth_context(self):
         return self._fill_partial_context(self._make_partial_synth_context())
 
+    def _make_convert_to_csv_block(self) -> str | None:
+        if (path := self.analysis_plan.path) is None:
+            return ""
+        if path.endswith(".csv"):
+            return ""
+
+        def template(UTIL_BLOCK, convert_to_csv, PATH):
+            UTIL_BLOCK  # type: ignore
+
+            # Convert the provided file to CSV:
+            convert_to_csv(PATH)
+
+        return (
+            DefaultsTemplate(template)
+            .fill_blocks(
+                UTIL_BLOCK=(Path(package_root) / "utils/shared/convert.py").read_text(),
+            )
+            .fill_values(
+                PATH=self.analysis_plan.get_absolute_orig_path(),
+            )
+            .finish()
+        )
+
     def _fill_partial_context(self, partial_context):
         placeholder_csv_content = ",".join(self.analysis_plan.analysis_columns)
         return (
             partial_context.fill_values(
-                CSV_PATH=self.analysis_plan.get_absolute_path(),
+                CSV_PATH=self.analysis_plan.get_absolute_csv_path(),
             )
             .fill_blocks(
                 OPTIONAL_CSV_BLOCK=(
@@ -34,7 +59,8 @@ class NotebookGenerator(AbstractGenerator):
                     f"Path('{PLACEHOLDER_CSV_NAME}').write_text('{placeholder_csv_content}')\n"
                     if self.analysis_plan.path == PLACEHOLDER_CSV_NAME
                     else ""
-                )
+                ),
+                OPTIONAL_CONVERT_TO_CSV_BLOCK=self._make_convert_to_csv_block(),
             )
             .finish()
         )
