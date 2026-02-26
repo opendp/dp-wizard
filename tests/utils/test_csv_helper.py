@@ -121,7 +121,7 @@ def test_datatype_inference(value_datatype):  # type: ignore
     value: str = value_datatype.pop(0)  # type: ignore
     datatype = value_datatype.pop(0)  # type: ignore
     column_name = "col"
-    with NamedTemporaryFile("w") as tmp:
+    with NamedTemporaryFile(mode="w", suffix=".csv") as tmp:
         tmp.write(f"{column_name}\n{value}")
         tmp.flush()
         csv_info = CsvInfo(Path(tmp.name))
