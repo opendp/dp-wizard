@@ -50,17 +50,17 @@ def convert_text(text: str, target_type: pl.DataType) -> list[str | float]:
 
 
 def get_csv_names_mismatch(
-    public_csv_path: Path, private_csv_path: Path
+    public_path: Path, private_path: Path
 ) -> tuple[set[ColumnName], set[ColumnName]]:
-    public_names = set(CsvInfo(public_csv_path).get_all_column_names())
-    private_names = set(CsvInfo(private_csv_path).get_all_column_names())
+    public_names = set(CsvInfo(public_path).get_all_column_names())
+    private_names = set(CsvInfo(private_path).get_all_column_names())
     extra_public = public_names - private_names
     extra_private = private_names - public_names
     return (extra_public, extra_private)
 
 
-def get_csv_row_count(csv_path: Path) -> int:
-    lf = pl.scan_csv(csv_path, ignore_errors=True)
+def get_csv_row_count(path: Path) -> int:
+    lf = pl.scan_csv(path, ignore_errors=True)
     return lf.select(pl.len()).collect().item()
 
 

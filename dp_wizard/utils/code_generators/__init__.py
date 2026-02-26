@@ -66,7 +66,7 @@ class AnalysisPlan:
     """
     >>> plan = AnalysisPlan(
     ...     product=Product.STATISTICS,
-    ...     csv_path='optional.csv',
+    ...     path='optional.csv',
     ...     contributions=10,
     ...     contributions_entity='Family',
     ...     epsilon=2.0,
@@ -98,7 +98,7 @@ class AnalysisPlan:
     """
 
     product: Product
-    csv_path: Optional[str]
+    path: Optional[str]
     contributions: int
     contributions_entity: str
     epsilon: float
@@ -116,10 +116,10 @@ class AnalysisPlan:
         grouped_by = f" grouped by {groups_md}" if groups_md else ""
         return f"{self.product} for {columns_md}{grouped_by}"
 
-    def get_absolute_csv_path(self) -> str:
-        if self.csv_path is None:
+    def get_absolute_path(self) -> str:
+        if self.path is None:
             return ""  # pragma: no cover
-        return str(Path(self.csv_path).absolute())
+        return str(Path(self.path).absolute())
 
     def get_stem(self) -> str:
         return re.sub(r"\W+", " ", str(self)).strip().replace(" ", "_").lower()

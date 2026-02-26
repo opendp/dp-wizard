@@ -133,10 +133,10 @@ def dataset_server(
     is_released = state.is_released
 
     # Dataset choices:
-    initial_private_csv_path = state.initial_private_csv_path
-    private_csv_path = state.private_csv_path
-    initial_public_csv_path = state.initial_public_csv_path
-    public_csv_path = state.public_csv_path
+    initial_private_path = state.initial_private_path
+    private_path = state.private_path
+    initial_public_path = state.initial_public_path
+    public_path = state.public_path
     contributions = state.contributions
     contributions_entity = state.contributions_entity
     max_rows = state.max_rows
@@ -162,23 +162,23 @@ def dataset_server(
     # group_keys = state.group_keys
 
     @reactive.effect
-    @reactive.event(input.public_csv_path)
-    def _on_public_csv_path_change():
-        path = input.public_csv_path()[0]["datapath"]
-        public_csv_path.set(path)
+    @reactive.event(input.public_path)
+    def _on_public_path_change():
+        path = input.public_path()[0]["datapath"]
+        public_path.set(path)
         csv_info.set(CsvInfo(Path(path)))
 
     @reactive.effect
-    @reactive.event(input.private_csv_path)
-    def _on_private_csv_path_change():
-        path = input.private_csv_path()[0]["datapath"]
-        private_csv_path.set(path)
+    @reactive.event(input.private_path)
+    def _on_private_path_change():
+        path = input.private_path()[0]["datapath"]
+        private_path.set(path)
         csv_info.set(CsvInfo(Path(path)))
 
     @reactive.calc
     def csv_column_mismatch_calc() -> Optional[tuple[set, set]]:
-        public = public_csv_path()
-        private = private_csv_path()
+        public = public_path()
+        private = private_path()
         if public and private:
             just_public, just_private = get_csv_names_mismatch(
                 Path(public), Path(private)
@@ -275,16 +275,16 @@ Choose both **Private Data** and **Public Data** {PUBLIC_PRIVATE_TEXT}
     def input_files_upload_ui():
         return ui.row(
             ui.input_file(
-                "private_csv_path",
+                "private_path",
                 "Choose Private Data",
                 accept=accept,
-                placeholder=Path(initial_private_csv_path).name,
+                placeholder=Path(initial_private_path).name,
             ),
             ui.input_file(
-                "public_csv_path",
+                "public_path",
                 "Choose Public Data",
                 accept=accept,
-                placeholder=Path(initial_public_csv_path).name,
+                placeholder=Path(initial_public_path).name,
             ),
         )
 

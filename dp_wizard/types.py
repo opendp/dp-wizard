@@ -99,12 +99,12 @@ class ColumnIdentifier(str):
 
 
 class CsvInfo:
-    def __init__(self, csv_path: Path | None):
+    def __init__(self, path: Path | None):
         self._schema = (
             {
                 ColumnName(k): v
                 for k, v in pl.scan_csv(
-                    csv_path,
+                    path,
                     # Read the whole CSV:
                     # Until we hear that this is too slow,
                     # it's better to be sure the types
@@ -118,7 +118,7 @@ class CsvInfo:
                 .items()
                 if k.strip() != ""
             }
-            if csv_path is not None
+            if path is not None
             else {}
         )
         self._warnings: list[str] = []
@@ -221,10 +221,10 @@ class AppState:
     is_released: reactive.Value[bool]
 
     # Dataset choices:
-    initial_private_csv_path: str
-    private_csv_path: reactive.Value[str]
-    initial_public_csv_path: str
-    public_csv_path: reactive.Value[str]
+    initial_private_path: str
+    private_path: reactive.Value[str]
+    initial_public_path: str
+    public_path: reactive.Value[str]
     contributions: reactive.Value[int]
     contributions_entity: reactive.Value[str]
     max_rows: reactive.Value[str]

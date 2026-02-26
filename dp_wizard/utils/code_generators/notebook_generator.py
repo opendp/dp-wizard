@@ -25,14 +25,14 @@ class NotebookGenerator(AbstractGenerator):
         placeholder_csv_content = ",".join(self.analysis_plan.analysis_columns)
         return (
             partial_context.fill_values(
-                CSV_PATH=self.analysis_plan.get_absolute_csv_path(),
+                CSV_PATH=self.analysis_plan.get_absolute_path(),
             )
             .fill_blocks(
                 OPTIONAL_CSV_BLOCK=(
                     "# Write to placeholder CSV so the notebook can still execute:\n"
                     "from pathlib import Path\n"
                     f"Path('{PLACEHOLDER_CSV_NAME}').write_text('{placeholder_csv_content}')\n"
-                    if self.analysis_plan.csv_path == PLACEHOLDER_CSV_NAME
+                    if self.analysis_plan.path == PLACEHOLDER_CSV_NAME
                     else ""
                 )
             )

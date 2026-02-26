@@ -23,7 +23,7 @@ class ScriptGenerator(AbstractGenerator):
     def _make_stats_context(self):
         return (
             self._make_partial_stats_context()
-            .fill_expressions(CSV_PATH="csv_path")
+            .fill_expressions(CSV_PATH="path")
             .fill_blocks(OPTIONAL_CSV_BLOCK="")
             .finish()
         )
@@ -31,7 +31,7 @@ class ScriptGenerator(AbstractGenerator):
     def _make_synth_context(self):
         return (
             self._make_partial_synth_context()
-            .fill_expressions(CSV_PATH="csv_path")
+            .fill_expressions(CSV_PATH="path")
             .fill_blocks(OPTIONAL_CSV_BLOCK="")
             .finish()
         )
