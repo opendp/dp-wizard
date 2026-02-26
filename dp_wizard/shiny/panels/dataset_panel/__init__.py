@@ -77,7 +77,7 @@ def get_contibutions_error(number_str) -> str | None:
         number_str=number_str,
         minimum=1,
         maximum=MAX_CONTRIBUTIONS,
-        min_message="must be at least 1",
+        min_message="This value is an upper bound on contributions",
         max_message="""
             Because the noise will be scaled by this number,
             it is much better to aggregate during preprocessing
