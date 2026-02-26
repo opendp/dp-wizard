@@ -30,6 +30,7 @@ def test_qa_app(page: Page, qa_app: ShinyAppProc):  # pragma: no cover
     page.goto(qa_app.url)
 
     page.locator("#max_rows").fill("10000")
+    page.locator("#contributions").fill("10")
     page.get_by_role("button", name="Define Analysis").click()
 
     page.locator(".selectize-input").nth(0).click()
@@ -51,6 +52,7 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     page.goto(local_app.url)
     expect(page).to_have_title("DP Wizard")
     page.locator("#max_rows").fill("10000")
+    page.locator("#contributions").fill("10")
     expect(page.get_by_text(pick_dataset_text)).to_be_visible()
     expect(page.get_by_text(perform_analysis_text)).not_to_be_visible()
     expect(page.get_by_text(download_results_text)).not_to_be_visible()
@@ -237,6 +239,7 @@ def test_local_app_downloads(
         page.locator("#tutorial_mode").click()
 
     page.locator("#max_rows").fill("10000")
+    page.locator("#contributions").fill("10")
     expect(page.get_by_text(dataset_release_warning)).not_to_be_visible()
     page.get_by_role("tab", name="Define Analysis").click()
     expect(page.get_by_text(analysis_requirements_warning)).to_be_visible()
