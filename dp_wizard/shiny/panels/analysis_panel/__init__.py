@@ -327,7 +327,7 @@ def analysis_server(
             return [
                 ui.markdown(
                     f"""
-                    Because you've provided public CSV,
+                    Because you've provided public data,
                     it *will be read* to generate previews.
 
                     The confidence interval depends on the number of rows.

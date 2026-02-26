@@ -29,6 +29,7 @@ def context_code_sample():  # pragma: no cover
                 "# More of these slots will be filled in\n"
                 "# as you move through DP Wizard.\n"
             ),
+            OPTIONAL_CONVERT_TO_CSV_BLOCK="",
         )
         .finish()
         .strip(),
