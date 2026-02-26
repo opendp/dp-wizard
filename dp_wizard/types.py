@@ -104,8 +104,8 @@ class CsvInfo:
     def __init__(self, path: Path | None):
         self._warnings: list[str] = []
         self._errors: list[str] = []
+        self._schema = {}
         if path is None:
-            self._schema = {}
             # TODO: Should there be an error?
             return
 
