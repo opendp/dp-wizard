@@ -16,9 +16,9 @@ _css = "display: block; padding: 0 1em 1em 1em;"
 def dataset_summary(state: AppState):  # pragma: no cover
     sources = []
     if state.private_csv_path():
-        sources.append("Private CSV")
+        sources.append("Private Data")
     if state.public_csv_path():
-        sources.append("Public CSV")
+        sources.append("Public Data")
 
     contributions = state.contributions()
     entity = state.contributions_entity()

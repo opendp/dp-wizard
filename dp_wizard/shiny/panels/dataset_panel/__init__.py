@@ -30,6 +30,7 @@ from dp_wizard.utils.csv_helper import CsvInfo, get_csv_names_mismatch
 
 dataset_panel_id = "dataset_panel"
 OTHER = "Other"
+accept = [".csv", ".tsv", ".tab"]
 
 
 def get_pos_int_error(
@@ -236,11 +237,11 @@ def dataset_server(
                 else [
                     ui.markdown(
                         f"""
-Choose **Private CSV** {PRIVATE_TEXT}
+Choose **Private Data** {PRIVATE_TEXT}
 
-Choose **Public CSV** {PUBLIC_TEXT}
+Choose **Public Data** {PUBLIC_TEXT}
 
-Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
+Choose both **Private Data** and **Public Data** {PUBLIC_PRIVATE_TEXT}
                         """
                     ),
                     ui.output_ui("input_files_tutorial_ui"),
@@ -256,7 +257,12 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
     def input_files_tutorial_ui():
         return tutorial_box(
             is_tutorial_mode(),
-            """
+            f"""
+            Internally, OpenDP works best with CSVs;
+            Other formats will be converted to CSV.
+            Any of these extensions are accepted:
+            {', '.join(f"`{ext}`" for ext in accept)}.
+
             If you don't have a CSV on hand to work with,
             quit and restart with `dp-wizard --demo`,
             and DP Wizard will provide a demo CSV
@@ -270,14 +276,14 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
         return ui.row(
             ui.input_file(
                 "private_csv_path",
-                "Choose Private CSV",
-                accept=[".csv"],
+                "Choose Private Data",
+                accept=accept,
                 placeholder=Path(initial_private_csv_path).name,
             ),
             ui.input_file(
                 "public_csv_path",
-                "Choose Public CSV",
-                accept=[".csv"],
+                "Choose Public Data",
+                accept=accept,
                 placeholder=Path(initial_public_csv_path).name,
             ),
         )
@@ -350,7 +356,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
         return [
             ui.markdown(
                 f"""
-                How many **rows** of the CSV can {entity_phrase} contribute to?
+                How many **rows** of your data can {entity_phrase} contribute?
                 This is the "unit of privacy" which will be protected.
                 """
             ),

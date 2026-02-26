@@ -45,12 +45,12 @@ def csv_message_ui(
         just_public, just_private = mismatch
         if just_public:
             messages.append(
-                "- Only the public CSV contains: "
+                "- Only the public data contains: "
                 + ", ".join(f"`{name}`" for name in just_public)
             )
         if just_private:
             messages.append(
-                "- Only the private CSV contains: "
+                "- Only the private data contains: "
                 + ", ".join(f"`{name}`" for name in just_private)
             )
     return hide_if(not messages, warning_md_box("\n".join(messages)))

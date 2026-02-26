@@ -283,7 +283,7 @@ def results_server(
         }
         return AnalysisPlan(
             product=product(),
-            # Prefer private CSV, if available:
+            # Prefer private data, if available:
             csv_path=private_csv_path() or public_csv_path() or PLACEHOLDER_CSV_NAME,
             contributions=contributions(),
             contributions_entity=contributions_entity(),
