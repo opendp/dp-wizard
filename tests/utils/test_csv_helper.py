@@ -91,6 +91,8 @@ def test_csv_info(suffix, content_bytes, all, numeric, message_substring, is_err
     with tempfile.TemporaryDirectory() as dir:
         path = Path(dir) / f"fake{suffix}"
         path.write_bytes(content_bytes)
+        # CsvInfo may write a new, converted, CSV in the directory,
+        # so we need a temp dir, and not just a temp file.
         csv_info = CsvInfo(path)
         assert all == ",".join(csv_info.get_all_column_names())
         assert numeric == ",".join(csv_info.get_numeric_column_names())
