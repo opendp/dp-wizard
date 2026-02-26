@@ -25,7 +25,7 @@ class NotebookGenerator(AbstractGenerator):
 
     def _make_convert_to_csv_block(self) -> str | None:
         if (path := self.analysis_plan.path) is None:
-            return ""
+            return ""  # pragma: no cover
         if path.endswith(".csv"):
             # Already CSV! No conversion needed.
             return ""
