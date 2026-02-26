@@ -22,7 +22,7 @@ See the [FAQ](https://github.com/opendp/dp-wizard/blob/main/dp_wizard/FAQ.md) fo
 <!-- Run `scripts/screenshots.sh` to regenerate these screenshots. -->
 
 Select Dataset:
-![Screenshot with a "Data Source" panel on the left, and "Unit of Privacy" and "Product" on the right.](https://opendp.github.io/dp-wizard/screenshots/select-dataset.png)
+![Screenshot with a "Data Source" panel on the left, and "Unit of Protection" and "Product" on the right.](https://opendp.github.io/dp-wizard/screenshots/select-dataset.png)
 
 Define Analysis:
 ![Screenshot with four panels: "Columns", "Grouping", "Privacy Budget", and "Simulation".](https://opendp.github.io/dp-wizard/screenshots/define-analysis.png)
