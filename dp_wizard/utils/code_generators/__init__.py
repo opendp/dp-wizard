@@ -125,8 +125,8 @@ class AnalysisPlan:
         if self.path is None:
             return ""  # pragma: no cover
         path = Path(self.path)
-        # Note that the conversion which creates this file from a TSV is inside the notebook,
-        # so we don't need conversion code here. 
+        # This CSV is converted from a TSV inside the notebook,
+        # so we don't need conversion code here.
         csv_path = path.parent / f"{path.stem}.csv"
         return str(csv_path.absolute())
 
