@@ -57,7 +57,7 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     expect(page.get_by_text(perform_analysis_text)).not_to_be_visible()
     expect(page.get_by_text(download_results_text)).not_to_be_visible()
     page.locator("#contributions").fill("123")
-    page.get_by_text("Code Sample: Unit of Privacy").click()
+    page.get_by_text("Code Sample: Unit of Protection").click()
     expect(page.get_by_text("123")).to_have_class("hljs-number")
     expect(page.locator(".shiny-output-error")).not_to_be_attached()
 
@@ -79,7 +79,7 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     page.locator("#contributions").fill("0")
     expect(page.get_by_text("Rows per contributor must be at least 1")).to_be_visible()
     expected_error = (
-        "Specify CSV, unit of privacy, and maximum row count before proceeding."
+        "Specify CSV, unit of protection, and maximum row count before proceeding."
     )
     expect(page.get_by_text(expected_error)).to_be_visible()
 
