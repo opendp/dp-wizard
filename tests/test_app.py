@@ -64,7 +64,7 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     assert define_analysis_button.is_disabled()
 
     # Now upload:
-    path = package_root.parent / "tests/fixtures/fake.csv"
+    path = package_root.parent / "tests/fixtures/fake.tsv"
     page.get_by_label("Choose Public Data").set_input_files(path.resolve())
 
     # Toggle tutorial: (CSV should not clear!)
@@ -247,7 +247,7 @@ def test_local_app_downloads(
     page.get_by_role("tab", name="Select Dataset").click()
     screenshot(page, "select-dataset")
 
-    path = package_root.parent / "tests/fixtures/fake.csv"
+    path = package_root.parent / "tests/fixtures/fake.tsv"
     page.get_by_label("Choose Public Data").set_input_files(path.resolve())
 
     page.get_by_label("DP Synthetic Data").click()

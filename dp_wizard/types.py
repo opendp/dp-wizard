@@ -1,4 +1,6 @@
+import csv
 import re
+import tempfile
 from dataclasses import dataclass
 from enum import Enum, auto
 from pathlib import Path
@@ -100,27 +102,35 @@ class ColumnIdentifier(str):
 
 class CsvInfo:
     def __init__(self, path: Path | None):
-        self._schema = (
-            {
-                ColumnName(k): v
-                for k, v in pl.scan_csv(
-                    path,
-                    # Read the whole CSV:
-                    # Until we hear that this is too slow,
-                    # it's better to be sure the types
-                    # have been accurately inferred.
-                    infer_schema_length=None,
-                    # Default is to raise NoDataError:
-                    # We prefer to validate below and set error.
-                    raise_if_empty=False,
-                )
-                .collect_schema()
-                .items()
-                if k.strip() != ""
-            }
-            if path is not None
-            else {}
-        )
+        if path is None:
+            self._schema = {}
+        else:
+            with tempfile.NamedTemporaryFile(mode="w") as tmp:
+                if path.suffix in [".tsv", ".tab"]:
+                    with path.open(newline="") as tab_delim:
+                        reader = csv.reader(tab_delim, dialect=csv.excel_tab)
+                        writer = csv.writer(tmp)
+                        for row in reader:
+                            writer.writerow(row)
+                    tmp.flush()
+                    path = Path(tmp.name)
+                self._schema = {
+                    ColumnName(k): v
+                    for k, v in pl.scan_csv(
+                        path,
+                        # Read the whole CSV:
+                        # Until we hear that this is too slow,
+                        # it's better to be sure the types
+                        # have been accurately inferred.
+                        infer_schema_length=None,
+                        # Default is to raise NoDataError:
+                        # We prefer to validate below and set error.
+                        raise_if_empty=False,
+                    )
+                    .collect_schema()
+                    .items()
+                    if k.strip() != ""
+                }
         self._warnings: list[str] = []
         self._errors: list[str] = []
         column_names = self._schema.keys()

@@ -16,34 +16,46 @@ from dp_wizard.utils.csv_helper import (
 
 
 @pytest.mark.parametrize(
-    "csv_text,all,numeric,message_substring,is_error",
+    "suffix,csv_text,all,numeric,message_substring,is_error",
     [
         # No error! and type inference:
-        (b"str,int\nX,1", "str,int", "int", None, False),
+        (".csv", b"str,int\nX,1", "str,int", "int", None, False),
+        (".tsv", b"str\tint\nX\t1", "str,int", "int", None, False),
         #
         # NO WARNING (but might be better if there were...)
         #
         # more column headers than values below:
-        (b"A,B,C,D\n1,2\n3,4", "A,B,C,D", "A,B", None, False),
+        (".csv", b"A,B,C,D\n1,2\n3,4", "A,B,C,D", "A,B", None, False),
+        (".tsv", b"A\tB\tC\tD\n1\t2\n3\t4", "A,B,C,D", "A,B", None, False),
         # fewer column headers than values below:
-        (b"A,B\n1,2,3,4\n5,6,7,8", "A,B", "A,B", None, False),
+        (".csv", b"A,B\n1,2,3,4\n5,6,7,8", "A,B", "A,B", None, False),
+        (".tsv", b"A\tB\n1\t2\t3\t4\n5\t6\t7\t8", "A,B", "A,B", None, False),
         # totally empty:
-        (b"", "", "", None, False),
+        (".csv", b"", "", "", None, False),
+        (".tsv", b"", "", "", None, False),
         #
         # WARNINGS
         #
         # skip empty column header:
-        (b",int\nX,1", "int", "int", "Only one column detected", False),
+        (".csv", b",int\nX,1", "int", "int", "Only one column detected", False),
         # if a header is a number, might be missing header row:
-        (b"A,1\nB,2", "A,1", "1", "Numeric column name", False),
+        (".csv", b"A,1\nB,2", "A,1", "1", "Numeric column name", False),
         # padded values:
-        (b" str , int \n X , 1 ", " str , int ", "", "Column name is padded", False),
+        (
+            ".csv",
+            b" str , int \n X , 1 ",
+            " str , int ",
+            "",
+            "Column name is padded",
+            False,
+        ),
         # actually pipe-delim:
-        (b"str|int\nX|1", "str|int", "", "Only one column detected", False),
+        (".csv", b"str|int\nX|1", "str|int", "", "Only one column detected", False),
         # no numbers:
-        (b"A,B,C\na,b,c", "A,B,C", "", "No numeric columns detected", False),
+        (".csv", b"A,B,C\na,b,c", "A,B,C", "", "No numeric columns detected", False),
         # duplicate header gets suffix from polars:
         (
+            ".csv",
             b"dup,dup\nX,1",
             "dup,dup_duplicated_0",
             "dup_duplicated_0",
@@ -54,16 +66,16 @@ from dp_wizard.utils.csv_helper import (
         # ERRORS
         #
         # empty header row:
-        (b",\nX,1", "", "", "No column names detected", True),
+        (".csv", b",\nX,1", "", "", "No column names detected", True),
         # actually TSV:
-        (b"str\tint\nX\t1", "", "", "Tab in column name", True),
+        (".csv", b"str\tint\nX\t1", "", "", "Tab in column name", True),
         # actually binary:
-        (b"\xff\xff\n\x00\x00", "", "", "Bad column name", True),
+        (".csv", b"\xff\xff\n\x00\x00", "", "", "Bad column name", True),
     ],
 )
-def test_csv_info(csv_text, all, numeric, message_substring, is_error):
+def test_csv_info(suffix, csv_text, all, numeric, message_substring, is_error):
     assert message_substring != ""  # programmer error!
-    with tempfile.NamedTemporaryFile(mode="wb") as tmp:
+    with tempfile.NamedTemporaryFile(mode="wb", suffix=suffix) as tmp:
         tmp.write(csv_text)
         tmp.flush()
         csv_info = CsvInfo(Path(tmp.file.name))
