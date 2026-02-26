@@ -62,12 +62,12 @@ csv_fixtures = [
 
 
 @pytest.mark.parametrize(
-    "suffix,csv_text,all,numeric,message_substring,is_error",
+    "suffix,content_bytes,all,numeric,message_substring,is_error",
     [(".csv", *fix) for fix in csv_fixtures]
     + [(".tsv", fix[0].replace(b",", b"\t"), *(fix[1:])) for fix in csv_fixtures]
     + [
         # Bad extension:
-        (".txt", b"", "", "", "'.txt' is not an expected file type", True),
+        (".txt", b"", "", "", "Expected .tsv or .tab, not", True),
         # CSV actually TSV:
         (".csv", b"str\tint\nX\t1", "", "", "Tab in column name", True),
         # CSV actually binary:
@@ -86,12 +86,12 @@ csv_fixtures = [
         (".tsv", b"\xff\xff\n\x00\x00", "", "", "invalid start byte", True),
     ],
 )
-def test_csv_info(suffix, csv_text, all, numeric, message_substring, is_error):
+def test_csv_info(suffix, content_bytes, all, numeric, message_substring, is_error):
     assert message_substring != ""  # programmer error!
-    with tempfile.NamedTemporaryFile(mode="wb", suffix=suffix) as tmp:
-        tmp.write(csv_text)
-        tmp.flush()
-        csv_info = CsvInfo(Path(tmp.file.name))
+    with tempfile.TemporaryDirectory() as dir:
+        path = Path(dir) / f"fake{suffix}"
+        path.write_bytes(content_bytes)
+        csv_info = CsvInfo(path)
         assert all == ",".join(csv_info.get_all_column_names())
         assert numeric == ",".join(csv_info.get_numeric_column_names())
         if message_substring is None:

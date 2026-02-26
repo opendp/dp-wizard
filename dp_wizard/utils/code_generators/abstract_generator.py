@@ -44,6 +44,13 @@ class AbstractGenerator(ABC):
             case _:  # pragma: no cover
                 raise ValueError(self.analysis_plan.product)
 
+    def _make_tsv_parser_block(self) -> str | None:
+        if (path := self.analysis_plan.path) is None:
+            return
+        if path.endswith(".csv"):
+            return
+        return "TODO: code that that translates TSV to CSV"
+
     @abstractmethod
     def _get_notebook_or_script(self) -> str: ...  # pragma: no cover
 

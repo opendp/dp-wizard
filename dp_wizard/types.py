@@ -1,12 +1,12 @@
-import csv
 import re
-import tempfile
 from dataclasses import dataclass
 from enum import Enum, auto
 from pathlib import Path
 
 import polars as pl
 from shiny import reactive
+
+from dp_wizard.utils.shared.convert import convert_to_csv
 
 
 class Weight(Enum):
@@ -106,41 +106,33 @@ class CsvInfo:
         self._errors: list[str] = []
         if path is None:
             self._schema = {}
-        elif path.suffix not in [".csv", ".tsv", ".tab"]:
-            self._errors = [f"'{path.suffix}' is not an expected file type"]
+            # TODO: Should there be an error?
             return
-        else:
-            try:
-                with tempfile.NamedTemporaryFile(mode="w") as tmp:
-                    if path.suffix in [".tsv", ".tab"]:
-                        with path.open(newline="") as tab_delim:
-                            reader = csv.reader(tab_delim, dialect=csv.excel_tab)
-                            writer = csv.writer(tmp)
-                            for row in reader:
-                                writer.writerow(row)
-                        tmp.flush()
-                        path = Path(tmp.name)
-                    self._schema = {
-                        ColumnName(k): v
-                        for k, v in pl.scan_csv(
-                            path,
-                            # Read the whole CSV:
-                            # Until we hear that this is too slow,
-                            # it's better to be sure the types
-                            # have been accurately inferred.
-                            infer_schema_length=None,
-                            # Default is to raise NoDataError:
-                            # We prefer to validate below and set error.
-                            raise_if_empty=False,
-                        )
-                        .collect_schema()
-                        .items()
-                        if k.strip() != ""
-                    }
-            except Exception as e:
-                # TODO: Is it safe to show raw error messages to user?
-                self._errors = [str(e)]
-                return
+
+        try:
+            if path.suffix != ".csv":
+                path = convert_to_csv(path)
+            self._schema = {
+                ColumnName(k): v
+                for k, v in pl.scan_csv(
+                    path,
+                    # Read the whole CSV:
+                    # Until we hear that this is too slow,
+                    # it's better to be sure the types
+                    # have been accurately inferred.
+                    infer_schema_length=None,
+                    # Default is to raise NoDataError:
+                    # We prefer to validate below and set error.
+                    raise_if_empty=False,
+                )
+                .collect_schema()
+                .items()
+                if k.strip() != ""
+            }
+        except Exception as e:
+            # TODO: Is it safe to show raw error messages to user?
+            self._errors = [str(e)]
+            return
         column_names = self._schema.keys()
 
         # Schema errors:
