@@ -101,6 +101,13 @@ def test_csv_info(suffix, content_bytes, all, numeric, message_substring, is_err
         assert csv_info.get_is_error() == is_error
 
 
+def test_empty_csv_info():
+    csv_info = CsvInfo(None)
+    assert csv_info.get_all_column_names() == []
+    assert csv_info.get_numeric_column_names() == []
+    assert csv_info.get_messages() == []
+
+
 @pytest.mark.parametrize(  # type: ignore
     "value_datatype",
     [

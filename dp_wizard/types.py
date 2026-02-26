@@ -106,7 +106,7 @@ class CsvInfo:
         self._errors: list[str] = []
         self._schema = {}
         if path is None:
-            # TODO: Should there be an error?
+            # Only used as initial value
             return
 
         try:
