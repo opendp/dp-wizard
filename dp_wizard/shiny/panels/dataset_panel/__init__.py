@@ -27,9 +27,11 @@ from dp_wizard.utils.argparse_helpers import (
 from dp_wizard.utils.code_generators import make_privacy_unit_block
 from dp_wizard.utils.constraints import MAX_CONTRIBUTIONS, MAX_ROW_COUNT, MIN_ROW_COUNT
 from dp_wizard.utils.csv_helper import CsvInfo, get_csv_names_mismatch
+from dp_wizard.utils.shared.convert import convert_to_csv
 
 dataset_panel_id = "dataset_panel"
 OTHER = "Other"
+accept = [".csv", ".tsv", ".tab"]
 
 
 def get_pos_int_error(
@@ -132,10 +134,10 @@ def dataset_server(
     is_released = state.is_released
 
     # Dataset choices:
-    initial_private_csv_path = state.initial_private_csv_path
-    private_csv_path = state.private_csv_path
-    initial_public_csv_path = state.initial_public_csv_path
-    public_csv_path = state.public_csv_path
+    initial_private_path = state.initial_private_path
+    private_path = state.private_path
+    initial_public_path = state.initial_public_path
+    public_path = state.public_path
     contributions = state.contributions
     contributions_entity = state.contributions_entity
     max_rows = state.max_rows
@@ -161,23 +163,28 @@ def dataset_server(
     # group_keys = state.group_keys
 
     @reactive.effect
-    @reactive.event(input.public_csv_path)
-    def _on_public_csv_path_change():
-        path = input.public_csv_path()[0]["datapath"]
-        public_csv_path.set(path)
-        csv_info.set(CsvInfo(Path(path)))
+    @reactive.event(input.public_path)
+    def _on_public_path_change():
+        path = Path(input.public_path()[0]["datapath"])
+        if path.suffix != ".csv":
+            # Histogram preview will try to read this file.
+            # Convert at the start, rather than in the downstream.
+            # For private files, the conversion is done in the notebook.
+            path = convert_to_csv(path)
+        public_path.set(str(path))
+        csv_info.set(CsvInfo(path))
 
     @reactive.effect
-    @reactive.event(input.private_csv_path)
-    def _on_private_csv_path_change():
-        path = input.private_csv_path()[0]["datapath"]
-        private_csv_path.set(path)
-        csv_info.set(CsvInfo(Path(path)))
+    @reactive.event(input.private_path)
+    def _on_private_path_change():
+        path = Path(input.private_path()[0]["datapath"])
+        private_path.set(str(path))
+        csv_info.set(CsvInfo(path))
 
     @reactive.calc
     def csv_column_mismatch_calc() -> Optional[tuple[set, set]]:
-        public = public_csv_path()
-        private = private_csv_path()
+        public = public_path()
+        private = private_path()
         if public and private:
             just_public, just_private = get_csv_names_mismatch(
                 Path(public), Path(private)
@@ -236,11 +243,11 @@ def dataset_server(
                 else [
                     ui.markdown(
                         f"""
-Choose **Private CSV** {PRIVATE_TEXT}
+Choose **Private Data** {PRIVATE_TEXT}
 
-Choose **Public CSV** {PUBLIC_TEXT}
+Choose **Public Data** {PUBLIC_TEXT}
 
-Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
+Choose both **Private Data** and **Public Data** {PUBLIC_PRIVATE_TEXT}
                         """
                     ),
                     ui.output_ui("input_files_tutorial_ui"),
@@ -256,7 +263,12 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
     def input_files_tutorial_ui():
         return tutorial_box(
             is_tutorial_mode(),
-            """
+            f"""
+            Internally, OpenDP works best with CSVs;
+            Other formats will be converted to CSV.
+            Any of these extensions are accepted:
+            {', '.join(f"`{ext}`" for ext in accept)}.
+
             If you don't have a CSV on hand to work with,
             quit and restart with `dp-wizard --demo`,
             and DP Wizard will provide a demo CSV
@@ -269,16 +281,16 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
     def input_files_upload_ui():
         return ui.row(
             ui.input_file(
-                "private_csv_path",
-                "Choose Private CSV",
-                accept=[".csv"],
-                placeholder=Path(initial_private_csv_path).name,
+                "private_path",
+                "Choose Private Data",
+                accept=accept,
+                placeholder=Path(initial_private_path).name,
             ),
             ui.input_file(
-                "public_csv_path",
-                "Choose Public CSV",
-                accept=[".csv"],
-                placeholder=Path(initial_public_csv_path).name,
+                "public_path",
+                "Choose Public Data",
+                accept=accept,
+                placeholder=Path(initial_public_path).name,
             ),
         )
 
@@ -350,7 +362,7 @@ Choose both **Private CSV** and **Public CSV** {PUBLIC_PRIVATE_TEXT}
         return [
             ui.markdown(
                 f"""
-                How many **rows** of the CSV can {entity_phrase} contribute to?
+                How many **rows** of your data can {entity_phrase} contribute to?
                 """
             ),
             tutorial_box(

@@ -98,12 +98,12 @@ def _make_server(cli_info: CLIInfo):
     def server(input: Inputs, output: Outputs, session: Session):  # pragma: no cover
         if cli_info.is_demo_csv:
             initial_contributions = 10
-            initial_private_csv_path = config_root / "demo.csv"
-            make_demo_csv(initial_private_csv_path, initial_contributions)
-            csv_info = CsvInfo(Path(initial_private_csv_path))
+            initial_private_path = config_root / "demo.csv"
+            make_demo_csv(initial_private_path, initial_contributions)
+            csv_info = CsvInfo(Path(initial_private_path))
         else:
             initial_contributions = 1
-            initial_private_csv_path = ""
+            initial_private_path = ""
             csv_info = CsvInfo(None)
 
         initial_product = Product.STATISTICS
@@ -118,10 +118,10 @@ def _make_server(cli_info: CLIInfo):
             is_analysis_defined=reactive.value(False),
             is_released=reactive.value(False),
             # Dataset choices:
-            initial_private_csv_path=str(initial_private_csv_path),
-            private_csv_path=reactive.value(str(initial_private_csv_path)),
-            initial_public_csv_path="",
-            public_csv_path=reactive.value(""),
+            initial_private_path=str(initial_private_path),
+            private_path=reactive.value(str(initial_private_path)),
+            initial_public_path="",
+            public_path=reactive.value(""),
             contributions=reactive.value(initial_contributions),
             contributions_entity=reactive.value("individual"),
             max_rows=reactive.value("0"),
