@@ -155,10 +155,10 @@ def analysis_server(
     is_released = state.is_released
 
     # Dataset choices:
-    # initial_private_csv_path = state.initial_private_csv_path
-    # private_csv_path = state.private_csv_path
-    # initial_public_csv_path = state.initial_private_csv_path
-    public_csv_path = state.public_csv_path
+    # initial_private_path = state.initial_private_path
+    # private_path = state.private_path
+    # initial_public_path = state.initial_private_path
+    public_path = state.public_path
     contributions = state.contributions
     contributions_entity = state.contributions_entity
     max_rows = state.max_rows
@@ -322,17 +322,17 @@ def analysis_server(
                 responsive=False,
             ),
         )
-        if public_csv_path():
-            row_count_str = str(get_csv_row_count(Path(public_csv_path())))
+        if public_path():
+            row_count_str = str(get_csv_row_count(Path(public_path())))
             return [
                 ui.markdown(
                     f"""
-                    Because you've provided a public CSV,
+                    Because you've provided public data,
                     it *will be read* to generate previews.
 
                     The confidence interval depends on the number of rows.
-                    Your public CSV has {row_count_str} rows,
-                    but if you believe the private CSV will be
+                    Your public data has {row_count_str} rows,
+                    but if you believe the private data will be
                     much larger or smaller, please update.
                     """
                 ),
@@ -370,7 +370,7 @@ def analysis_server(
             column_server(
                 column_id,
                 product=product,
-                public_csv_path=public_csv_path(),
+                public_path=public_path(),
                 name=column_ids_to_names[column_id],
                 contributions=contributions,
                 contributions_entity=contributions_entity,
