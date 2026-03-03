@@ -14,7 +14,7 @@ IMPORTS_BLOCK
 UTILS_BLOCK
 
 
-def get_synth_context_contributions(csv_path):
+def get_synth_context_contributions(path):
     SYNTH_CONTEXT_BLOCK
     # CSV_COMMENT_BLOCK
     return synth_context, contributions
@@ -28,7 +28,7 @@ if __name__ == "__main__":
         "--csv", required=True, help="Path to csv containing private data"
     )
     args = parser.parse_args()
-    synth_context, contributions = get_synth_context_contributions(csv_path=args.csv)
+    synth_context, contributions = get_synth_context_contributions(path=args.csv)
 
     SYNTH_QUERY_BLOCK
     import sys

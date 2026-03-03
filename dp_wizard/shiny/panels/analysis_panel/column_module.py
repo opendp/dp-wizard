@@ -132,7 +132,7 @@ def column_server(
     input: Inputs,
     output: Outputs,
     session: Session,
-    public_csv_path: str,
+    public_path: str,
     product: reactive.Value[Product],
     name: ColumnName,
     contributions: reactive.Value[int],
@@ -213,8 +213,8 @@ def column_server(
         # but I'd guess this is dominated by the DP operations,
         # so not worth optimizing.
         lf = (
-            pl.scan_csv(public_csv_path, ignore_errors=True)
-            if public_csv_path
+            pl.scan_csv(public_path, ignore_errors=True)
+            if public_path
             else pl.LazyFrame(
                 mock_data({name: ColumnDef(lower_x, upper_x)}, row_count=row_count)
             )
@@ -469,7 +469,7 @@ def column_server(
     def histogram_preview_plot():
         title_name = (
             name
-            if public_csv_path
+            if public_path
             else f"Simulated {name} (assuming a normal distribution)"
         )
 

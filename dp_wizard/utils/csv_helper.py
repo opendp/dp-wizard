@@ -50,17 +50,17 @@ def convert_text(text: str, target_type: pl.DataType) -> list[str | float]:
 
 
 def get_csv_names_mismatch(
-    public_csv_path: Path, private_csv_path: Path
+    public_path: Path, private_path: Path
 ) -> tuple[set[ColumnName], set[ColumnName]]:
-    public_names = set(CsvInfo(public_csv_path).get_all_column_names())
-    private_names = set(CsvInfo(private_csv_path).get_all_column_names())
+    public_names = set(CsvInfo(public_path).get_all_column_names())
+    private_names = set(CsvInfo(private_path).get_all_column_names())
     extra_public = public_names - private_names
     extra_private = private_names - public_names
     return (extra_public, extra_private)
 
 
-def get_csv_row_count(csv_path: Path) -> int:
-    lf = pl.scan_csv(csv_path, ignore_errors=True)
+def get_csv_row_count(path: Path) -> int:
+    lf = pl.scan_csv(path, ignore_errors=True)
     return lf.select(pl.len()).collect().item()
 
 
@@ -133,31 +133,6 @@ def make_demo_csv(path: Path, contributions: int) -> None:
                         "self_assessment": self_assessment,
                     }
                 )
-
-
-def infer_csv_info(names_values_str: str) -> CsvInfo:
-    """
-    >>> infer_csv_info("missing\\nstr : foobar\\nint:42")
-    CsvInfo({'missing': String, 'str': String, 'int': Int64}, warnings=[], errors=[])
-    >>> infer_csv_info("")
-    CsvInfo({}, warnings=[], errors=[])
-
-    """
-    names_values_list = [
-        (name_value.split(":") + ["", ""])[:2]
-        for name_value in names_values_str.splitlines()
-    ]
-    names_values_dict = {
-        name.strip(): value.strip() for [name, value] in names_values_list
-    }
-    from tempfile import NamedTemporaryFile
-
-    with NamedTemporaryFile("w") as tmp:
-        tmp.write(",".join(names_values_dict.keys()))
-        tmp.write("\n")
-        tmp.write(",".join(names_values_dict.values()))
-        tmp.flush()
-        return CsvInfo(Path(tmp.name))
 
 
 def _clip(n: float, lower_bound: float, upper_bound: float) -> float:

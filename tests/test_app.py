@@ -43,7 +43,7 @@ def test_qa_app(page: Page, qa_app: ShinyAppProc):  # pragma: no cover
 
 
 def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: no cover
-    pick_dataset_text = "How many rows of the CSV"
+    pick_dataset_text = "How many rows of your data"
     perform_analysis_text = "Select numeric columns to calculate statistics on"
     download_results_text = "You can now make a differentially private release"
 
@@ -55,7 +55,7 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     expect(page.get_by_text(perform_analysis_text)).not_to_be_visible()
     expect(page.get_by_text(download_results_text)).not_to_be_visible()
     page.locator("#contributions").fill("123")
-    page.get_by_text("Code Sample: Unit of Privacy").click()
+    page.get_by_text("Code Sample: Unit of Protection").click()
     expect(page.get_by_text("123")).to_have_class("hljs-number")
     expect(page.locator(".shiny-output-error")).not_to_be_attached()
 
@@ -64,8 +64,8 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     assert define_analysis_button.is_disabled()
 
     # Now upload:
-    csv_path = package_root.parent / "tests/fixtures/fake.csv"
-    page.get_by_label("Choose Public CSV").set_input_files(csv_path.resolve())
+    path = package_root.parent / "tests/fixtures/fake.tsv"
+    page.get_by_label("Choose Public Data").set_input_files(path.resolve())
 
     # Toggle tutorial: (CSV should not clear!)
     page.locator("#tutorial_mode").click()
@@ -77,7 +77,7 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     page.locator("#contributions").fill("0")
     expect(page.get_by_text("Rows per contributor must be at least 1")).to_be_visible()
     expected_error = (
-        "Specify CSV, unit of privacy, and maximum row count before proceeding."
+        "Specify CSV, unit of protection, and maximum row count before proceeding."
     )
     expect(page.get_by_text(expected_error)).to_be_visible()
 
@@ -101,7 +101,7 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     page.locator(".irs-bar").click()
     expect(page.get_by_text("(Epsilon): 0.2")).to_be_visible()
     # Simulation
-    expect(page.get_by_text("Because you've provided a public CSV")).to_be_visible()
+    expect(page.get_by_text("Because you've provided public data")).to_be_visible()
 
     # Button disabled until column selected:
     download_results_button = page.get_by_role("button", name="Download Results")
@@ -247,8 +247,8 @@ def test_local_app_downloads(
     page.get_by_role("tab", name="Select Dataset").click()
     screenshot(page, "select-dataset")
 
-    csv_path = package_root.parent / "tests/fixtures/fake.csv"
-    page.get_by_label("Choose Public CSV").set_input_files(csv_path.resolve())
+    path = package_root.parent / "tests/fixtures/fake.tsv"
+    page.get_by_label("Choose Public Data").set_input_files(path.resolve())
 
     page.get_by_label("DP Synthetic Data").click()
 

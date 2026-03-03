@@ -16,7 +16,7 @@ UTILS_BLOCK
 COLUMNS_BLOCK
 
 
-def get_stats_context_contributions(csv_path):
+def get_stats_context_contributions(path):
     STATS_CONTEXT_BLOCK
     # CSV_COMMENT_BLOCK
     return stats_context, contributions
@@ -30,6 +30,6 @@ if __name__ == "__main__":
         "--csv", required=True, help="Path to csv containing private data"
     )
     args = parser.parse_args()
-    stats_context, contributions = get_stats_context_contributions(csv_path=args.csv)
+    stats_context, contributions = get_stats_context_contributions(path=args.csv)
 
     STATS_QUERIES_BLOCK
