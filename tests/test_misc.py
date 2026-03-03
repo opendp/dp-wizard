@@ -106,21 +106,22 @@ def get_file_paths() -> list[Path]:
 
 def test_common_typos():
     expected_pairs = [
+        # Unless "github" is in a domain name or a path, capitalize:
+        # "(?!...)" is a negative lookahead.
         (r"github(?!\.com)(?!\.io)(?!/workflows)", ["GitHub"]),
+        # "[pins]" is the only recognized extra install:
         (r"dp.wizard\[[^]]+\]", ["dp_wizard[pins]"]),
+        # "--editable" installs should always use "[pins]":
         (r"pip install --editable \S+", ["pip install --editable '.[pins]'"]),
+        # Negative lookaheads are covered above.
+        # Check for other unexpected installs:
         (
-            r"pip install \S+",
+            r"pip install (?!'dp_wizard\S+)(?!pytest\"?)\S+",
             [
-                "pip install 'dp_wizard[pins]'",
-                "pip install 'dp_wizard[pins]';",
-                "pip install 'dp_wizard[pins]'`",
                 "pip install DEPENDENCIES",
                 "pip install -r",
                 "pip install --editable",
                 "pip install flit",
-                "pip install pytest",  # In test fixtures
-                'pip install pytest"',
             ],
         ),
     ]
@@ -136,7 +137,7 @@ def test_common_typos():
                 if match[1] not in expected:  # pragma: no cover
                     options = " or ".join(f'"{e}"' for e in expected)
                     failures.append(
-                        f"Expected {options} in {rel_path}, not:"
+                        f"In {rel_path}, expected {options}, not:"
                         f"\n> {''.join(match)}"
                     )
     if failures:  # pragma: no cover
