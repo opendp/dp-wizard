@@ -22,7 +22,7 @@ from dp_wizard.utils.constraints import (
     MIN_ROW_COUNT,
 )
 
-abc_csv_path = str((package_root.parent / "tests/fixtures/abc.csv").absolute())
+abc_path = str((package_root.parent / "tests/fixtures/abc.csv").absolute())
 
 good_floats = st.floats(
     allow_nan=False,
@@ -71,7 +71,7 @@ def test_make_random_notebook(bin_count, epsilon, lower_upper, max_rows, contrib
         schema_columns={ColumnName("2B"): pl.Float32()},
         contributions=contributions,
         contributions_entity="PLACEHOLDER",  # TODO: enum?
-        csv_path=abc_csv_path,
+        path=abc_path,
         epsilon=epsilon,
         max_rows=max_rows,
     )

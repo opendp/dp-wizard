@@ -106,10 +106,10 @@ def results_server(
     is_released = state.is_released
 
     # Dataset choices:
-    # initial_private_csv_path = state.initial_private_csv_path
-    private_csv_path = state.private_csv_path
-    # initial_public_csv_path = state.initial_private_csv_path
-    public_csv_path = state.public_csv_path
+    # initial_private_path = state.initial_private_path
+    private_path = state.private_path
+    # initial_public_path = state.initial_private_path
+    public_path = state.public_path
     contributions = state.contributions
     contributions_entity = state.contributions_entity
     max_rows = state.max_rows
@@ -283,8 +283,8 @@ def results_server(
         }
         return AnalysisPlan(
             product=product(),
-            # Prefer private CSV, if available:
-            csv_path=private_csv_path() or public_csv_path() or PLACEHOLDER_CSV_NAME,
+            # Prefer private data, if available:
+            path=private_path() or public_path() or PLACEHOLDER_CSV_NAME,
             contributions=contributions(),
             contributions_entity=contributions_entity(),
             epsilon=epsilon(),

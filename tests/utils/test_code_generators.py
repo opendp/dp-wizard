@@ -106,7 +106,7 @@ hw_grade_bin_expr = (
     )
 
 
-abc_csv_path = str((package_root.parent / "tests/fixtures/abc.csv").absolute())
+abc_path = str((package_root.parent / "tests/fixtures/abc.csv").absolute())
 
 
 def number_lines(text: str):
@@ -151,7 +151,7 @@ plans_all_combos = [
         schema_columns={k: pl.Float32() for k in columns.keys()},
         contributions=contributions,
         contributions_entity="Family",
-        csv_path=abc_csv_path,
+        path=abc_path,
         epsilon=1,
         max_rows=100_000,
     )
@@ -255,17 +255,49 @@ def test_make_script(plan):
         fp.flush()
 
         result = subprocess.run(
-            ["python", fp.name, "--csv", abc_csv_path], capture_output=True
+            ["python", fp.name, "--csv", abc_path], capture_output=True
         )
         assert result.returncode == 0
 
 
+def test_tsv():
+    path = Path(__file__).parent.parent / "fixtures/fake.tsv"
+
+    plan = AnalysisPlan(
+        product=Product.STATISTICS,
+        groups={},
+        analysis_columns={
+            ColumnName("class year"): [
+                AnalysisPlanColumn(
+                    mean.name,
+                    lower_bound=0,
+                    upper_bound=100000,
+                    bin_count=0,
+                    weight=1,
+                )
+            ]
+        },
+        schema_columns={
+            ColumnName("class year"): pl.Int32(),
+        },
+        contributions=1,
+        contributions_entity="Family",
+        path=str(path),
+        epsilon=1,
+        max_rows=1000,
+    )
+    notebook_py = NotebookGenerator(plan, "Note goes here!").make_py()
+    print(number_lines(notebook_py))
+    globals = {}
+    exec(notebook_py, globals)
+
+
 def test_pums():
-    csv_path = Path(__file__).parent.parent / "fixtures/pums_1000.csv"
+    path = Path(__file__).parent.parent / "fixtures/pums_1000.csv"
 
     # The "income" field looks like integers in the first rows,
     # but farther down there are floats.
-    assert CsvInfo(csv_path).get_schema()[ColumnName("income")] == pl.Float64
+    assert CsvInfo(path).get_schema()[ColumnName("income")] == pl.Float64
 
     plan = AnalysisPlan(
         product=Product.STATISTICS,
@@ -286,7 +318,7 @@ def test_pums():
         },
         contributions=1,
         contributions_entity="Family",
-        csv_path=str(csv_path),
+        path=str(path),
         epsilon=1,
         max_rows=1000,
     )
