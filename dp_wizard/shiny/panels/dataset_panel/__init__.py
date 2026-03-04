@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 from typing import Optional
 
@@ -78,8 +79,10 @@ def get_str_int_error(
     except (TypeError, ValueError, OverflowError):
         return "should be an integer"
     if number < minimum:
+        min_message = re.sub(r"\s+", " ", min_message).strip()
         return f"should not be less than {minimum:,}: {min_message}"
     if number > maximum:
+        max_message = re.sub(r"\s+", " ", max_message).strip()
         return f"should not be greater than {maximum:,}: {max_message}"
     return None
 
@@ -102,6 +105,11 @@ def get_max_rows_error(number_str) -> str | None:
 
 
 def get_contibutions_error(number_str) -> str | None:
+    """
+    >>> get_contibutions_error("100")
+    >>> get_contibutions_error("101")
+    "... should not be greater than 100: Because the noise will be scaled ..."
+    """
     message = get_str_int_error(
         number_str=number_str,
         minimum=1,
