@@ -35,6 +35,18 @@ accept = [".csv", ".tsv", ".tab"]
 
 
 def int_or_zero(number_str: str) -> int:
+    """
+    >>> int_or_zero("1")
+    1
+    >>> int_or_zero("One")
+    0
+
+    This is not a general-purpose function:
+    If use changes, handle more cases.
+
+    >>> int_or_zero("1.0")
+    0
+    """
     try:
         number = int(number_str)
     except (TypeError, ValueError, OverflowError):
@@ -49,6 +61,16 @@ def get_str_int_error(
     min_message: str,
     max_message: str,
 ) -> str | None:
+    """
+    >>> get_str_int_error("", 1, 10, "low", "high")
+    'is required'
+    >>> get_str_int_error("ABC", 1, 10, "low", "high")
+    'should be an integer'
+    >>> get_str_int_error("0", 1, 10, "low", "high")
+    'should not be less than 1: low'
+    >>> get_str_int_error("11", 1, 10, "low", "high")
+    'should not be greater than 10: high'
+    """
     if number_str == "":
         return "is required"
     try:
@@ -63,6 +85,11 @@ def get_str_int_error(
 
 
 def get_max_rows_error(number_str) -> str | None:
+    """
+    >>> get_max_rows_error(100)
+    >>> get_max_rows_error(99)
+    'Maximum row count should not be less than 100: For very small data sets, ...'
+    """
     message = get_str_int_error(
         number_str=number_str,
         minimum=MIN_ROW_COUNT,
