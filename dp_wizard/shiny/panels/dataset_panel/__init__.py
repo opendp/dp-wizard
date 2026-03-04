@@ -554,6 +554,9 @@ Choose both **Private Data** and **Public Data** {PUBLIC_PRIVATE_TEXT}
                   selected columns, and the correlations between columns.
                   This is less accurate than calculating the desired
                   statistics directly, but can be easier to work with downstream.
+                - The **DP Summary** is less configurable than the other options.
+                  It slices the privacy budget thinly to provide just a
+                  little information about each of a large number of fields.
                 """,
                 responsive=False,
             ),
