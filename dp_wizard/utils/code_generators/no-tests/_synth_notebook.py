@@ -1,8 +1,14 @@
-# {"tagmap":{
-#   "Brief Report": [],
-#   "Full Tutorial": ["tutorial"],
-#   "Include Postprocessing": ["tutorial", "postprocessing"]
-# }}
+# {
+#   "tag_map": {
+#       "Brief Report": [],
+#       "Full Tutorial": ["tutorial"],
+#       "Include Postprocessing": ["tutorial", "postprocessing"]
+#   },
+#   "css_map": {
+#       "tutorial": "background: lightblue;",
+#       "postprocessing": "background: lightblue;"
+#   }
+# }
 
 # # TITLE
 #
