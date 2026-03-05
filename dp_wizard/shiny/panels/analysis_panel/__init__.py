@@ -322,6 +322,7 @@ def analysis_server(
                 responsive=False,
             ),
         )
+        default_choices = ["100", "1000", "10000"]
         if public_path():
             row_count_str = str(get_csv_row_count(Path(public_path())))
             return [
@@ -339,7 +340,7 @@ def analysis_server(
                 ui.input_select(
                     "row_count",
                     "Estimated Rows",
-                    choices=[row_count_str, "100", "1000", "10000"],
+                    choices=[row_count_str] + default_choices,
                     selected=row_count_str,
                 ),
                 help,
@@ -356,8 +357,8 @@ def analysis_server(
                 ui.input_select(
                     "row_count",
                     "Estimated Rows",
-                    choices=["100", "1000", "10000"],
-                    selected="100",
+                    choices=default_choices,
+                    selected=default_choices[0],
                 ),
                 help,
             ]
