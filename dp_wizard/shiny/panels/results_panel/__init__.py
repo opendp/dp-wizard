@@ -1,11 +1,14 @@
 import html
-import json
 import re
 from pathlib import Path
 from shutil import make_archive
 from tempfile import TemporaryDirectory
 
-from dp_wizard_templates.converters import convert_from_notebook, convert_to_notebook
+from dp_wizard_templates.converters import (
+    clean_notebook,
+    convert_from_notebook,
+    convert_to_notebook,
+)
 from shiny import Inputs, Outputs, Session, reactive, render, types, ui
 
 from dp_wizard import config_root
@@ -384,11 +387,11 @@ def results_server(
 
     @reactive.calc
     def notebook_json():
-        return json.dumps(notebook_dict())
+        return clean_notebook(notebook_dict())
 
     @reactive.calc
     def notebook_json_unexecuted():
-        return json.dumps(notebook_dict_unexecuted())
+        return clean_notebook(notebook_dict_unexecuted())
 
     @reactive.calc
     def notebook_html():
