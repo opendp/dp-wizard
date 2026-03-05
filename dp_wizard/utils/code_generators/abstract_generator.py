@@ -1,3 +1,4 @@
+import json
 from abc import ABC, abstractmethod
 from math import gcd
 from typing import Iterable
@@ -108,6 +109,22 @@ so it is safer to ignore them. That said, if a significant number of records
 are ignored because of errors, it will bias results.
 """,
                 **self._make_extra_blocks(),  # type: ignore
+            )
+            .fill_blocks(
+                FRONTMATTER_BLOCK=json.dumps(
+                    {
+                        "tag_map": {
+                            "Brief Report": [],
+                            "Full Tutorial": ["tutorial"],
+                            "Include Postprocessing": ["tutorial", "postprocessing"],
+                        },
+                        "css_map": {
+                            "tutorial": "background: lightblue;",
+                            "postprocessing": "background: lightblue;",
+                        },
+                    }
+                ),
+                optional=True,  # Not used by script template
             )
             .finish(reformat=reformat)
         )
