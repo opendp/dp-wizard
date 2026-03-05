@@ -12,7 +12,7 @@ confidence = 0.95
 def make_accuracy_histogram(
     lf: pl.LazyFrame,
     column_name: str,
-    row_count: int,
+    max_length: int,
     lower_bound: float,
     upper_bound: float,
     bin_count: int,
@@ -33,7 +33,7 @@ def make_accuracy_histogram(
     >>> accuracy, histogram = make_accuracy_histogram(
     ...     lf=pl.LazyFrame(df),
     ...     column_name=column_name,
-    ...     row_count=100,
+    ...     max_length=100,
     ...     lower_bound=0, upper_bound=10,
     ...     bin_count=5,
     ...     contributions=1,
@@ -76,7 +76,7 @@ def make_accuracy_histogram(
         margins=[
             dp.polars.Margin(  # type: ignore
                 by=["bin"],
-                max_length=row_count,
+                max_length=max_length,
                 invariant="keys",
             ),
         ],

@@ -322,45 +322,35 @@ def analysis_server(
                 responsive=False,
             ),
         )
+        choices = ["100", "1000", "10000"]
         if public_path():
             row_count_str = str(get_csv_row_count(Path(public_path())))
-            return [
-                ui.markdown(
-                    f"""
-                    Because you've provided public data,
-                    it *will be read* to generate previews.
+            choices.insert(0, row_count_str)
+            message = f"""
+                Because you've provided public data,
+                it *will be read* to generate previews.
 
-                    The confidence interval depends on the number of rows.
-                    Your public data has {row_count_str} rows,
-                    but if you believe the private data will be
-                    much larger or smaller, please update.
-                    """
-                ),
-                ui.input_select(
-                    "row_count",
-                    "Estimated Rows",
-                    choices=[row_count_str, "100", "1000", "10000"],
-                    selected=row_count_str,
-                ),
-                help,
-            ]
+                The confidence interval depends on the number of rows.
+                Your public data has {row_count_str} rows,
+                but if you believe the private data will be
+                much larger or smaller, please update.
+            """
         else:
-            return [
-                ui.markdown(
-                    """
-                    What is the approximate number of rows in the dataset?
-                    This number is only used for the simulation
-                    and not the final calculation.
-                    """
-                ),
-                ui.input_select(
-                    "row_count",
-                    "Estimated Rows",
-                    choices=["100", "1000", "10000"],
-                    selected="100",
-                ),
-                help,
-            ]
+            message = """
+                What is the approximate number of rows in the dataset?
+                This number is only used for the simulation
+                and not the final calculation.
+            """
+        return [
+            ui.markdown(message),
+            ui.input_select(
+                "row_count",
+                "Estimated Rows",
+                choices=choices,
+                selected=choices[0],
+            ),
+            help,
+        ]
 
     @render.ui
     def columns_ui():
