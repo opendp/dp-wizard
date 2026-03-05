@@ -90,9 +90,7 @@ class AbstractGenerator(ABC):
             .fill_blocks(
                 IMPORTS_BLOCK=DefaultsTemplate(imports_template).finish(),
                 UTILS_BLOCK=bins_py + plots_py,
-                **self._make_extra_blocks(),  # type: ignore
-            )
-            .fill_blocks(
+                CUSTOM_NOTE=self.note,
                 WINDOWS_COMMENT_BLOCK="""
 (If installing in the Windows CMD shell,
 use double-quotes instead of single-quotes below.)""",
@@ -109,7 +107,7 @@ value would leak information and violate the DP guarantee,
 so it is safer to ignore them. That said, if a significant number of records
 are ignored because of errors, it will bias results.
 """,
-                CUSTOM_NOTE=self.note,
+                **self._make_extra_blocks(),  # type: ignore
             )
             .finish(reformat=reformat)
         )
