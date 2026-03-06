@@ -9,24 +9,24 @@ from dp_wizard_templates.converters import convert_from_notebook, convert_to_not
 from shiny import Inputs, Outputs, Session, reactive, render, types, ui
 
 from dp_wizard import config_root
-from dp_wizard.shiny.components.icons import (
+from dp_wizard.types import AppState, ColumnName, Product
+from dp_wizard.ui.components.icons import (
     download_code_icon,
     download_config_icon,
     download_results_icon,
 )
-from dp_wizard.shiny.components.outputs import (
+from dp_wizard.ui.components.outputs import (
     hide_if,
     only_for_screenreader,
     tutorial_box,
     warning_md_box,
 )
-from dp_wizard.shiny.components.summaries import analysis_summary, dataset_summary
-from dp_wizard.shiny.panels.results_panel.download_options import (
+from dp_wizard.ui.components.summaries import analysis_summary, dataset_summary
+from dp_wizard.ui.panels.results_panel.download_options import (
     download_button,
     download_link,
     table_of_contents_md,
 )
-from dp_wizard.types import AppState, ColumnName, Product
 from dp_wizard.utils.code_generators import AnalysisPlan, AnalysisPlanColumn
 from dp_wizard.utils.code_generators.notebook_generator import (
     PLACEHOLDER_CSV_NAME,
