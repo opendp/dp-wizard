@@ -10,6 +10,7 @@ tomlkit
 isort
 black
 autoflake8
+pyinstaller
 
 # Testing:
 pytest

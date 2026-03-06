@@ -4,8 +4,8 @@ from htmltools import Tag
 from shiny import App, Inputs, Outputs, Session, reactive, ui
 
 from dp_wizard import config_root, package_root
-from dp_wizard.shiny.components.icons import tutorial_icon
-from dp_wizard.shiny.panels import (
+from dp_wizard.core.components.icons import tutorial_icon
+from dp_wizard.core.panels import (
     analysis_panel,
     dataset_panel,
     faq_panel,
@@ -19,8 +19,8 @@ from dp_wizard.utils.csv_helper import (
     make_demo_csv,
 )
 
-_shiny_root = package_root / "shiny"
-_assets_root = _shiny_root / "assets"
+_core_root = package_root / "core"
+_assets_root = _core_root / "assets"
 assert _assets_root.exists()
 
 
@@ -51,11 +51,11 @@ def _make_app_ui(cli_info: CLIInfo) -> Tag:
     return ui.page_bootstrap(
         ui.head_content(
             ui.tags.link(rel="icon", href="favicon.ico"),
-            ui.include_css(_shiny_root / "assets/styles.css"),
+            ui.include_css(_core_root / "assets/styles.css"),
             ui.include_css(
-                _shiny_root / "vendor/highlight.js/11.11.1/styles/default.min.css"
+                _core_root / "vendor/highlight.js/11.11.1/styles/default.min.css"
             ),
-            ui.include_js(_shiny_root / "vendor/highlight.js/11.11.1/highlight.min.js"),
+            ui.include_js(_core_root / "vendor/highlight.js/11.11.1/highlight.min.js"),
         ),
         ui.navset_tab(
             faq_panel.about_ui(),

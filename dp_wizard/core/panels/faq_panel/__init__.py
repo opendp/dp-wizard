@@ -5,7 +5,7 @@ from htmltools import tags
 from shiny import Inputs, Outputs, Session, reactive, ui
 
 from dp_wizard import __version__, package_root
-from dp_wizard.shiny.components.outputs import nav_button
+from dp_wizard.core.components.outputs import nav_button
 
 
 def _get_info() -> str:
