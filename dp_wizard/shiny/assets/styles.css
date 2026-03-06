@@ -31,7 +31,8 @@ Improve readability of popover.
 .tooltip-inner {
     text-align: left;
     color: black;
-    background-color: lightgray;
+    background-color: var(--bs-info-bg-subtle);
+    border-color: var(--bs-info-bg-subtle);
     opacity: 100%;
 }
 /*
@@ -40,16 +41,16 @@ The tooltip is positioned to avoid falling outside of the window,
 so any of these might be applied.
 */
 .bs-tooltip-auto[data-popper-placement^="right"] .tooltip-arrow::before {
-    border-right-color: lightgrey;
+    border-right-color: var(--bs-info-bg-subtle);
 }
 .bs-tooltip-auto[data-popper-placement^="bottom"] .tooltip-arrow::before {
-    border-bottom-color: lightgray;
+    border-bottom-color: var(--bs-info-bg-subtle);
 }
 .bs-tooltip-auto[data-popper-placement^="left"] .tooltip-arrow::before {
-    border-left-color: lightgrey;
+    border-left-color: var(--bs-info-bg-subtle);
 }
 .bs-tooltip-auto[data-popper-placement^="top"] .tooltip-arrow::before {
-    border-top-color: lightgray;
+    border-top-color: var(--bs-info-bg-subtle);
 }
 
 /*
