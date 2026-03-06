@@ -62,7 +62,7 @@ def test_doc_examples_up_to_date():
 
     if any(
         # path is expanded to an absolute path, so ignore it:
-        line.strip() not in expected_code and path not in line
+        line not in expected_code and path not in line
         for line in doc_code.splitlines()
     ):
         # It's fine for the docs to be a subset of the generated code,
