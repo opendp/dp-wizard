@@ -11,7 +11,6 @@ from dp_wizard.utils.code_generators import (
     make_privacy_loss_block,
     make_privacy_unit_block,
 )
-from dp_wizard.utils.code_generators.analyses import histogram
 from dp_wizard.utils.dp_helper import confidence
 from dp_wizard.utils.shared.bins import make_cut_points
 
@@ -148,12 +147,13 @@ are ignored because of errors, it will bias results.
             DefaultsTemplate(basic_template)
             .fill_values(GROUPS=groups, MAX_ROWS=max_rows)
             .finish()
-        ] + [
-            DefaultsTemplate(bin_template)
-            .fill_values(GROUPS=groups, BIN_NAME=bin_name)
-            .finish()
-            for bin_name in bin_names
         ]
+        for bin_name in bin_names:
+            margins.append(
+                DefaultsTemplate(bin_template)
+                .fill_values(GROUPS=groups, BIN_NAME=bin_name)
+                .finish()
+            )
 
         margins_list = "[" + ", ".join(margins) + "\n    ]"
         return margins_list
@@ -249,30 +249,23 @@ are ignored because of errors, it will bias results.
             for name, plan in self.analysis_plan.analysis_columns.items()
             if has_bins(get_statistic_by_name(plan[0].statistic_name))
         ]
+        all_groups_have_keys = all(
+            len(group_keys) > 0 for group_keys in self.analysis_plan.groups.values()
+        )
 
         privacy_unit_block = make_privacy_unit_block(
             contributions=self.analysis_plan.contributions,
             contributions_entity=self.analysis_plan.contributions_entity,
         )
         privacy_loss_block = make_privacy_loss_block(
-            pure=False,
+            pure=all_groups_have_keys,
             epsilon=self.analysis_plan.epsilon,
             max_rows=self.analysis_plan.max_rows,
         )
-
-        is_just_histograms = all(
-            plan_column[0].statistic_name == histogram.name
-            for plan_column in self.analysis_plan.analysis_columns.values()
-        )
-        margins_list = (
-            # Histograms don't need margins.
-            "[]"
-            if is_just_histograms
-            else self._make_margins_list(
-                bin_names=[f"{name}_bin" for name in bin_column_names],
-                groups=self.analysis_plan.groups,
-                max_rows=self.analysis_plan.max_rows,
-            )
+        margins_list = self._make_margins_list(
+            bin_names=[f"{name}_bin" for name in bin_column_names],
+            groups=self.analysis_plan.groups,
+            max_rows=self.analysis_plan.max_rows,
         )
         extra_columns = ", ".join(
             [
