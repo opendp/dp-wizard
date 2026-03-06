@@ -5,10 +5,10 @@ from htmltools.tags import details, summary
 from shiny import Inputs, Outputs, Session, module, reactive, render, ui
 from shiny.types import SilentException
 
-from dp_wizard.shiny.components.icons import (
+from dp_wizard.core.components.icons import (
     column_config_icon,
 )
-from dp_wizard.shiny.components.outputs import (
+from dp_wizard.core.components.outputs import (
     code_sample,
     col_widths,
     hide_if,

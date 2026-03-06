@@ -1,8 +1,8 @@
 import polars as pl
 from shiny import Inputs, Outputs, Session, module, reactive, render, ui
 
-from dp_wizard.shiny.components.icons import column_config_icon
-from dp_wizard.shiny.components.outputs import only_for_screenreader
+from dp_wizard.core.components.icons import column_config_icon
+from dp_wizard.core.components.outputs import only_for_screenreader
 from dp_wizard.types import ColumnName
 from dp_wizard.utils.csv_helper import convert_text
 

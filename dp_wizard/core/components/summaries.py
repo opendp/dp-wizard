@@ -1,6 +1,6 @@
 from shiny.ui import tags
 
-from dp_wizard.shiny.components.icons import (
+from dp_wizard.core.components.icons import (
     budget_icon,
     columns_icon,
     data_source_icon,

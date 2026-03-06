@@ -3,12 +3,12 @@ from typing import Optional
 
 from shiny import Inputs, Outputs, Session, reactive, render, ui
 
-from dp_wizard.shiny.components.icons import (
+from dp_wizard.core.components.icons import (
     data_source_icon,
     product_icon,
     unit_of_protection_icon,
 )
-from dp_wizard.shiny.components.outputs import (
+from dp_wizard.core.components.outputs import (
     code_sample,
     col_widths,
     hide_if,
@@ -17,7 +17,7 @@ from dp_wizard.shiny.components.outputs import (
     tutorial_box,
     warning_md_box,
 )
-from dp_wizard.shiny.panels.dataset_panel import data_source
+from dp_wizard.core.panels.dataset_panel import data_source
 from dp_wizard.types import AppState, Product
 from dp_wizard.utils.argparse_helpers import (
     PRIVATE_TEXT,

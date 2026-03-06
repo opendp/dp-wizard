@@ -1,5 +1,5 @@
 from dp_wizard import package_root
-from dp_wizard.shiny.components.outputs import (
+from dp_wizard.core.components.outputs import (
     code_sample,
     hide_if,
     warning_md_box,
