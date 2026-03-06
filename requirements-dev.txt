@@ -8,6 +8,10 @@ absl-py==2.3.1
     # via
     #   chex
     #   optax
+altgraph==0.17.5
+    # via
+    #   macholib
+    #   pyinstaller
 anyio==4.9.0
     # via
     #   starlette
@@ -175,6 +179,8 @@ kiwisolver==1.4.8
     # via matplotlib
 linkify-it-py==2.0.3
     # via shiny
+macholib==1.16.4
+    # via pyinstaller
 markdown-it-py==3.0.0
     # via
     #   jupytext
@@ -259,6 +265,8 @@ packaging==24.2
     #   jupytext
     #   matplotlib
     #   nbconvert
+    #   pyinstaller
+    #   pyinstaller-hooks-contrib
     #   pytest
     #   shiny
 pandas==2.3.2
@@ -316,6 +324,10 @@ pygments==2.19.1
     # via
     #   ipython
     #   nbconvert
+pyinstaller==6.19.0
+    # via -r requirements-dev.in
+pyinstaller-hooks-contrib==2026.2
+    # via pyinstaller
 pyparsing==3.2.3
     # via matplotlib
 pyproject-hooks==1.2.0
