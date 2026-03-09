@@ -18,11 +18,10 @@ from dp_wizard.shiny.components.outputs import (
 )
 from dp_wizard.types import ColumnName, Product, StatisticName, Weight
 from dp_wizard.utils.code_generators import make_column_config_block
-from dp_wizard.utils.code_generators.analyses import (
+from dp_wizard.utils.code_generators.analyses import (  # median,
     get_statistic_by_name,
     histogram,
     mean,
-    median,
 )
 from dp_wizard.utils.constraints import MAX_BOUND, MIN_BOUND
 from dp_wizard.utils.dp_helper import confidence, make_accuracy_histogram
@@ -251,7 +250,9 @@ def column_server(
                     ui.input_select(
                         "statistic_name",
                         only_for_screenreader("Type of statistic"),
-                        [histogram.name, mean.name, median.name],
+                        [histogram.name, mean.name],
+                        # TODO: Restore "median.name" when upstream bug is resolved:
+                        # https://github.com/opendp/opendp/issues/2640
                         width=label_width,
                         selected=statistic_name,
                     ),

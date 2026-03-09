@@ -77,6 +77,7 @@ def make_accuracy_histogram(
             dp.polars.Margin(  # type: ignore
                 by=["bin"],
                 max_length=max_length,
+                # Range bins names are not private information: This is safe.
                 invariant="keys",
             ),
         ],
