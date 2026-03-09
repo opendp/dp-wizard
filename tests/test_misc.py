@@ -1,5 +1,7 @@
 import re
 import subprocess
+from pathlib import Path
+from stat import S_IXUSR as user_exec_mask
 
 import pytest
 
@@ -61,3 +63,13 @@ def test_python_min_version(rel_path):
     if "README" in rel_path:
         # Make sure we haven't upgraded one reference by mistake.
         assert not re.search(r"3.1[^0]", text)
+
+
+@pytest.mark.parametrize(
+    "script_path",
+    (package_root.parent / "scripts").glob("*.sh"),
+    ids=lambda path: path.name,
+)
+def test_bash_scripts(script_path: Path):
+    assert script_path.stat().st_mode & user_exec_mask  # type: ignore
+    assert script_path.read_text().startswith("#!/bin/bash\n\nset -euo pipefail")
