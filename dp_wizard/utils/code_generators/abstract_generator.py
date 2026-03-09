@@ -136,13 +136,12 @@ are ignored because of errors, it will bias results.
             # and taking their product.
             dp.polars.Margin(
                 by=list(GROUPS.keys()),
-                invariant="keys",
                 max_length=MAX_ROWS,
                 max_groups=100,
             )
 
         def bin_template(GROUPS, BIN_NAME):
-            dp.polars.Margin(by=([BIN_NAME] + list(GROUPS.keys())), invariant="keys")
+            dp.polars.Margin(by=([BIN_NAME] + list(GROUPS.keys())))
 
         margins = [
             DefaultsTemplate(basic_template)
