@@ -1,5 +1,22 @@
 # CHANGELOG
 
+## 0.9.0
+
+Highlights:
+
+- remove invariants, add dp.len [#885](https://github.com/opendp/dp-wizard/pull/885)
+- Handle TSVs [#879](https://github.com/opendp/dp-wizard/pull/879)
+
+Also includes:
+
+- No "warning" for low epsilon [#871](https://github.com/opendp/dp-wizard/pull/871)
+- Unit of privacy should start empty [#878](https://github.com/opendp/dp-wizard/pull/878)
+- change the phrasing to emphasize that this should be an upper bound [#873](https://github.com/opendp/dp-wizard/pull/873)
+- Use all groups for column color, not just first [#876](https://github.com/opendp/dp-wizard/pull/876)
+- "unit of privacy" -> "unit of protection" [#877](https://github.com/opendp/dp-wizard/pull/877)
+- add new section to FAQ [#874](https://github.com/opendp/dp-wizard/pull/874)
+
+
 ## 0.8.0
 
 Highlights:
