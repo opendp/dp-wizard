@@ -60,4 +60,4 @@ def test_python_min_version(rel_path):
     assert "3.10" in text
     if "README" in rel_path:
         # Make sure we haven't upgraded one reference by mistake.
-        assert not re.search(r"3.1[^0]", text)
+        assert not re.search(r"3\.1[^0]", text)
