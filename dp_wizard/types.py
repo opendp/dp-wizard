@@ -53,7 +53,7 @@ class StatisticName(str):
 
 class ColumnName(str):
     """
-    The exact column header in the CSV.
+    The exact column header in the data source.
     """
 
     pass
