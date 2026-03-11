@@ -531,10 +531,8 @@ Choose both **Private Data** and **Public Data** {PUBLIC_PRIVATE_TEXT}
             return button
         return [
             button,
-            """
-            Specify CSV, unit of protection,
-            and maximum row count before proceeding.
-            """,
+            "Specify data source, unit of protection, "
+            "and maximum row count before proceeding.",
         ]
 
     @render.ui
