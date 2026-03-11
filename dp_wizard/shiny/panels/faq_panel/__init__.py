@@ -1,41 +1,19 @@
-import subprocess
 import sys
 import urllib.parse
 
 from htmltools import tags
 from shiny import Inputs, Outputs, Session, reactive, ui
 
-from dp_wizard import __version__
+from dp_wizard import __version__, package_root
 from dp_wizard.shiny.components.outputs import nav_button
 
 
-def _run(cmd) -> str:
-    """
-    >>> _run("echo hello")
-    '    hello'
-    """
-    # Do not check exit status:
-    # If there is a problem, we don't want to worry about it.
-    return "\n".join(
-        f"    {line}"
-        for line in subprocess.run(cmd.split(" "), capture_output=True)
-        .stdout.decode()
-        .splitlines()
-    )
-
-
 def _get_info() -> str:
-    git_status = _run("git status")
-    pip_freeze = _run("pip freeze")
     return f"""
 DP Wizard v{__version__}
 python: {sys.version}
 arguments: {' '.join(sys.argv[1:])}
-git status:
-{git_status}
-pip freeze:
-{pip_freeze}
-    """
+"""
 
 
 def _make_issue_url(info) -> str:
@@ -73,24 +51,14 @@ def about_ui():
     issue_url = _make_issue_url(info)
 
     return ui.nav_panel(
-        "About",
+        "FAQ",
         ui.card(
-            ui.card_header("About DP Wizard"),
-            ui.markdown(
-                """
-                DP Wizard guides you through the application of
-                differential privacy. After selecting a local CSV,
-                you'll be prompted to describe the analysis you need.
-                Output options include:
-                - A Jupyter notebook which demonstrates how to use
-                the [OpenDP Library](https://docs.opendp.org/).
-                - A plain Python script.
-                - Text and CSV reports.
-                """
-            ),
+            ui.markdown((package_root / "FAQ.md").read_text())
+            + "If you are on Github, the form below captures environment information "
+            "and pre-fills a Github issue:",
             ui.accordion(
                 ui.accordion_panel(
-                    "File an Issue",
+                    "Pre-fill Issue",
                     tags.div(
                         tags.textarea(
                             info,
@@ -100,7 +68,7 @@ def about_ui():
                             style="font-family: monospace;",
                         ),
                         ui.a(
-                            "File issue",
+                            "Pre-fill Issue",
                             href=issue_url,
                             target="_blank",
                             class_="btn btn-default",

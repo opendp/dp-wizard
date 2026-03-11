@@ -10,6 +10,7 @@ class DownloadOption(NamedTuple):
     ext: str
     icon: str
     description_md: str
+    requires_release: bool = True
 
     @property
     def clean_description_md(self) -> str:
@@ -25,6 +26,7 @@ _download_options = {
             ".txt",
             "file",
             "A short description of the analysis, and a table of contents.",
+            requires_release=False,
         ),
         DownloadOption(
             "Package",
@@ -48,20 +50,10 @@ _download_options = {
             "The same content, but exported as HTML.",
         ),
         DownloadOption(
-            "Report",
-            ".txt",
-            "file-lines",
-            """
-            A report which includes your parameter choices and the results.
-            Intended to be human-readable, but it does use YAML,
-            so it can be parsed by other programs.
-            """,
-        ),
-        DownloadOption(
             "Table",
             ".csv",
             "file-csv",
-            "The same information, but condensed into a CSV.",
+            "Just the results as a CSV.",
         ),
         DownloadOption(
             "Contingency Table",
@@ -79,12 +71,14 @@ _download_options = {
             It can also be updated with the path
             to a private CSV and executed locally.
             """,
+            requires_release=False,
         ),
         DownloadOption(
             "HTML (unexecuted)",
             ".html",
             "file-code",
             "The same content, but exported as HTML.",
+            requires_release=False,
         ),
         DownloadOption(
             "Script",
@@ -94,6 +88,7 @@ _download_options = {
             The same code as the notebooks, but extracted into
             a Python script which can be run from the command line.
             """,
+            requires_release=False,
         ),
         DownloadOption(
             "Notebook Source",
@@ -103,6 +98,17 @@ _download_options = {
             Python source code converted by jupytext into notebook.
             Primarily of interest to DP Wizard developers.
             """,
+            requires_release=False,
+        ),
+        DownloadOption(
+            "Configuration",
+            ".yaml",
+            "sliders",
+            """
+            Analysis configuration as YAML. Except for the contents of
+            your input CSV, this captures all the details of your analysis.
+            """,
+            requires_release=False,
         ),
     ]
 }
@@ -113,9 +119,8 @@ def table_of_contents_md():
     >>> print(table_of_contents_md())
     - README (.txt): A short description of the analysis, and a table of contents.
     ...
-    - Table (.csv): The same information, but condensed into a CSV.
     """
-    included_names = ["README", "Notebook", "HTML", "Script", "Report", "Table"]
+    included_names = ["README", "Notebook", "HTML", "Script", "Table", "Configuration"]
     included_options = [_download_options[name] for name in included_names]
     return "\n".join(
         f"- {opt.name} ({opt.ext}): {opt.clean_description_md}"

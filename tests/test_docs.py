@@ -1,3 +1,5 @@
+import polars as pl
+
 from dp_wizard import package_root
 from dp_wizard.types import ColumnName, Product
 from dp_wizard.utils.code_generators import AnalysisPlan, AnalysisPlanColumn
@@ -34,11 +36,11 @@ def test_doc_examples_up_to_date():
 
     doc_code = "\n".join(strip_doc_test(block) for block in doc_test_blocks)
 
-    csv_path = "docs/fill-in-correct-path.csv"
+    path = "docs/fill-in-correct-path.csv"
     plan = AnalysisPlan(
         product=Product.STATISTICS,
         groups={},
-        columns={
+        analysis_columns={
             ColumnName("grade"): [
                 AnalysisPlanColumn(
                     statistic_name=histogram.name,
@@ -49,17 +51,18 @@ def test_doc_examples_up_to_date():
                 )
             ],
         },
+        schema_columns={ColumnName("grade"): pl.Float32()},
         contributions=1,
         contributions_entity="Individual",
-        csv_path=csv_path,
+        path=path,
         epsilon=1.0,
         max_rows=100_000,
     )
     expected_code = NotebookGenerator(plan, "Note goes here!").make_py(reformat=True)
 
     if any(
-        # csv_path is expanded to an absolute path, so ignore it:
-        line not in expected_code and csv_path not in line
+        # path is expanded to an absolute path, so ignore it:
+        line not in expected_code and path not in line
         for line in doc_code.splitlines()
     ):
         # It's fine for the docs to be a subset of the generated code,

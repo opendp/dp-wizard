@@ -388,7 +388,7 @@ Divide into four teams, and on one computer either:
 <tr>
 <td>
 
-**[`pip install 'dp_wizard[app]'`](https://pypi.org/project/dp_wizard/)<br>`dp_wizard --cloud`<br><small>(requires Python>=3.10)</small>**
+**[`pip install 'dp_wizard[pins]'`](https://pypi.org/project/dp_wizard/)<br>`dp_wizard --demo`<br><small>(requires Python>=3.10)</small>**
 
 </td>
 <td>
@@ -416,7 +416,7 @@ Then:
 
 - 1: On "Select Dataset":
     - Under "CSV Columns", enter `grade`.
-    - Leave the "Unit of Privacy" at 1.
+    - Leave the "Unit of Protection" at 1.
     - Click "Define Analysis".
 
 </td>
@@ -658,7 +658,7 @@ Multi-step workflows: Spend a little of your budget first, just to understand di
 
 Text or image data can't just be dropped into DP.
 
-Even if it can be reduced to a feature vector, can you define a unit of privacy?
+Even if it can be reduced to a feature vector, can you define a unit of protection?
 
 ### Requires trust
 

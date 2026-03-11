@@ -23,8 +23,8 @@ from dp_wizard.utils.code_generators.analyses import (
     get_statistic_by_name,
     histogram,
     mean,
-    median,
 )
+from dp_wizard.utils.constraints import MAX_BOUND, MIN_BOUND
 from dp_wizard.utils.dp_helper import confidence, make_accuracy_histogram
 from dp_wizard.utils.mock_data import ColumnDef, mock_data
 from dp_wizard.utils.shared.plots import plot_bars
@@ -46,15 +46,21 @@ def get_float_error(number_str) -> str | None:
     >>> get_float_error('1.1')
     >>> get_float_error('nan')
     'should be a number'
-    >>> get_float_error('inf')
-    'should be a number'
+    >>> get_float_error('1_000_000_000_001')
+    'should not be greater than 100,000,000,000'
+    >>> get_float_error('-1_000_000_000_001')
+    'should not be less than -100,000,000,000'
     """
     if number_str is None or number_str == "":
         return "is required"
     try:
-        int(float(number_str))
+        number = int(float(number_str))
     except (TypeError, ValueError, OverflowError):
         return "should be a number"
+    if number > MAX_BOUND:
+        return f"should not be greater than {MAX_BOUND:,}"
+    if number < MIN_BOUND:
+        return f"should not be less than {MIN_BOUND:,}"
     return None
 
 
@@ -126,7 +132,7 @@ def column_server(
     input: Inputs,
     output: Outputs,
     session: Session,
-    public_csv_path: str,
+    public_path: str,
     product: reactive.Value[Product],
     name: ColumnName,
     contributions: reactive.Value[int],
@@ -141,7 +147,7 @@ def column_server(
     bin_counts: reactive.Value[dict[ColumnName, int]],
     weights: reactive.Value[dict[ColumnName, Weight]],
     is_tutorial_mode: reactive.Value[bool],
-    is_sample_csv: bool,
+    is_demo_csv: bool,
     is_single_column: bool,
 ):  # pragma: no cover
     @reactive.effect
@@ -207,8 +213,8 @@ def column_server(
         # but I'd guess this is dominated by the DP operations,
         # so not worth optimizing.
         lf = (
-            pl.scan_csv(public_csv_path, ignore_errors=True)
-            if public_csv_path
+            pl.scan_csv(public_path, ignore_errors=True)
+            if public_path
             else pl.LazyFrame(
                 mock_data({name: ColumnDef(lower_x, upper_x)}, row_count=row_count)
             )
@@ -242,7 +248,9 @@ def column_server(
                     ui.input_select(
                         "statistic_name",
                         only_for_screenreader("Type of statistic"),
-                        [histogram.name, mean.name, median.name, bounds.name],
+                        [histogram.name, mean.name, bounds.name],
+                        # TODO: Restore "median.name" when upstream bug is resolved:
+                        # https://github.com/opendp/opendp/issues/2640
                         width=label_width,
                         selected=statistic_name,
                     ),
@@ -277,7 +285,7 @@ def column_server(
                     we should try never to look directly at the data,
                     not even to set bounds! This can be hard.
                     """,
-                    is_sample_csv,
+                    is_demo_csv,
                     """
                     Given what we know _a priori_ about grading scales,
                     you could limit `grade` to values between 0 and 100.
@@ -474,7 +482,7 @@ def column_server(
     def histogram_preview_plot():
         title_name = (
             name
-            if public_csv_path
+            if public_path
             else f"Simulated {name} (assuming a normal distribution)"
         )
 

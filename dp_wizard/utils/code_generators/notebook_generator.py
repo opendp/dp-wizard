@@ -1,9 +1,10 @@
-from dp_wizard_templates.code_template import Template
+from pathlib import Path
 
-from dp_wizard import package_root
+from dp_wizard import config_root, package_root
 from dp_wizard.types import ColumnIdentifier, Product
 from dp_wizard.utils.code_generators.abstract_generator import (
     AbstractGenerator,
+    DefaultsTemplate,
     get_template_root,
 )
 from dp_wizard.utils.dp_helper import confidence
@@ -22,31 +23,66 @@ class NotebookGenerator(AbstractGenerator):
     def _make_synth_context(self):
         return self._fill_partial_context(self._make_partial_synth_context())
 
+    def _make_convert_to_csv_block(self) -> str | None:
+        if (path := self.analysis_plan.path) is None:
+            return ""  # pragma: no cover
+        if path.endswith(".csv"):
+            # Already CSV! No conversion needed.
+            return ""
+
+        def template(UTIL_BLOCK, convert_to_csv, PATH):
+            UTIL_BLOCK  # type: ignore
+
+            # Convert the provided file:
+            from pathlib import Path
+
+            convert_to_csv(Path(PATH))
+
+        return (
+            DefaultsTemplate(template)
+            .fill_blocks(
+                UTIL_BLOCK=(Path(package_root) / "utils/shared/convert.py").read_text(),
+            )
+            .fill_values(
+                PATH=self.analysis_plan.get_absolute_orig_path(),
+            )
+            .finish()
+        )
+
     def _fill_partial_context(self, partial_context):
-        placeholder_csv_content = ",".join(self.analysis_plan.columns)
+        placeholder_csv_content = ",".join(self.analysis_plan.analysis_columns)
         return (
             partial_context.fill_values(
                 CSV_PATH=self.analysis_plan.get_absolute_csv_path(),
             )
-            .fill_code_blocks(
+            .fill_blocks(
                 OPTIONAL_CSV_BLOCK=(
-                    "# Write to placeholder CSV so the notebook can still execute:\n"
+                    "# Write to placeholder .csv so the notebook can still execute:\n"
                     "from pathlib import Path\n"
                     f"Path('{PLACEHOLDER_CSV_NAME}').write_text('{placeholder_csv_content}')\n"
-                    if self.analysis_plan.csv_path == PLACEHOLDER_CSV_NAME
+                    if self.analysis_plan.path == PLACEHOLDER_CSV_NAME
                     else ""
-                )
+                ),
+                OPTIONAL_CONVERT_TO_CSV_BLOCK=self._make_convert_to_csv_block(),
             )
             .finish()
         )
 
     def _make_python_cell(self, block):
-        return f"\n# +\n{block}\n# -\n"
+        return f"\n{block}\n"
 
     def _make_columns(self):
         column_config_dict = self._make_column_config_dict()
         return "\n".join(
-            f"# ### Expression for `{name}`\n{self._make_python_cell(block)}"
+            f"""
+# + [markdown] tags=["tutorial"]
+# ### Expression for `{name}`
+# -
+
+# + tags=["tutorial"]
+{self._make_python_cell(block)}
+# -
+"""
             for name, block in column_config_dict.items()
         )
 
@@ -67,42 +103,34 @@ class NotebookGenerator(AbstractGenerator):
 
         match self.analysis_plan.product:
             case Product.SYNTHETIC_DATA:
-                outputs_expression = Template(template).finish()
+                outputs_expression = DefaultsTemplate(template).finish()
             case Product.STATISTICS:
                 outputs_expression = (
                     "{"
                     + ",".join(
                         self._make_report_kv(name, plan[0].statistic_name)
-                        for name, plan in self.analysis_plan.columns.items()
+                        for name, plan in self.analysis_plan.analysis_columns.items()
                     )
                     + "}"
                 )
             case _:  # pragma: no cover
                 raise ValueError(self.analysis_plan.product)
-        target_path = package_root / ".local-sessions"
 
-        reports_partial = (
-            Template(f"{self._get_synth_or_stats()}_reports", root)
+        return (
+            DefaultsTemplate(f"{self._get_synth_or_stats()}_reports", root)
             .fill_expressions(
                 OUTPUTS=outputs_expression,
-                COLUMNS={
-                    k: v[0]._asdict() for k, v in self.analysis_plan.columns.items()
-                },
+                when=self.analysis_plan.product == Product.STATISTICS,
             )
             .fill_values(
-                CSV_PATH=self.analysis_plan.get_absolute_csv_path(),
-                EPSILON=self.analysis_plan.epsilon,
-                TXT_REPORT_PATH=str(target_path / "report.txt"),
-                CSV_REPORT_PATH=str(target_path / "report.csv"),
+                CSV_REPORT_PATH=str(config_root / "report.csv"),
             )
+            .fill_values(
+                CONTINGENCY_TABLE_PATH=str(config_root / "contingency.csv"),
+                when=self.analysis_plan.product == Product.SYNTHETIC_DATA,
+            )
+            .finish()
         )
-
-        if self.analysis_plan.product == Product.SYNTHETIC_DATA:
-            reports_partial.fill_values(
-                CONTINGENCY_TABLE_PATH=str(target_path / "contingency.csv"),
-            )
-
-        return reports_partial.finish()
 
     def _make_extra_blocks(self):
         match self.analysis_plan.product:

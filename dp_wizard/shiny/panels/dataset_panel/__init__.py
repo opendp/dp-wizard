@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 from typing import Optional
 
@@ -6,7 +7,7 @@ from shiny import Inputs, Outputs, Session, reactive, render, ui
 from dp_wizard.shiny.components.icons import (
     data_source_icon,
     product_icon,
-    unit_of_privacy_icon,
+    unit_of_protection_icon,
 )
 from dp_wizard.shiny.components.outputs import (
     code_sample,
@@ -19,52 +20,110 @@ from dp_wizard.shiny.components.outputs import (
 )
 from dp_wizard.shiny.panels.dataset_panel import data_source
 from dp_wizard.types import AppState, Product
+from dp_wizard.utils.argparse_helpers import (
+    PRIVATE_TEXT,
+    PUBLIC_PRIVATE_TEXT,
+    PUBLIC_TEXT,
+)
 from dp_wizard.utils.code_generators import make_privacy_unit_block
-from dp_wizard.utils.csv_helper import CsvInfo, get_csv_names_mismatch, infer_csv_info
+from dp_wizard.utils.constraints import MAX_CONTRIBUTIONS, MAX_ROW_COUNT, MIN_ROW_COUNT
+from dp_wizard.utils.csv_helper import CsvInfo, get_csv_names_mismatch
+from dp_wizard.utils.shared.convert import convert_to_csv
 
 dataset_panel_id = "dataset_panel"
 OTHER = "Other"
+accept = [".csv", ".tsv", ".tab"]
 
 
-def get_pos_int_error(number_str, minimum=100) -> str | None:
+def int_or_zero(number_str: str) -> int:
     """
-    If the inputs are numeric, I think shiny converts
-    any strings that can't be parsed to numbers into None,
-    so the "should be a number" errors may not be seen in practice.
-    >>> get_pos_int_error('100')
-    >>> get_pos_int_error('0')
-    'should be at least 100'
-    >>> get_pos_int_error(None)
+    >>> int_or_zero("1")
+    1
+    >>> int_or_zero("One")
+    0
+
+    This is not a general-purpose function:
+    If use changes, handle more cases.
+
+    >>> int_or_zero("1.0")
+    0
+    """
+    try:
+        number = int(number_str)
+    except (TypeError, ValueError, OverflowError):
+        return 0
+    return number
+
+
+def get_str_int_error(
+    number_str: str,
+    minimum: int,
+    maximum: int,
+    min_message: str,
+    max_message: str,
+) -> str | None:
+    """
+    >>> get_str_int_error("", 1, 10, "low", "high")
     'is required'
-    >>> get_pos_int_error('')
-    'is required'
-    >>> get_pos_int_error('100.1')
+    >>> get_str_int_error("ABC", 1, 10, "low", "high")
     'should be an integer'
+    >>> get_str_int_error("0", 1, 10, "low", "high")
+    'should not be less than 1: low'
+    >>> get_str_int_error("11", 1, 10, "low", "high")
+    'should not be greater than 10: high'
     """
-    if number_str is None or number_str == "":
+    if number_str == "":
         return "is required"
     try:
         number = int(number_str)
     except (TypeError, ValueError, OverflowError):
         return "should be an integer"
     if number < minimum:
-        return f"should be at least {minimum}"
+        min_message = re.sub(r"\s+", " ", min_message).strip()
+        return f"should not be less than {minimum:,}: {min_message}"
+    if number > maximum:
+        max_message = re.sub(r"\s+", " ", max_message).strip()
+        return f"should not be greater than {maximum:,}: {max_message}"
     return None
 
 
-def get_row_count_errors(max_rows) -> list[str]:
+def get_max_rows_error(number_str) -> str | None:
     """
-    >>> get_row_count_errors(100)
-    []
-    >>> get_row_count_errors('xyz')
-    ['Maximum row count should be an integer.']
-    >>> get_row_count_errors(None)
-    ['Maximum row count is required.']
+    >>> get_max_rows_error(100)
+    >>> get_max_rows_error(99)
+    'Maximum row count should not be less than 100: For very small data sets, ...'
     """
-    messages = []
-    if error := get_pos_int_error(max_rows):
-        messages.append(f"Maximum row count {error}.")
-    return messages
+    message = get_str_int_error(
+        number_str=number_str,
+        minimum=MIN_ROW_COUNT,
+        maximum=MAX_ROW_COUNT,
+        min_message="For very small data sets, too much noise would be required",
+        max_message="Larger values may cause overflow during calcuations",
+    )
+    if message:
+        return f"Maximum row count {message}."
+
+
+def get_contibutions_error(number_str) -> str | None:
+    """
+    >>> get_contibutions_error("100")
+    >>> get_contibutions_error("101")
+    "... should not be greater than 100: Because the noise will be scaled ..."
+    """
+    message = get_str_int_error(
+        number_str=number_str,
+        minimum=1,
+        maximum=MAX_CONTRIBUTIONS,
+        min_message="This value is an upper bound on contributions",
+        max_message="""
+            Because the noise will be scaled by this number,
+            it is much better to aggregate during preprocessing
+            or to use OpenDP's truncation in your code
+            than to use a large value here.
+        """,
+    )
+    if message:
+        return f"Rows per contributor {message}."
 
 
 def dataset_ui():
@@ -75,16 +134,17 @@ def dataset_ui():
         ui.layout_columns(
             ui.card(
                 ui.card_header(data_source_icon, "Data Source"),
-                ui.output_ui("csv_or_columns_ui"),
-                ui.output_ui("row_count_bounds_ui"),
+                ui.output_ui("csv_upload_ui"),
+                ui.output_ui("max_rows_tutorial_ui"),
+                ui.output_ui("max_rows_input_ui"),
             ),
             [
                 ui.card(
-                    ui.card_header(unit_of_privacy_icon, "Unit of Privacy"),
+                    ui.card_header(unit_of_protection_icon, "Unit of Protection"),
                     ui.output_ui("input_entity_ui"),
                     ui.output_ui("input_contributions_ui"),
                     ui.output_ui("contributions_validation_ui"),
-                    ui.output_ui("unit_of_privacy_python_ui"),
+                    ui.output_ui("unit_of_protection_python_ui"),
                 ),
                 ui.card(
                     ui.card_header(product_icon, "Product"),
@@ -104,8 +164,7 @@ def dataset_server(
     state: AppState,
 ):  # pragma: no cover
     # CLI options:
-    is_sample_csv = state.is_sample_csv
-    in_cloud = state.in_cloud
+    is_demo_csv = state.is_demo_csv
 
     # Reactive bools:
     is_tutorial_mode = state.is_tutorial_mode
@@ -114,10 +173,10 @@ def dataset_server(
     is_released = state.is_released
 
     # Dataset choices:
-    initial_private_csv_path = state.initial_private_csv_path
-    private_csv_path = state.private_csv_path
-    initial_public_csv_path = state.initial_public_csv_path
-    public_csv_path = state.public_csv_path
+    initial_private_path = state.initial_private_path
+    private_path = state.private_path
+    initial_public_path = state.initial_public_path
+    public_path = state.public_path
     contributions = state.contributions
     contributions_entity = state.contributions_entity
     max_rows = state.max_rows
@@ -143,29 +202,28 @@ def dataset_server(
     # group_keys = state.group_keys
 
     @reactive.effect
-    @reactive.event(input.public_csv_path)
-    def _on_public_csv_path_change():
-        path = input.public_csv_path()[0]["datapath"]
-        public_csv_path.set(path)
-        csv_info.set(CsvInfo(Path(path)))
+    @reactive.event(input.public_path)
+    def _on_public_path_change():
+        path = Path(input.public_path()[0]["datapath"])
+        if path.suffix != ".csv":
+            # Histogram preview will try to read this file.
+            # Convert at the start, rather than in the downstream.
+            # For private files, the conversion is done in the notebook.
+            path = convert_to_csv(path)
+        public_path.set(str(path))
+        csv_info.set(CsvInfo(path))
 
     @reactive.effect
-    @reactive.event(input.private_csv_path)
-    def _on_private_csv_path_change():
-        path = input.private_csv_path()[0]["datapath"]
-        private_csv_path.set(path)
-        csv_info.set(CsvInfo(Path(path)))
-
-    @reactive.effect
-    @reactive.event(input.all_column_names)
-    def _on_column_names_change():
-        # Only used when the user is supplying column names in cloud mode.
-        csv_info.set(infer_csv_info(input.all_column_names()))
+    @reactive.event(input.private_path)
+    def _on_private_path_change():
+        path = Path(input.private_path()[0]["datapath"])
+        private_path.set(str(path))
+        csv_info.set(CsvInfo(path))
 
     @reactive.calc
     def csv_column_mismatch_calc() -> Optional[tuple[set, set]]:
-        public = public_csv_path()
-        private = private_csv_path()
+        public = public_path()
+        private = private_path()
         if public and private:
             just_public, just_private = get_csv_names_mismatch(
                 Path(public), Path(private)
@@ -208,20 +266,71 @@ def dataset_server(
         )
 
     @render.ui
-    def csv_or_columns_ui():
-        return data_source.csv_or_columns_ui(
-            in_cloud=in_cloud,
-            is_tutorial_mode=is_tutorial_mode,
-            csv_info=csv_info,
+    def csv_upload_ui():
+        return [
+            (
+                warning_md_box(
+                    """
+                    So that private data is not accidentally uploaded,
+                    the demo provides a private CSV, and does not support
+                    data upload.
+
+                    Run DP Wizard locally to process your own data.
+                    """
+                )
+                if is_demo_csv
+                else [
+                    ui.markdown(
+                        f"""
+Choose **Private Data** {PRIVATE_TEXT}
+
+Choose **Public Data** {PUBLIC_TEXT}
+
+Choose both **Private Data** and **Public Data** {PUBLIC_PRIVATE_TEXT}
+                        """
+                    ),
+                    ui.output_ui("input_files_tutorial_ui"),
+                    ui.output_ui("input_files_upload_ui"),
+                ]
+            ),
+            ui.output_ui("csv_message_ui"),
+            data_source.context_code_sample(),
+            ui.output_ui("python_tutorial_ui"),
+        ]
+
+    @render.ui
+    def input_files_tutorial_ui():
+        return tutorial_box(
+            is_tutorial_mode(),
+            f"""
+            Internally, OpenDP works best with CSVs;
+            Other formats will be converted to CSV.
+            Any of these extensions are accepted:
+            {', '.join(f"`{ext}`" for ext in accept)}.
+
+            If you don't have a CSV on hand to work with,
+            quit and restart with `dp-wizard --demo`,
+            and DP Wizard will provide a demo CSV
+            for the tutorial.
+            """,
+            responsive=False,
         )
 
     @render.ui
-    def input_files_ui():
-        return data_source.input_files_ui(
-            is_tutorial_mode=is_tutorial_mode,
-            is_sample_csv=is_sample_csv,
-            initial_private_csv_path=initial_private_csv_path,
-            initial_public_csv_path=initial_public_csv_path,
+    def input_files_upload_ui():
+        return ui.row(
+            ui.input_file(
+                "private_path",
+                "Choose Private Data",
+                accept=accept,
+                placeholder=Path(initial_private_path).name,
+            ),
+            ui.input_file(
+                "public_path",
+                "Choose Public Data",
+                accept=accept,
+                placeholder=Path(initial_public_path).name,
+            ),
         )
 
     @render.ui
@@ -292,31 +401,28 @@ def dataset_server(
         return [
             ui.markdown(
                 f"""
-                How many **rows** of the CSV can {entity_phrase} contribute to?
-                This is the "unit of privacy" which will be protected.
+                How many **rows** of your data can {entity_phrase} contribute to?
                 """
             ),
             tutorial_box(
                 is_tutorial_mode(),
                 """
-                A larger number here will add more noise
-                to the released statistics, to ensure that
-                the contribution of any single individual is masked.
+                For privacy to be protected, this number needs to an upper bound,
+                even if not all contributors will have this many rows.
                 """,
-                is_sample_csv,
+                is_demo_csv,
                 """
-                The `sample.csv` simulates 10 assignments
+                The `demo.csv` simulates 10 assignments
                 over the course of the term for each student,
                 so enter `10` here.
                 """,
                 responsive=False,
             ),
             ui.layout_columns(
-                ui.input_numeric(
+                ui.input_text(
                     "contributions",
                     only_for_screenreader("Maximum number of rows contributed"),
-                    contributions(),
-                    min=1,
+                    "",
                 ),
                 [],  # Column placeholder
                 col_widths=col_widths,  # type: ignore
@@ -326,7 +432,7 @@ def dataset_server(
     @reactive.effect
     @reactive.event(input.contributions)
     def _on_contributions_change():
-        contributions.set(input.contributions())
+        contributions.set(int_or_zero(input.contributions()))
 
     @reactive.effect
     @reactive.event(input.entity)
@@ -335,53 +441,35 @@ def dataset_server(
 
     @reactive.calc
     def contributions_entity_calc() -> str:
+        # The "[2:]" removes the leading emoji and space.
         return input.entity()[2:].lower().strip()
 
     @reactive.effect
     def set_is_dataset_selected():
         info = csv_info()
         is_dataset_selected.set(
-            contributions_valid()
+            not get_contibutions_error(input.contributions())
             and not info.get_is_error()
             and len(info.get_all_column_names()) > 0
-            and not get_row_count_errors(max_rows())
-            and (in_cloud or not csv_column_mismatch_calc())
+            and not get_max_rows_error(input.max_rows())
+            and not csv_column_mismatch_calc()
         )
-
-    @reactive.calc
-    def contributions_valid():
-        contributions = input.contributions()
-        return isinstance(contributions, int) and contributions >= 1
 
     @render.ui
     def contributions_validation_ui():
-        return hide_if(
-            contributions_valid(),
-            warning_md_box("Contributions must be 1 or greater."),
-        )
+        error = get_contibutions_error(input.contributions())
+        if error:
+            return warning_md_box(error)
 
     @render.ui
     def python_tutorial_ui():
-        cloud_extra_markdown = (
-            """
-            Because this instance of DP Wizard is running in the cloud,
-            we don't allow private data to be uploaded.
-            When run locally, DP Wizard can also run an analysis
-            on your data and return results,
-            and not just an unexecuted notebook.
-            """
-            if in_cloud
-            else ""
-        )
         return tutorial_box(
             is_tutorial_mode(),
-            f"""
+            """
             Along the way, code samples demonstrate
             how the information you provide is used in the
             OpenDP Library, and at the end you can download
             a notebook for the entire calculation.
-
-            {cloud_extra_markdown}
             """,
             responsive=False,
         )
@@ -389,16 +477,16 @@ def dataset_server(
     @reactive.effect
     @reactive.event(input.max_rows)
     def _on_max_rows_change():
-        max_rows.set(input.max_rows())
+        max_rows.set(int_or_zero(input.max_rows()))
 
     @render.ui
-    def optional_row_count_error_ui():
-        error_md = "\n".join(f"- {error}" for error in get_row_count_errors(max_rows()))
+    def max_rows_validation_ui():
+        error_md = get_max_rows_error(input.max_rows())
         if error_md:
             return warning_md_box(error_md)
 
     @render.ui
-    def row_count_bounds_ui():
+    def max_rows_tutorial_ui():
         return (
             ui.markdown("What is the **maximum row count** of your CSV?"),
             tutorial_box(
@@ -418,16 +506,21 @@ def dataset_server(
                 """,
                 responsive=False,
             ),
+        )
+
+    @render.ui
+    def max_rows_input_ui():
+        return (
             ui.layout_columns(
                 ui.input_text(
                     "max_rows",
                     only_for_screenreader("Maximum number of rows in CSV"),
-                    "0",
+                    "",
                 ),
                 [],  # column placeholder
                 col_widths=col_widths,  # type: ignore
             ),
-            ui.output_ui("optional_row_count_error_ui"),
+            ui.output_ui("max_rows_validation_ui"),
         )
 
     @render.ui
@@ -438,16 +531,16 @@ def dataset_server(
             return button
         return [
             button,
-            f"""
-            Specify {'columns' if in_cloud else 'CSV'}, unit of privacy,
+            """
+            Specify CSV, unit of protection,
             and maximum row count before proceeding.
             """,
         ]
 
     @render.ui
-    def unit_of_privacy_python_ui():
+    def unit_of_protection_python_ui():
         return code_sample(
-            "Unit of Privacy",
+            "Unit of Protection",
             make_privacy_unit_block(
                 contributions=contributions(),
                 contributions_entity=contributions_entity_calc(),

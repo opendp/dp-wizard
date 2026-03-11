@@ -24,6 +24,7 @@ from dp_wizard.shiny.panels.analysis_panel.column_module import column_server, c
 from dp_wizard.shiny.panels.analysis_panel.group_module import group_server, group_ui
 from dp_wizard.types import AppState, ColumnId
 from dp_wizard.utils.code_generators import make_privacy_loss_block
+from dp_wizard.utils.constraints import MAX_EPSILON, MIN_EPSILON
 from dp_wizard.utils.csv_helper import (
     get_csv_row_count,
     id_labels_dict_from_schema,
@@ -83,8 +84,8 @@ def analysis_ui():
                 ),
                 log_slider(
                     "log_epsilon_slider",
-                    lower_bound=0.1,
-                    upper_bound=10.0,
+                    lower_bound=MIN_EPSILON,
+                    upper_bound=MAX_EPSILON,
                     lower_message="Better Privacy",
                     upper_message="Better Accuracy",
                 ),
@@ -145,8 +146,7 @@ def analysis_server(
     state: AppState,
 ):  # pragma: no cover
     # CLI options:
-    is_sample_csv = state.is_sample_csv
-    # in_cloud = state.in_cloud
+    is_demo_csv = state.is_demo_csv
 
     # Reactive bools:
     is_tutorial_mode = state.is_tutorial_mode
@@ -155,10 +155,10 @@ def analysis_server(
     is_released = state.is_released
 
     # Dataset choices:
-    # initial_private_csv_path = state.initial_private_csv_path
-    # private_csv_path = state.private_csv_path
-    # initial_public_csv_path = state.initial_private_csv_path
-    public_csv_path = state.public_csv_path
+    # initial_private_path = state.initial_private_path
+    # private_path = state.private_path
+    # initial_public_path = state.initial_private_path
+    public_path = state.public_path
     contributions = state.contributions
     contributions_entity = state.contributions_entity
     max_rows = state.max_rows
@@ -278,9 +278,9 @@ def analysis_server(
             DP Wizard only supports the analysis of numeric data,
             but string values can be used for grouping.
             """,
-            is_sample_csv,
+            is_demo_csv,
             """
-            With `sample.csv` you can select `class_year_str`
+            With `demo.csv` you can select `class_year_str`
             to group results by class year.
             """,
             responsive=False,
@@ -297,10 +297,10 @@ def analysis_server(
             each column has a smaller share of the privacy budget,
             and the accuracy of results will decline.
             """,
-            is_sample_csv,
+            is_demo_csv,
             """
             Not all columns need analysis.
-            With `sample.csv`, you could just select `grade`.
+            With `demo.csv`, you could just select `grade`.
             """,
             responsive=False,
         )
@@ -322,17 +322,17 @@ def analysis_server(
                 responsive=False,
             ),
         )
-        if public_csv_path():
-            row_count_str = str(get_csv_row_count(Path(public_csv_path())))
+        if public_path():
+            row_count_str = str(get_csv_row_count(Path(public_path())))
             return [
                 ui.markdown(
                     f"""
-                    Because you've provided a public CSV,
+                    Because you've provided public data,
                     it *will be read* to generate previews.
 
                     The confidence interval depends on the number of rows.
-                    Your public CSV has {row_count_str} rows,
-                    but if you believe the private CSV will be
+                    Your public data has {row_count_str} rows,
+                    but if you believe the private data will be
                     much larger or smaller, please update.
                     """
                 ),
@@ -370,7 +370,7 @@ def analysis_server(
             column_server(
                 column_id,
                 product=product,
-                public_csv_path=public_csv_path(),
+                public_path=public_path(),
                 name=column_ids_to_names[column_id],
                 contributions=contributions,
                 contributions_entity=contributions_entity,
@@ -384,7 +384,7 @@ def analysis_server(
                 bin_counts=bin_counts,
                 weights=weights,
                 is_tutorial_mode=is_tutorial_mode,
-                is_sample_csv=is_sample_csv,
+                is_demo_csv=is_demo_csv,
                 is_single_column=len(column_ids) == 1,
             )
         return [column_ui(column_id) for column_id in column_ids]
@@ -418,19 +418,24 @@ def analysis_server(
     @render.ui
     def epsilon_ui():
         e_value = epsilon()
-        extra = ""
+        optional_warning = None
         if e_value >= 5:
-            extra = (
-                ": The use of a value this **large** is discouraged "
-                "because it may compromise privacy."
+            optional_warning = warning_md_box(
+                """
+                The use of a value this large is discouraged
+                because high accuracy may compromise privacy.
+                """
             )
         if e_value <= 0.2:
-            extra = (
-                ": The use of a value this **small** is discouraged "
-                "because the additional noise will lower the accuracy of results."
+            optional_warning = ui.markdown(
+                """
+                Small values will better preserve privacy,
+                but as a consequence, statistics will be less accurate.
+                """
             )
         return [
-            ui.markdown(f"Privacy Budget (Epsilon): {e_value}{extra}"),
+            ui.markdown(f"Privacy Budget (Epsilon): {e_value}"),
+            optional_warning,
             tutorial_box(
                 is_tutorial_mode(),
                 """

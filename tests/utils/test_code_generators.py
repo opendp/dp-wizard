@@ -7,7 +7,7 @@ import opendp.prelude as dp
 import polars as pl
 import pytest
 import requests
-from dp_wizard_templates.converters import convert_nb_to_html, convert_py_to_nb
+from dp_wizard_templates.converters import convert_from_notebook, convert_to_notebook
 
 from dp_wizard import opendp_version, package_root
 from dp_wizard.types import ColumnName, CsvInfo, Product, StatisticName
@@ -25,8 +25,6 @@ python_paths = package_root.glob("**/*.py")
 
 @pytest.mark.parametrize("python_path", python_paths, ids=lambda path: path.name)
 def test_no_unparameterized_docs_urls(python_path: Path):
-    if ".local-sessions" in str(python_path):
-        return  # pragma: no cover
     python_code = python_path.read_text()
     assert not re.search(r"docs\.opendp\.org/en/[^O{]", python_code)
 
@@ -108,7 +106,7 @@ hw_grade_bin_expr = (
     )
 
 
-abc_csv_path = str((package_root.parent / "tests/fixtures/abc.csv").absolute())
+abc_path = str((package_root.parent / "tests/fixtures/abc.csv").absolute())
 
 
 def number_lines(text: str):
@@ -156,10 +154,11 @@ plans_all_combos = [
     AnalysisPlan(
         product=product,
         groups=groups,
-        columns=columns,
+        analysis_columns=columns,
+        schema_columns={k: pl.Float32() for k in columns.keys()},
         contributions=contributions,
         contributions_entity="Family",
-        csv_path=abc_csv_path,
+        path=abc_path,
         epsilon=1,
         max_rows=100_000,
     )
@@ -191,7 +190,7 @@ plans_all_combos = [
 # but make sure it's relatively prime so we have coverage.
 mod = 7
 assert len(plans_all_combos) % mod != 0
-plans = [plan for i, plan in enumerate(plans_all_combos) if i % 7 == 0]
+plans = [plan for i, plan in enumerate(plans_all_combos) if i % mod == 0]
 
 
 expected_urls = [
@@ -234,24 +233,19 @@ def test_make_notebook(plan):
             raise ValueError(plan.product)
     assert isinstance(globals[context_global], dp.Context)
 
-    notebook_nb = convert_py_to_nb(notebook_py, "Title placeholder")
-
-    # TODO: clean up upstream, and this simplify this.
-    # https://github.com/opendp/dp-wizard-templates/issues/30
-    import warnings
-
-    import nbformat.warnings
-
-    with warnings.catch_warnings():
-        warnings.simplefilter(
-            action="ignore", category=nbformat.warnings.DuplicateCellId
-        )
-        notebook_html = convert_nb_to_html(notebook_nb)
+    notebook_dict = convert_to_notebook(notebook_py, "Title placeholder")
+    notebook_html = convert_from_notebook(notebook_dict)
     # Parsing HTML with an RE is usually not the right solution,
     # but since these are generated from the markdown,
     # BeautifulSoup seems like overkill.
     urls = set(re.findall(r'<a[^>]+href="(http[^"]+)[^>]+>', notebook_html))
     assert urls <= set(expected_urls)
+
+    assert "tags=" not in notebook_html, "Missing '# +' in jupytext source?"
+    assert set(re.findall(r"celltag_\w+", notebook_html)) == {
+        "celltag_tutorial",
+        "celltag_postprocessing",
+    }, "Typo in tag?"
 
 
 @pytest.mark.parametrize("plan", plans, ids=id_for_plan)
@@ -263,28 +257,61 @@ def test_make_script(plan):
     # https://jupytext.readthedocs.io/en/latest/formats-scripts.html#the-light-format
     assert "# -" not in script
     assert "# +" not in script
+    assert "tags=" not in script
 
     with NamedTemporaryFile(mode="w") as fp:
         fp.write(script)
         fp.flush()
 
         result = subprocess.run(
-            ["python", fp.name, "--csv", abc_csv_path], capture_output=True
+            ["python", fp.name, "--csv", abc_path], capture_output=True
         )
         assert result.returncode == 0
 
 
-def test_pums():
-    csv_path = Path(__file__).parent.parent / "fixtures/pums_1000.csv"
-
-    # The "income" field looks like integers in the first rows,
-    # but farther down there are floats.
-    assert CsvInfo(csv_path).get_schema()[ColumnName("income")] == pl.Float64
+def test_tsv():
+    path = Path(__file__).parent.parent / "fixtures/fake.tsv"
 
     plan = AnalysisPlan(
         product=Product.STATISTICS,
         groups={},
-        columns={
+        analysis_columns={
+            ColumnName("class year"): [
+                AnalysisPlanColumn(
+                    mean.name,
+                    lower_bound=0,
+                    upper_bound=100000,
+                    bin_count=0,
+                    weight=1,
+                )
+            ]
+        },
+        schema_columns={
+            ColumnName("class year"): pl.Int32(),
+        },
+        contributions=1,
+        contributions_entity="Family",
+        path=str(path),
+        epsilon=1,
+        max_rows=1000,
+    )
+    notebook_py = NotebookGenerator(plan, "Note goes here!").make_py()
+    print(number_lines(notebook_py))
+    globals = {}
+    exec(notebook_py, globals)
+
+
+def test_pums():
+    path = Path(__file__).parent.parent / "fixtures/pums_1000.csv"
+
+    # The "income" field looks like integers in the first rows,
+    # but farther down there are floats.
+    assert CsvInfo(path).get_schema()[ColumnName("income")] == pl.Float64
+
+    plan = AnalysisPlan(
+        product=Product.STATISTICS,
+        groups={},
+        analysis_columns={
             ColumnName("income"): [
                 AnalysisPlanColumn(
                     mean.name,
@@ -295,9 +322,12 @@ def test_pums():
                 )
             ]
         },
+        schema_columns={
+            ColumnName("income"): pl.Int32(),
+        },
         contributions=1,
         contributions_entity="Family",
-        csv_path=str(csv_path),
+        path=str(path),
         epsilon=1,
         max_rows=1000,
     )
@@ -305,3 +335,9 @@ def test_pums():
     print(number_lines(notebook_py))
     globals = {}
     exec(notebook_py, globals)
+
+
+@pytest.mark.parametrize("plan", plans, ids=id_for_plan)
+def test_analysis_plan_yaml(plan):
+    # TODO: Support round trips.
+    plan.serialize()

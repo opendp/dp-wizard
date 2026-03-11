@@ -3,12 +3,12 @@ from pathlib import Path
 from htmltools import Tag
 from shiny import App, Inputs, Outputs, Session, reactive, ui
 
-from dp_wizard import package_root
+from dp_wizard import config_root, package_root
 from dp_wizard.shiny.components.icons import tutorial_icon
 from dp_wizard.shiny.panels import (
-    about_panel,
     analysis_panel,
     dataset_panel,
+    faq_panel,
     results_panel,
 )
 from dp_wizard.types import AppState, Product
@@ -16,7 +16,7 @@ from dp_wizard.utils import config
 from dp_wizard.utils.argparse_helpers import CLIInfo
 from dp_wizard.utils.csv_helper import (
     CsvInfo,
-    make_sample_csv,
+    make_demo_csv,
 )
 
 _shiny_root = package_root / "shiny"
@@ -58,7 +58,7 @@ def _make_app_ui(cli_info: CLIInfo) -> Tag:
             ui.include_js(_shiny_root / "vendor/highlight.js/11.11.1/highlight.min.js"),
         ),
         ui.navset_tab(
-            about_panel.about_ui(),
+            faq_panel.about_ui(),
             dataset_panel.dataset_ui(),
             analysis_panel.analysis_ui(),
             results_panel.results_ui(),
@@ -96,22 +96,21 @@ def ctrl_c_reminder() -> None:  # pragma: no cover
 
 def _make_server(cli_info: CLIInfo):
     def server(input: Inputs, output: Outputs, session: Session):  # pragma: no cover
-        if cli_info.is_sample_csv:
+        if cli_info.is_demo_csv:
             initial_contributions = 10
-            initial_private_csv_path = package_root / ".local-config/sample.csv"
-            make_sample_csv(initial_private_csv_path, initial_contributions)
-            csv_info = CsvInfo(Path(initial_private_csv_path))
+            initial_private_path = config_root / "demo.csv"
+            make_demo_csv(initial_private_path, initial_contributions)
+            csv_info = CsvInfo(Path(initial_private_path))
         else:
-            initial_contributions = 1
-            initial_private_csv_path = ""
+            initial_contributions = 0
+            initial_private_path = ""
             csv_info = CsvInfo(None)
 
         initial_product = Product.STATISTICS
 
         state = AppState(
             # CLI options:
-            is_sample_csv=cli_info.is_sample_csv,
-            in_cloud=cli_info.is_cloud_mode,
+            is_demo_csv=cli_info.is_demo_csv,
             qa_mode=cli_info.is_qa_mode,
             # Reactive bools:
             is_tutorial_mode=reactive.value(cli_info.get_is_tutorial_mode()),
@@ -119,13 +118,13 @@ def _make_server(cli_info: CLIInfo):
             is_analysis_defined=reactive.value(False),
             is_released=reactive.value(False),
             # Dataset choices:
-            initial_private_csv_path=str(initial_private_csv_path),
-            private_csv_path=reactive.value(str(initial_private_csv_path)),
-            initial_public_csv_path="",
-            public_csv_path=reactive.value(""),
+            initial_private_path=str(initial_private_path),
+            private_path=reactive.value(str(initial_private_path)),
+            initial_public_path="",
+            public_path=reactive.value(""),
             contributions=reactive.value(initial_contributions),
             contributions_entity=reactive.value("individual"),
-            max_rows=reactive.value("0"),
+            max_rows=reactive.value(0),
             initial_product=initial_product,
             product=reactive.value(initial_product),
             # Analysis choices:
@@ -157,7 +156,7 @@ def _make_server(cli_info: CLIInfo):
             # Do not set state: Nothing downstream needs this.
             config.set_is_dark_mode(dark_mode == "dark")
 
-        about_panel.about_server(input, output, session)
+        faq_panel.about_server(input, output, session)
         dataset_panel.dataset_server(input, output, session, state)
         analysis_panel.analysis_server(input, output, session, state)
         results_panel.results_server(input, output, session, state)
