@@ -258,9 +258,8 @@ def dataset_server(
                 demonstrates how to use the
                 [OpenDP Library](https://docs.opendp.org/).
 
-                (If you don't need these extra help messages,
-                turn them off by toggling the switch in the upper right
-                corner of the window.)
+                (If you don't need this tutorial, turn it off
+                by toggling the switch in the upper right corner.)
                 """,
             ),
         )
