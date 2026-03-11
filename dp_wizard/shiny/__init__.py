@@ -4,7 +4,6 @@ from htmltools import Tag
 from shiny import App, Inputs, Outputs, Session, reactive, ui
 
 from dp_wizard import config_root, package_root
-from dp_wizard.shiny.components.icons import tutorial_icon
 from dp_wizard.shiny.panels import (
     analysis_panel,
     dataset_panel,
