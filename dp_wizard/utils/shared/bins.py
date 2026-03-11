@@ -26,3 +26,21 @@ def make_cut_points(
     # Duplicate values would cause an error in Polars.
     # Use a set to return unique values.
     return sorted({round_2(lower_bound + i * bin_width) for i in range(bin_count + 1)})
+
+
+def make_exponential_cut_points(extreme: float) -> list[int]:
+    """
+    Returns exponentially spaced cut points
+
+    >>> make_exponential_cut_points(500)
+    [0, 1, 10, 100, 1000]
+    >>> make_exponential_cut_points(-100)
+    [-100, -10, -1, 0]
+    """
+    from math import ceil, log10
+
+    log_extreme = ceil(log10(abs(extreme)))
+    cut_points = [0] + [10**exponent for exponent in range(log_extreme + 1)]
+    if extreme < 0:
+        return list(reversed([-point for point in cut_points]))
+    return cut_points
