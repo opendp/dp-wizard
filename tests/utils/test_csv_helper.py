@@ -109,6 +109,11 @@ def test_csv_info_none():
     assert csv_info.get_messages() == []
 
 
+def test_csv_info_no_such_file():
+    csv_info = CsvInfo(Path("no-such-file.csv"))
+    assert csv_info.get_messages() == ["No such file: no-such-file.csv"]
+
+
 def make_sparse_file(path: Path, size_in_mb: int):
     """
     >>> with NamedTemporaryFile() as tmp:

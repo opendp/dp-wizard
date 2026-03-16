@@ -120,7 +120,7 @@ class CsvInfo:
 
         try:
             size = path.stat().st_size
-        except Exception:
+        except Exception:  # pragma: no cover
             self._errors.append(f"Could not stat file: {path}")
             return
         M = 1024 * 1024
