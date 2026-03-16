@@ -1,7 +1,6 @@
 import csv
-import tempfile
 from pathlib import Path
-from tempfile import NamedTemporaryFile
+from tempfile import NamedTemporaryFile, TemporaryDirectory
 
 import polars as pl
 import polars.testing as pl_testing
@@ -88,7 +87,7 @@ csv_fixtures = [
 )
 def test_csv_info(suffix, content_bytes, all, numeric, message_substring, is_error):
     assert message_substring != ""  # programmer error!
-    with tempfile.TemporaryDirectory() as dir:
+    with TemporaryDirectory() as dir:
         path = Path(dir) / f"fake{suffix}"
         path.write_bytes(content_bytes)
         # CsvInfo may write a new, converted, CSV in the directory,
@@ -103,11 +102,49 @@ def test_csv_info(suffix, content_bytes, all, numeric, message_substring, is_err
         assert csv_info.get_is_error() == is_error
 
 
-def test_empty_csv_info():
+def test_csv_info_none():
     csv_info = CsvInfo(None)
     assert csv_info.get_all_column_names() == []
     assert csv_info.get_numeric_column_names() == []
     assert csv_info.get_messages() == []
+
+
+def make_sparse_file(path: Path, size_in_mb: int):
+    """
+    >>> with NamedTemporaryFile() as tmp:
+    ...     path = Path(tmp.name)
+    ...     make_sparse_file(path, 1)
+    ...     print('reported size:', path.stat().st_size)
+    ...     print('blocks used:', path.stat().st_blocks)
+    reported size: 1048576
+    blocks used: 0
+    """
+    f = path.open("ab")
+    f.truncate(size_in_mb * 1024 * 1024)
+    f.close()
+
+
+@pytest.mark.parametrize(
+    "size_in_mb,is_error,message_0",
+    [
+        (1, False, "No numeric columns detected."),
+        (11, False, "Files larger than 10M may be slow to process."),
+        (
+            101,
+            True,
+            "DP Wizard is an interactive tool, and 101M would be too slow. "
+            "DP Wizard is limited to 100M, although "
+            "the OpenDP Library itself doesn't have such a limit.",
+        ),
+    ],
+)
+def test_csv_info_large(size_in_mb, is_error, message_0):
+    with TemporaryDirectory() as dir:
+        path = Path(dir) / "fake.csv"
+        make_sparse_file(path, size_in_mb)
+        csv_info = CsvInfo(path)
+        assert csv_info.get_is_error() == is_error
+        assert csv_info.get_messages()[0] == message_0
 
 
 @pytest.mark.parametrize(  # type: ignore
@@ -142,7 +179,7 @@ def test_datatype_inference(value_datatype):  # type: ignore
 
 
 def test_get_csv_names_mismatch():
-    with tempfile.TemporaryDirectory() as tmp:
+    with TemporaryDirectory() as tmp:
         a_path = Path(tmp) / "a.csv"
         a_path.write_text("a,b,c")
         b_path = Path(tmp) / "b.csv"
@@ -153,7 +190,7 @@ def test_get_csv_names_mismatch():
 
 
 def test_get_csv_row_count():
-    with tempfile.TemporaryDirectory() as tmp:
+    with TemporaryDirectory() as tmp:
         path = Path(tmp) / "a.csv"
         path.write_text("a,b,c\n1,2,3")
         assert get_csv_row_count(path) == 1
@@ -167,9 +204,7 @@ def test_get_csv_row_count():
 # https://github.com/opendp/opendp/issues/2298
 @pytest.mark.parametrize("write_encoding", ["latin1", "utf8"])
 def test_csv_loading(write_encoding):
-    with tempfile.NamedTemporaryFile(
-        mode="w", newline="", encoding=write_encoding
-    ) as fp:
+    with NamedTemporaryFile(mode="w", newline="", encoding=write_encoding) as fp:
         data = {"NAME": ["André"], "AGE": [42]}
         write_lf = pl.DataFrame(data).lazy()
 
