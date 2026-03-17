@@ -131,26 +131,22 @@ def dataset_ui():
         "Select Dataset",
         ui.output_ui("dataset_release_warning_ui"),
         ui.output_ui("welcome_ui"),
-        ui.layout_columns(
-            ui.card(
-                ui.card_header(data_source_icon, "Data Source"),
-                ui.output_ui("csv_upload_ui"),
-                ui.output_ui("max_rows_tutorial_ui"),
-                ui.output_ui("max_rows_input_ui"),
-            ),
-            [
-                ui.card(
-                    ui.card_header(unit_of_protection_icon, "Unit of Protection"),
-                    ui.output_ui("input_entity_ui"),
-                    ui.output_ui("input_contributions_ui"),
-                    ui.output_ui("contributions_validation_ui"),
-                    ui.output_ui("unit_of_protection_python_ui"),
-                ),
-                ui.card(
-                    ui.card_header(product_icon, "Product"),
-                    ui.output_ui("product_ui"),
-                ),
-            ],
+        ui.card(
+            ui.card_header(data_source_icon, "Data Source"),
+            ui.output_ui("csv_upload_ui"),
+            ui.output_ui("max_rows_tutorial_ui"),
+            ui.output_ui("max_rows_input_ui"),
+        ),
+        ui.card(
+            ui.card_header(unit_of_protection_icon, "Unit of Protection"),
+            ui.output_ui("input_entity_ui"),
+            ui.output_ui("input_contributions_ui"),
+            ui.output_ui("contributions_validation_ui"),
+            ui.output_ui("unit_of_protection_python_ui"),
+        ),
+        ui.card(
+            ui.card_header(product_icon, "Product"),
+            ui.output_ui("product_ui"),
         ),
         ui.output_ui("define_analysis_button_ui"),
         value="dataset_panel",
