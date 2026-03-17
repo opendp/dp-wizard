@@ -275,7 +275,6 @@ def dataset_server(
                 else ui.output_ui("input_files_upload_ui")
             ),
             ui.output_ui("csv_message_ui"),
-            ui.output_ui("python_tutorial_ui"),
         ]
 
     @render.ui
@@ -330,13 +329,13 @@ Choose both **Private Data** and **Public Data** {PUBLIC_PRIVATE_TEXT}
         return ui.row(
             ui.input_file(
                 "private_path",
-                "Choose Private Data",
+                "Private Data Source",
                 accept=accept,
                 placeholder=Path(initial_private_path).name,
             ),
             ui.input_file(
                 "public_path",
-                "Choose Public Data",
+                "Public Data Source",
                 accept=accept,
                 placeholder=Path(initial_public_path).name,
             ),
@@ -465,19 +464,6 @@ Choose both **Private Data** and **Public Data** {PUBLIC_PRIVATE_TEXT}
         error = get_contibutions_error(input.contributions())
         if error:
             return warning_md_box(error)
-
-    @render.ui
-    def python_tutorial_ui():
-        return tutorial_box(
-            is_tutorial_mode(),
-            """
-            Along the way, code samples demonstrate
-            how the information you provide is used in the
-            OpenDP Library, and at the end you can download
-            a notebook for the entire calculation.
-            """,
-            responsive=False,
-        )
 
     @reactive.effect
     @reactive.event(input.max_rows)
