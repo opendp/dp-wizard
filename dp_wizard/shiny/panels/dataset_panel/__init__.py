@@ -144,10 +144,21 @@ def dataset_ui():
         ),
         ui.card(
             ui.card_header(unit_of_protection_icon, "Unit of Protection"),
-            ui.output_ui("input_entity_ui"),
-            ui.output_ui("input_contributions_ui"),
-            ui.output_ui("contributions_validation_ui"),
-            ui.output_ui("unit_of_protection_python_ui"),
+            ui.layout_columns(
+                ui.output_ui("input_entity_ui"),
+                ui.output_ui("entity_info_ui"),
+            ),
+            ui.layout_columns(
+                [
+                    ui.output_ui("input_contributions_ui"),
+                    ui.output_ui("contributions_validation_ui"),
+                ],
+                ui.output_ui("input_contributions_help_ui"),
+            ),
+            ui.layout_columns(
+                ui.output_ui("unit_of_protection_python_ui"),
+                [],
+            ),
         ),
         ui.card(
             ui.card_header(product_icon, "Product"),
@@ -381,15 +392,11 @@ Choose both **Private Data** and **Public Data** {PUBLIC_PRIVATE_TEXT}
                 Next, what is the **entity** whose privacy you want to protect?
                 """
             ),
-            ui.layout_columns(
-                ui.input_select(
-                    "entity",
-                    only_for_screenreader("Protect privacy of this entity"),
-                    list(entities.keys()),
-                    selected="👤 Individual",
-                ),
-                ui.output_ui("entity_info_ui"),
-                col_widths=col_widths,  # type: ignore
+            ui.input_select(
+                "entity",
+                only_for_screenreader("Protect privacy of this entity"),
+                list(entities.keys()),
+                selected="👤 Individual",
             ),
         ]
 
@@ -412,26 +419,31 @@ Choose both **Private Data** and **Public Data** {PUBLIC_PRIVATE_TEXT}
                 How many **rows** of your data can {entity_phrase} contribute to?
                 """
             ),
-            tutorial_box(
-                is_tutorial_mode(),
-                """
-                For privacy to be protected, this number needs to an upper bound,
-                even if not all contributors will have this many rows.
-                """,
-                is_demo_csv,
-                """
-                The `demo.csv` simulates 10 assignments
-                over the course of the term for each student,
-                so enter `10` here.
-                """,
-                responsive=False,
-            ),
             ui.input_text(
                 "contributions",
                 only_for_screenreader("Maximum number of rows contributed"),
                 "",
             ),
         ]
+
+    @render.ui
+    def input_contributions_help_ui():
+        return (
+            tutorial_box(
+                is_tutorial_mode(),
+                """
+            For privacy to be protected, this number needs to an upper bound,
+            even if not all contributors will have this many rows.
+            """,
+                is_demo_csv,
+                """
+            The `demo.csv` simulates 10 assignments
+            over the course of the term for each student,
+            so enter `10` here.
+            """,
+                responsive=False,
+            ),
+        )
 
     @reactive.effect
     @reactive.event(input.contributions)
@@ -540,20 +552,21 @@ Choose both **Private Data** and **Public Data** {PUBLIC_PRIVATE_TEXT}
 
     @render.ui
     def product_ui():
-        return [
+        return ui.layout_columns(
+            [
+                ui.markdown(
+                    """
+                    What type of analysis do you want?
+                    """
+                ),
+                ui.input_radio_buttons(
+                    "product",
+                    only_for_screenreader("Type of analysis"),
+                    Product.to_dict(),
+                    selected=str(initial_product.value),
+                ),
+            ],
             ui.markdown(
-                """
-                What type of analysis do you want?
-                """
-            ),
-            ui.input_radio_buttons(
-                "product",
-                only_for_screenreader("Type of analysis"),
-                Product.to_dict(),
-                selected=str(initial_product.value),
-            ),
-            tutorial_box(
-                is_tutorial_mode(),
                 """
                 Although the underlying OpenDP library is very flexible,
                 DP Wizard offers only a few analysis options:
@@ -565,10 +578,9 @@ Choose both **Private Data** and **Public Data** {PUBLIC_PRIVATE_TEXT}
                   selected columns, and the correlations between columns.
                   This is less accurate than calculating the desired
                   statistics directly, but can be easier to work with downstream.
-                """,
-                responsive=False,
+                """
             ),
-        ]
+        )
 
     @reactive.effect
     @reactive.event(input.product)

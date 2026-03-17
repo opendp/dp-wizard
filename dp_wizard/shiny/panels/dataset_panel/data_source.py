@@ -1,4 +1,3 @@
-from dp_wizard import package_root
 from dp_wizard.shiny.components.outputs import (
     hide_if,
     warning_md_box,
