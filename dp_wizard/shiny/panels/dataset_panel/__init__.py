@@ -133,9 +133,14 @@ def dataset_ui():
         ui.output_ui("welcome_ui"),
         ui.card(
             ui.card_header(data_source_icon, "Data Source"),
-            ui.output_ui("csv_upload_ui"),
-            ui.output_ui("max_rows_tutorial_ui"),
-            ui.output_ui("max_rows_input_ui"),
+            ui.layout_columns(
+                ui.output_ui("csv_upload_ui"),
+                ui.output_ui("csv_upload_help_ui"),
+            ),
+            ui.layout_columns(
+                ui.output_ui("max_rows_input_ui"),
+                ui.output_ui("max_rows_tutorial_ui"),
+            ),
         ),
         ui.card(
             ui.card_header(unit_of_protection_icon, "Unit of Protection"),
@@ -265,6 +270,18 @@ def dataset_server(
     def csv_upload_ui():
         return [
             (
+                ui.markdown("Private Data: `demo.csv`")
+                if is_demo_csv
+                else ui.output_ui("input_files_upload_ui")
+            ),
+            ui.output_ui("csv_message_ui"),
+            ui.output_ui("python_tutorial_ui"),
+        ]
+
+    @render.ui
+    def csv_upload_help_ui():
+        return [
+            (
                 warning_md_box(
                     """
                     So that private data is not accidentally uploaded,
@@ -286,12 +303,8 @@ Choose both **Private Data** and **Public Data** {PUBLIC_PRIVATE_TEXT}
                         """
                     ),
                     ui.output_ui("input_files_tutorial_ui"),
-                    ui.output_ui("input_files_upload_ui"),
                 ]
             ),
-            ui.output_ui("csv_message_ui"),
-            data_source.context_code_sample(),
-            ui.output_ui("python_tutorial_ui"),
         ]
 
     @render.ui
@@ -414,14 +427,10 @@ Choose both **Private Data** and **Public Data** {PUBLIC_PRIVATE_TEXT}
                 """,
                 responsive=False,
             ),
-            ui.layout_columns(
-                ui.input_text(
-                    "contributions",
-                    only_for_screenreader("Maximum number of rows contributed"),
-                    "",
-                ),
-                [],  # Column placeholder
-                col_widths=col_widths,  # type: ignore
+            ui.input_text(
+                "contributions",
+                only_for_screenreader("Maximum number of rows contributed"),
+                "",
             ),
         ]
 
@@ -484,7 +493,6 @@ Choose both **Private Data** and **Public Data** {PUBLIC_PRIVATE_TEXT}
     @render.ui
     def max_rows_tutorial_ui():
         return (
-            ui.markdown("What is the **maximum row count** of your CSV?"),
             tutorial_box(
                 is_tutorial_mode(),
                 """
@@ -507,6 +515,7 @@ Choose both **Private Data** and **Public Data** {PUBLIC_PRIVATE_TEXT}
     @render.ui
     def max_rows_input_ui():
         return (
+            ui.markdown("What is the **maximum row count** of your CSV?"),
             ui.layout_columns(
                 ui.input_text(
                     "max_rows",
