@@ -292,7 +292,7 @@ def dataset_server(
     def csv_upload_help_ui():
         return [
             (
-                warning_md_box(
+                ui.markdown(
                     """
                     So that private data is not accidentally uploaded,
                     the demo provides a private CSV, and does not support

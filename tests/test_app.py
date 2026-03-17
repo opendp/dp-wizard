@@ -67,7 +67,7 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
 
     # Now upload:
     path = package_root.parent / "tests/fixtures/fake.tsv"
-    page.get_by_label("Choose Public Data").set_input_files(path.resolve())
+    page.get_by_label("Public Data Source").set_input_files(path.resolve())
 
     # Toggle tutorial: (CSV should not clear!)
     page.locator("#tutorial_mode").click()
@@ -256,7 +256,7 @@ def test_local_app_downloads(
     screenshot(page, "select-dataset")
 
     path = package_root.parent / "tests/fixtures/fake.tsv"
-    page.get_by_label("Choose Public Data").set_input_files(path.resolve())
+    page.get_by_label("Public Data Source").set_input_files(path.resolve())
 
     page.get_by_label("DP Synthetic Data").click()
 
