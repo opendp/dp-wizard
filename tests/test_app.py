@@ -30,6 +30,7 @@ def test_qa_app(page: Page, qa_app: ShinyAppProc):  # pragma: no cover
     page.goto(qa_app.url)
 
     page.locator("#max_rows").fill("10000")
+    page.locator("#contributions").fill("10")
     page.get_by_role("button", name="Define Analysis").click()
 
     page.locator(".selectize-input").nth(0).click()
@@ -51,6 +52,7 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     page.goto(local_app.url)
     expect(page).to_have_title("DP Wizard")
     page.locator("#max_rows").fill("10000")
+    page.locator("#contributions").fill("10")
     expect(page.get_by_text(pick_dataset_text)).to_be_visible()
     expect(page.get_by_text(perform_analysis_text)).not_to_be_visible()
     expect(page.get_by_text(download_results_text)).not_to_be_visible()
@@ -75,7 +77,12 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     # "assert define_analysis_button.is_enabled()" has spurious errors.
     # https://github.com/opendp/dp-wizard/issues/221
     page.locator("#contributions").fill("0")
-    expect(page.get_by_text("Rows per contributor must be at least 1")).to_be_visible()
+    expect(
+        page.get_by_text(
+            "Rows per contributor should not be less than 1: "
+            "This value is an upper bound on contributions."
+        )
+    ).to_be_visible()
     expected_error = (
         "Specify CSV, unit of protection, and maximum row count before proceeding."
     )
@@ -83,7 +90,7 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
 
     page.locator("#contributions").fill("2")
     expect(
-        page.get_by_text("Rows per contributor must be at least 1")
+        page.get_by_text("Rows per contributor should not be less than 1")
     ).not_to_be_visible()
     expect(page.get_by_text(expected_error)).not_to_be_visible()
 
@@ -237,6 +244,7 @@ def test_local_app_downloads(
         page.locator("#tutorial_mode").click()
 
     page.locator("#max_rows").fill("10000")
+    page.locator("#contributions").fill("10")
     expect(page.get_by_text(dataset_release_warning)).not_to_be_visible()
     page.get_by_role("tab", name="Define Analysis").click()
     expect(page.get_by_text(analysis_requirements_warning)).to_be_visible()

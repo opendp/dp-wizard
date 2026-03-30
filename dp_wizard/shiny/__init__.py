@@ -102,7 +102,7 @@ def _make_server(cli_info: CLIInfo):
             make_demo_csv(initial_private_path, initial_contributions)
             csv_info = CsvInfo(Path(initial_private_path))
         else:
-            initial_contributions = 1
+            initial_contributions = 0
             initial_private_path = ""
             csv_info = CsvInfo(None)
 
@@ -124,7 +124,7 @@ def _make_server(cli_info: CLIInfo):
             public_path=reactive.value(""),
             contributions=reactive.value(initial_contributions),
             contributions_entity=reactive.value("individual"),
-            max_rows=reactive.value("0"),
+            max_rows=reactive.value(0),
             initial_product=initial_product,
             product=reactive.value(initial_product),
             # Analysis choices:

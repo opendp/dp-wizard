@@ -15,7 +15,7 @@
 
 This project is configured so there are two different install possibilities from pypi:
 - `pip install 'dp_wizard[pins]'` pins all dependencies, and is the best route for most users.
-- `pip install dp_wizard` does not pin dependencies, and is best if you're using `dp_wizard` as a library.
+- Without `[pins]`, dependencies are not pinned. This is best if you're using `dp_wizard` as a library in a larger project.
 
 ### Posit Cloud
 
@@ -33,7 +33,7 @@ Branch names should be of the form `NNNN-short-description`, where `NNNN` is the
 
 Add developer-only dependencies in `requirements-dev.in`; Add other dependencies in `requirements.in`. After an edit to either file run `scripts/requirements.py` to install the new dependency locally and update `pyproject.toml`.
 
-A Github [project board](https://github.com/orgs/opendp/projects/10/views/2) provides an overview of the issues and PRs.
+A GitHub [project board](https://github.com/orgs/opendp/projects/10/views/2) provides an overview of the issues and PRs.
 When PRs are [Ready for Review](https://github.com/orgs/opendp/projects/10/views/2?filterQuery=status%3A%22Ready+for+Review%22) they should be flagged as such so reviewers can find them.
 
 ```mermaid
