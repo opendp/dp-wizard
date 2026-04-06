@@ -290,32 +290,30 @@ def dataset_server(
 
     @render.ui
     def csv_upload_help_ui():
-        return [
-            (
-                ui.markdown(
-                    """
+        return (
+            ui.markdown(
+                """
                     So that private data is not accidentally uploaded,
                     the demo provides a private CSV, and does not support
                     data upload.
 
-                    Run DP Wizard locally to process your own data.
-                    """
-                )
-                if is_demo_csv
-                else [
-                    ui.markdown(
-                        f"""
+                        Run DP Wizard locally to process your own data.
+                        """
+            )
+            if is_demo_csv
+            else [
+                ui.markdown(
+                    f"""
 Choose **Private Data** {PRIVATE_TEXT}
 
 Choose **Public Data** {PUBLIC_TEXT}
 
 Choose both **Private Data** and **Public Data** {PUBLIC_PRIVATE_TEXT}
                         """
-                    ),
-                    ui.output_ui("input_files_tutorial_ui"),
-                ]
-            ),
-        ]
+                ),
+                ui.output_ui("input_files_tutorial_ui"),
+            ]
+        )
 
     @render.ui
     def input_files_tutorial_ui():
