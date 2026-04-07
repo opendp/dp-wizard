@@ -12,8 +12,8 @@ Options for running DP Wizard:
 
 - No install [online demo](https://mccalluc-dp-wizard.share.connect.posit.cloud/): Does not support data upload.
 - Install from [Docker](https://hub.docker.com/repository/docker/mccalluc/dp-wizard/general): `docker run -p 8000:8000 mccalluc/dp-wizard`
-- Install from [PyPI](https://pypi.org/project/dp-wizard/): `pip install 'dp-wizard[app]'; dp-wizard`
-- Install from [source](https://github.com/opendp/dp-wizard): See developer instructions.
+- Install from [PyPI](https://pypi.org/project/dp-wizard/): `pip install 'dp_wizard[pins]'; dp-wizard`
+- Install from [source](https://github.com/opendp/dp-wizard): See [developer instructions](https://github.com/opendp/dp-wizard/blob/main/README.md#development).
 
 See the [FAQ](https://github.com/opendp/dp-wizard/blob/main/dp_wizard/FAQ.md) for more information.
 
@@ -102,7 +102,7 @@ You can now install dependencies, and the application itself, and start a tutori
 $ pip install -r requirements-dev.txt
 $ pre-commit install
 $ playwright install
-$ pip install --editable .
+$ pip install --editable '.[pins]'
 $ dp-wizard --demo
 ```
 
@@ -146,15 +146,21 @@ PR conventions and the release process are covered in [README-TEAM.md](README-TE
 
 (See also the [CHANGELOG](CHANGELOG.md).)
 
+2026-03-11: [Presentation for GREI (Generalist Repository Ecosystem Initiative)](https://docs.google.com/presentation/d/1sFwcfp5GO5UOIHSER7tGwWrn9RMbWOlecLrukZ6W-cg/edit)
+
+2026-02-10: [Blog post for v0.8](https://opendp.org/2026/02/10/announcing-dp-wizard-v0-8/)
+
+2025-11-13: [Blog post for v0.6](https://opendp.org/2025/11/13/announcing-dp-wizard-v0-6/)
+
 2025-09-23: [Blog post for v0.5](https://opendp.org/2025/09/23/announcing-dp-wizard-v0-5/)
 
 2025-08-07: [DP Wizard Templates: Code templates and notebook generation](https://opendp.github.io/dp-wizard-templates/)
 
-2025-05-07: [Slides for 50 minute presentation at 2025 Harvard IT Summit](https://opendp.github.io/harvard-it-summit-2025)
+2025-05-07: [Presentation at 2025 Harvard IT Summit](https://opendp.github.io/harvard-it-summit-2025)
 
 2025-04-14: [Blog post for v0.3](https://opendp.org/2025/04/14/announcing-opendp-library-0-13-and-dp-wizard/)
 
-2025-04-11: [Slides for 5 minute mini-talk on v0.3.0 at ABSURD (Annual Boston Security Usability Research Day)](https://docs.google.com/presentation/d/1g1c5ksG9sN8A_qWW9nFmFFZ6dSCkUAmL6_cUahi3VPA/edit#slide=id.g34c5f4bdc6a_0_0)
+2025-04-11: [Mini-talk on v0.3.0 at ABSURD (Annual Boston Security Usability Research Day)](https://docs.google.com/presentation/d/1g1c5ksG9sN8A_qWW9nFmFFZ6dSCkUAmL6_cUahi3VPA/edit#slide=id.g34c5f4bdc6a_0_0)
 
 2024-12-13: [Blog post for initial release](https://opendp.org/blog/dp-wizard-easy-way-get-started-differential-privacy-and-opendp)
 

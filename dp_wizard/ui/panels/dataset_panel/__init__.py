@@ -269,15 +269,18 @@ def dataset_server(
     def csv_upload_ui():
         return [
             (
-                warning_md_box(
-                    """
-                    So that private data is not accidentally uploaded,
-                    the demo provides a private CSV, and does not support
-                    data upload.
+                [
+                    ui.markdown("Private Data: `demo.csv`"),
+                    warning_md_box(
+                        """
+                        So that private data is not accidentally uploaded,
+                        the demo provides a private CSV, and does not support
+                        data upload.
 
-                    Run DP Wizard locally to process your own data.
-                    """
-                )
+                        Run DP Wizard locally to process your own data.
+                        """
+                    ),
+                ]
                 if is_demo_csv
                 else [
                     ui.markdown(
