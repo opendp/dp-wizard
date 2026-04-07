@@ -21,7 +21,24 @@ diffimg
 hypothesis
 
 # Dependabot warnings:
-filelock>=3.20.1
+# While our use of these libraries is limited,
+# and requiring a higher version could inconvenience users,
+# the safest route is to require versions that include the security fixes.
+filelock>=3.20.3
+fonttools>=4.60.2
+pillow>=11.3.0
+requests>=2.32.4
+starlette>=0.49.1
+tornado>=6.5
+urllib3>=2.6.3
+virtualenv>=20.36.1
+wheel>=0.46.2
+
+
+# TODO: Upgrade when fix is available.
+# https://github.com/opendp/dp-wizard/security/dependabot/35
+# nbconvert
+
 
 # App dependencies:
 -r requirements.in
