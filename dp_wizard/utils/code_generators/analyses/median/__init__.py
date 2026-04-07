@@ -21,10 +21,10 @@ root = get_template_root(__file__)
 
 
 def make_query(code_gen, identifier, accuracy_name, stats_name):
-    def template(GROUP_NAMES, stats_context, EXPR_NAME):
+    def template(dp, GROUP_NAMES, stats_context, EXPR_NAME):
         groups = GROUP_NAMES
         QUERY_NAME = (
-            stats_context.query().group_by(groups).agg(EXPR_NAME).WITH_KEYS
+            stats_context.query().group_by(groups).agg(dp.len(), EXPR_NAME).WITH_KEYS
             if groups
             else stats_context.query().select(EXPR_NAME)
         )

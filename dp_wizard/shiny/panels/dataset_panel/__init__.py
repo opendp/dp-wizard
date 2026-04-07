@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 from typing import Optional
 
@@ -34,57 +35,95 @@ OTHER = "Other"
 accept = [".csv", ".tsv", ".tab"]
 
 
-def get_pos_int_error(
-    number_str, minimum=MIN_ROW_COUNT, maximum=MAX_ROW_COUNT
+def int_or_zero(number_str: str) -> int:
+    """
+    >>> int_or_zero("1")
+    1
+    >>> int_or_zero("One")
+    0
+
+    This is not a general-purpose function:
+    If use changes, handle more cases.
+
+    >>> int_or_zero("1.0")
+    0
+    """
+    try:
+        number = int(number_str)
+    except (TypeError, ValueError, OverflowError):
+        return 0
+    return number
+
+
+def get_str_int_error(
+    number_str: str,
+    minimum: int,
+    maximum: int,
+    min_message: str,
+    max_message: str,
 ) -> str | None:
     """
-    If the inputs are numeric, I think shiny converts
-    any strings that can't be parsed to numbers into None,
-    so the "should be a number" errors may not be seen in practice.
-    >>> get_pos_int_error('100')
-    >>> get_pos_int_error('0')
-    'should not be less than 100: For very small data sets, too much noise would be required'
-    >>> get_pos_int_error('1_000_000_001')
-    'should not be greater than 1,000,000,000: Larger values may cause overflow during calcuations'
-    >>> get_pos_int_error(None)
+    >>> get_str_int_error("", 1, 10, "low", "high")
     'is required'
-    >>> get_pos_int_error('')
-    'is required'
-    >>> get_pos_int_error('100.1')
+    >>> get_str_int_error("ABC", 1, 10, "low", "high")
     'should be an integer'
-    """  # noqa: B950
-    if number_str is None or number_str == "":
+    >>> get_str_int_error("0", 1, 10, "low", "high")
+    'should not be less than 1: low'
+    >>> get_str_int_error("11", 1, 10, "low", "high")
+    'should not be greater than 10: high'
+    """
+    if number_str == "":
         return "is required"
     try:
         number = int(number_str)
     except (TypeError, ValueError, OverflowError):
         return "should be an integer"
     if number < minimum:
-        return (
-            f"should not be less than {minimum:,}: "
-            "For very small data sets, too much noise would be required"
-        )
+        min_message = re.sub(r"\s+", " ", min_message).strip()
+        return f"should not be less than {minimum:,}: {min_message}"
     if number > maximum:
-        return (
-            f"should not be greater than {maximum:,}: "
-            "Larger values may cause overflow during calcuations"
-        )
+        max_message = re.sub(r"\s+", " ", max_message).strip()
+        return f"should not be greater than {maximum:,}: {max_message}"
     return None
 
 
-def get_row_count_errors(max_rows) -> list[str]:
+def get_max_rows_error(number_str) -> str | None:
     """
-    >>> get_row_count_errors(100)
-    []
-    >>> get_row_count_errors('xyz')
-    ['Maximum row count should be an integer.']
-    >>> get_row_count_errors(None)
-    ['Maximum row count is required.']
+    >>> get_max_rows_error(100)
+    >>> get_max_rows_error(99)
+    'Maximum row count should not be less than 100: For very small data sets, ...'
     """
-    messages = []
-    if error := get_pos_int_error(max_rows):
-        messages.append(f"Maximum row count {error}.")
-    return messages
+    message = get_str_int_error(
+        number_str=number_str,
+        minimum=MIN_ROW_COUNT,
+        maximum=MAX_ROW_COUNT,
+        min_message="For very small data sets, too much noise would be required",
+        max_message="Larger values may cause overflow during calcuations",
+    )
+    if message:
+        return f"Maximum row count {message}."
+
+
+def get_contibutions_error(number_str) -> str | None:
+    """
+    >>> get_contibutions_error("100")
+    >>> get_contibutions_error("101")
+    "... should not be greater than 100: Because the noise will be scaled ..."
+    """
+    message = get_str_int_error(
+        number_str=number_str,
+        minimum=1,
+        maximum=MAX_CONTRIBUTIONS,
+        min_message="This value is an upper bound on contributions",
+        max_message="""
+            Because the noise will be scaled by this number,
+            it is much better to aggregate during preprocessing
+            or to use OpenDP's truncation in your code
+            than to use a large value here.
+        """,
+    )
+    if message:
+        return f"Rows per contributor {message}."
 
 
 def dataset_ui():
@@ -96,8 +135,8 @@ def dataset_ui():
             ui.card(
                 ui.card_header(data_source_icon, "Data Source"),
                 ui.output_ui("csv_upload_ui"),
-                ui.output_ui("row_count_bounds_tutorial_ui"),
-                ui.output_ui("row_count_bounds_input_ui"),
+                ui.output_ui("max_rows_tutorial_ui"),
+                ui.output_ui("max_rows_input_ui"),
             ),
             [
                 ui.card(
@@ -219,9 +258,8 @@ def dataset_server(
                 demonstrates how to use the
                 [OpenDP Library](https://docs.opendp.org/).
 
-                (If you don't need these extra help messages,
-                turn them off by toggling the switch in the upper right
-                corner of the window.)
+                (If you don't need this tutorial, turn it off
+                by toggling the switch in the upper right corner.)
                 """,
             ),
         )
@@ -230,15 +268,18 @@ def dataset_server(
     def csv_upload_ui():
         return [
             (
-                warning_md_box(
-                    """
-                    So that private data is not accidentally uploaded,
-                    the demo provides a private CSV, and does not support
-                    data upload.
+                [
+                    ui.markdown("Private Data: `demo.csv`"),
+                    warning_md_box(
+                        """
+                        So that private data is not accidentally uploaded,
+                        the demo provides a private CSV, and does not support
+                        data upload.
 
-                    Run DP Wizard locally to process your own data.
-                    """
-                )
+                        Run DP Wizard locally to process your own data.
+                        """
+                    ),
+                ]
                 if is_demo_csv
                 else [
                     ui.markdown(
@@ -380,12 +421,10 @@ Choose both **Private Data** and **Public Data** {PUBLIC_PRIVATE_TEXT}
                 responsive=False,
             ),
             ui.layout_columns(
-                ui.input_numeric(
+                ui.input_text(
                     "contributions",
                     only_for_screenreader("Maximum number of rows contributed"),
-                    contributions(),
-                    min=1,
-                    max=MAX_CONTRIBUTIONS,
+                    "",
                 ),
                 [],  # Column placeholder
                 col_widths=col_widths,  # type: ignore
@@ -395,7 +434,7 @@ Choose both **Private Data** and **Public Data** {PUBLIC_PRIVATE_TEXT}
     @reactive.effect
     @reactive.event(input.contributions)
     def _on_contributions_change():
-        contributions.set(input.contributions())
+        contributions.set(int_or_zero(input.contributions()))
 
     @reactive.effect
     @reactive.event(input.entity)
@@ -404,42 +443,25 @@ Choose both **Private Data** and **Public Data** {PUBLIC_PRIVATE_TEXT}
 
     @reactive.calc
     def contributions_entity_calc() -> str:
+        # The "[2:]" removes the leading emoji and space.
         return input.entity()[2:].lower().strip()
 
     @reactive.effect
     def set_is_dataset_selected():
         info = csv_info()
         is_dataset_selected.set(
-            not contributions_message()
+            not get_contibutions_error(input.contributions())
             and not info.get_is_error()
             and len(info.get_all_column_names()) > 0
-            and not get_row_count_errors(max_rows())
+            and not get_max_rows_error(input.max_rows())
             and not csv_column_mismatch_calc()
         )
 
-    @reactive.calc
-    def contributions_message():
-        contributions = input.contributions()
-        assert isinstance(contributions, int)
-        if contributions < 1:
-            return "Rows per contributor must be at least 1."
-        if contributions > MAX_CONTRIBUTIONS:
-            return f"""
-                Rows per contributor limited to {MAX_CONTRIBUTIONS}.
-                Because the noise will be scaled by this number,
-                it is much better to aggregate during preprocessing
-                or to use OpenDP's truncation in your code
-                than to use a large value here.
-                """
-        return ""
-
     @render.ui
     def contributions_validation_ui():
-        message = contributions_message()
-        return hide_if(
-            not message,
-            warning_md_box(message),
-        )
+        error = get_contibutions_error(input.contributions())
+        if error:
+            return warning_md_box(error)
 
     @render.ui
     def python_tutorial_ui():
@@ -457,18 +479,18 @@ Choose both **Private Data** and **Public Data** {PUBLIC_PRIVATE_TEXT}
     @reactive.effect
     @reactive.event(input.max_rows)
     def _on_max_rows_change():
-        max_rows.set(input.max_rows())
+        max_rows.set(int_or_zero(input.max_rows()))
 
     @render.ui
-    def optional_row_count_error_ui():
-        error_md = "\n".join(f"- {error}" for error in get_row_count_errors(max_rows()))
+    def max_rows_validation_ui():
+        error_md = get_max_rows_error(input.max_rows())
         if error_md:
             return warning_md_box(error_md)
 
     @render.ui
-    def row_count_bounds_tutorial_ui():
+    def max_rows_tutorial_ui():
         return (
-            ui.markdown("What is the **maximum row count** of your CSV?"),
+            ui.markdown("What is the **maximum row count** of your data source?"),
             tutorial_box(
                 is_tutorial_mode(),
                 """
@@ -489,18 +511,18 @@ Choose both **Private Data** and **Public Data** {PUBLIC_PRIVATE_TEXT}
         )
 
     @render.ui
-    def row_count_bounds_input_ui():
+    def max_rows_input_ui():
         return (
             ui.layout_columns(
                 ui.input_text(
                     "max_rows",
-                    only_for_screenreader("Maximum number of rows in CSV"),
-                    "0",
+                    only_for_screenreader("Maximum number of rows in data source"),
+                    "",
                 ),
                 [],  # column placeholder
                 col_widths=col_widths,  # type: ignore
             ),
-            ui.output_ui("optional_row_count_error_ui"),
+            ui.output_ui("max_rows_validation_ui"),
         )
 
     @render.ui
@@ -511,10 +533,8 @@ Choose both **Private Data** and **Public Data** {PUBLIC_PRIVATE_TEXT}
             return button
         return [
             button,
-            """
-            Specify CSV, unit of protection,
-            and maximum row count before proceeding.
-            """,
+            "Specify data source, unit of protection, "
+            "and maximum row count before proceeding.",
         ]
 
     @render.ui

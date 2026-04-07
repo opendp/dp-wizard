@@ -415,8 +415,8 @@ Then:
 <td>
 
 - 1: On "Select Dataset":
-    - Under "CSV Columns", enter `grade`.
-    - Leave the "Unit of Protection" at 1.
+    - A demo CSV is already provided.
+    - Leave the "Unit of Protection" at 10.
     - Click "Define Analysis".
 
 </td>
