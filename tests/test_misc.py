@@ -84,6 +84,7 @@ def get_file_paths() -> list[Path]:
         for path in package_root.parent.iterdir()
         if not (
             path.match("*venv*")
+            or path.name.startswith(".coverage")
             or path.name
             in [
                 "docs",
