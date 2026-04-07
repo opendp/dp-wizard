@@ -490,7 +490,7 @@ Choose both **Private Data** and **Public Data** {PUBLIC_PRIVATE_TEXT}
     @render.ui
     def max_rows_tutorial_ui():
         return (
-            ui.markdown("What is the **maximum row count** of your CSV?"),
+            ui.markdown("What is the **maximum row count** of your data source?"),
             tutorial_box(
                 is_tutorial_mode(),
                 """
@@ -516,7 +516,7 @@ Choose both **Private Data** and **Public Data** {PUBLIC_PRIVATE_TEXT}
             ui.layout_columns(
                 ui.input_text(
                     "max_rows",
-                    only_for_screenreader("Maximum number of rows in CSV"),
+                    only_for_screenreader("Maximum number of rows in data source"),
                     "",
                 ),
                 [],  # column placeholder
@@ -533,10 +533,8 @@ Choose both **Private Data** and **Public Data** {PUBLIC_PRIVATE_TEXT}
             return button
         return [
             button,
-            """
-            Specify CSV, unit of protection,
-            and maximum row count before proceeding.
-            """,
+            "Specify data source, unit of protection, "
+            "and maximum row count before proceeding.",
         ]
 
     @render.ui

@@ -51,7 +51,7 @@ options:
   --no_browser  By default, a browser is started; Enable this for no browser.
   --reload      Enable to watch source directory and reload on changes.
 
-Unless you have set "--demo", you will specify a CSV inside the application.
+Unless you have set "--demo", you will specify a CSV or TSV inside the application.
 
 Provide a "Private Data" if you only have a private data set, and want to
 make a release from it: The preview visualizations will only use
@@ -61,7 +61,7 @@ read until the release.
 Provide a "Public Data" if you have a public data set, and are curious how
 DP can be applied: The preview visualizations will use your public data.
 
-Provide both if you have two CSVs with the same structure.
+Provide both if you have two CSVs or TSVs with the same structure.
 Perhaps the public data is older and no longer sensitive. Preview
 visualizations will be made with the public data, but the release will
 be made with private data.
