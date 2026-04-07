@@ -1,7 +1,7 @@
 ### What does DP Wizard do?
 
 DP Wizard guides you through the application of differential privacy.
-After selecting a local CSV, you'll be prompted to describe the analysis you need.
+After selecting a local CSV or TSV, you'll be prompted to describe the analysis you need.
 Output options include:
 - A Jupyter notebook which demonstrates how to use
 the [OpenDP Library](https://docs.opendp.org/).
@@ -14,7 +14,7 @@ the [OpenDP Library](https://docs.opendp.org/).
 DP Wizard (or differential privacy more generally) is not an all-purpose privacy filter:
 It requires data of a particular form for its privacy guarantees to be valid.
 
-- **Tabular data**: While DP on other kinds of data is an active area of research (graphs or text, for example), DP Wizard is limited to CSVs.
+- **Tabular data**: While DP on other kinds of data is an active area of research (graphs or text, for example), DP Wizard is limited to CSVs and TSVs.
 - **Field / record structure**: Rows should represent records, and columns should represent fields.
 - **Individuals, not aggregates**: Further, each row should be related to a single entity whose privacy you want to protect:
 If the data has already been aggregated to a higher level, DP Wizard is not the right tool.

@@ -667,8 +667,8 @@ href="https://mccalluc-dp-wizard.share.connect.posit.cloud/"><code>tinyurl.com/d
 <ul>
 <li>1: On “Select Dataset”:
 <ul>
-<li>Under “CSV Columns”, enter <code>grade</code>.</li>
-<li>Leave the “Unit of Protection” at 1.</li>
+<li>A demo CSV is already provided.</li>
+<li>Leave the “Unit of Protection” at 10.</li>
 <li>Click “Define Analysis”.</li>
 </ul></li>
 </ul>
@@ -797,7 +797,7 @@ budget, and set the weight for each query under that overall budget.</p>
 &gt;&gt;&gt;
 &gt;&gt;&gt; privacy_loss = dp.loss_of(
 ...     epsilon=1.0,
-...     delta=1 / max(1e7, 100000),
+...     delta=0,  # or 1 / max(1e7, 100000),
 ... )
 &gt;&gt;&gt;
 &gt;&gt;&gt; # See the OpenDP Library docs for more on Context:
@@ -813,7 +813,15 @@ budget, and set the weight for each query under that overall budget.</p>
 ...     split_by_weights=[  # With only one query, the entire budget is allocated to that query:
 ...         1,  # grade
 ...     ],
-...     margins=[],
+...     margins=[
+...         dp.polars.Margin(
+...             by=list({}.keys()),
+...             invariant=&quot;keys&quot;,
+...             max_length=100000,
+...             max_groups=100,
+...         ),
+...         dp.polars.Margin(by=([&quot;grade_bin&quot;] + list({}.keys())), invariant=&quot;keys&quot;),
+...     ],
 ... )
 </code></pre>
 </div>

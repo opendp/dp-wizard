@@ -5,7 +5,6 @@ from shiny import App, Inputs, Outputs, Session, reactive, ui
 
 from dp_wizard import config_root, package_root
 from dp_wizard.types import AppState, Product
-from dp_wizard.ui.components.icons import tutorial_icon
 from dp_wizard.ui.panels import (
     analysis_panel,
     dataset_panel,
@@ -67,15 +66,14 @@ def _make_app_ui(cli_info: CLIInfo) -> Tag:
                 ui.input_switch(
                     "tutorial_mode",
                     ui.tooltip(
-                        tutorial_icon,
+                        "Tutorial",
                         """
-                        Tutorial mode walks you through the analysis process
+                        The tutorial walks you through the process
                         and provides extra help along the way.
                         """,
-                        placement="right",
                     ),
                     value=_get_is_tutorial_mode(cli_info),
-                    width="4em",
+                    width="7em",
                 )
             ),
             ui.nav_control(
