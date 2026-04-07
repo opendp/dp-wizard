@@ -226,9 +226,6 @@ def make_privacy_unit_block(
 
 def make_privacy_loss_block(pure: bool, epsilon: float, max_rows: int):
     """
-    Comments in the *pure* privacy loss block reference synthetic data generation
-    ("cuts dict"), so don't use "pure=True" for stats code!
-
     >>> print(
     ...     'pure DP: ',
     ...     make_privacy_loss_block(pure=True, epsilon=1, max_rows=1000)
@@ -249,8 +246,8 @@ def make_privacy_loss_block(pure: bool, epsilon: float, max_rows: int):
             privacy_loss = dp.loss_of(  # noqa: F841
                 # EPSILON_COMMENT_BLOCK
                 epsilon=EPSILON,
-                # If your columns don't match your cuts dict,
-                # you will also need to provide a very small "delta" value.
+                # Not necessary in this case,
+                # but other analyses require a very small "delta" value.
                 # https://docs.opendp.org/en/OPENDP_V_VERSION/getting-started/tabular-data/grouping.html#Stable-Keys
                 delta=0,  # or 1 / max(1e7, MAX_ROWS),
             )

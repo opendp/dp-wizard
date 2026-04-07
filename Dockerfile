@@ -40,7 +40,7 @@ COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 
 COPY . .
-RUN pip install --editable '.[app]'
+RUN pip install --editable '.[pins]'
 
 # TODO: Follow best practices!
 
