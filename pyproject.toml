@@ -4,7 +4,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "dp_wizard"
-authors = [{name = "The OpenDP Project", email = "info@opendp.org"}]
+authors = [{name = "The OpenDP Project", email = "contact@opendp.org"}]
 readme = "README-PYPI.md"
 license = {file = "LICENSE"}
 classifiers = [
