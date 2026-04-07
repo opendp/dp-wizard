@@ -86,6 +86,7 @@ def get_file_paths() -> list[Path]:
             path.match("*venv*")
             or path.name
             in [
+                "build",
                 "docs",
                 ".git",
                 ".DS_Store",

@@ -1,39 +1,7 @@
-from dp_wizard import package_root
 from dp_wizard.shiny.components.outputs import (
-    code_sample,
     hide_if,
     warning_md_box,
 )
-from dp_wizard.utils.code_generators import DefaultsTemplate
-
-
-def context_code_sample():  # pragma: no cover
-    return code_sample(
-        "Context",
-        DefaultsTemplate(
-            # NOTE: If stats vs. synth is moved to the top of the flow,
-            # then we can show the appropriate template here.
-            "stats_context",
-            package_root / "utils/code_generators/no-tests",
-        )
-        .fill_values(CSV_PATH="demo.csv")
-        .fill_expressions(
-            MARGINS_LIST="margins",
-            EXTRA_COLUMNS="extra_columns",
-            WEIGHTS="weights",
-        )
-        .fill_blocks(
-            PRIVACY_UNIT_BLOCK="",
-            PRIVACY_LOSS_BLOCK="",
-            OPTIONAL_CSV_BLOCK=(
-                "# More of these slots will be filled in\n"
-                "# as you move through DP Wizard.\n"
-            ),
-            OPTIONAL_CONVERT_TO_CSV_BLOCK="",
-        )
-        .finish()
-        .strip(),
-    )
 
 
 def csv_message_ui(

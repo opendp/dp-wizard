@@ -131,26 +131,38 @@ def dataset_ui():
         "Select Dataset",
         ui.output_ui("dataset_release_warning_ui"),
         ui.output_ui("welcome_ui"),
-        ui.layout_columns(
-            ui.card(
-                ui.card_header(data_source_icon, "Data Source"),
+        ui.card(
+            ui.card_header(data_source_icon, "Data Source"),
+            ui.layout_columns(
                 ui.output_ui("csv_upload_ui"),
-                ui.output_ui("max_rows_tutorial_ui"),
-                ui.output_ui("max_rows_input_ui"),
+                ui.output_ui("csv_upload_help_ui"),
             ),
-            [
-                ui.card(
-                    ui.card_header(unit_of_protection_icon, "Unit of Protection"),
-                    ui.output_ui("input_entity_ui"),
+            ui.layout_columns(
+                ui.output_ui("max_rows_input_ui"),
+                ui.output_ui("max_rows_tutorial_ui"),
+            ),
+        ),
+        ui.card(
+            ui.card_header(unit_of_protection_icon, "Unit of Protection"),
+            ui.layout_columns(
+                ui.output_ui("input_entity_ui"),
+                ui.output_ui("entity_info_ui"),
+            ),
+            ui.layout_columns(
+                [
                     ui.output_ui("input_contributions_ui"),
                     ui.output_ui("contributions_validation_ui"),
-                    ui.output_ui("unit_of_protection_python_ui"),
-                ),
-                ui.card(
-                    ui.card_header(product_icon, "Product"),
-                    ui.output_ui("product_ui"),
-                ),
-            ],
+                ],
+                ui.output_ui("input_contributions_help_ui"),
+            ),
+            ui.layout_columns(
+                ui.output_ui("unit_of_protection_python_ui"),
+                [],
+            ),
+        ),
+        ui.card(
+            ui.card_header(product_icon, "Product"),
+            ui.output_ui("product_ui"),
         ),
         ui.output_ui("define_analysis_button_ui"),
         value="dataset_panel",
@@ -269,37 +281,39 @@ def dataset_server(
     def csv_upload_ui():
         return [
             (
-                [
-                    ui.markdown("Private Data: `demo.csv`"),
-                    warning_md_box(
-                        """
-                        So that private data is not accidentally uploaded,
-                        the demo provides a private CSV, and does not support
-                        data upload.
+                ui.markdown("Private Data: `demo.csv`")
+                if is_demo_csv
+                else ui.output_ui("input_files_upload_ui")
+            ),
+            ui.output_ui("csv_message_ui"),
+        ]
+
+    @render.ui
+    def csv_upload_help_ui():
+        return (
+            ui.markdown(
+                """
+                    So that private data is not accidentally uploaded,
+                    the demo provides a private CSV, and does not support
+                    data upload.
 
                         Run DP Wizard locally to process your own data.
                         """
-                    ),
-                ]
-                if is_demo_csv
-                else [
-                    ui.markdown(
-                        f"""
+            )
+            if is_demo_csv
+            else [
+                ui.markdown(
+                    f"""
 Choose **Private Data** {PRIVATE_TEXT}
 
 Choose **Public Data** {PUBLIC_TEXT}
 
 Choose both **Private Data** and **Public Data** {PUBLIC_PRIVATE_TEXT}
                         """
-                    ),
-                    ui.output_ui("input_files_tutorial_ui"),
-                    ui.output_ui("input_files_upload_ui"),
-                ]
-            ),
-            ui.output_ui("csv_message_ui"),
-            data_source.context_code_sample(),
-            ui.output_ui("python_tutorial_ui"),
-        ]
+                ),
+                ui.output_ui("input_files_tutorial_ui"),
+            ]
+        )
 
     @render.ui
     def input_files_tutorial_ui():
@@ -324,13 +338,13 @@ Choose both **Private Data** and **Public Data** {PUBLIC_PRIVATE_TEXT}
         return ui.row(
             ui.input_file(
                 "private_path",
-                "Choose Private Data",
+                "Private Data Source",
                 accept=accept,
                 placeholder=Path(initial_private_path).name,
             ),
             ui.input_file(
                 "public_path",
-                "Choose Public Data",
+                "Public Data Source",
                 accept=accept,
                 placeholder=Path(initial_public_path).name,
             ),
@@ -376,15 +390,11 @@ Choose both **Private Data** and **Public Data** {PUBLIC_PRIVATE_TEXT}
                 Next, what is the **entity** whose privacy you want to protect?
                 """
             ),
-            ui.layout_columns(
-                ui.input_select(
-                    "entity",
-                    only_for_screenreader("Protect privacy of this entity"),
-                    list(entities.keys()),
-                    selected="👤 Individual",
-                ),
-                ui.output_ui("entity_info_ui"),
-                col_widths=col_widths,  # type: ignore
+            ui.input_select(
+                "entity",
+                only_for_screenreader("Protect privacy of this entity"),
+                list(entities.keys()),
+                selected="👤 Individual",
             ),
         ]
 
@@ -407,30 +417,31 @@ Choose both **Private Data** and **Public Data** {PUBLIC_PRIVATE_TEXT}
                 How many **rows** of your data can {entity_phrase} contribute to?
                 """
             ),
+            ui.input_text(
+                "contributions",
+                only_for_screenreader("Maximum number of rows contributed"),
+                "",
+            ),
+        ]
+
+    @render.ui
+    def input_contributions_help_ui():
+        return (
             tutorial_box(
                 is_tutorial_mode(),
                 """
-                For privacy to be protected, this number needs to an upper bound,
-                even if not all contributors will have this many rows.
-                """,
+            For privacy to be protected, this number needs to an upper bound,
+            even if not all contributors will have this many rows.
+            """,
                 is_demo_csv,
                 """
-                The `demo.csv` simulates 10 assignments
-                over the course of the term for each student,
-                so enter `10` here.
-                """,
+            The `demo.csv` simulates 10 assignments
+            over the course of the term for each student,
+            so enter `10` here.
+            """,
                 responsive=False,
             ),
-            ui.layout_columns(
-                ui.input_text(
-                    "contributions",
-                    only_for_screenreader("Maximum number of rows contributed"),
-                    "",
-                ),
-                [],  # Column placeholder
-                col_widths=col_widths,  # type: ignore
-            ),
-        ]
+        )
 
     @reactive.effect
     @reactive.event(input.contributions)
@@ -464,19 +475,6 @@ Choose both **Private Data** and **Public Data** {PUBLIC_PRIVATE_TEXT}
         if error:
             return warning_md_box(error)
 
-    @render.ui
-    def python_tutorial_ui():
-        return tutorial_box(
-            is_tutorial_mode(),
-            """
-            Along the way, code samples demonstrate
-            how the information you provide is used in the
-            OpenDP Library, and at the end you can download
-            a notebook for the entire calculation.
-            """,
-            responsive=False,
-        )
-
     @reactive.effect
     @reactive.event(input.max_rows)
     def _on_max_rows_change():
@@ -491,7 +489,6 @@ Choose both **Private Data** and **Public Data** {PUBLIC_PRIVATE_TEXT}
     @render.ui
     def max_rows_tutorial_ui():
         return (
-            ui.markdown("What is the **maximum row count** of your CSV?"),
             tutorial_box(
                 is_tutorial_mode(),
                 """
@@ -514,6 +511,7 @@ Choose both **Private Data** and **Public Data** {PUBLIC_PRIVATE_TEXT}
     @render.ui
     def max_rows_input_ui():
         return (
+            ui.markdown("What is the **maximum row count** of your CSV?"),
             ui.layout_columns(
                 ui.input_text(
                     "max_rows",
@@ -552,20 +550,21 @@ Choose both **Private Data** and **Public Data** {PUBLIC_PRIVATE_TEXT}
 
     @render.ui
     def product_ui():
-        return [
+        return ui.layout_columns(
+            [
+                ui.markdown(
+                    """
+                    What type of analysis do you want?
+                    """
+                ),
+                ui.input_radio_buttons(
+                    "product",
+                    only_for_screenreader("Type of analysis"),
+                    Product.to_dict(),
+                    selected=str(initial_product.value),
+                ),
+            ],
             ui.markdown(
-                """
-                What type of analysis do you want?
-                """
-            ),
-            ui.input_radio_buttons(
-                "product",
-                only_for_screenreader("Type of analysis"),
-                Product.to_dict(),
-                selected=str(initial_product.value),
-            ),
-            tutorial_box(
-                is_tutorial_mode(),
                 """
                 Although the underlying OpenDP library is very flexible,
                 DP Wizard offers only a few analysis options:
@@ -577,10 +576,9 @@ Choose both **Private Data** and **Public Data** {PUBLIC_PRIVATE_TEXT}
                   selected columns, and the correlations between columns.
                   This is less accurate than calculating the desired
                   statistics directly, but can be easier to work with downstream.
-                """,
-                responsive=False,
+                """
             ),
-        ]
+        )
 
     @reactive.effect
     @reactive.event(input.product)
