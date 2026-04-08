@@ -338,7 +338,7 @@ Choose both **Private Data** and **Public Data** {PUBLIC_PRIVATE_TEXT}
     @render.ui
     def csv_message_ui():
         return data_source.csv_message_ui(
-            csv_column_mismatch_calc=csv_column_mismatch_calc,
+            csv_column_mismatch=csv_column_mismatch_calc(),
             csv_messages=csv_info().get_messages(),
         )
 
