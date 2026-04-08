@@ -22,7 +22,7 @@ from dp_wizard.shiny.components.outputs import (
 from dp_wizard.shiny.components.summaries import dataset_summary
 from dp_wizard.shiny.panels.analysis_panel.column_module import column_server, column_ui
 from dp_wizard.shiny.panels.analysis_panel.group_module import group_server, group_ui
-from dp_wizard.types import AppState, ColumnId
+from dp_wizard.types import AppState, ColumnId, Product
 from dp_wizard.utils.code_generators import make_privacy_loss_block
 from dp_wizard.utils.constraints import MAX_EPSILON, MIN_EPSILON
 from dp_wizard.utils.csv_helper import (
@@ -39,63 +39,10 @@ def analysis_ui():
         ui.output_ui("analysis_release_warning_ui"),
         ui.output_ui("previous_summary_ui"),
         ui.layout_columns(
-            ui.card(
-                ui.card_header(columns_icon, "Columns"),
-                ui.markdown("Select numeric columns to calculate statistics on."),
-                ui.input_selectize(
-                    "columns_selectize",
-                    "Columns",
-                    [],
-                    multiple=True,
-                ),
-                ui.output_ui("columns_selectize_tutorial_ui"),
-            ),
-            ui.card(
-                ui.card_header(groups_icon, "Grouping"),
-                ui.markdown(
-                    """
-                    Select columns to group by, or leave empty
-                    to calculate statistics across the entire dataset.
-
-                    Groups aren't applied to the previews on this page
-                    but will be used in the final release.
-                    """
-                ),
-                ui.input_selectize(
-                    "groups_selectize",
-                    "Group by",
-                    [],
-                    multiple=True,
-                ),
-                ui.output_ui("groups_selectize_tutorial_ui"),
-            ),
-            ui.card(
-                ui.card_header(budget_icon, "Privacy Budget"),
-                ui.markdown(
-                    f"""
-                    What is your privacy budget for this release?
-                    Many factors including the sensitivity of your data,
-                    the frequency of DP releases,
-                    and the regulatory landscape can be considered.
-                    Consider how your budget compares to that of
-                    <a href="{registry_url}"
-                       target="_blank">other projects</a>.
-                    """
-                ),
-                log_slider(
-                    "log_epsilon_slider",
-                    lower_bound=MIN_EPSILON,
-                    upper_bound=MAX_EPSILON,
-                    lower_message="Better Privacy",
-                    upper_message="Better Accuracy",
-                ),
-                ui.output_ui("epsilon_ui"),
-                ui.output_ui("privacy_loss_python_ui"),
-            ),
-            ui.card(
-                ui.card_header(simulation_icon, "Simulation"),
-                ui.output_ui("simulation_card_ui"),
-            ),
+            _columns_card_ui(),
+            _grouping_card_ui(),
+            _privacy_card_ui(),
+            _simulation_card_ui(),
             col_widths={
                 "sm": [12, 12, 12, 12],  # 4 rows
                 "md": [6, 6, 6, 6],  # 2 rows
@@ -106,6 +53,75 @@ def analysis_ui():
         ui.output_ui("groups_ui"),
         ui.output_ui("download_results_button_ui"),
         value="analysis_panel",
+    )
+
+
+def _columns_card_ui():
+    return (
+        ui.card(
+            ui.card_header(columns_icon, "Columns"),
+            ui.output_ui("select_columns_message_ui"),
+            ui.input_selectize(
+                "columns_selectize",
+                "Columns",
+                [],
+                multiple=True,
+            ),
+            ui.output_ui("columns_selectize_tutorial_ui"),
+        ),
+    )
+
+
+def _grouping_card_ui():
+    return (
+        ui.card(
+            ui.card_header(groups_icon, "Grouping"),
+            ui.output_ui("select_groups_message_ui"),
+            ui.input_selectize(
+                "groups_selectize",
+                "Group by",
+                [],
+                multiple=True,
+            ),
+            ui.output_ui("groups_selectize_tutorial_ui"),
+        ),
+    )
+
+
+def _privacy_card_ui():
+    return (
+        ui.card(
+            ui.card_header(budget_icon, "Privacy Budget"),
+            ui.markdown(
+                f"""
+                What is your privacy budget for this release?
+                Many factors including the sensitivity of your data,
+                the frequency of DP releases,
+                and the regulatory landscape can be considered.
+                Consider how your budget compares to that of
+                <a href="{registry_url}"
+                    target="_blank">other projects</a>.
+                """
+            ),
+            log_slider(
+                "log_epsilon_slider",
+                lower_bound=MIN_EPSILON,
+                upper_bound=MAX_EPSILON,
+                lower_message="Better Privacy",
+                upper_message="Better Accuracy",
+            ),
+            ui.output_ui("epsilon_ui"),
+            ui.output_ui("privacy_loss_python_ui"),
+        ),
+    )
+
+
+def _simulation_card_ui():
+    return (
+        ui.card(
+            ui.card_header(simulation_icon, "Simulation"),
+            ui.output_ui("simulation_card_ui"),
+        ),
     )
 
 
@@ -260,6 +276,33 @@ def analysis_server(
     @render.ui
     def previous_summary_ui():
         return dataset_summary(state)
+
+    @render.ui
+    def select_columns_message_ui():
+        match product():
+            case Product.STATISTICS:
+                message = "Select numeric columns to calculate statistics on."
+            case Product.SYNTHETIC_DATA:
+                message = "Select numeric columns to generate synthetic data for."
+        return ui.markdown(message)
+
+    @render.ui
+    def select_groups_message_ui():
+        match product():
+            case Product.STATISTICS:
+                message = """
+                Select columns to group by, or leave empty
+                to calculate statistics across the entire dataset.
+
+                Groups aren't applied to the previews on this page
+                but will be used in the final release.
+                """
+
+            case Product.SYNTHETIC_DATA:
+                message = """
+                Select additional string columns to include in the synthetic data.
+                """
+        return ui.markdown(message)
 
     @reactive.effect
     @reactive.event(input.columns_selectize)
