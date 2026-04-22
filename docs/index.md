@@ -694,7 +694,7 @@ Other PETs protect privacy during computation, but don't preserve privacy in res
 
 |   | OpenDP | DP Wizard |
 |---|--------|-----------|
-|email:| info@opendp.org | cmccallum@g.harvard.edu |
+|email:| contact@opendp.org | cmccallum@g.harvard.edu |
 |docs:| [docs.opendp.org](https://docs.opendp.org) | [opendp.github.io/dp-wizard](https://opendp.github.io/dp-wizard) |
 |source:| [github.com/opendp/opendp](https://github.com/opendp/opendp/) | [github.com/opendp/dp-wizard](https://github.com/opendp/dp-wizard/) |
 
