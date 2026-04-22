@@ -568,7 +568,10 @@ Next, we'll define our Context. This is where we set the privacy budget, and set
 ...             max_length=100000,
 ...             max_groups=100,
 ...         ),
-...         dp.polars.Margin(by=(["grade_bin"] + list({}.keys())), invariant="keys"),
+...         dp.polars.Margin(
+...             by=(["grade_bin"] + list({}.keys())),
+...             invariant="keys",  # Consider the bin values to be public information.
+...         ),
 ...     ],
 ... )
 

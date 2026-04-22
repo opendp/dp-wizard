@@ -820,7 +820,10 @@ budget, and set the weight for each query under that overall budget.</p>
 ...             max_length=100000,
 ...             max_groups=100,
 ...         ),
-...         dp.polars.Margin(by=([&quot;grade_bin&quot;] + list({}.keys())), invariant=&quot;keys&quot;),
+...         dp.polars.Margin(
+...             by=([&quot;grade_bin&quot;] + list({}.keys())),
+...             invariant=&quot;keys&quot;,  # Consider the bin values to be public information.
+...         ),
 ...     ],
 ... )
 </code></pre>
