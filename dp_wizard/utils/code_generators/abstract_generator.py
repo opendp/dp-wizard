@@ -140,7 +140,10 @@ are ignored because of errors, it will bias results.
             )
 
         def bin_template(GROUPS, BIN_NAME):
-            dp.polars.Margin(by=([BIN_NAME] + list(GROUPS.keys())))
+            dp.polars.Margin(
+                by=([BIN_NAME] + list(GROUPS.keys())),
+                invariant="keys",  # Consider the bin values to be public information.
+            )
 
         margins = [
             DefaultsTemplate(basic_template)
