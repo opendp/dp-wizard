@@ -19,6 +19,8 @@ if bp in Path(__file__).read_text():
         "#run-a-test-from-a-specific-breakpoint"
     )
 
+default_timeout = 10_000
+
 local_app = create_app_fixture(package_root / "app.py")
 
 test_apps = Path(__file__).parent / "apps"
@@ -27,6 +29,7 @@ qa_app = create_app_fixture(test_apps / "app_qa.py")
 
 
 def test_qa_app(page: Page, qa_app: ShinyAppProc):  # pragma: no cover
+    page.set_default_timeout(10_000)
     page.goto(qa_app.url)
 
     page.locator("#max_rows").fill("10000")
@@ -49,6 +52,7 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
     download_results_text = "You can now make a differentially private release"
 
     # -- Select Dataset --
+    page.set_default_timeout(10_000)
     page.goto(local_app.url)
     expect(page).to_have_title("DP Wizard")
     page.locator("#max_rows").fill("10000")
@@ -229,6 +233,7 @@ def test_local_app_downloads(
     analysis_requirements_warning = "select your dataset on the previous tab"
     results_requirements_warning = "define your analysis on the previous tab"
 
+    page.set_default_timeout(10_000)
     page.goto(local_app.url)
 
     # For more compact screenshots:
