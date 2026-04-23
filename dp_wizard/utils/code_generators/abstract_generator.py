@@ -1,3 +1,4 @@
+import json
 from abc import ABC, abstractmethod
 from math import gcd
 from typing import Iterable
@@ -89,9 +90,7 @@ class AbstractGenerator(ABC):
             .fill_blocks(
                 IMPORTS_BLOCK=DefaultsTemplate(imports_template).finish(),
                 UTILS_BLOCK=bins_py + plots_py,
-                **self._make_extra_blocks(),  # type: ignore
-            )
-            .fill_blocks(
+                CUSTOM_NOTE=self.note,
                 WINDOWS_COMMENT_BLOCK="""
 (If installing in the Windows CMD shell,
 use double-quotes instead of single-quotes below.)""",
@@ -108,7 +107,23 @@ value would leak information and violate the DP guarantee,
 so it is safer to ignore them. That said, if a significant number of records
 are ignored because of errors, it will bias results.
 """,
-                CUSTOM_NOTE=self.note,
+                **self._make_extra_blocks(),  # type: ignore
+            )
+            .fill_blocks(
+                FRONTMATTER_BLOCK=json.dumps(
+                    {
+                        "tag_map": {
+                            "Brief Report": [],
+                            "Full Tutorial": ["tutorial"],
+                            "Include Postprocessing": ["tutorial", "postprocessing"],
+                        },
+                        "css_map": {
+                            "tutorial": "background: lightblue;",
+                            "postprocessing": "background: lightblue;",
+                        },
+                    }
+                ),
+                optional=True,  # Not used by script template
             )
             .finish(reformat=reformat)
         )
