@@ -1,6 +1,7 @@
 from shiny.ui import tags
 
-from dp_wizard.shiny.components.icons import (
+from dp_wizard.types import AppState
+from dp_wizard.ui.components.icons import (
     budget_icon,
     columns_icon,
     data_source_icon,
@@ -8,7 +9,6 @@ from dp_wizard.shiny.components.icons import (
     product_icon,
     unit_of_protection_icon,
 )
-from dp_wizard.types import AppState
 
 _css = "display: block; padding: 0 1em 1em 1em;"
 
