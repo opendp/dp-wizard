@@ -4,9 +4,8 @@ print(
     f"assuming {contributions} contributions per individual"
 )
 
-group_names = GROUP_NAMES
-if group_names:
-    print(f"(grouped by {'/'.join(group_names)})")
+if groups:
+    print(f"(grouped by {'/'.join(groups)})")
 
 print(CONFIDENCE_NOTE, ACCURACY_NAME)
 print(HISTOGRAM_NAME)
