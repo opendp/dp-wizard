@@ -20,7 +20,7 @@ from dp_wizard.utils.code_generators.analyses import histogram, mean, median
 from dp_wizard.utils.code_generators.notebook_generator import NotebookGenerator
 from dp_wizard.utils.code_generators.script_generator import ScriptGenerator
 
-python_paths = package_root.glob("**/*.py")
+python_paths = list(package_root.glob("**/*.py"))
 
 
 @pytest.mark.parametrize("python_path", python_paths, ids=lambda path: path.name)
