@@ -62,7 +62,7 @@ members = [
 ]
 
 [tool.uv.sources]
-dp-wizard-templates = { workspace = true, editable = true }
+dp-wizard = { workspace = true, editable = true }
 
 [dependency-groups]
 dev = [
