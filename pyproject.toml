@@ -1,18 +1,19 @@
 [build-system]
-requires = ["flit_core >=3.2,<4"]
-build-backend = "flit_core.buildapi"
+requires = ["uv_build>=0.11.24,<0.12"]
+build-backend = "uv_build"
 
 [project]
 name = "dp_wizard"
 authors = [{name = "The OpenDP Project", email = "contact@opendp.org"}]
-readme = "README-PYPI.md"
+readme = "README.md"
 license = {file = "LICENSE"}
+version = "0.9.0"
+description = "DP Wizard makes it easier to get started with differential privacy."
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
 ]
 keywords = ["differential privacy"]
-dynamic = ["version", "description"]
 dependencies = [
     "dp-wizard-templates==0.8.2",
     "faicons",
@@ -54,6 +55,14 @@ strict = [
 [tool.isort]
 profile = "black"
 skip_glob = [".venv*/*"]
+
+[tool.uv.workspace]
+members = [
+    ".",
+]
+
+[tool.uv.sources]
+dp-wizard-templates = { workspace = true, editable = true }
 
 [dependency-groups]
 dev = [

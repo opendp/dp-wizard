@@ -88,22 +88,14 @@ so let's remember [what we learned](WHAT-WE-LEARNED.md) along the way.
 
 ### Getting Started
 
-DP-Wizard will run across multiple Python versions, but for the fewest surprises during development, it makes sense to use the oldest supported version in a virtual environment. On MacOS:
 ```shell
 $ git clone https://github.com/opendp/dp-wizard.git
 $ cd dp-wizard
-$ brew install python@3.10
-$ python3.10 -m venv .venv
-$ source .venv/bin/activate
-```
-
-You can now install dependencies, and the application itself, and start a tutorial:
-```shell
-$ pip install -r requirements-dev.txt
-$ pre-commit install
-$ playwright install
-$ pip install --editable '.[pins]'
-$ dp-wizard --demo
+$ pip install uv # if not already installed
+$ uv sync
+$ uv run pre-commit install
+$ uv run playwright install
+$ uv run dp-wizard --demo
 ```
 
 Your browser should open and connect you to the application.
@@ -118,18 +110,18 @@ $ brew install pandoc
 
 Tests should pass, and code coverage should be complete (except blocks we explicitly ignore):
 ```shell
-$ scripts/ci.sh
+$ uv run scripts/ci.sh
 ```
 
 We're using [Playwright](https://playwright.dev/python/) for end-to-end tests. You can use it to [generate test code](https://playwright.dev/python/docs/codegen-intro) just by interacting with the app in a browser:
 ```shell
-$ dp-wizard # The server will continue to run, so open a new terminal to continue.
-$ playwright codegen http://127.0.0.1:8000/
+$ uv run dp-wizard # The server will continue to run, so open a new terminal to continue.
+$ uv run playwright codegen http://127.0.0.1:8000/
 ```
 
 You can also [step through these tests](https://playwright.dev/python/docs/running-tests#debugging-tests) and see what the browser sees:
 ```shell
-$ PWDEBUG=1 pytest -k test_app
+$ PWDEBUG=1 uv run pytest -k test_app
 ```
 
 If Playwright fails in CI, we can still see what went wrong:
