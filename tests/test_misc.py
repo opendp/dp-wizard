@@ -37,13 +37,12 @@ def test_version():
     "rel_path",
     [
         "pyproject.toml",
-        "requirements-dev.txt",
     ],
 )
 def test_opendp_pin(rel_path):
     opendp_lines = [
         line
-        for line in (package_root.parent / rel_path).read_text().splitlines()
+        for line in (package_root.parent.parent / rel_path).read_text().splitlines()
         if "opendp[" in line
     ]
     assert all([f"opendp[mbi]=={opendp_version}" in line for line in opendp_lines])
@@ -52,15 +51,14 @@ def test_opendp_pin(rel_path):
 @pytest.mark.parametrize(
     "rel_path",
     [
-        "dp_wizard/__init__.py",
+        "src/dp_wizard/__init__.py",
         "README.md",
-        "README-PYPI.md",
         ".github/workflows/test.yml",
         "pyproject.toml",
     ],
 )
 def test_python_min_version(rel_path):
-    text = (package_root.parent / rel_path).read_text()
+    text = (package_root.parent.parent / rel_path).read_text()
     assert "3.10" in text
     if "README" in rel_path:
         # Make sure we haven't upgraded one reference by mistake.
@@ -69,7 +67,7 @@ def test_python_min_version(rel_path):
 
 @pytest.mark.parametrize(
     "script_path",
-    (package_root.parent / "scripts").glob("*.sh"),
+    list((package_root.parent / "scripts").glob("*.sh")),
     ids=lambda path: path.name,
 )
 def test_bash_scripts(script_path: Path):
