@@ -736,7 +736,7 @@ going on here, see the documentation for OpenDP:
 https://docs.opendp.org/</p>
 <h4 id="prerequisites">Prerequisites</h4>
 <p>First install and import the required dependencies:</p>
-<pre><code>%pip install &#39;opendp[polars]==0.14.1&#39; matplotlib</code></pre>
+<pre><code>%pip install &#39;opendp[polars]==0.14.2&#39; matplotlib</code></pre>
 <pre><code>&gt;&gt;&gt; import matplotlib.pyplot as plt
 &gt;&gt;&gt; import opendp.prelude as dp
 &gt;&gt;&gt; import polars as pl
@@ -770,7 +770,7 @@ Polars expression that describes how we want to summarize that
 column.</p>
 <h3 id="expression-for-grade">Expression for <code>grade</code></h3>
 <pre><code>&gt;&gt;&gt; # See the OpenDP Library docs for more on making private histograms:
-&gt;&gt;&gt; # https://docs.opendp.org/en/v0.14.1/getting-started/examples/histograms.html
+&gt;&gt;&gt; # https://docs.opendp.org/en/v0.14.2/getting-started/examples/histograms.html
 &gt;&gt;&gt;
 &gt;&gt;&gt; # Use the public information to make cut points for &#39;grade&#39;:
 &gt;&gt;&gt; grade_cut_points = make_cut_points(
@@ -801,7 +801,7 @@ budget, and set the weight for each query under that overall budget.</p>
 ... )
 &gt;&gt;&gt;
 &gt;&gt;&gt; # See the OpenDP Library docs for more on Context:
-&gt;&gt;&gt; # https://docs.opendp.org/en/v0.14.1/api/user-guide/context/index.html#context
+&gt;&gt;&gt; # https://docs.opendp.org/en/v0.14.2/api/user-guide/context/index.html#context
 &gt;&gt;&gt; stats_context = dp.Context.compositor(
 ...     data=pl.scan_csv(
 ...         &quot;docs/fill-in-correct-path.csv&quot;,
@@ -873,13 +873,13 @@ most well developed.</li>
 <h3 id="with-opendp">With OpenDP</h3>
 <ul>
 <li>(<a
-href="https://docs.opendp.org/en/v0.14.1/api/user-guide/transformations/aggregation-quantile.html">Quantiles</a>)</li>
+href="https://docs.opendp.org/en/v0.14.2/api/user-guide/transformations/aggregation-quantile.html">Quantiles</a>)</li>
 <li>(<a
-href="https://docs.opendp.org/en/v0.14.1/getting-started/statistical-modeling/pca.html">PCA</a>)</li>
+href="https://docs.opendp.org/en/v0.14.2/getting-started/statistical-modeling/pca.html">PCA</a>)</li>
 <li>(<a
-href="https://docs.opendp.org/en/v0.14.1/api/python/opendp.measurements.html#opendp.measurements.make_randomized_response_bitvec">RAPPOR</a>)</li>
+href="https://docs.opendp.org/en/v0.14.2/api/python/opendp.measurements.html#opendp.measurements.make_randomized_response_bitvec">RAPPOR</a>)</li>
 <li>(<a
-href="https://docs.opendp.org/en/v0.14.1/api/python/opendp.extras.sklearn.linear_model.html">Linear
+href="https://docs.opendp.org/en/v0.14.2/api/python/opendp.extras.sklearn.linear_model.html">Linear
 regression</a>)</li>
 </ul>
 </td>

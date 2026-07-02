@@ -22,7 +22,7 @@ from dp_wizard.utils.constraints import (
     MIN_ROW_COUNT,
 )
 
-abc_path = str((package_root.parent / "tests/fixtures/abc.csv").absolute())
+abc_path = str((package_root.parent.parent / "tests/fixtures/abc.csv").absolute())
 
 good_floats = st.floats(
     allow_nan=False,

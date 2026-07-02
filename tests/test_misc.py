@@ -67,7 +67,7 @@ def test_python_min_version(rel_path):
 
 @pytest.mark.parametrize(
     "script_path",
-    list((package_root.parent / "scripts").glob("*.sh")),
+    list((package_root.parent.parent / "scripts").glob("*.sh")),
     ids=lambda path: path.name,
 )
 def test_bash_scripts(script_path: Path):
@@ -79,7 +79,7 @@ def get_file_paths() -> list[Path]:
     # TODO: Is there a package that respects .gitignore?
     top_level_paths = [
         path
-        for path in package_root.parent.iterdir()
+        for path in package_root.parent.parent.iterdir()
         if not (
             path.match("*venv*")
             or path.name.startswith(".coverage")

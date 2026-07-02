@@ -24,7 +24,7 @@ def strip_doc_test(block: str) -> str:
 
 
 def test_doc_examples_up_to_date():
-    index_md = package_root.parent / "docs/index.md"
+    index_md = package_root.parent.parent / "docs/index.md"
     blocks = index_md.read_text().split("```\n")
     pip_install = "%pip install"
     while True:

@@ -38,9 +38,8 @@ def parse_log(lines):
 
 
 def main():  # pragma: no cover
-    old_changelog_lines = (
-        (package_root.parent / "CHANGELOG.md").read_text().splitlines()
-    )
+    changelog_path = package_root.parent.parent / "CHANGELOG.md"
+    old_changelog_lines = changelog_path.read_text().splitlines()
     new_changelog_lines = []
 
     prev_version = __version__
@@ -53,7 +52,7 @@ def main():  # pragma: no cover
             new_changelog_lines.append("")
         new_changelog_lines.append(line)
 
-    (package_root.parent / "CHANGELOG.md").write_text(
+    changelog_path.write_text(
         "\n".join(new_changelog_lines) + "\n"  # Precommit requires trailing "\n".
     )
 

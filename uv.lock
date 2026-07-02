@@ -906,8 +906,8 @@ requires-dist = [
     { name = "nest-asyncio", marker = "extra == 'pins'", specifier = "==1.6.0" },
     { name = "networkx", marker = "extra == 'pins'", specifier = "==3.4.2" },
     { name = "numpy", marker = "extra == 'pins'", specifier = "==2.2.4" },
-    { name = "opendp", extras = ["mbi"], specifier = "==0.14.1" },
-    { name = "opendp", extras = ["mbi"], marker = "extra == 'pins'", specifier = "==0.14.1" },
+    { name = "opendp", extras = ["mbi"], specifier = "==0.14.2" },
+    { name = "opendp", extras = ["mbi"], marker = "extra == 'pins'", specifier = "==0.14.2" },
     { name = "opt-einsum", marker = "extra == 'pins'", specifier = "==3.4.0" },
     { name = "optax", marker = "extra == 'pins'", specifier = "==0.2.5" },
     { name = "orjson", marker = "extra == 'pins'", specifier = "==3.10.16" },
@@ -977,7 +977,7 @@ dev = [
     { name = "hypothesis", specifier = ">=6.155.7" },
     { name = "isort", specifier = ">=8.0.1" },
     { name = "matplotlib", specifier = ">=3.10.1" },
-    { name = "opendp", extras = ["mbi"], specifier = "==0.14.1" },
+    { name = "opendp", extras = ["mbi"], specifier = "==0.14.2" },
     { name = "pillow", specifier = ">=11.3.0" },
     { name = "pip-tools", specifier = ">=7.5.3" },
     { name = "pre-commit", specifier = ">=4.6.0" },
@@ -2033,20 +2033,20 @@ wheels = [
 
 [[package]]
 name = "opendp"
-version = "0.14.1"
+version = "0.14.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "deprecated" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/53/2c/7644571c48bff82d1024be252dc3e4d659e6ab50acb0a0601fecee8968c5/opendp-0.14.1.tar.gz", hash = "sha256:780abb06d6841f4b21d225af3e0dc5a3e4bf1a9ac59ce06b5945f709546f25c4", size = 739184, upload-time = "2025-09-17T02:46:38.502Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/17/48/210b648737a22e957480b468457937579fe52de3476520ff123fa53319b6/opendp-0.14.2.tar.gz", hash = "sha256:2ba2d69417d97f9e27213b3cfd7923bb04bd0ade5011d76bd5dd3d608dc8a328", size = 736449, upload-time = "2026-03-11T12:49:20.045Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e4/c1/47987a2ca6cbdf4a7445b2e4dcdb7595190a6bf87c04e2f6385b88e50da3/opendp-0.14.1-cp310-abi3-macosx_10_13_x86_64.whl", hash = "sha256:53047a60398ded5c87c9c01e10792cb2b9f5dd1a7aa15146576116b3c649fb2f", size = 38330314, upload-time = "2025-09-17T02:46:17.754Z" },
-    { url = "https://files.pythonhosted.org/packages/88/ec/f492ca755a75461b7439b2326b5e3dd148fb6c990a5ce80eec5151723afc/opendp-0.14.1-cp310-abi3-macosx_11_0_arm64.whl", hash = "sha256:2660bb2a58ac95a5920f98140bc231be6aa9d671e8e36d7fcd231179f00445d2", size = 37108655, upload-time = "2025-09-17T02:46:21.86Z" },
-    { url = "https://files.pythonhosted.org/packages/f5/0e/0bd94623241e272b79d1c044dd5936bd54cb83099a1d0b8e1cd9832f6db3/opendp-0.14.1-cp310-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:68313b168ff3621d7eea7c7c1116825cb2c12a195b23191dd182068ba9fa791e", size = 41448864, upload-time = "2025-09-17T02:46:24.791Z" },
-    { url = "https://files.pythonhosted.org/packages/43/2f/7e779345ca04f3a7d065bb97329893537e0f74be8a125ec8037426d82084/opendp-0.14.1-cp310-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:7435a0c547c42efafb431ef5e6cbb7ba87f28b03e664c79b4ffce21fddca9681", size = 41493377, upload-time = "2025-09-17T02:46:27.263Z" },
-    { url = "https://files.pythonhosted.org/packages/a1/5e/b05fce02b3e9249161be88e9f4c03b4fa3b7bc4cc710d32886e107315314/opendp-0.14.1-cp310-abi3-win32.whl", hash = "sha256:c114bf7c7f50b33f0ecc2af243cf1c05a5d4451058c1c633517d27a882fa9e29", size = 30885452, upload-time = "2025-09-17T02:46:29.83Z" },
-    { url = "https://files.pythonhosted.org/packages/f7/8f/d2323dfba27f78a63c3cf4a768ebf9f82d7940506e91d3d2ee4fcea941d2/opendp-0.14.1-cp310-abi3-win_amd64.whl", hash = "sha256:894e93f24b206de229aae4bc403ec7c5fdb81c30b9a140d00b649d13a284dc1a", size = 35502524, upload-time = "2025-09-17T02:46:32.678Z" },
-    { url = "https://files.pythonhosted.org/packages/0c/f5/1b230feebd464904a7af67a3b8e02c1cbd4c12f652ee77c0d5699cc65346/opendp-0.14.1-py3-none-manylinux_2_28_aarch64.whl", hash = "sha256:9190b305eea45940ab5da4345add547d15b39fa42af0f289322c0b47e1f93ab6", size = 40426601, upload-time = "2025-09-17T02:46:36.384Z" },
+    { url = "https://files.pythonhosted.org/packages/5d/e5/8b6062c263e07edff031d201402e6ca5372068ddd957ab21e101f9143f10/opendp-0.14.2-cp310-abi3-macosx_10_13_x86_64.whl", hash = "sha256:888f76833297bec903f7531f8edf3d0bc90d8902a0eeb1cfb0feab4f7b346d1d", size = 38956692, upload-time = "2026-03-11T12:48:49.095Z" },
+    { url = "https://files.pythonhosted.org/packages/34/ef/44cc412e10174b7b1d2f4c4a83c86b03ee03a2c1d0375a3be668170cd5dc/opendp-0.14.2-cp310-abi3-macosx_11_0_arm64.whl", hash = "sha256:6c3af1c649fb23bad057c1da17e9d9f2d2250b0a3f25040e6438783f49040652", size = 37306314, upload-time = "2026-03-11T12:48:53.736Z" },
+    { url = "https://files.pythonhosted.org/packages/06/cc/dbd58d0a1aaed730f977c28f45c376b391e7efca418f7845415f29f7b870/opendp-0.14.2-cp310-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:443c7653e092ec3176313a58299fc4480f8cbe79ee441268ac3f7dd2b6a0bb2e", size = 39579393, upload-time = "2026-03-11T12:48:57.979Z" },
+    { url = "https://files.pythonhosted.org/packages/1b/b4/77c96e75c58dff73994fe94f5b370b66cf01456f74f624ddab02330a4a81/opendp-0.14.2-cp310-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:feb54bd37f3b02d5fcca1ced00f678f08db4f32fb2d3033d8b00f7769f90a3ef", size = 41717473, upload-time = "2026-03-11T12:49:02.552Z" },
+    { url = "https://files.pythonhosted.org/packages/8d/88/e8879ba75897d70002a74c8cfd7df120fc02780f50719743246ece0da241/opendp-0.14.2-cp310-abi3-win32.whl", hash = "sha256:30665ecd9c44b8e3ec726362265521dfaca0759f27898655094e93b95bf1bf5a", size = 30754188, upload-time = "2026-03-11T12:49:07.155Z" },
+    { url = "https://files.pythonhosted.org/packages/af/39/1ba1151e836b2ad78bdb36d9d79e919eccdd124400deff50679149fbb7ed/opendp-0.14.2-cp310-abi3-win_amd64.whl", hash = "sha256:58dc551b60e5086091fa0a42d53b0868d61bccbd158d39b76ad8a3d66f50fab4", size = 35321685, upload-time = "2026-03-11T12:49:10.953Z" },
+    { url = "https://files.pythonhosted.org/packages/bc/b6/5c95f9194eb75125488d6228d6f87bb7dc854302fb6c85e6999c0ed69a78/opendp-0.14.2-py3-none-manylinux_2_28_aarch64.whl", hash = "sha256:a9731ea38890d373ca78cd84d73574ccc989db6cfa0ee9a8b92de30ead681ff8", size = 40444849, upload-time = "2026-03-11T12:49:15.532Z" },
 ]
 
 [package.optional-dependencies]

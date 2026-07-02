@@ -106,7 +106,7 @@ hw_grade_bin_expr = (
     )
 
 
-abc_path = str((package_root.parent / "tests/fixtures/abc.csv").absolute())
+abc_path = str((package_root.parent.parent / "tests/fixtures/abc.csv").absolute())
 
 
 def number_lines(text: str):
@@ -187,8 +187,8 @@ plans = [plan for i, plan in enumerate(plans_all_combos) if i % mod == 0]
 expected_urls = [
     "https://docs.opendp.org/",
     "https://github.com/opendp/dp-wizard",
-    "https://docs.opendp.org/en/v0.14.1/api/python/opendp.extras.mbi.html#opendp.extras.mbi.ContingencyTable.synthesize",
-    "https://docs.opendp.org/en/v0.14.1/api/python/opendp.extras.mbi.html#opendp.extras.mbi.ContingencyTable.project_melted",
+    "https://docs.opendp.org/en/v0.14.2/api/python/opendp.extras.mbi.html#opendp.extras.mbi.ContingencyTable.synthesize",
+    "https://docs.opendp.org/en/v0.14.2/api/python/opendp.extras.mbi.html#opendp.extras.mbi.ContingencyTable.project_melted",
 ]
 
 
