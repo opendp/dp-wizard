@@ -11,7 +11,7 @@ DP Wizard demonstrates how to calculate DP statistics or create a synthetic data
 > - Releasing this software under an [OSI approved license](https://opensource.org/licenses), in this case the [MIT License](https://github.com/opendp/opendp/blob/main/LICENSE).
 > - Ensuring there are at least two maintainers, in this case Eddie de Leon (`eddiestudies`) and Chuck McCallum (`mccalluc`), who will respond within a week to new issues and PRs.
 > - Only making changes on `main` through PRs, and getting approval on these PRs before merging.
-> - On an annual basis, recruiting one or more volunteers (not active contributors) who will conduct a health-check, focussed not on the details of the algorithms but on the health of this repo as open source software. Their report will be linked here. The next (and first) health-check is scheduled for September 2026.
+> - On an annual basis, recruiting one or more volunteers (not active contributors) who will conduct a health-check, focused not on the details of the algorithms but on the health of this repo as open source software. Their report will be linked here. The next (and first) health-check is scheduled for September 2026.
 
 If differential privacy is new to you, [these slides](https://opendp.github.io/dp-wizard/) provide some background, and explain how DP Wizard works.
 
