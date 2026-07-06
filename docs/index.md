@@ -516,7 +516,7 @@ Based on the input you provided, for each column we'll create a Polars expressio
 
 ```
 >>> # See the OpenDP Library docs for more on making private histograms:
->>> # https://docs.opendp.org/en/v0.14.2/getting-started/examples/histograms.html
+>>> # https://docs.opendp.org/en/v0.14.2/getting-started/tabular-data/grouping.html
 >>>
 >>> # Use the public information to make cut points for 'grade':
 >>> grade_cut_points = make_cut_points(

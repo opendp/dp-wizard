@@ -7,18 +7,18 @@ import opendp.prelude as dp
 import polars as pl
 import pytest
 import requests
+from dp_wizard.types import ColumnName, CsvInfo, Product, StatisticName
+from dp_wizard.utils.code_generators.notebook_generator import NotebookGenerator
+from dp_wizard.utils.code_generators.script_generator import ScriptGenerator
 from dp_wizard_templates.converters import convert_from_notebook, convert_to_notebook
 
 from dp_wizard import opendp_version, package_root
-from dp_wizard.types import ColumnName, CsvInfo, Product, StatisticName
 from dp_wizard.utils.code_generators import (
     AnalysisPlan,
     AnalysisPlanColumn,
     make_column_config_block,
 )
 from dp_wizard.utils.code_generators.analyses import histogram, mean, median
-from dp_wizard.utils.code_generators.notebook_generator import NotebookGenerator
-from dp_wizard.utils.code_generators.script_generator import ScriptGenerator
 
 python_paths = list(package_root.glob("**/*.py"))
 
@@ -87,7 +87,7 @@ def test_make_column_config_block_for_histogram():
             bin_count=10,
         ).strip()
         == f"""# See the OpenDP Library docs for more on making private histograms:
-# https://docs.opendp.org/en/v{opendp_version}/getting-started/examples/histograms.html
+# https://docs.opendp.org/en/v{opendp_version}/getting-started/tabular-data/grouping.html
 
 # Use the public information to make cut points for 'HW GRADE':
 hw_grade_cut_points = make_cut_points(
