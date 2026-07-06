@@ -7,7 +7,7 @@ the addition of calibrated noise to aggregate statistics to protect the privacy 
 DP Wizard demonstrates how to calculate DP statistics or create a synthetic dataset from the data you provide.
 
 > [!NOTE]
-> This software is part of the [**OpenDP Commons**](https://sites.harvard.edu/opendp/tools/#opendp-commons). As such, the OpenDP Executive Committee commits to:
+> This software is part of the [**OpenDP Commons**](https://opendp.org/tools/#opendp-commons). As such, the OpenDP Executive Committee commits to:
 > - Releasing this software under an [OSI approved licence](https://opensource.org/licenses), in this case the [MIT License](https://github.com/opendp/opendp/blob/main/LICENSE).
 > - Ensuring there are at least two maintainers, in this case Eddie de Leon (`eddiestudies`) and Chuck McCallum (`mccalluc`), who will respond within a week to new issues and PRs.
 > - Only making changes on `main` through PRs, and getting approval on these PRs before merging.
