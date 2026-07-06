@@ -415,8 +415,8 @@ Then:
 <td>
 
 - 1: On "Select Dataset":
-    - Under "CSV Columns", enter `grade`.
-    - Leave the "Unit of Protection" at 1.
+    - A demo CSV is already provided.
+    - Leave the "Unit of Protection" at 10.
     - Click "Define Analysis".
 
 </td>
@@ -545,7 +545,7 @@ Next, we'll define our Context. This is where we set the privacy budget, and set
 >>>
 >>> privacy_loss = dp.loss_of(
 ...     epsilon=1.0,
-...     delta=1 / max(1e7, 100000),
+...     delta=0,  # or 1 / max(1e7, 100000),
 ... )
 >>>
 >>> # See the OpenDP Library docs for more on Context:
@@ -561,7 +561,18 @@ Next, we'll define our Context. This is where we set the privacy budget, and set
 ...     split_by_weights=[  # With only one query, the entire budget is allocated to that query:
 ...         1,  # grade
 ...     ],
-...     margins=[],
+...     margins=[
+...         dp.polars.Margin(
+...             by=list({}.keys()),
+...             invariant="keys",
+...             max_length=100000,
+...             max_groups=100,
+...         ),
+...         dp.polars.Margin(
+...             by=(["grade_bin"] + list({}.keys())),
+...             invariant="keys",  # Consider the bin values to be public information.
+...         ),
+...     ],
 ... )
 
 ```
@@ -683,7 +694,7 @@ Other PETs protect privacy during computation, but don't preserve privacy in res
 
 |   | OpenDP | DP Wizard |
 |---|--------|-----------|
-|email:| info@opendp.org | cmccallum@g.harvard.edu |
+|email:| contact@opendp.org | cmccallum@g.harvard.edu |
 |docs:| [docs.opendp.org](https://docs.opendp.org) | [opendp.github.io/dp-wizard](https://opendp.github.io/dp-wizard) |
 |source:| [github.com/opendp/opendp](https://github.com/opendp/opendp/) | [github.com/opendp/dp-wizard](https://github.com/opendp/dp-wizard/) |
 

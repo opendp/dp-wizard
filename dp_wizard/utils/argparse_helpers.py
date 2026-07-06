@@ -9,7 +9,7 @@ PRIVATE_TEXT = """if you only have a private data set, and want to
 make a release from it: The preview visualizations will only use
 simulated data, and apart from the headers, the private data is not
 read until the release."""
-PUBLIC_PRIVATE_TEXT = """if you have two CSVs with the same structure.
+PUBLIC_PRIVATE_TEXT = """if you have two CSVs or TSVs with the same structure.
 Perhaps the public data is older and no longer sensitive. Preview
 visualizations will be made with the public data, but the release will
 be made with private data."""
@@ -25,7 +25,7 @@ def _get_arg_parser() -> argparse.ArgumentParser:
         description="DP Wizard makes it easier to get started with "
         "Differential Privacy.",
         epilog=f"""
-Unless you have set "--demo", you will specify a CSV inside the application.
+Unless you have set "--demo", you will specify a CSV or TSV inside the application.
 
 Provide a "Private Data" {PRIVATE_TEXT}
 

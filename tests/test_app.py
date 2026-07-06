@@ -84,7 +84,8 @@ def test_local_app_validations(page: Page, local_app: ShinyAppProc):  # pragma: 
         )
     ).to_be_visible()
     expected_error = (
-        "Specify CSV, unit of protection, and maximum row count before proceeding."
+        "Specify data source, unit of protection, "
+        "and maximum row count before proceeding."
     )
     expect(page.get_by_text(expected_error)).to_be_visible()
 

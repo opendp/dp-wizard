@@ -314,7 +314,7 @@ def analysis_server(
                 Unlike the other settings on this page,
                 this estimate **is not used** in the final calculation.
 
-                Until you make a release, your CSV will not be
+                Until you make a release, your data source will not be
                 read except to determine the names of columns,
                 but the number of rows does have implications for the
                 accuracy which DP can provide with a given privacy budget.
