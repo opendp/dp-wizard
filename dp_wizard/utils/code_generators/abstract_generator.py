@@ -2,17 +2,15 @@ from abc import ABC, abstractmethod
 from math import gcd
 from typing import Iterable
 
-from dp_wizard_templates.code_template import Template
-
 from dp_wizard import get_template_root, opendp_version, package_root
 from dp_wizard.types import ColumnIdentifier, Product
 from dp_wizard.utils.code_generators import (
     AnalysisPlan,
+    DefaultsTemplate,
     make_column_config_block,
     make_privacy_loss_block,
     make_privacy_unit_block,
 )
-from dp_wizard.utils.code_generators.analyses import histogram
 from dp_wizard.utils.dp_helper import confidence
 from dp_wizard.utils.shared.bins import make_cut_points
 
@@ -61,9 +59,9 @@ class AbstractGenerator(ABC):
 
     def _make_python_cell(self, block) -> str:
         """
-        Default to just pass through.
+        Default to just add padding.
         """
-        return block
+        return f"\n{block}\n"
 
     def _make_comment_cell(self, comment: str) -> str:
         return "".join(f"# {line}\n" for line in comment.splitlines())
@@ -83,17 +81,17 @@ class AbstractGenerator(ABC):
         plots_py = (package_root / "utils/shared/plots.py").read_text()
 
         code = (
-            Template(self._get_root_template(), template_root)
+            DefaultsTemplate(self._get_root_template(), template_root)
             .fill_expressions(
                 TITLE=str(self.analysis_plan),
                 DEPENDENCIES=f"'opendp[{extra}]=={opendp_version}' matplotlib",
             )
-            .fill_code_blocks(
-                IMPORTS_BLOCK=Template(imports_template).finish(),
+            .fill_blocks(
+                IMPORTS_BLOCK=DefaultsTemplate(imports_template).finish(),
                 UTILS_BLOCK=bins_py + plots_py,
-                **self._make_extra_blocks(),
+                **self._make_extra_blocks(),  # type: ignore
             )
-            .fill_comment_blocks(
+            .fill_blocks(
                 WINDOWS_COMMENT_BLOCK="""
 (If installing in the Windows CMD shell,
 use double-quotes instead of single-quotes below.)""",
@@ -137,25 +135,27 @@ are ignored because of errors, it will bias results.
             # and taking their product.
             dp.polars.Margin(
                 by=list(GROUPS.keys()),
-                invariant="keys",
                 max_length=MAX_ROWS,
                 max_groups=100,
             )
 
         def bin_template(GROUPS, BIN_NAME):
-            dp.polars.Margin(by=([BIN_NAME] + list(GROUPS.keys())), invariant="keys")
+            dp.polars.Margin(
+                by=([BIN_NAME] + list(GROUPS.keys())),
+                invariant="keys",  # Consider the bin values to be public information.
+            )
 
         margins = [
-            Template(basic_template)
-            .fill_expressions(OPENDP_V_VERSION=f"v{opendp_version}")
+            DefaultsTemplate(basic_template)
             .fill_values(GROUPS=groups, MAX_ROWS=max_rows)
             .finish()
-        ] + [
-            Template(bin_template)
-            .fill_values(GROUPS=groups, BIN_NAME=bin_name)
-            .finish()
-            for bin_name in bin_names
         ]
+        for bin_name in bin_names:
+            margins.append(
+                DefaultsTemplate(bin_template)
+                .fill_values(GROUPS=groups, BIN_NAME=bin_name)
+                .finish()
+            )
 
         margins_list = "[" + ", ".join(margins) + "\n    ]"
         return margins_list
@@ -172,7 +172,7 @@ are ignored because of errors, it will bias results.
                 upper_bound=col[0].upper_bound,
                 bin_count=col[0].bin_count,
             )
-            for name, col in self.analysis_plan.columns.items()
+            for name, col in self.analysis_plan.analysis_columns.items()
         }
 
     def _make_confidence_note(self):
@@ -184,13 +184,13 @@ are ignored because of errors, it will bias results.
                 f"confidence = {confidence} # {self._make_confidence_note()}"
             )
         ]
-        for column_name in self.analysis_plan.columns.keys():
+        for column_name in self.analysis_plan.analysis_columns.keys():
             to_return.append(self._make_query(column_name))
 
         return "\n".join(to_return)
 
     def _make_query(self, column_name):
-        plan = self.analysis_plan.columns[column_name]
+        plan = self.analysis_plan.analysis_columns[column_name]
         identifier = ColumnIdentifier(column_name)
         accuracy_name = f"{identifier}_accuracy"
         stats_name = f"{identifier}_stats"
@@ -221,7 +221,8 @@ are ignored because of errors, it will bias results.
 
     def _make_weights_expression(self):
         weights_dict = {
-            name: plans[0].weight for name, plans in self.analysis_plan.columns.items()
+            name: plans[0].weight
+            for name, plans in self.analysis_plan.analysis_columns.items()
         }
         weights_message = (
             "Allocate the privacy budget to your queries in this ratio:"
@@ -247,50 +248,42 @@ are ignored because of errors, it will bias results.
 
         bin_column_names = [
             ColumnIdentifier(name)
-            for name, plan in self.analysis_plan.columns.items()
+            for name, plan in self.analysis_plan.analysis_columns.items()
             if has_bins(get_statistic_by_name(plan[0].statistic_name))
         ]
+        all_groups_have_keys = all(
+            len(group_keys) > 0 for group_keys in self.analysis_plan.groups.values()
+        )
 
         privacy_unit_block = make_privacy_unit_block(
             contributions=self.analysis_plan.contributions,
             contributions_entity=self.analysis_plan.contributions_entity,
         )
         privacy_loss_block = make_privacy_loss_block(
-            pure=False,
+            pure=all_groups_have_keys,
             epsilon=self.analysis_plan.epsilon,
             max_rows=self.analysis_plan.max_rows,
         )
-
-        is_just_histograms = all(
-            plan_column[0].statistic_name == histogram.name
-            for plan_column in self.analysis_plan.columns.values()
-        )
-        margins_list = (
-            # Histograms don't need margins.
-            "[]"
-            if is_just_histograms
-            else self._make_margins_list(
-                bin_names=[f"{name}_bin" for name in bin_column_names],
-                groups=self.analysis_plan.groups,
-                max_rows=self.analysis_plan.max_rows,
-            )
+        margins_list = self._make_margins_list(
+            bin_names=[f"{name}_bin" for name in bin_column_names],
+            groups=self.analysis_plan.groups,
+            max_rows=self.analysis_plan.max_rows,
         )
         extra_columns = ", ".join(
             [
                 f"{ColumnIdentifier(name)}_bin_expr"
-                for name, plan in self.analysis_plan.columns.items()
+                for name, plan in self.analysis_plan.analysis_columns.items()
                 if has_bins(get_statistic_by_name(plan[0].statistic_name))
             ]
         )
         return (
-            Template("stats_context", template_root)
+            DefaultsTemplate("stats_context", template_root)
             .fill_expressions(
                 MARGINS_LIST=margins_list,
                 EXTRA_COLUMNS=extra_columns,
-                OPENDP_V_VERSION=f"v{opendp_version}",
                 WEIGHTS=self._make_weights_expression(),
             )
-            .fill_code_blocks(
+            .fill_blocks(
                 PRIVACY_UNIT_BLOCK=privacy_unit_block,
                 PRIVACY_LOSS_BLOCK=privacy_loss_block,
             )
@@ -306,15 +299,9 @@ are ignored because of errors, it will bias results.
             epsilon=self.analysis_plan.epsilon,
             max_rows=self.analysis_plan.max_rows,
         )
-        return (
-            Template("synth_context", template_root)
-            .fill_expressions(
-                OPENDP_V_VERSION=f"v{opendp_version}",
-            )
-            .fill_code_blocks(
-                PRIVACY_UNIT_BLOCK=privacy_unit_block,
-                PRIVACY_LOSS_BLOCK=privacy_loss_block,
-            )
+        return DefaultsTemplate("synth_context", template_root).fill_blocks(
+            PRIVACY_UNIT_BLOCK=privacy_unit_block,
+            PRIVACY_LOSS_BLOCK=privacy_loss_block,
         )
 
     def _make_synth_query(self):
@@ -347,7 +334,7 @@ are ignored because of errors, it will bias results.
             if possible_rows < max_rows:
                 contingency_table_melted = contingency_table.project_melted(COLUMNS)
                 if possible_rows < 200:
-                    plot_bars(contingency_table_melted, "Contingency Table")
+                    plot_bars(contingency_table_melted, title="Contingency Table")
             else:
                 contingency_table_melted = (
                     f"Contingency table could be more than {max_rows} rows; "
@@ -390,16 +377,13 @@ are ignored because of errors, it will bias results.
                     )
                 }
             )
-            for (k, v) in self.analysis_plan.columns.items()
+            for (k, v) in self.analysis_plan.analysis_columns.items()
         }
         keys = self.analysis_plan.groups
         return (
-            Template(template)
-            .fill_expressions(
-                OPENDP_V_VERSION=f"v{opendp_version}",
-            )
+            DefaultsTemplate(template)
             .fill_values(
-                COLUMNS=list(self.analysis_plan.columns.keys())
+                COLUMNS=list(self.analysis_plan.analysis_columns.keys())
                 + list(self.analysis_plan.groups.keys()),
                 CUTS=cuts,
                 KEYS=keys,
