@@ -87,6 +87,7 @@ def get_file_paths() -> list[Path]:
             or path.name.startswith(".coverage")
             or path.name
             in [
+                "build",
                 "docs",
                 ".git",
                 ".DS_Store",

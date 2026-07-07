@@ -54,6 +54,7 @@ strict = [
 [tool.isort]
 profile = "black"
 skip_glob = [".venv*/*"]
+known_first_party = ["dp_wizard"]
 
 
 [project.optional-dependencies]
