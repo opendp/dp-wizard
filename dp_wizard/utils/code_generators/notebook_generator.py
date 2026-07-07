@@ -1,4 +1,6 @@
-from dp_wizard import package_root
+from pathlib import Path
+
+from dp_wizard import config_root, package_root
 from dp_wizard.types import ColumnIdentifier, Product
 from dp_wizard.utils.code_generators.abstract_generator import (
     AbstractGenerator,
@@ -21,6 +23,32 @@ class NotebookGenerator(AbstractGenerator):
     def _make_synth_context(self):
         return self._fill_partial_context(self._make_partial_synth_context())
 
+    def _make_convert_to_csv_block(self) -> str | None:
+        if (path := self.analysis_plan.path) is None:
+            return ""  # pragma: no cover
+        if path.endswith(".csv"):
+            # Already CSV! No conversion needed.
+            return ""
+
+        def template(UTIL_BLOCK, convert_to_csv, PATH):
+            UTIL_BLOCK  # type: ignore
+
+            # Convert the provided file:
+            from pathlib import Path
+
+            convert_to_csv(Path(PATH))
+
+        return (
+            DefaultsTemplate(template)
+            .fill_blocks(
+                UTIL_BLOCK=(Path(package_root) / "utils/shared/convert.py").read_text(),
+            )
+            .fill_values(
+                PATH=self.analysis_plan.get_absolute_orig_path(),
+            )
+            .finish()
+        )
+
     def _fill_partial_context(self, partial_context):
         placeholder_csv_content = ",".join(self.analysis_plan.analysis_columns)
         return (
@@ -29,12 +57,13 @@ class NotebookGenerator(AbstractGenerator):
             )
             .fill_blocks(
                 OPTIONAL_CSV_BLOCK=(
-                    "# Write to placeholder CSV so the notebook can still execute:\n"
+                    "# Write to placeholder .csv so the notebook can still execute:\n"
                     "from pathlib import Path\n"
                     f"Path('{PLACEHOLDER_CSV_NAME}').write_text('{placeholder_csv_content}')\n"
-                    if self.analysis_plan.csv_path == PLACEHOLDER_CSV_NAME
+                    if self.analysis_plan.path == PLACEHOLDER_CSV_NAME
                     else ""
-                )
+                ),
+                OPTIONAL_CONVERT_TO_CSV_BLOCK=self._make_convert_to_csv_block(),
             )
             .finish()
         )
@@ -86,25 +115,18 @@ class NotebookGenerator(AbstractGenerator):
                 )
             case _:  # pragma: no cover
                 raise ValueError(self.analysis_plan.product)
-        target_path = package_root / ".local-sessions"
 
         return (
             DefaultsTemplate(f"{self._get_synth_or_stats()}_reports", root)
             .fill_expressions(
                 OUTPUTS=outputs_expression,
-                COLUMNS={
-                    k: v[0]._asdict()
-                    for k, v in self.analysis_plan.analysis_columns.items()
-                },
+                when=self.analysis_plan.product == Product.STATISTICS,
             )
             .fill_values(
-                CSV_PATH=self.analysis_plan.get_absolute_csv_path(),
-                EPSILON=self.analysis_plan.epsilon,
-                TXT_REPORT_PATH=str(target_path / "report.txt"),
-                CSV_REPORT_PATH=str(target_path / "report.csv"),
+                CSV_REPORT_PATH=str(config_root / "report.csv"),
             )
             .fill_values(
-                CONTINGENCY_TABLE_PATH=str(target_path / "contingency.csv"),
+                CONTINGENCY_TABLE_PATH=str(config_root / "contingency.csv"),
                 when=self.analysis_plan.product == Product.SYNTHETIC_DATA,
             )
             .finish()

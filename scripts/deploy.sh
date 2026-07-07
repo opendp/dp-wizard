@@ -1,11 +1,11 @@
 #!/bin/bash
 
+set -euo pipefail
+
 die() {
   printf '%s\n' "$*" >&2
   exit 1
 }
-
-set -euo pipefail
 
 echo "Check git..."
 

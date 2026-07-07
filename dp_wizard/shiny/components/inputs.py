@@ -32,10 +32,10 @@ def log_slider(
     opacity: 0;
 }}
 {target} .irs-line {{
-    /* Warn about high or low values. */
+    /* Warn about high values. */
     top: 29px;
     height: 7px;
-    background: linear-gradient(to right, red, lightgrey, lightgrey, red);
+    background: linear-gradient(to right, lightgrey, lightgrey, lightgrey, red);
     border: 0.9px solid #8D959E; /* To match bootstrap. */
 }}
 {target} .irs-handle {{

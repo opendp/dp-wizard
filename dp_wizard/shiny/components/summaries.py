@@ -6,7 +6,7 @@ from dp_wizard.shiny.components.icons import (
     data_source_icon,
     groups_icon,
     product_icon,
-    unit_of_privacy_icon,
+    unit_of_protection_icon,
 )
 from dp_wizard.types import AppState
 
@@ -15,25 +15,23 @@ _css = "display: block; padding: 0 1em 1em 1em;"
 
 def dataset_summary(state: AppState):  # pragma: no cover
     sources = []
-    if state.private_csv_path():
-        sources.append("Private CSV")
-    if state.public_csv_path():
-        sources.append("Public CSV")
-    if state.in_cloud:
-        sources.append("Field List")
+    if state.private_path():
+        sources.append("Private Data")
+    if state.public_path():
+        sources.append("Public Data")
 
     contributions = state.contributions()
     entity = state.contributions_entity()
     s = "s" if contributions > 1 else ""
-    unit_of_privacy = f"{contributions} row{s} / {entity}"
+    unit_of_protection = f"{contributions} row{s} / {entity}"
 
     product = state.product()
 
     return tags.small(
         data_source_icon,
         f"Data Source: {', '.join(sources)}; ",
-        unit_of_privacy_icon,
-        f"Unit of Privacy: {unit_of_privacy}; ",
+        unit_of_protection_icon,
+        f"Unit of Protection: {unit_of_protection}; ",
         product_icon,
         f"Product: {product}.",
         style=_css,

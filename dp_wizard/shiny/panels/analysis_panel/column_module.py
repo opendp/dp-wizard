@@ -18,11 +18,10 @@ from dp_wizard.shiny.components.outputs import (
 )
 from dp_wizard.types import ColumnName, Product, StatisticName, Weight
 from dp_wizard.utils.code_generators import make_column_config_block
-from dp_wizard.utils.code_generators.analyses import (
+from dp_wizard.utils.code_generators.analyses import (  # median,
     get_statistic_by_name,
     histogram,
     mean,
-    median,
 )
 from dp_wizard.utils.constraints import MAX_BOUND, MIN_BOUND
 from dp_wizard.utils.dp_helper import confidence, make_accuracy_histogram
@@ -132,7 +131,7 @@ def column_server(
     input: Inputs,
     output: Outputs,
     session: Session,
-    public_csv_path: str,
+    public_path: str,
     product: reactive.Value[Product],
     name: ColumnName,
     contributions: reactive.Value[int],
@@ -147,7 +146,7 @@ def column_server(
     bin_counts: reactive.Value[dict[ColumnName, int]],
     weights: reactive.Value[dict[ColumnName, Weight]],
     is_tutorial_mode: reactive.Value[bool],
-    is_sample_csv: bool,
+    is_demo_csv: bool,
     is_single_column: bool,
 ):  # pragma: no cover
     @reactive.effect
@@ -213,8 +212,8 @@ def column_server(
         # but I'd guess this is dominated by the DP operations,
         # so not worth optimizing.
         lf = (
-            pl.scan_csv(public_csv_path, ignore_errors=True)
-            if public_csv_path
+            pl.scan_csv(public_path, ignore_errors=True)
+            if public_path
             else pl.LazyFrame(
                 mock_data({name: ColumnDef(lower_x, upper_x)}, row_count=row_count)
             )
@@ -248,7 +247,9 @@ def column_server(
                     ui.input_select(
                         "statistic_name",
                         only_for_screenreader("Type of statistic"),
-                        [histogram.name, mean.name, median.name],
+                        [histogram.name, mean.name],
+                        # TODO: Restore "median.name" when upstream bug is resolved:
+                        # https://github.com/opendp/opendp/issues/2640
                         width=label_width,
                         selected=statistic_name,
                     ),
@@ -283,7 +284,7 @@ def column_server(
                     we should try never to look directly at the data,
                     not even to set bounds! This can be hard.
                     """,
-                    is_sample_csv,
+                    is_demo_csv,
                     """
                     Given what we know _a priori_ about grading scales,
                     you could limit `grade` to values between 0 and 100.
@@ -469,7 +470,7 @@ def column_server(
     def histogram_preview_plot():
         title_name = (
             name
-            if public_csv_path
+            if public_path
             else f"Simulated {name} (assuming a normal distribution)"
         )
 
