@@ -17,7 +17,7 @@ dependencies = [
     "dp-wizard-templates==0.8.2",
     "faicons",
     "matplotlib",
-    "opendp[mbi]==0.14.1",
+    "opendp[mbi]==0.14.2",
     "shiny",
 ]
 
@@ -118,7 +118,7 @@ pins = [
     "nest-asyncio==1.6.0",
     "networkx==3.4.2",
     "numpy==2.2.4",
-    "opendp[mbi]==0.14.1",
+    "opendp[mbi]==0.14.2",
     "opt-einsum==3.4.0",
     "optax==0.2.5",
     "orjson==3.10.16",

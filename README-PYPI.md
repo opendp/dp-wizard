@@ -6,6 +6,13 @@ DP Wizard makes it easier to get started with differential privacy,
 the addition of calibrated noise to aggregate statistics to protect the privacy of individuals.
 DP Wizard demonstrates how to calculate DP statistics or create a synthetic dataset from the data you provide.
 
+> [!NOTE]
+> This software is part of the [**OpenDP Commons**](https://opendp.org/tools/#opendp-commons). As such, the OpenDP Executive Committee commits to:
+> - Releasing this software under an [OSI approved license](https://opensource.org/licenses), in this case the [MIT License](https://github.com/opendp/opendp/blob/main/LICENSE).
+> - Ensuring there are at least two maintainers, in this case Eddie de Leon (`eddiestudies`) and Chuck McCallum (`mccalluc`), who will respond within a week to new issues and PRs.
+> - Only making changes on `main` through PRs, and getting approval on these PRs before merging.
+> - On an annual basis, recruiting one or more volunteers (not active contributors) who will conduct a health-check, focused not on the details of the algorithms but on the health of this repo as open source software. Their report will be linked here. The next (and first) health-check is scheduled for September 2026.
+
 If differential privacy is new to you, [these slides](https://opendp.github.io/dp-wizard/) provide some background, and explain how DP Wizard works.
 
 Options for running DP Wizard:

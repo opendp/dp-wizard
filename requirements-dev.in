@@ -6,7 +6,7 @@ flit
 flake8
 flake8-bugbear
 pre-commit
-tomlkit
+tomlkit==0.13.2  # Newer versions cause ValueError; Will be dropping in favor of uv.
 isort
 black
 autoflake8
