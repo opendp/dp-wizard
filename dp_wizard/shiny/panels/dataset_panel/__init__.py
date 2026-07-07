@@ -2,6 +2,8 @@ import re
 from pathlib import Path
 from typing import Optional
 
+from shiny import Inputs, Outputs, Session, reactive, render, ui
+
 from dp_wizard.shiny.components.icons import (
     data_source_icon,
     product_icon,
@@ -16,19 +18,17 @@ from dp_wizard.shiny.components.outputs import (
     tutorial_box,
     warning_md_box,
 )
+from dp_wizard.shiny.panels.dataset_panel import data_source
 from dp_wizard.types import AppState, Product
 from dp_wizard.utils.argparse_helpers import (
     PRIVATE_TEXT,
     PUBLIC_PRIVATE_TEXT,
     PUBLIC_TEXT,
 )
+from dp_wizard.utils.code_generators import make_privacy_unit_block
 from dp_wizard.utils.constraints import MAX_CONTRIBUTIONS, MAX_ROW_COUNT, MIN_ROW_COUNT
 from dp_wizard.utils.csv_helper import CsvInfo, get_csv_names_mismatch
 from dp_wizard.utils.shared.convert import convert_to_csv
-from shiny import Inputs, Outputs, Session, reactive, render, ui
-
-from dp_wizard.shiny.panels.dataset_panel import data_source
-from dp_wizard.utils.code_generators import make_privacy_unit_block
 
 dataset_panel_id = "dataset_panel"
 OTHER = "Other"

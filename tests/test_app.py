@@ -1,15 +1,15 @@
 from pathlib import Path
 
 import pytest
-from dp_wizard.shiny.panels.results_panel.download_options import (
-    DownloadOption,
-    _download_options,
-)
 from playwright.sync_api import Page, expect
 from shiny.pytest import create_app_fixture
 from shiny.run import ShinyAppProc
 
 from dp_wizard import package_root
+from dp_wizard.shiny.panels.results_panel.download_options import (
+    DownloadOption,
+    _download_options,
+)
 
 bp = "BREAKPOINT()".lower()
 if bp in Path(__file__).read_text():
