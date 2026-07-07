@@ -69,7 +69,7 @@ def test_python_min_version(rel_path):
 
 @pytest.mark.parametrize(
     "script_path",
-    (package_root.parent / "scripts").glob("*.sh"),
+    list((package_root.parent / "scripts").glob("*.sh")),
     ids=lambda path: path.name,
 )
 def test_bash_scripts(script_path: Path):

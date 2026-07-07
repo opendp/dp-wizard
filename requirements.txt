@@ -182,7 +182,7 @@ numpy==2.2.4
     #   randomgen
     #   scikit-learn
     #   scipy
-opendp[mbi]==0.14.1
+opendp[mbi]==0.14.2
     # via -r requirements.in
 opt-einsum==3.4.0
     # via jax

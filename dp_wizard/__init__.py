@@ -6,7 +6,7 @@ from pathlib import Path
 
 package_root = Path(__file__).parent
 __version__ = (package_root / "VERSION").read_text().strip()
-opendp_version = "0.14.1"
+opendp_version = "0.14.2"
 registry_url = "https://registry.opendp.org/deployments-registry/"
 config_root = Path(os.path.expanduser("~")) / ".dp-wizard"
 if not config_root.exists():
