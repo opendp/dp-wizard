@@ -6,14 +6,21 @@ DP Wizard makes it easier to get started with differential privacy,
 the addition of calibrated noise to aggregate statistics to protect the privacy of individuals.
 DP Wizard demonstrates how to calculate DP statistics or create a synthetic dataset from the data you provide.
 
+> [!NOTE]
+> This software is part of the [**OpenDP Commons**](https://opendp.org/tools/#opendp-commons). As such, the OpenDP Executive Committee commits to:
+> - Releasing this software under an [OSI approved license](https://opensource.org/licenses), in this case the [MIT License](https://github.com/opendp/opendp/blob/main/LICENSE).
+> - Ensuring there are at least two maintainers, in this case Eddie de Leon (`eddiestudies`) and Chuck McCallum (`mccalluc`), who will respond within a week to new issues and PRs.
+> - Only making changes on `main` through PRs, and getting approval on these PRs before merging.
+> - On an annual basis, recruiting one or more volunteers (not active contributors) who will conduct a health-check, focused not on the details of the algorithms but on the health of this repo as open source software. Their report will be linked here. The next (and first) health-check is scheduled for September 2026.
+
 If differential privacy is new to you, [these slides](https://opendp.github.io/dp-wizard/) provide some background, and explain how DP Wizard works.
 
 Options for running DP Wizard:
 
 - No install [online demo](https://mccalluc-dp-wizard.share.connect.posit.cloud/): Does not support data upload.
 - Install from [Docker](https://hub.docker.com/repository/docker/mccalluc/dp-wizard/general): `docker run -p 8000:8000 mccalluc/dp-wizard`
-- Install from [PyPI](https://pypi.org/project/dp-wizard/): `pip install 'dp-wizard[app]'; dp-wizard`
-- Install from [source](https://github.com/opendp/dp-wizard): See developer instructions.
+- Install from [PyPI](https://pypi.org/project/dp-wizard/): `pip install 'dp_wizard[pins]'; dp-wizard`
+- Install from [source](https://github.com/opendp/dp-wizard): See [developer instructions](https://github.com/opendp/dp-wizard/blob/main/README.md#development).
 
 See the [FAQ](https://github.com/opendp/dp-wizard/blob/main/dp_wizard/FAQ.md) for more information.
 
@@ -51,7 +58,7 @@ options:
   --no_browser  By default, a browser is started; Enable this for no browser.
   --reload      Enable to watch source directory and reload on changes.
 
-Unless you have set "--demo", you will specify a CSV inside the application.
+Unless you have set "--demo", you will specify a CSV or TSV inside the application.
 
 Provide a "Private Data" if you only have a private data set, and want to
 make a release from it: The preview visualizations will only use
@@ -61,7 +68,7 @@ read until the release.
 Provide a "Public Data" if you have a public data set, and are curious how
 DP can be applied: The preview visualizations will use your public data.
 
-Provide both if you have two CSVs with the same structure.
+Provide both if you have two CSVs or TSVs with the same structure.
 Perhaps the public data is older and no longer sensitive. Preview
 visualizations will be made with the public data, but the release will
 be made with private data.
@@ -69,7 +76,7 @@ be made with private data.
 
 ## Contributions
 
-There are several ways to contribute. First, if you find DP Wizard useful, please [let us know](mailto:info@opendp.org) and we'll spend more time on this project. If DP Wizard doesn't work for you, we also want to know that! Please [file an issue](https://github.com/opendp/dp-wizard/issues/new/choose) and we'll look into it.
+There are several ways to contribute. First, if you find DP Wizard useful, please [let us know](mailto:contact@opendp.org) and we'll spend more time on this project. If DP Wizard doesn't work for you, we also want to know that! Please [file an issue](https://github.com/opendp/dp-wizard/issues/new/choose) and we'll look into it.
 
 We also welcome PRs, but if you have an idea for a new feature, it may be helpful to get in touch before you begin, to make sure your idea is in line with our vision:
 - The DP Wizard codebase shouldn't actually contain any differential privacy algorithms. This project is a thin wrapper around the [OpenDP Library](https://github.com/opendp/opendp/), and that's where new algorithms should be added.
@@ -78,7 +85,7 @@ We also welcome PRs, but if you have an idea for a new feature, it may be helpfu
 
 With those caveats in mind,
 feel free to [file a feature request](https://github.com/opendp/dp-wizard/issues/new/choose),
-or [email us](mailto:info@opendp.org).
+or [email us](mailto:contact@opendp.org).
 
 
 ## Development
@@ -102,7 +109,7 @@ You can now install dependencies, and the application itself, and start a tutori
 $ pip install -r requirements-dev.txt
 $ pre-commit install
 $ playwright install
-$ pip install --editable .
+$ pip install --editable '.[pins]'
 $ dp-wizard --demo
 ```
 
@@ -146,15 +153,21 @@ PR conventions and the release process are covered in [README-TEAM.md](README-TE
 
 (See also the [CHANGELOG](CHANGELOG.md).)
 
+2026-03-11: [Presentation for GREI (Generalist Repository Ecosystem Initiative)](https://docs.google.com/presentation/d/1sFwcfp5GO5UOIHSER7tGwWrn9RMbWOlecLrukZ6W-cg/edit)
+
+2026-02-10: [Blog post for v0.8](https://opendp.org/2026/02/10/announcing-dp-wizard-v0-8/)
+
+2025-11-13: [Blog post for v0.6](https://opendp.org/2025/11/13/announcing-dp-wizard-v0-6/)
+
 2025-09-23: [Blog post for v0.5](https://opendp.org/2025/09/23/announcing-dp-wizard-v0-5/)
 
 2025-08-07: [DP Wizard Templates: Code templates and notebook generation](https://opendp.github.io/dp-wizard-templates/)
 
-2025-05-07: [Slides for 50 minute presentation at 2025 Harvard IT Summit](https://opendp.github.io/harvard-it-summit-2025)
+2025-05-07: [Presentation at 2025 Harvard IT Summit](https://opendp.github.io/harvard-it-summit-2025)
 
 2025-04-14: [Blog post for v0.3](https://opendp.org/2025/04/14/announcing-opendp-library-0-13-and-dp-wizard/)
 
-2025-04-11: [Slides for 5 minute mini-talk on v0.3.0 at ABSURD (Annual Boston Security Usability Research Day)](https://docs.google.com/presentation/d/1g1c5ksG9sN8A_qWW9nFmFFZ6dSCkUAmL6_cUahi3VPA/edit#slide=id.g34c5f4bdc6a_0_0)
+2025-04-11: [Mini-talk on v0.3.0 at ABSURD (Annual Boston Security Usability Research Day)](https://docs.google.com/presentation/d/1g1c5ksG9sN8A_qWW9nFmFFZ6dSCkUAmL6_cUahi3VPA/edit#slide=id.g34c5f4bdc6a_0_0)
 
 2024-12-13: [Blog post for initial release](https://opendp.org/blog/dp-wizard-easy-way-get-started-differential-privacy-and-opendp)
 

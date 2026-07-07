@@ -21,6 +21,14 @@ def make_cut_points(
 
     >>> make_cut_points(0, 10, 2)
     [0.0, 5.0, 10.0]
+    >>> make_cut_points(-1, 1, 4)
+    [-1.0, -0.5, 0.0, 0.5, 1.0]
+
+    Will return fewer points than requested if cut points
+    only differ in later decimal places.
+
+    >>> make_cut_points(1, 1.01, 4)
+    [1.0]
     """
     bin_width = (upper_bound - lower_bound) / bin_count
     # Duplicate values would cause an error in Polars.

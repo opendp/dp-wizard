@@ -20,7 +20,7 @@ from dp_wizard.utils.code_generators.analyses import histogram, mean, median
 from dp_wizard.utils.code_generators.notebook_generator import NotebookGenerator
 from dp_wizard.utils.code_generators.script_generator import ScriptGenerator
 
-python_paths = package_root.glob("**/*.py")
+python_paths = list(package_root.glob("**/*.py"))
 
 
 @pytest.mark.parametrize("python_path", python_paths, ids=lambda path: path.name)
@@ -87,7 +87,7 @@ def test_make_column_config_block_for_histogram():
             bin_count=10,
         ).strip()
         == f"""# See the OpenDP Library docs for more on making private histograms:
-# https://docs.opendp.org/en/v{opendp_version}/getting-started/examples/histograms.html
+# https://docs.opendp.org/en/v{opendp_version}/getting-started/tabular-data/grouping.html
 
 # Use the public information to make cut points for 'HW GRADE':
 hw_grade_cut_points = make_cut_points(
@@ -187,8 +187,8 @@ plans = [plan for i, plan in enumerate(plans_all_combos) if i % mod == 0]
 expected_urls = [
     "https://docs.opendp.org/",
     "https://github.com/opendp/dp-wizard",
-    "https://docs.opendp.org/en/v0.14.1/api/python/opendp.extras.mbi.html#opendp.extras.mbi.ContingencyTable.synthesize",
-    "https://docs.opendp.org/en/v0.14.1/api/python/opendp.extras.mbi.html#opendp.extras.mbi.ContingencyTable.project_melted",
+    "https://docs.opendp.org/en/v0.14.2/api/python/opendp.extras.mbi.html#opendp.extras.mbi.ContingencyTable.synthesize",
+    "https://docs.opendp.org/en/v0.14.2/api/python/opendp.extras.mbi.html#opendp.extras.mbi.ContingencyTable.project_melted",
 ]
 
 
