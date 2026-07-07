@@ -4,6 +4,7 @@ print(
     f"assuming {contributions} contributions per individual"
 )
 
+groups = GROUP_NAMES
 if groups:
     print(f"(grouped by {'/'.join(groups)})")
 
