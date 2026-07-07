@@ -1,6 +1,7 @@
 import re
 import subprocess
 from pathlib import Path
+from stat import S_IXUSR as user_exec_mask
 
 import pytest
 
@@ -63,7 +64,17 @@ def test_python_min_version(rel_path):
     assert "3.10" in text
     if "README" in rel_path:
         # Make sure we haven't upgraded one reference by mistake.
-        assert not re.search(r"3.1[^0]", text)
+        assert not re.search(r"3\.1[^0]", text)
+
+
+@pytest.mark.parametrize(
+    "script_path",
+    list((package_root.parent / "scripts").glob("*.sh")),
+    ids=lambda path: path.name,
+)
+def test_bash_scripts(script_path: Path):
+    assert script_path.stat().st_mode & user_exec_mask  # type: ignore
+    assert script_path.read_text().startswith("#!/bin/bash\n\nset -euo pipefail")
 
 
 def get_file_paths() -> list[Path]:
@@ -73,6 +84,7 @@ def get_file_paths() -> list[Path]:
         for path in package_root.parent.iterdir()
         if not (
             path.match("*venv*")
+            or path.name.startswith(".coverage")
             or path.name
             in [
                 "build",

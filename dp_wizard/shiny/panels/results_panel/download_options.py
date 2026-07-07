@@ -39,7 +39,7 @@ _download_options = {
             ".ipynb",
             "book",
             """
-            An executed Jupyter notebook which references your CSV
+            An executed Jupyter notebook which references your data source
             and shows the result of a differentially private analysis.
             """,
         ),
@@ -106,7 +106,7 @@ _download_options = {
             "sliders",
             """
             Analysis configuration as YAML. Except for the contents of
-            your input CSV, this captures all the details of your analysis.
+            your data source, this captures all the details of your analysis.
             """,
             requires_release=False,
         ),
