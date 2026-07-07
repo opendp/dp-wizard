@@ -146,8 +146,7 @@ def analysis_server(
     state: AppState,
 ):  # pragma: no cover
     # CLI options:
-    is_sample_csv = state.is_sample_csv
-    # in_cloud = state.in_cloud
+    is_demo_csv = state.is_demo_csv
 
     # Reactive bools:
     is_tutorial_mode = state.is_tutorial_mode
@@ -156,10 +155,10 @@ def analysis_server(
     is_released = state.is_released
 
     # Dataset choices:
-    # initial_private_csv_path = state.initial_private_csv_path
-    # private_csv_path = state.private_csv_path
-    # initial_public_csv_path = state.initial_private_csv_path
-    public_csv_path = state.public_csv_path
+    # initial_private_path = state.initial_private_path
+    # private_path = state.private_path
+    # initial_public_path = state.initial_private_path
+    public_path = state.public_path
     contributions = state.contributions
     contributions_entity = state.contributions_entity
     max_rows = state.max_rows
@@ -279,9 +278,9 @@ def analysis_server(
             DP Wizard only supports the analysis of numeric data,
             but string values can be used for grouping.
             """,
-            is_sample_csv,
+            is_demo_csv,
             """
-            With `sample.csv` you can select `class_year_str`
+            With `demo.csv` you can select `class_year_str`
             to group results by class year.
             """,
             responsive=False,
@@ -298,10 +297,10 @@ def analysis_server(
             each column has a smaller share of the privacy budget,
             and the accuracy of results will decline.
             """,
-            is_sample_csv,
+            is_demo_csv,
             """
             Not all columns need analysis.
-            With `sample.csv`, you could just select `grade`.
+            With `demo.csv`, you could just select `grade`.
             """,
             responsive=False,
         )
@@ -315,7 +314,7 @@ def analysis_server(
                 Unlike the other settings on this page,
                 this estimate **is not used** in the final calculation.
 
-                Until you make a release, your CSV will not be
+                Until you make a release, your data source will not be
                 read except to determine the names of columns,
                 but the number of rows does have implications for the
                 accuracy which DP can provide with a given privacy budget.
@@ -323,17 +322,17 @@ def analysis_server(
                 responsive=False,
             ),
         )
-        if public_csv_path():
-            row_count_str = str(get_csv_row_count(Path(public_csv_path())))
+        if public_path():
+            row_count_str = str(get_csv_row_count(Path(public_path())))
             return [
                 ui.markdown(
                     f"""
-                    Because you've provided a public CSV,
+                    Because you've provided public data,
                     it *will be read* to generate previews.
 
                     The confidence interval depends on the number of rows.
-                    Your public CSV has {row_count_str} rows,
-                    but if you believe the private CSV will be
+                    Your public data has {row_count_str} rows,
+                    but if you believe the private data will be
                     much larger or smaller, please update.
                     """
                 ),
@@ -371,7 +370,7 @@ def analysis_server(
             column_server(
                 column_id,
                 product=product,
-                public_csv_path=public_csv_path(),
+                public_path=public_path(),
                 name=column_ids_to_names[column_id],
                 contributions=contributions,
                 contributions_entity=contributions_entity,
@@ -385,7 +384,7 @@ def analysis_server(
                 bin_counts=bin_counts,
                 weights=weights,
                 is_tutorial_mode=is_tutorial_mode,
-                is_sample_csv=is_sample_csv,
+                is_demo_csv=is_demo_csv,
                 is_single_column=len(column_ids) == 1,
             )
         return [column_ui(column_id) for column_id in column_ids]
@@ -428,10 +427,10 @@ def analysis_server(
                 """
             )
         if e_value <= 0.2:
-            optional_warning = warning_md_box(
+            optional_warning = ui.markdown(
                 """
-                The use of a value this small is discouraged
-                because added noise will lower the accuracy of results.
+                Small values will better preserve privacy,
+                but as a consequence, statistics will be less accurate.
                 """
             )
         return [

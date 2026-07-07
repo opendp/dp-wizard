@@ -388,7 +388,7 @@ Divide into four teams, and on one computer either:
 <tr>
 <td>
 
-**[`pip install 'dp_wizard[app]'`](https://pypi.org/project/dp_wizard/)<br>`dp_wizard --cloud`<br><small>(requires Python>=3.10)</small>**
+**[`pip install 'dp_wizard[pins]'`](https://pypi.org/project/dp_wizard/)<br>`dp_wizard --demo`<br><small>(requires Python>=3.10)</small>**
 
 </td>
 <td>
@@ -415,8 +415,8 @@ Then:
 <td>
 
 - 1: On "Select Dataset":
-    - Under "CSV Columns", enter `grade`.
-    - Leave the "Unit of Privacy" at 1.
+    - A demo CSV is already provided.
+    - Leave the "Unit of Protection" at 10.
     - Click "Define Analysis".
 
 </td>
@@ -476,7 +476,7 @@ This is a demonstration of how the OpenDP Library can be used to create a differ
 First install and import the required dependencies:
 
 ```
-%pip install 'opendp[polars]==0.14.1' matplotlib
+%pip install 'opendp[polars]==0.14.2' matplotlib
 ```
 ```
 >>> import matplotlib.pyplot as plt
@@ -516,7 +516,7 @@ Based on the input you provided, for each column we'll create a Polars expressio
 
 ```
 >>> # See the OpenDP Library docs for more on making private histograms:
->>> # https://docs.opendp.org/en/v0.14.1/getting-started/examples/histograms.html
+>>> # https://docs.opendp.org/en/v0.14.2/getting-started/tabular-data/grouping.html
 >>>
 >>> # Use the public information to make cut points for 'grade':
 >>> grade_cut_points = make_cut_points(
@@ -545,11 +545,11 @@ Next, we'll define our Context. This is where we set the privacy budget, and set
 >>>
 >>> privacy_loss = dp.loss_of(
 ...     epsilon=1.0,
-...     delta=1 / max(1e7, 100000),
+...     delta=0,  # or 1 / max(1e7, 100000),
 ... )
 >>>
 >>> # See the OpenDP Library docs for more on Context:
->>> # https://docs.opendp.org/en/v0.14.1/api/user-guide/context/index.html#context
+>>> # https://docs.opendp.org/en/v0.14.2/api/user-guide/context/index.html#context
 >>> stats_context = dp.Context.compositor(
 ...     data=pl.scan_csv(
 ...         "docs/fill-in-correct-path.csv",
@@ -561,7 +561,18 @@ Next, we'll define our Context. This is where we set the privacy budget, and set
 ...     split_by_weights=[  # With only one query, the entire budget is allocated to that query:
 ...         1,  # grade
 ...     ],
-...     margins=[],
+...     margins=[
+...         dp.polars.Margin(
+...             by=list({}.keys()),
+...             invariant="keys",
+...             max_length=100000,
+...             max_groups=100,
+...         ),
+...         dp.polars.Margin(
+...             by=(["grade_bin"] + list({}.keys())),
+...             invariant="keys",  # Consider the bin values to be public information.
+...         ),
+...     ],
 ... )
 
 ```
@@ -616,10 +627,10 @@ If we try to run more queries at this point, it will error. Once the privacy bud
 
 ### With OpenDP
 
-- ([Quantiles](https://docs.opendp.org/en/v0.14.1/api/user-guide/transformations/aggregation-quantile.html))
-- ([PCA](https://docs.opendp.org/en/v0.14.1/getting-started/statistical-modeling/pca.html))
-- ([RAPPOR](https://docs.opendp.org/en/v0.14.1/api/python/opendp.measurements.html#opendp.measurements.make_randomized_response_bitvec))
-- ([Linear regression](https://docs.opendp.org/en/v0.14.1/api/python/opendp.extras.sklearn.linear_model.html))
+- ([Quantiles](https://docs.opendp.org/en/v0.14.2/api/user-guide/transformations/aggregation-quantile.html))
+- ([PCA](https://docs.opendp.org/en/v0.14.2/getting-started/statistical-modeling/pca.html))
+- ([RAPPOR](https://docs.opendp.org/en/v0.14.2/api/python/opendp.measurements.html#opendp.measurements.make_randomized_response_bitvec))
+- ([Linear regression](https://docs.opendp.org/en/v0.14.2/api/python/opendp.extras.sklearn.linear_model.html))
 
 </td>
 <td>
@@ -659,7 +670,7 @@ Multi-step workflows: Spend a little of your budget first, just to understand di
 
 Text or image data can't just be dropped into DP.
 
-Even if it can be reduced to a feature vector, can you define a unit of privacy?
+Even if it can be reduced to a feature vector, can you define a unit of protection?
 
 ### Requires trust
 
@@ -684,7 +695,7 @@ Other PETs protect privacy during computation, but don't preserve privacy in res
 
 |   | OpenDP | DP Wizard |
 |---|--------|-----------|
-|email:| info@opendp.org | cmccallum@g.harvard.edu |
+|email:| contact@opendp.org | cmccallum@g.harvard.edu |
 |docs:| [docs.opendp.org](https://docs.opendp.org) | [opendp.github.io/dp-wizard](https://opendp.github.io/dp-wizard) |
 |source:| [github.com/opendp/opendp](https://github.com/opendp/opendp/) | [github.com/opendp/dp-wizard](https://github.com/opendp/dp-wizard/) |
 

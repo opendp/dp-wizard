@@ -53,7 +53,9 @@ def main():  # pragma: no cover
             new_changelog_lines.append("")
         new_changelog_lines.append(line)
 
-    (package_root.parent / "CHANGELOG.md").write_text("\n".join(new_changelog_lines))
+    (package_root.parent / "CHANGELOG.md").write_text(
+        "\n".join(new_changelog_lines) + "\n"  # Precommit requires trailing "\n".
+    )
 
 
 if __name__ == "__main__":  # pragma: no cover

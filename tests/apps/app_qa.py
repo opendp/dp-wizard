@@ -1,10 +1,9 @@
 from dp_wizard.shiny import make_app
-from dp_wizard.utils.argparse_helpers import CLIInfo
+from dp_wizard.utils.argparse_helpers import cli_info_defaults
 
 app = make_app(
-    CLIInfo(
-        is_sample_csv=True,
-        is_cloud_mode=False,
+    cli_info_defaults(
+        is_demo_csv=True,
         is_qa_mode=True,
     )
 )

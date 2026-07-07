@@ -12,6 +12,7 @@ class ScriptGenerator(AbstractGenerator):
         # The output is passed through black, so we don't need to overdo this regex.
         # Strip jupytext light annotations.
         py = re.sub(r"# \+.*", "", py)
+        # Note that "# - ..." could be a markdown list item in a comment.
         py = re.sub(r"# -$", "", py, flags=re.MULTILINE)
         return py
 
@@ -25,16 +26,16 @@ class ScriptGenerator(AbstractGenerator):
     def _make_stats_context(self):
         return (
             self._make_partial_stats_context()
-            .fill_expressions(CSV_PATH="csv_path")
-            .fill_blocks(OPTIONAL_CSV_BLOCK="")
+            .fill_expressions(CSV_PATH="path")
+            .fill_blocks(OPTIONAL_CSV_BLOCK="", OPTIONAL_CONVERT_TO_CSV_BLOCK="")
             .finish()
         )
 
     def _make_synth_context(self):
         return (
             self._make_partial_synth_context()
-            .fill_expressions(CSV_PATH="csv_path")
-            .fill_blocks(OPTIONAL_CSV_BLOCK="")
+            .fill_expressions(CSV_PATH="path")
+            .fill_blocks(OPTIONAL_CSV_BLOCK="", OPTIONAL_CONVERT_TO_CSV_BLOCK="")
             .finish()
         )
 

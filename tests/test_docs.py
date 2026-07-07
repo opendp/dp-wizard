@@ -36,7 +36,7 @@ def test_doc_examples_up_to_date():
 
     doc_code = "\n".join(strip_doc_test(block) for block in doc_test_blocks)
 
-    csv_path = "docs/fill-in-correct-path.csv"
+    path = "docs/fill-in-correct-path.csv"
     plan = AnalysisPlan(
         product=Product.STATISTICS,
         groups={},
@@ -54,7 +54,7 @@ def test_doc_examples_up_to_date():
         schema_columns={ColumnName("grade"): pl.Float32()},
         contributions=1,
         contributions_entity="Individual",
-        csv_path=csv_path,
+        path=path,
         epsilon=1.0,
         max_rows=100_000,
     )
@@ -65,7 +65,7 @@ def test_doc_examples_up_to_date():
         for line in doc_code.splitlines()
         # csv_path is absolute and it will have local information
         # that shouldn't be checked in.
-        if line not in expected_code and csv_path not in line
+        if line not in expected_code and path not in line
     ]
     assert (
         not unexpected_lines

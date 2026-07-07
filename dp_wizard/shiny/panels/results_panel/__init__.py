@@ -1,3 +1,4 @@
+import html
 import json
 import re
 from pathlib import Path
@@ -7,7 +8,7 @@ from tempfile import TemporaryDirectory
 from dp_wizard_templates.converters import convert_from_notebook, convert_to_notebook
 from shiny import Inputs, Outputs, Session, reactive, render, types, ui
 
-from dp_wizard import package_root
+from dp_wizard import config_root
 from dp_wizard.shiny.components.icons import (
     download_code_icon,
     download_config_icon,
@@ -34,7 +35,6 @@ from dp_wizard.utils.code_generators.notebook_generator import (
 from dp_wizard.utils.code_generators.script_generator import ScriptGenerator
 
 _wait_message = "Please wait."
-_target_path = package_root / ".local-sessions"
 
 
 def _strip_ansi(e) -> str:
@@ -96,8 +96,7 @@ def results_server(
     state: AppState,
 ):  # pragma: no cover
     # CLI options:
-    # is_sample_csv = state.is_sample_csv
-    in_cloud = state.in_cloud
+    # is_demo_csv = state.is_demo_csv
     qa_mode = state.qa_mode
 
     # Reactive bools:
@@ -107,10 +106,10 @@ def results_server(
     is_released = state.is_released
 
     # Dataset choices:
-    # initial_private_csv_path = state.initial_private_csv_path
-    private_csv_path = state.private_csv_path
-    # initial_public_csv_path = state.initial_private_csv_path
-    public_csv_path = state.public_csv_path
+    # initial_private_path = state.initial_private_path
+    private_path = state.private_path
+    # initial_public_path = state.initial_private_path
+    public_path = state.public_path
     contributions = state.contributions
     contributions_entity = state.contributions_entity
     max_rows = state.max_rows
@@ -202,71 +201,52 @@ def results_server(
             "Notebook",
             "HTML",
             "Script",
-            "Report",
             "Table",
+            "Configuration",
         ]
         if product() == Product.SYNTHETIC_DATA:
             downloads.append("Contingency Table")
-        return (
-            ui.markdown(
-                """
-                When [installed and run
-                locally](https://pypi.org/project/dp_wizard/),
-                there are more download options because DP Wizard
-                can read your private CSV and release differentially
-                private statistics.
-                """
-            )
-            if in_cloud
-            else [
-                tutorial_box(
-                    is_tutorial_mode(),
-                    """
-                    Now you can download a notebook for your analysis.
-                    The Jupyter notebook could be used locally or on Colab,
-                    but the HTML version can be viewed in the brower.
-                    """,
-                    responsive=False,
-                ),
-                download_button(
-                    "Package",
-                    primary=True,
-                    disabled=disabled,
-                ),
-                ui.br(),
-                "Contains:",
-                ui.tags.ul(
-                    *[
-                        ui.tags.li(
-                            download_link(
-                                download,
-                                disabled=disabled,
-                            )
-                        )
-                        for download in downloads
-                    ]
-                ),
-            ]
-        )
-
-    @render.ui
-    def download_code_ui():
-        disabled = not weights()
         return [
             tutorial_box(
                 is_tutorial_mode(),
-                (
-                    """
-                    In the cloud, DP Wizard only provides unexecuted
-                    notebooks and scripts.
-                    """
-                    if in_cloud
-                    else """
-                    Alternatively, you can download a script or unexecuted
-                    notebook that demonstrates the steps of your analysis,
-                    but does not contain any data or analysis results.
-                    """
-                ),
+                """
+                Now you can download a notebook for your analysis.
+                The Jupyter notebook could be used locally or on Colab,
+                but the HTML version can be viewed in the brower.
+                """,
+                responsive=False,
+            ),
+            download_button(
+                "Package",
+                primary=True,
+                disabled=disabled,
+            ),
+            ui.br(),
+            "Contains:",
+            ui.tags.ul(
+                *[
+                    ui.tags.li(
+                        download_link(
+                            download,
+                            disabled=disabled,
+                        )
+                    )
+                    for download in downloads
+                ]
+            ),
+        ]
+
+    @render.ui
+    def download_code_ui():
+        disabled = not is_analysis_defined()
+        return [
+            tutorial_box(
+                is_tutorial_mode(),
+                """
+                Alternatively, you can download a script or unexecuted
+                notebook that demonstrates the steps of your analysis,
+                but does not contain any data or analysis results.
+                """,
                 responsive=False,
             ),
             download_button("Notebook (unexecuted)", disabled=disabled),
@@ -303,8 +283,8 @@ def results_server(
         }
         return AnalysisPlan(
             product=product(),
-            # Prefer private CSV, if available:
-            csv_path=private_csv_path() or public_csv_path() or PLACEHOLDER_CSV_NAME,
+            # Prefer private data, if available:
+            path=private_path() or public_path() or PLACEHOLDER_CSV_NAME,
             contributions=contributions(),
             contributions_entity=contributions_entity(),
             epsilon=epsilon(),
@@ -338,8 +318,8 @@ def results_server(
             # been written out as files, but it's safer to start
             # from a clean slate, rather than rely on the side effect
             # of a reactive.calc.
-            (zip_root_dir / f"{stem}.txt").write_text(report_txt())
             (zip_root_dir / f"{stem}.csv").write_text(table_csv())
+            (zip_root_dir / f"{stem}.yaml").write_text(configuration_yaml())
 
             base_name = f"{tmp_dir}/{stem}"
             ext = "zip"
@@ -369,7 +349,11 @@ def results_server(
             return "raise Exception('qa_mode!')"
         return NotebookGenerator(
             analysis_plan(),
-            input.custom_download_note(),
+            # The custom download note is inserted as a comment,
+            # and jupytext copies it verbatim to a markdown cell,
+            # and nbconvert does not sanitize MD before converting to HTML.
+            # Sanitizing HTML would be more complicated, and potentially lossy.
+            html.escape(input.custom_download_note(), quote=False),
         ).make_py()
 
     @reactive.calc
@@ -382,7 +366,7 @@ def results_server(
     @reactive.calc
     def notebook_dict():
         # This creates the notebook, and evaluates it,
-        # and drops reports in the local-sessions dir.
+        # and drops reports in the config_root.
         # Could be slow!
         # Luckily, reactive calcs are lazy.
 
@@ -415,19 +399,18 @@ def results_server(
         return convert_from_notebook(notebook_dict_unexecuted())
 
     @reactive.calc
-    def report_txt():
-        notebook_dict()  # Evaluate just for the side effect of creating report.
-        return (_target_path / "report.txt").read_text()
-
-    @reactive.calc
     def table_csv():
         notebook_dict()  # Evaluate just for the side effect of creating report.
-        return (_target_path / "report.csv").read_text()
+        return (config_root / "report.csv").read_text()
 
     @reactive.calc
     def contingency_table_csv():
         notebook_dict()  # Evaluate just for the side effect of creating report.
-        return (_target_path / "contingency.csv").read_text()
+        return (config_root / "contingency.csv").read_text()
+
+    @reactive.calc
+    def configuration_yaml():
+        return analysis_plan().serialize()
 
     ######################
     #
@@ -452,6 +435,7 @@ def results_server(
             "html": "text/html",
             "csv": "text/csv",
             "txt": "text/plain",
+            "yaml": "application/yaml",
         }.get(last_ext)
         if mime is None:
             raise Exception(f"No MIME type for {ext}")
@@ -505,9 +489,9 @@ def results_server(
     async def download_html_unexecuted_button():
         yield _make_download_or_modal_error(notebook_html_unexecuted)
 
-    @download(".txt")
-    async def download_report_link():
-        yield _make_download_or_modal_error(report_txt)
+    @download(".yaml")
+    async def download_configuration_link():
+        yield _make_download_or_modal_error(configuration_yaml)
 
     @download(".csv")
     async def download_table_link():

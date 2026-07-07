@@ -14,59 +14,86 @@ from dp_wizard.utils.csv_helper import (
     get_csv_row_count,
 )
 
+csv_fixtures = [
+    # No error! and type inference:
+    (b"str,int\nX,1", "str,int", "int", None, False),
+    #
+    # NO WARNING (but might be better if there were...)
+    #
+    # more column headers than values below:
+    (b"A,B,C,D\n1,2\n3,4", "A,B,C,D", "A,B", None, False),
+    # fewer column headers than values below:
+    (b"A,B\n1,2,3,4\n5,6,7,8", "A,B", "A,B", None, False),
+    # totally empty:
+    (b"", "", "", None, False),
+    #
+    # WARNINGS
+    #
+    # skip empty column header:
+    (b",int\nX,1", "int", "int", "Only one column detected", False),
+    # if a header is a number, might be missing header row:
+    (b"A,1\nB,2", "A,1", "1", "Numeric column name", False),
+    # padded values:
+    (
+        b" str , int \n X , 1 ",
+        " str , int ",
+        "",
+        "Column name is padded",
+        False,
+    ),
+    # actually pipe-delim:
+    (b"str|int\nX|1", "str|int", "", "Only one column detected", False),
+    # no numbers:
+    (b"A,B,C\na,b,c", "A,B,C", "", "No numeric columns detected", False),
+    # duplicate header gets suffix from polars:
+    (
+        b"dup,dup\nX,1",
+        "dup,dup_duplicated_0",
+        "dup_duplicated_0",
+        "Column name modified",
+        False,
+    ),
+    #
+    # ERRORS
+    #
+    # empty header row:
+    (b",\nX,1", "", "", "No column names detected", True),
+]
+
 
 @pytest.mark.parametrize(
-    "csv_text,all,numeric,message_substring,is_error",
-    [
-        # No error! and type inference:
-        (b"str,int\nX,1", "str,int", "int", None, False),
-        #
-        # NO WARNING (but might be better if there were...)
-        #
-        # more column headers than values below:
-        (b"A,B,C,D\n1,2\n3,4", "A,B,C,D", "A,B", None, False),
-        # fewer column headers than values below:
-        (b"A,B\n1,2,3,4\n5,6,7,8", "A,B", "A,B", None, False),
-        # totally empty:
-        (b"", "", "", None, False),
-        #
-        # WARNINGS
-        #
-        # skip empty column header:
-        (b",int\nX,1", "int", "int", "Only one column detected", False),
-        # if a header is a number, might be missing header row:
-        (b"A,1\nB,2", "A,1", "1", "Numeric column name", False),
-        # padded values:
-        (b" str , int \n X , 1 ", " str , int ", "", "Column name is padded", False),
-        # actually pipe-delim:
-        (b"str|int\nX|1", "str|int", "", "Only one column detected", False),
-        # no numbers:
-        (b"A,B,C\na,b,c", "A,B,C", "", "No numeric columns detected", False),
-        # duplicate header gets suffix from polars:
+    "suffix,content_bytes,all,numeric,message_substring,is_error",
+    [(".csv", *fix) for fix in csv_fixtures]
+    + [(".tsv", fix[0].replace(b",", b"\t"), *(fix[1:])) for fix in csv_fixtures]
+    + [
+        # Bad extension:
+        (".txt", b"", "", "", "Expected .tsv or .tab, not", True),
+        # CSV actually TSV:
+        (".csv", b"str\tint\nX\t1", "", "", "Tab in column name", True),
+        # CSV actually binary:
+        (".csv", b"\xff\xff\n\x00\x00", "", "", "Bad column name", True),
+        # TSV actually CSV:
+        # TODO: Currently a warning, not an error.
         (
-            b"dup,dup\nX,1",
-            "dup,dup_duplicated_0",
-            "dup_duplicated_0",
-            "Column name modified",
+            ".tsv",
+            b"str,int\nX,1",
+            "str,int",
+            "",
+            "Only one column detected: 'str,int'",
             False,
         ),
-        #
-        # ERRORS
-        #
-        # empty header row:
-        (b",\nX,1", "", "", "No column names detected", True),
-        # actually TSV:
-        (b"str\tint\nX\t1", "", "", "Tab in column name", True),
-        # actually binary:
-        (b"\xff\xff\n\x00\x00", "", "", "Bad column name", True),
+        # TSV actually binary:
+        (".tsv", b"\xff\xff\n\x00\x00", "", "", "invalid start byte", True),
     ],
 )
-def test_csv_info(csv_text, all, numeric, message_substring, is_error):
+def test_csv_info(suffix, content_bytes, all, numeric, message_substring, is_error):
     assert message_substring != ""  # programmer error!
-    with tempfile.NamedTemporaryFile(mode="wb") as tmp:
-        tmp.write(csv_text)
-        tmp.flush()
-        csv_info = CsvInfo(Path(tmp.file.name))
+    with tempfile.TemporaryDirectory() as dir:
+        path = Path(dir) / f"fake{suffix}"
+        path.write_bytes(content_bytes)
+        # CsvInfo may write a new, converted, CSV in the directory,
+        # so we need a temp dir, and not just a temp file.
+        csv_info = CsvInfo(path)
         assert all == ",".join(csv_info.get_all_column_names())
         assert numeric == ",".join(csv_info.get_numeric_column_names())
         if message_substring is None:
@@ -74,6 +101,13 @@ def test_csv_info(csv_text, all, numeric, message_substring, is_error):
         else:
             assert message_substring in "; ".join(csv_info.get_messages())
         assert csv_info.get_is_error() == is_error
+
+
+def test_empty_csv_info():
+    csv_info = CsvInfo(None)
+    assert csv_info.get_all_column_names() == []
+    assert csv_info.get_numeric_column_names() == []
+    assert csv_info.get_messages() == []
 
 
 @pytest.mark.parametrize(  # type: ignore
@@ -96,7 +130,7 @@ def test_datatype_inference(value_datatype):  # type: ignore
     value: str = value_datatype.pop(0)  # type: ignore
     datatype = value_datatype.pop(0)  # type: ignore
     column_name = "col"
-    with NamedTemporaryFile("w") as tmp:
+    with NamedTemporaryFile(mode="w", suffix=".csv") as tmp:
         tmp.write(f"{column_name}\n{value}")
         tmp.flush()
         csv_info = CsvInfo(Path(tmp.name))

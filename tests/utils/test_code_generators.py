@@ -20,13 +20,11 @@ from dp_wizard.utils.code_generators.analyses import histogram, mean, median
 from dp_wizard.utils.code_generators.notebook_generator import NotebookGenerator
 from dp_wizard.utils.code_generators.script_generator import ScriptGenerator
 
-python_paths = package_root.glob("**/*.py")
+python_paths = list(package_root.glob("**/*.py"))
 
 
 @pytest.mark.parametrize("python_path", python_paths, ids=lambda path: path.name)
 def test_no_unparameterized_docs_urls(python_path: Path):
-    if ".local-sessions" in str(python_path):
-        return  # pragma: no cover
     python_code = python_path.read_text()
     assert not re.search(r"docs\.opendp\.org/en/[^O{]", python_code)
 
@@ -89,7 +87,7 @@ def test_make_column_config_block_for_histogram():
             bin_count=10,
         ).strip()
         == f"""# See the OpenDP Library docs for more on making private histograms:
-# https://docs.opendp.org/en/v{opendp_version}/getting-started/examples/histograms.html
+# https://docs.opendp.org/en/v{opendp_version}/getting-started/tabular-data/grouping.html
 
 # Use the public information to make cut points for 'HW GRADE':
 hw_grade_cut_points = make_cut_points(
@@ -108,7 +106,7 @@ hw_grade_bin_expr = (
     )
 
 
-abc_csv_path = str((package_root.parent / "tests/fixtures/abc.csv").absolute())
+abc_path = str((package_root.parent / "tests/fixtures/abc.csv").absolute())
 
 
 def number_lines(text: str):
@@ -153,7 +151,7 @@ plans_all_combos = [
         schema_columns={k: pl.Float32() for k in columns.keys()},
         contributions=contributions,
         contributions_entity="Family",
-        csv_path=abc_csv_path,
+        path=abc_path,
         epsilon=1,
         max_rows=100_000,
     )
@@ -189,9 +187,9 @@ plans = [plan for i, plan in enumerate(plans_all_combos) if i % mod == 0]
 expected_urls = [
     "https://docs.opendp.org/",
     "https://github.com/opendp/dp-wizard",
-    "https://docs.opendp.org/en/v0.14.1/api/python/opendp.extras.polars.html#opendp.extras.polars.LazyFrameQuery.summarize",
-    "https://docs.opendp.org/en/v0.14.1/api/python/opendp.extras.mbi.html#opendp.extras.mbi.ContingencyTable.synthesize",
-    "https://docs.opendp.org/en/v0.14.1/api/python/opendp.extras.mbi.html#opendp.extras.mbi.ContingencyTable.project_melted",
+    "https://docs.opendp.org/en/v0.14.2/api/python/opendp.extras.polars.html#opendp.extras.polars.LazyFrameQuery.summarize",
+    "https://docs.opendp.org/en/v0.14.2/api/python/opendp.extras.mbi.html#opendp.extras.mbi.ContingencyTable.synthesize",
+    "https://docs.opendp.org/en/v0.14.2/api/python/opendp.extras.mbi.html#opendp.extras.mbi.ContingencyTable.project_melted",
 ]
 
 
@@ -258,17 +256,49 @@ def test_make_script(plan):
         fp.flush()
 
         result = subprocess.run(
-            ["python", fp.name, "--csv", abc_csv_path], capture_output=True
+            ["python", fp.name, "--csv", abc_path], capture_output=True
         )
         assert result.returncode == 0
 
 
+def test_tsv():
+    path = Path(__file__).parent.parent / "fixtures/fake.tsv"
+
+    plan = AnalysisPlan(
+        product=Product.STATISTICS,
+        groups={},
+        analysis_columns={
+            ColumnName("class year"): [
+                AnalysisPlanColumn(
+                    mean.name,
+                    lower_bound=0,
+                    upper_bound=100000,
+                    bin_count=0,
+                    weight=1,
+                )
+            ]
+        },
+        schema_columns={
+            ColumnName("class year"): pl.Int32(),
+        },
+        contributions=1,
+        contributions_entity="Family",
+        path=str(path),
+        epsilon=1,
+        max_rows=1000,
+    )
+    notebook_py = NotebookGenerator(plan, "Note goes here!").make_py()
+    print(number_lines(notebook_py))
+    globals = {}
+    exec(notebook_py, globals)
+
+
 def test_pums():
-    csv_path = Path(__file__).parent.parent / "fixtures/pums_1000.csv"
+    path = Path(__file__).parent.parent / "fixtures/pums_1000.csv"
 
     # The "income" field looks like integers in the first rows,
     # but farther down there are floats.
-    assert CsvInfo(csv_path).get_schema()[ColumnName("income")] == pl.Float64
+    assert CsvInfo(path).get_schema()[ColumnName("income")] == pl.Float64
 
     plan = AnalysisPlan(
         product=Product.STATISTICS,
@@ -289,7 +319,7 @@ def test_pums():
         },
         contributions=1,
         contributions_entity="Family",
-        csv_path=str(csv_path),
+        path=str(path),
         epsilon=1,
         max_rows=1000,
     )
@@ -297,3 +327,9 @@ def test_pums():
     print(number_lines(notebook_py))
     globals = {}
     exec(notebook_py, globals)
+
+
+@pytest.mark.parametrize("plan", plans, ids=id_for_plan)
+def test_analysis_plan_yaml(plan):
+    # TODO: Support round trips.
+    plan.serialize()
