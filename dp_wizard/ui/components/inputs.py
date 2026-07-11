@@ -2,7 +2,7 @@ from math import log10
 
 from shiny import ui
 
-from dp_wizard.shiny.components.outputs import only_for_screenreader
+from dp_wizard.ui.components.outputs import only_for_screenreader
 
 
 def log_slider(

@@ -5,10 +5,11 @@ from htmltools.tags import details, summary
 from shiny import Inputs, Outputs, Session, module, reactive, render, ui
 from shiny.types import SilentException
 
-from dp_wizard.shiny.components.icons import (
+from dp_wizard.types import ColumnName, Product, StatisticName, Weight
+from dp_wizard.ui.components.icons import (
     column_config_icon,
 )
-from dp_wizard.shiny.components.outputs import (
+from dp_wizard.ui.components.outputs import (
     code_sample,
     col_widths,
     hide_if,
@@ -16,7 +17,6 @@ from dp_wizard.shiny.components.outputs import (
     tutorial_box,
     warning_md_box,
 )
-from dp_wizard.types import ColumnName, Product, StatisticName, Weight
 from dp_wizard.utils.code_generators import make_column_config_block
 from dp_wizard.utils.code_generators.analyses import (  # median,
     get_statistic_by_name,

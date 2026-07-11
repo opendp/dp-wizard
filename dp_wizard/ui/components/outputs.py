@@ -3,7 +3,7 @@ import re
 from htmltools.tags import details, script, small, summary
 from shiny import ui
 
-from dp_wizard.shiny.components.icons import next_tab_icon, tutorial_icon
+from dp_wizard.ui.components.icons import next_tab_icon, tutorial_icon
 
 col_widths = {
     # Controls stay roughly a constant width;

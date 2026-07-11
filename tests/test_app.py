@@ -6,7 +6,7 @@ from shiny.pytest import create_app_fixture
 from shiny.run import ShinyAppProc
 
 from dp_wizard import package_root
-from dp_wizard.shiny.panels.results_panel.download_options import (
+from dp_wizard.ui.panels.results_panel.download_options import (
     DownloadOption,
     _download_options,
 )

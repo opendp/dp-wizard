@@ -5,24 +5,24 @@ from typing import Iterable
 from shiny import Inputs, Outputs, Session, reactive, render, ui
 
 from dp_wizard import registry_url
-from dp_wizard.shiny.components.icons import (
+from dp_wizard.types import AppState, ColumnId
+from dp_wizard.ui.components.icons import (
     budget_icon,
     columns_icon,
     groups_icon,
     simulation_icon,
 )
-from dp_wizard.shiny.components.inputs import log_slider
-from dp_wizard.shiny.components.outputs import (
+from dp_wizard.ui.components.inputs import log_slider
+from dp_wizard.ui.components.outputs import (
     code_sample,
     hide_if,
     nav_button,
     tutorial_box,
     warning_md_box,
 )
-from dp_wizard.shiny.components.summaries import dataset_summary
-from dp_wizard.shiny.panels.analysis_panel.column_module import column_server, column_ui
-from dp_wizard.shiny.panels.analysis_panel.group_module import group_server, group_ui
-from dp_wizard.types import AppState, ColumnId
+from dp_wizard.ui.components.summaries import dataset_summary
+from dp_wizard.ui.panels.analysis_panel.column_module import column_server, column_ui
+from dp_wizard.ui.panels.analysis_panel.group_module import group_server, group_ui
 from dp_wizard.utils.code_generators import make_privacy_loss_block
 from dp_wizard.utils.constraints import MAX_EPSILON, MIN_EPSILON
 from dp_wizard.utils.csv_helper import (
