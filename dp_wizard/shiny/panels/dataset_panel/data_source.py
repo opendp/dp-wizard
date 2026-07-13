@@ -37,13 +37,12 @@ def context_code_sample():  # pragma: no cover
 
 
 def csv_message_ui(
-    csv_column_mismatch_calc,
+    csv_column_mismatch,
     csv_messages: list[str],
 ):  # pragma: no cover
     messages = [f"- {m}" for m in csv_messages]
-    mismatch = csv_column_mismatch_calc()
-    if mismatch:
-        just_public, just_private = mismatch
+    if csv_column_mismatch:
+        just_public, just_private = csv_column_mismatch
         if just_public:
             messages.append(
                 "- Only the public data contains: "

@@ -114,6 +114,37 @@ class CsvInfo:
             # Only used as initial value
             return
 
+        if not path.exists():
+            self._errors.append(f"No such file: {path}")
+            return
+
+        try:
+            size = path.stat().st_size
+        except Exception:  # pragma: no cover
+            self._errors.append(f"Could not stat file: {path}")
+            return
+        M = 1024 * 1024
+        error_m = 100
+        warn_m = 10
+        assert error_m > warn_m
+        if size > error_m * M:
+            self._errors.append(
+                re.sub(
+                    r"\s+",
+                    " ",
+                    f"""
+                    DP Wizard is an interactive tool, and {size // M}M
+                    would be too slow. DP Wizard is limited to {error_m}M,
+                    although the OpenDP Library itself doesn't have such a limit.
+                    """,
+                ).strip()
+            )
+            return
+        if size > warn_m * M:
+            self._warnings.append(
+                f"Files larger than {warn_m}M may be slow to process."
+            )
+
         try:
             if path.suffix != ".csv":
                 path = convert_to_csv(path)
