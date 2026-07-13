@@ -124,9 +124,8 @@ def make_sparse_file(path: Path, size_in_mb: int):
     reported size: 1048576
     blocks used: 0
     """
-    f = path.open("ab")
-    f.truncate(size_in_mb * 1024 * 1024)
-    f.close()
+    with path.open("ab") as f:
+        f.truncate(size_in_mb * 1024 * 1024)
 
 
 @pytest.mark.parametrize(
