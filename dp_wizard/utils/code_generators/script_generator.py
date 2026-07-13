@@ -10,7 +10,10 @@ class ScriptGenerator(AbstractGenerator):
 
     def _clean_up_py(self, py: str):
         # The output is passed through black, so we don't need to overdo this regex.
-        py = re.sub(r"# [+-]$", "", py, flags=re.MULTILINE)
+        # Strip jupytext light annotations.
+        py = re.sub(r"# \+.*", "", py)
+        # Note that "# - ..." could be a markdown list item in a comment.
+        py = re.sub(r"# -$", "", py, flags=re.MULTILINE)
         return py
 
     def _make_columns(self):
