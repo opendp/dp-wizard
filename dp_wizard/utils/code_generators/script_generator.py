@@ -4,17 +4,37 @@ from dp_wizard.types import Product
 from dp_wizard.utils.code_generators.abstract_generator import AbstractGenerator
 
 
+def _remove_jupytext(py: str):
+    """
+    Remove jupytext light annotations that are only used for notebook generation.
+
+    >>> py_src = '''
+    ... # + tags=["this is removed"]
+    ... # Comment stays
+    ... Code stays
+    ... # -
+    ... # - Line above is removed, but this could be a list item.
+    ... '''.strip()
+    >>> print(_remove_jupytext(py_src))
+    <BLANKLINE>
+    # Comment stays
+    Code stays
+    <BLANKLINE>
+    # - Line above is removed, but this could be a list item.
+    """
+    # The output is passed through black,
+    # so don't worry about formatting of output.
+    py = re.sub(r"# \+.*", "", py)
+    py = re.sub(r"# -$", "", py, flags=re.MULTILINE)
+    return py
+
+
 class ScriptGenerator(AbstractGenerator):
     def _get_notebook_or_script(self):
         return "script"
 
     def _clean_up_py(self, py: str):
-        # The output is passed through black, so we don't need to overdo this regex.
-        # Strip jupytext light annotations.
-        py = re.sub(r"# \+.*", "", py)
-        # Note that "# - ..." could be a markdown list item in a comment.
-        py = re.sub(r"# -$", "", py, flags=re.MULTILINE)
-        return py
+        return _remove_jupytext(py)
 
     def _make_columns(self):
         column_config_dict = self._make_column_config_dict()
