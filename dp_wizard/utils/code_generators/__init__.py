@@ -15,10 +15,10 @@ from dp_wizard.types import ColumnName, Product, StatisticName
 
 class DefaultsTemplate(Template):
     def finish(self, reformat=False):
-        self.fill_expressions(
-            OPENDP_V_VERSION=f"v{opendp_version}",
-            optional=True,
-        )
+        # self.fill_expressions(
+        #     ...,
+        #     optional=True,
+        # )
         return super().finish(reformat)
 
 
@@ -248,7 +248,7 @@ def make_privacy_loss_block(pure: bool, epsilon: float, max_rows: int):
                 epsilon=EPSILON,
                 # Not necessary in this case,
                 # but other analyses require a very small "delta" value.
-                # https://docs.opendp.org/en/OPENDP_V_VERSION/getting-started/tabular-data/grouping.html#Stable-Keys
+                # https://docs.opendp.org/en/stable/getting-started/tabular-data/grouping.html#Stable-Keys
                 delta=0,  # or 1 / max(1e7, MAX_ROWS),
             )
 
@@ -263,7 +263,7 @@ def make_privacy_loss_block(pure: bool, epsilon: float, max_rows: int):
                 # that data may be released in the clear. Delta should always be small,
                 # but if the dataset is particularly large,
                 # delta should be at least as small as 1/(row count).
-                # https://docs.opendp.org/en/OPENDP_V_VERSION/getting-started/tabular-data/grouping.html#Stable-Keys
+                # https://docs.opendp.org/en/stable/getting-started/tabular-data/grouping.html#Stable-Keys
                 delta=1 / max(1e7, MAX_ROWS),
             )
 

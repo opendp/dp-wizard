@@ -36,7 +36,7 @@ def make_query(code_gen, identifier, accuracy_name, stats_name):
         # + [markdown] tags=["tutorial"]
         # We can summarize the statistic to get the accuracy.
         # More on [`summarize()` in the OpenDP
-        # docs](https://docs.opendp.org/en/OPENDP_V_VERSION/api/python/opendp.extras.polars.html#opendp.extras.polars.LazyFrameQuery.summarize).
+        # docs](https://docs.opendp.org/en/stable/api/python/opendp.extras.polars.html#opendp.extras.polars.LazyFrameQuery.summarize).
         # -
 
         # + tags=["tutorial"]

@@ -128,7 +128,7 @@ are ignored because of errors, it will bias results.
         def basic_template(GROUPS, MAX_ROWS):
             # "max_partition_length" should be a loose upper bound,
             # for example, the size of the total population being sampled.
-            # https://docs.opendp.org/en/OPENDP_V_VERSION/api/python/opendp.extras.polars.html#opendp.extras.polars.Margin.max_partition_length
+            # https://docs.opendp.org/en/stable/api/python/opendp.extras.polars.html#opendp.extras.polars.Margin.max_partition_length
             #
             # In production, "max_groups" should be set by considering
             # the number of possible values for each grouping column,
@@ -321,7 +321,7 @@ are ignored because of errors, it will bias results.
             contingency_table = synth_query.release()
 
             # Calling
-            # [`project_melted()`](https://docs.opendp.org/en/OPENDP_V_VERSION/api/python/opendp.extras.mbi.html#opendp.extras.mbi.ContingencyTable.project_melted)
+            # [`project_melted()`](https://docs.opendp.org/en/stable/api/python/opendp.extras.mbi.html#opendp.extras.mbi.ContingencyTable.project_melted)
             # returns a dataframe with one row per combination of values.
             # We'll first check the number of possible rows,
             # to make sure it's not too large:
@@ -345,7 +345,7 @@ are ignored because of errors, it will bias results.
 
             # Finally, a contingency table can also be used
             # to create synthetic data by calling
-            # [`synthesize()`](https://docs.opendp.org/en/OPENDP_V_VERSION/api/python/opendp.extras.mbi.html#opendp.extras.mbi.ContingencyTable.synthesize).
+            # [`synthesize()`](https://docs.opendp.org/en/stable/api/python/opendp.extras.mbi.html#opendp.extras.mbi.ContingencyTable.synthesize).
             # (There may be warnings from upstream libraries
             # which we can ignore for now.)
 
