@@ -388,21 +388,17 @@ Divide into four teams, and on one computer either:
 <tr>
 <td>
 
-**[`pip install 'dp_wizard[pins]'`](https://pypi.org/project/dp_wizard/)<br>`dp_wizard --demo`<br><small>(requires Python>=3.10)</small>**
+**[`pip install 'dp_wizard[pins]'`](https://pypi.org/project/dp_wizard/)`; dp_wizard --demo`**<br><small>(requires Python>=3.10)</small>
 
 </td>
 <td>
 
-**... or go to: [`tinyurl.com/dp-wizard`](https://mccalluc-dp-wizard.share.connect.posit.cloud/)**
-
-</td>
-</tr>
-</table>
+**`docker run -p 8000:8000 mccalluc/dp-wizard`**<br><small>(requires Docker)</small>
 
 </td>
 <td>
 
-![](images/dp-wizard-cloud-qr-code.png)
+... or go to: **[`tinyurl.com/dp-wizard`](https://mccalluc-dp-wizard.share.connect.posit.cloud/)**
 
 </td>
 </tr>
@@ -426,6 +422,10 @@ Then:
     - Select `grade` in "Columns".
     - Leave "Group By" empty.
     - Leave "Privacy Budget" at 1, and "Number of Rows" at 100.
+
+</td>
+<td>
+
 - 3: On the histogram:
     - Change the upper bound to 100.
 
