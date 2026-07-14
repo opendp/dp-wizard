@@ -92,17 +92,7 @@ def _privacy_card_ui():
     return (
         ui.card(
             ui.card_header(budget_icon, "Privacy Budget"),
-            ui.markdown(
-                f"""
-                What is your privacy budget for this release?
-                Many factors including the sensitivity of your data,
-                the frequency of DP releases,
-                and the regulatory landscape can be considered.
-                Consider how your budget compares to that of
-                <a href="{registry_url}"
-                    target="_blank">other projects</a>.
-                """
-            ),
+            ui.output_ui("privacy_budget_message_ui"),
             log_slider(
                 "log_epsilon_slider",
                 lower_bound=MIN_EPSILON,
@@ -303,6 +293,20 @@ def analysis_server(
                 Select additional string columns to include in the synthetic data.
                 """
         return ui.markdown(message)
+
+    @render.ui
+    def privacy_budget_message_ui():
+        return ui.markdown(
+            f"""
+            What is your privacy budget for this release?
+            Many factors including the sensitivity of your data,
+            the frequency of DP releases,
+            and the regulatory landscape can be considered.
+            Consider how your budget compares to that of
+            <a href="{registry_url}"
+                target="_blank">other projects</a>.
+            """
+        )
 
     @reactive.effect
     @reactive.event(input.columns_selectize)
