@@ -1,5 +1,32 @@
 # CHANGELOG
 
+## 0.10.0
+
+Highlights:
+
+- Error if CSV is too large for interactive application [#918](https://github.com/opendp/dp-wizard/pull/918)
+- Add `summarize()` stats in generated notebooks [#835](https://github.com/opendp/dp-wizard/pull/835)
+- `delta=0` bug fix [#923](https://github.com/opendp/dp-wizard/pull/923)
+
+Also includes:
+
+- Better message strings if generating synthetic data [#792](https://github.com/opendp/dp-wizard/pull/792)
+- Add OpenDP Commons note;  upgrade opendp [#936](https://github.com/opendp/dp-wizard/pull/936)
+- Change from `info@opendp.org` to `contact@opendp.org` [#933](https://github.com/opendp/dp-wizard/pull/933)
+- Dimplify review workflow [#927](https://github.com/opendp/dp-wizard/pull/927)
+- Add clabot [#928](https://github.com/opendp/dp-wizard/pull/928)
+- Use `delta=0` if groups are specified [#897](https://github.com/opendp/dp-wizard/pull/897)
+- Add more doctests for `make_cut_points` [#888](https://github.com/opendp/dp-wizard/pull/888)
+- Update UI since TSV is supported: "CSV or TSV" or "data source" [#915](https://github.com/opendp/dp-wizard/pull/915)
+- add "Tutorial" label in header [#917](https://github.com/opendp/dp-wizard/pull/917)
+- Fix misc dependabot issues [#807](https://github.com/opendp/dp-wizard/pull/807)
+- One pass is sufficient for screenshots; style check on scripts [#902](https://github.com/opendp/dp-wizard/pull/902)
+- Update list of presentations [#908](https://github.com/opendp/dp-wizard/pull/908)
+- See-developer-instructions link [#872](https://github.com/opendp/dp-wizard/pull/872)
+- Add UI note: "Private Data: demo.csv" [#909](https://github.com/opendp/dp-wizard/pull/909)
+- Add trailing "\n" to output of changelog.py [#916](https://github.com/opendp/dp-wizard/pull/916)
+- fix caps on "GitHub", and fix references to "[app]" [#852](https://github.com/opendp/dp-wizard/pull/852)
+
 ## 0.9.0
 
 Highlights:
