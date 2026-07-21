@@ -184,4 +184,4 @@ From OpenDP:
 From other groups:
 
 - [PrivSyn](https://github.com/vvv214/privsyn-tabular): Uses AIM for synthetic data generation.
-- [ARX](https://arx.deidentifier.org/): Differential privacy [is mentioned](https://arx.deidentifier.org/overview/privacy-criteria/), but only as one model among many.
+- [ARX](https://arx.deidentifier.org/): Differential privacy [is mentioned](https://arx.deidentifier.org/overview/privacy-criteria/) as one of the supported models.
