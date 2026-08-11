@@ -28,12 +28,13 @@ class Weight(Enum):
 class Product(Enum):
     STATISTICS = auto()
     SYNTHETIC_DATA = auto()
+    SUMMARY = auto()
 
     @classmethod
     def to_dict(cls) -> dict[str, str]:
         """
         >>> Product.to_dict()
-        {'1': 'DP Statistics', '2': 'DP Synthetic Data'}
+        {'1': 'DP Statistics', '2': 'DP Synthetic Data', '3': 'DP Summary'}
         """
         return {
             str(member.value): str(member) for (_, member) in cls.__members__.items()
