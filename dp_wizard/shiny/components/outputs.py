@@ -77,6 +77,11 @@ def tutorial_box(
             # Using columns here makes sure we line up with panels below.
             columns.append(None)
         return ui.layout_columns(*columns)
+    else:
+        return ui.tooltip(
+            tutorial_icon,
+            ui.markdown(markdown),
+        )
 
 
 def hide_if(condition: bool, el):  # pragma: no cover
