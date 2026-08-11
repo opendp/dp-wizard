@@ -516,7 +516,7 @@ Based on the input you provided, for each column we'll create a Polars expressio
 
 ```
 >>> # See the OpenDP Library docs for more on making private histograms:
->>> # https://docs.opendp.org/en/v0.14.2/getting-started/tabular-data/grouping.html
+>>> # https://docs.opendp.org/en/stable/getting-started/tabular-data/grouping.html
 >>>
 >>> # Use the public information to make cut points for 'grade':
 >>> grade_cut_points = make_cut_points(
@@ -549,7 +549,7 @@ Next, we'll define our Context. This is where we set the privacy budget, and set
 ... )
 >>>
 >>> # See the OpenDP Library docs for more on Context:
->>> # https://docs.opendp.org/en/v0.14.2/api/user-guide/context/index.html#context
+>>> # https://docs.opendp.org/en/stable/api/user-guide/context/index.html#context
 >>> stats_context = dp.Context.compositor(
 ...     data=pl.scan_csv(
 ...         "docs/fill-in-correct-path.csv",
@@ -627,10 +627,10 @@ If we try to run more queries at this point, it will error. Once the privacy bud
 
 ### With OpenDP
 
-- ([Quantiles](https://docs.opendp.org/en/v0.14.2/api/user-guide/transformations/aggregation-quantile.html))
-- ([PCA](https://docs.opendp.org/en/v0.14.2/getting-started/statistical-modeling/pca.html))
-- ([RAPPOR](https://docs.opendp.org/en/v0.14.2/api/python/opendp.measurements.html#opendp.measurements.make_randomized_response_bitvec))
-- ([Linear regression](https://docs.opendp.org/en/v0.14.2/api/python/opendp.extras.sklearn.linear_model.html))
+- ([Quantiles](https://docs.opendp.org/en/stable/api/user-guide/transformations/aggregation-quantile.html))
+- ([PCA](https://docs.opendp.org/en/stable/getting-started/statistical-modeling/pca.html))
+- ([RAPPOR](https://docs.opendp.org/en/stable/api/python/opendp.measurements.html#opendp.measurements.make_randomized_response_bitvec))
+- ([Linear regression](https://docs.opendp.org/en/stable/api/python/opendp.extras.sklearn.linear_model.html))
 
 </td>
 <td>
