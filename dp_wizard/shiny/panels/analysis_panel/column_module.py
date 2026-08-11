@@ -213,6 +213,9 @@ def column_server(
         # so not worth optimizing.
         lf = (
             pl.scan_csv(public_path, ignore_errors=True)
+            .collect()
+            .sample(n=row_count, with_replacement=True)
+            .lazy()
             if public_path
             else pl.LazyFrame(
                 mock_data({name: ColumnDef(lower_x, upper_x)}, row_count=row_count)
@@ -221,7 +224,7 @@ def column_server(
         return make_accuracy_histogram(
             lf=lf,
             column_name=name,
-            row_count=row_count,
+            max_length=row_count,
             lower_bound=lower_x,
             upper_bound=upper_x,
             bin_count=bin_count,
